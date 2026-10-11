@@ -821,6 +821,259 @@ HIGH_PAGE = (
     "MAIL high from EmeraldFox: verify done: jev-6con CONFIRMED (id 42481, 06:05Z)"
 )
 
+OLD_PAGE = "MAIL urgent from WindyLantern: old incident (id 42400, 05:40Z)"
+
+
+class DurableInboxDelivery(unittest.TestCase):
+    """Offline production-path delivery, isolated state and fake subprocess transport."""
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix="fiw-durable-inbox-"))
+        self.inbox = self.root / "AmberWillow" / "inbox"
+        self.state = self.root / "inbox-paged.json"
+        self.calls = []
+        self.clock = 0.0
+        self.fail_submit = False
+        self.stack = contextlib.ExitStack()
+        self.addCleanup(self.stack.close)
+        self.stack.enter_context(mock.patch.dict(os.environ, {
+            "JEV_WATCH_INBOX_ROOT": str(self.root),
+            "JEV_WATCH_INBOX_AGENT": "AmberWillow",
+            "JEV_WATCH_INBOX_STATE": str(self.state),
+        }))
+        self.stack.enter_context(mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False))
+        self.stack.enter_context(mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", 0.0))
+        self.stack.enter_context(mock.patch.object(fiw, "PAGE_BUSY_PENDING", []))
+        self.stack.enter_context(mock.patch.object(fiw, "PAGE_BUSY_UNCERTAIN", set(), create=True))
+        self.stack.enter_context(mock.patch.object(fiw.time, "monotonic", side_effect=lambda: self.clock))
+        self.stack.enter_context(mock.patch.object(fiw.time, "time", side_effect=lambda: STARTED + self.clock))
+        self.stack.enter_context(mock.patch.object(fiw.subprocess, "run", side_effect=self.transport))
+        mail(self.inbox, 42478, "urgent", "2026-09-25T05:57:22.203681Z",
+             "[URGENT] TypeSafe key emitted during MiniWoB env check")
+        mail(self.inbox, 42481, "high", "2026-09-25T06:05:10.000001Z",
+             "verify done: jev-6con CONFIRMED", sender="EmeraldFox")
+
+    def transport(self, argv, **_):
+        self.calls.append(argv)
+        if argv[:2] == ["tmux", "capture-pane"]:
+            return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
+        saved = json.loads(self.state.read_text())
+        inflight = [entry for entry in saved["pending"] if entry["status"] == "inflight"]
+        self.assertTrue(inflight)
+        self.assertTrue(all(entry["id"] not in saved["paged"] for entry in inflight))
+        if "C-q" in argv and self.fail_submit:
+            return subprocess.CompletedProcess(argv, 1, "", "offline planted submit failure")
+        return subprocess.CompletedProcess(argv, 0, "", "")
+
+    def round(self, module=fiw):
+        return module.inbox_round(self.inbox, self.state, module.page)
+
+    def test_confirmed_batch_advances_exact_ids_and_next_mail_progresses(self):
+        self.round()
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertEqual([item["id"] for item in saved["pending"]], [42478, 42481])
+        self.assertEqual([item["message"] for item in saved["pending"]], [URGENT_PAGE, HIGH_PAGE])
+        self.clock = 600.0
+        self.assertTrue(fiw.flush_pending_page1(now=self.clock))
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [42478, 42481])
+        self.assertEqual(saved["pending"], [])
+        mail(self.inbox, 42490, "high", "2026-09-25T06:30:00.0Z", "callback")
+        self.round()
+        saved = json.loads(self.state.read_text())
+        self.assertEqual([item["id"] for item in saved["pending"]], [42490])
+        self.clock = 1200.0
+        self.assertTrue(fiw.flush_pending_page1(now=self.clock))
+        self.assertEqual(json.loads(self.state.read_text())["paged"], [42478, 42481, 42490])
+        self.assertEqual([call[-1] for call in self.calls if "-l" in call],
+                         [URGENT_PAGE + "; " + HIGH_PAGE, "MAIL high from WindyLantern: callback (id 42490, 06:30Z)"])
+
+    def test_failed_flush_survives_restart_without_blind_retry(self):
+        self.round()
+        self.clock = 600.0
+        self.fail_submit = True
+        self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertEqual([item["id"] for item in saved["pending"]], [42478, 42481])
+        self.assertTrue(all(item["status"] == "uncertain" for item in saved["pending"]))
+        module_spec = importlib.util.spec_from_file_location("durable_restart", WATCH)
+        fresh = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(fresh)
+        before = len(self.calls)
+        self.clock = 1200.0
+        self.assertFalse(fresh.flush_pending_page1(now=self.clock))
+        self.assertIn("uncertain", self.round(fresh))
+        self.assertEqual(len(self.calls), before)
+        self.assertEqual(json.loads(self.state.read_text())["pending"], saved["pending"])
+
+    def test_same_owner_outage_backlog_is_bounded_without_age_discard(self):
+        self.state.write_text(json.dumps({"agent": "AmberWillow", "paged": [], "history": []}))
+        for msg_id in range(50000, 50126):
+            mail(self.inbox, msg_id, "urgent", "2026-09-24T05:40:00.0Z", "old incident")
+        self.round()
+        saved = json.loads(self.state.read_text())
+        self.assertLessEqual(len(saved["pending"]), fiw.INBOX_DISPATCH_LIMIT)
+        self.assertEqual(saved["history"], [])
+        self.assertEqual(saved["paged"], [])
+        self.clock = 600.0
+        self.assertTrue(fiw.flush_pending_page1(now=self.clock))
+        first_ids = json.loads(self.state.read_text())["paged"]
+        self.assertEqual(first_ids, list(range(50000, 50000 + fiw.INBOX_DISPATCH_LIMIT)))
+        self.round()
+        queued = json.loads(self.state.read_text())["pending"]
+        self.assertEqual([item["id"] for item in queued],
+                         list(range(50000 + fiw.INBOX_DISPATCH_LIMIT, 50000 + 2 * fiw.INBOX_DISPATCH_LIMIT)))
+
+    def test_immediate_idle_delivery_persists_intent_then_confirms_ids(self):
+        fiw.PAGE_BUSY_LAST_SENT = None
+        calls = []
+
+        def idle_transport(argv, **kwargs):
+            if argv[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(argv, 0, "idle prompt", "")
+            calls.append(argv)
+            saved = json.loads(self.state.read_text())
+            inflight = [entry for entry in saved["pending"] if entry["status"] == "inflight"]
+            self.assertEqual(len(inflight), 1)
+            self.assertEqual(argv[-1], inflight[0]["message"])
+            self.assertNotIn(inflight[0]["id"], saved["paged"])
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        with mock.patch.object(fiw.subprocess, "run", side_effect=idle_transport):
+            self.round()
+            self.round()
+        self.assertEqual([call[-1] for call in calls], [URGENT_PAGE, HIGH_PAGE])
+        self.assertEqual(json.loads(self.state.read_text())["paged"], [42478, 42481])
+
+    def test_restart_recovers_queued_batch_and_its_durable_cooldown(self):
+        self.round()
+        module_spec = importlib.util.spec_from_file_location("queued_restart", WATCH)
+        fresh = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(fresh)
+        self.clock = 599.0
+        before = len(self.calls)
+        self.assertFalse(fresh.flush_pending_page1(now=self.clock))
+        self.assertEqual(len(self.calls), before)
+        self.clock = 600.0
+        self.assertTrue(fresh.flush_pending_page1(now=self.clock))
+        self.assertEqual(json.loads(self.state.read_text())["paged"], [42478, 42481])
+
+    def test_capture_failure_keeps_queued_mail_safe_to_try_without_side_effect(self):
+        self.round()
+        self.clock = 600.0
+        with mock.patch.object(fiw, "_capture_pane1_screen", return_value=None):
+            self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertTrue(all(entry["status"] == "queued" for entry in saved["pending"]))
+        self.assertTrue(fiw.flush_pending_page1(now=self.clock))
+        self.assertEqual(json.loads(self.state.read_text())["pending"], [])
+
+    def test_crash_after_write_ahead_stays_uncertain_and_new_mail_can_progress(self):
+        self.round()
+        self.clock = 600.0
+        with mock.patch.object(fiw, "_send_busy_page1", side_effect=RuntimeError("offline crash")):
+            with self.assertRaisesRegex(RuntimeError, "offline crash"):
+                fiw.flush_pending_page1(now=self.clock)
+        saved = json.loads(self.state.read_text())
+        self.assertTrue(all(entry["status"] == "inflight" for entry in saved["pending"]))
+        before = len(self.calls)
+        self.assertIn("uncertain", self.round())
+        self.assertEqual(len(self.calls), before)
+        mail(self.inbox, 42490, "high", "2026-09-25T06:30:00.0Z", "next callback")
+        self.round()
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [42490])
+        self.assertEqual([entry["id"] for entry in saved["pending"]], [42478, 42481])
+        self.assertTrue(all(entry["status"] == "uncertain" for entry in saved["pending"]))
+        payload = [call[-1] for call in self.calls if "-l" in call][-1]
+        self.assertNotIn(URGENT_PAGE, payload)
+        self.assertNotIn(HIGH_PAGE, payload)
+
+    def test_owner_change_does_not_flush_previous_owner_payload(self):
+        self.round()
+        self.clock = 600.0
+        before = len(self.calls)
+        other_inbox = self.root / "HazySpring" / "inbox"
+        mail(other_inbox, 42500, "urgent", "2026-09-25T06:30:00.0Z", "other owner")
+        with mock.patch.dict(os.environ, {"JEV_WATCH_INBOX_AGENT": "HazySpring"}):
+            self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+            self.assertEqual(len(self.calls), before)
+            fiw.inbox_round(other_inbox, self.state, lambda message: True)
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [42500])
+        archived = saved["other_agents"]["AmberWillow"]
+        self.assertEqual([entry["id"] for entry in archived["pending"]], [42478, 42481])
+        self.assertEqual(archived["paged"], [])
+        self.assertTrue(fiw.flush_pending_page1(now=self.clock))
+        restored = json.loads(self.state.read_text())
+        self.assertEqual(restored["agent"], "AmberWillow")
+        self.assertEqual(restored["paged"], [42478, 42481])
+        self.assertEqual(restored["other_agents"]["HazySpring"]["paged"], [42500])
+
+    def test_native_admission_rechecks_owner_before_sending(self):
+        read_state = fiw._pane1_mail_state
+        def changed_owner():
+            os.environ["JEV_WATCH_INBOX_AGENT"] = "HazySpring"
+            return read_state()
+        with mock.patch.dict(os.environ), mock.patch.object(fiw, "_pane1_mail_state", side_effect=changed_owner):
+            self.round()
+        self.assertEqual(self.calls, [])
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertTrue(all(entry["status"] == "queued" for entry in saved["pending"]))
+        self.assertEqual(fiw.PAGE_BUSY_PENDING, [])
+
+    def test_dry_run_pending_flush_never_calls_transport(self):
+        self.round()
+        self.clock = 600.0
+        before = len(self.calls)
+        with mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", True):
+            self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+        self.assertEqual(len(self.calls), before)
+        self.assertEqual(json.loads(self.state.read_text())["paged"], [])
+
+    def test_owner_change_during_capture_never_transports_previous_owner_mail(self):
+        self.round()
+        self.clock = 600.0
+        before = len(self.calls)
+        with mock.patch.dict(os.environ):
+            def changed_owner():
+                os.environ["JEV_WATCH_INBOX_AGENT"] = "HazySpring"
+                return "⠋ active"
+            with mock.patch.object(fiw, "_capture_pane1_screen", side_effect=changed_owner):
+                self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+        self.assertEqual(len(self.calls), before)
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertTrue(all(entry["status"] == "queued" for entry in saved["pending"]))
+
+    def test_unwritable_pending_state_prevents_any_transport(self):
+        with mock.patch.object(fiw, "_write_page_state", side_effect=OSError("offline state unwritable")):
+            self.assertIn("NOT_RUN", self.round())
+        self.assertEqual(self.calls, [])
+
+    def test_lost_result_commit_retains_write_ahead_evidence_without_retry(self):
+        self.round()
+        self.clock = 600.0
+        write_state = fiw._write_page_state
+        def lost_commit(state, saved):
+            if saved["paged"]:
+                raise OSError("offline commit lost")
+            return write_state(state, saved)
+        with mock.patch.object(fiw, "_write_page_state", side_effect=lost_commit):
+            self.assertFalse(fiw.flush_pending_page1(now=self.clock))
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertTrue(all(entry["status"] == "inflight" for entry in saved["pending"]))
+        before = len(self.calls)
+        self.assertIn("uncertain", self.round())
+        self.assertFalse(fiw.flush_pending_page1(now=1200.0))
+        self.assertEqual(len(self.calls), before)
+
+
 
 class Inbox(unittest.TestCase):
     def setUp(self):
@@ -853,7 +1106,7 @@ class Inbox(unittest.TestCase):
             "cut off",
             raw='{\n  "id": 42483,\n  "importance": "urgent",',
         )
-        # older than start - 15 min: history on a first run, never paged
+        # Old unread urgent mail remains eligible; dispatch is bounded, not age-filtered.
         mail(self.inbox, 42400, "urgent", "2026-09-25T05:40:00.0Z", "old incident")
 
     def send(self, message):
@@ -862,44 +1115,42 @@ class Inbox(unittest.TestCase):
 
     def round(self, module=None, send=None):
         return (module or fiw).inbox_round(
-            self.inbox, self.state, STARTED, send or self.send
+            self.inbox, self.state, send or self.send
         )
 
-    def test_a_new_conductor_name_treats_its_backlog_as_history_but_pages_new_mail(
-        self,
-    ):
-        # pane 1 restarted: the state was written for the previous owner of the conductor pane
+    def test_owner_change_keeps_previous_owner_evidence_separate(self):
         self.state.parent.mkdir(parents=True)
-        self.state.write_text(
-            json.dumps({"agent": "HazySpring", "paged": [], "history": []})
-        )
+        old_pending = [{"id": 42478, "message": "OLD OWNER ONLY", "status": "uncertain"}]
+        self.state.write_text(json.dumps({
+            "agent": "HazySpring", "paged": [42481], "history": [], "pending": old_pending,
+        }))
         line = self.round()
-        self.assertEqual(self.sent, [], line)
+        self.assertEqual(self.sent, [OLD_PAGE, URGENT_PAGE, HIGH_PAGE], line)
         saved = json.loads(self.state.read_text())
         self.assertEqual(saved["agent"], "AmberWillow")
-        self.assertIn(42478, saved["history"])
+        self.assertEqual(saved["other_agents"]["HazySpring"]["pending"], old_pending)
+        self.assertEqual(saved["other_agents"]["HazySpring"]["paged"], [42481])
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.0Z")
         mail(self.inbox, 42600, "high", now, "fresh after restart")
         self.round()
-        self.assertEqual(len(self.sent), 1)
-        self.assertIn("(id 42600,", self.sent[0])
+        self.assertEqual(len(self.sent), 4)
+        self.assertIn("(id 42600,", self.sent[-1])
 
-    def test_urgent_and_high_page_once_each_normal_and_pre_start_never(self):
-        line = self.round()
-        self.assertEqual(self.sent, [URGENT_PAGE, HIGH_PAGE])
+    def assert_paged_round(self, line, newly_paged):
+        self.assertEqual(self.sent, [OLD_PAGE, URGENT_PAGE, HIGH_PAGE])
         self.assertTrue(
-            line.startswith("Inbox: 2 urgent/high paged this round, 2 paged total"),
+            line.startswith(f"Inbox: {newly_paged} urgent/high paged this round, 3 paged total"),
             line,
         )
+
+    def test_urgent_and_high_page_once_each_including_old_unread_mail(self):
+        line = self.round()
+        self.assert_paged_round(line, 3)
 
     def test_a_second_poll_pages_nothing_new(self):
         self.round()
         line = self.round()
-        self.assertEqual(self.sent, [URGENT_PAGE, HIGH_PAGE])
-        self.assertTrue(
-            line.startswith("Inbox: 0 urgent/high paged this round, 2 paged total"),
-            line,
-        )
+        self.assert_paged_round(line, 0)
 
     def test_a_restart_with_the_same_state_file_pages_nothing(self):
         self.round()
@@ -910,9 +1161,9 @@ class Inbox(unittest.TestCase):
         spec2.loader.exec_module(fresh)
         restarted = []
         line = self.round(fresh, send=lambda m: restarted.append(m) or True)
-        # the pre-start message included: the state file exists now, so no first-run cutoff
+        # All eligible urgent IDs, including old unread mail, were confirmed on the first round.
         self.assertEqual(restarted, [])
-        self.assertIn("2 paged total", line)
+        self.assertIn("3 paged total", line)
 
     def test_a_new_high_after_the_first_round_is_paged(self):
         self.round()
@@ -926,30 +1177,35 @@ class Inbox(unittest.TestCase):
         )
         self.round()
         self.assertEqual(
-            self.sent[2:], ["MAIL high from RedMaple: callback (id 42490, 06:30Z)"]
+            self.sent[3:], ["MAIL high from RedMaple: callback (id 42490, 06:30Z)"]
         )
 
     def test_an_id_already_in_the_state_file_is_not_paged(self):
         self.state.parent.mkdir(parents=True)
         self.state.write_text(json.dumps({"paged": [42478], "history": [42400]}))
         line = self.round()
-        self.assertEqual(self.sent, [HIGH_PAGE])
-        self.assertIn("2 paged total", line)
+        self.assertEqual(self.sent, [OLD_PAGE, HIGH_PAGE])
+        self.assertIn("3 paged total", line)
 
     def test_malformed_front_matter_is_reported_in_the_line_not_raised(self):
         line = self.round()
         self.assertIn("1 malformed", line)
         self.assertIn("__42483.md", line)
 
-    def test_a_failed_send_is_not_recorded_so_the_next_round_retries(self):
-        line = self.round(send=lambda m: False)
-        self.assertIn("2 send failed", line)
+    def test_failed_send_retains_uncertain_ids_without_blind_retry(self):
+        line = self.round(send=lambda message: False)
+        self.assertIn("3 send failed", line)
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["paged"], [])
+        self.assertEqual([entry["id"] for entry in saved["pending"]], [42400, 42478, 42481])
+        self.assertTrue(all(entry["status"] == "uncertain" for entry in saved["pending"]))
         self.round()
-        self.assertEqual(self.sent, [URGENT_PAGE, HIGH_PAGE])
+        self.assertEqual(self.sent, [])
+        self.assertEqual(json.loads(self.state.read_text())["pending"], saved["pending"])
 
     def test_missing_inbox_dir_is_not_run_and_pages_nothing(self):
         line = fiw.inbox_round(
-            self.root / "Nobody" / "inbox", self.state, STARTED, self.send
+            self.root / "Nobody" / "inbox", self.state, self.send
         )
         self.assertTrue(line.startswith("Inbox: NOT_RUN "), line)
         self.assertEqual(self.sent, [])
@@ -964,7 +1220,7 @@ class Inbox(unittest.TestCase):
 
     def test_once_prints_the_inbox_line_after_the_skills_line(self):
         self.state.parent.mkdir(parents=True)
-        self.state.write_text(json.dumps({"paged": [42478, 42481], "history": [42400]}))
+        self.state.write_text(json.dumps({"paged": [42400, 42478, 42481], "history": []}))
         env = {
             "JEV_WATCH_INBOX_ROOT": str(self.root),
             "JEV_WATCH_INBOX_AGENT": "AmberWillow",
@@ -988,11 +1244,11 @@ class Inbox(unittest.TestCase):
         lines = out.getvalue().splitlines()
         self.assertEqual(lines[-2], "Skills 24h: y")
         self.assertTrue(
-            lines[-1].startswith("Inbox: 0 urgent/high paged this round, 2 paged total")
+            lines[-1].startswith("Inbox: 0 urgent/high paged this round, 3 paged total")
         )
         self.assertEqual(self.sent, [])
 
-    def test_daemon_first_run_uses_process_start_cutoff_when_inbox_arrives_later(self):
+    def test_daemon_recovers_mail_when_inbox_arrives_later_without_age_discard(self):
         class StopAfterSecondRound(Exception):
             pass
 
@@ -1058,6 +1314,26 @@ class Inbox(unittest.TestCase):
         self.assertEqual(saved["history"], [])
         self.assertEqual(saved["paged"], [42495])
 
+
+class KeyPagerStateContract(unittest.TestCase):
+    """Offline census/transport fixture: string marks keep the shared state contract."""
+
+    def test_key_paths_persist_once_and_failed_send_stays_retryable(self):
+        root = Path(tempfile.mkdtemp(prefix="fiw-key-state-"))
+        state = root / "key-paged.json"
+        path = str(root / "offline-session.jsonl")
+        lines = [f"Key exposure 24h: 1 session files hold a TypeSafe-shaped key; newest: {path} (05:57Z)"]
+        failed = fiw.key_round(lines, state, lambda message: False)
+        self.assertIn("1 send failed", failed)
+        self.assertEqual(json.loads(state.read_text()), {"agent": "", "paged": [], "history": []})
+        sent = []
+        first = fiw.key_round(lines, state, lambda message: sent.append(message) or True)
+        second = fiw.key_round(lines, state, lambda message: sent.append(message) or True)
+        self.assertIn("1 new paths paged", first)
+        self.assertIn("0 new paths paged", second)
+        self.assertEqual(json.loads(state.read_text()), {"agent": "", "paged": [path], "history": []})
+        self.assertEqual(len(sent), 1)
+        self.assertIn("KEY EXPOSURE: " + path, sent[0])
 
 class StrangerPager(unittest.TestCase):
     def setUp(self):
@@ -1306,16 +1582,51 @@ class UnsubmittedComposer(unittest.TestCase):
 class ConductorPaging(unittest.TestCase):
     """Conductor pages must not interrupt active pane-1 work (jev-06wt)."""
 
-    def run_sender(self, screen):
+    def setUp(self):
+        root = Path(tempfile.mkdtemp(prefix="fiw-conductor-"))
+        stack = contextlib.ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(mock.patch.dict(os.environ, {
+            "JEV_WATCH_INBOX_ROOT": str(root),
+            "JEV_WATCH_INBOX_AGENT": "AmberWillow",
+            "JEV_WATCH_INBOX_STATE": str(root / "inbox-paged.json"),
+        }))
+        stack.enter_context(mock.patch.object(fiw, "PAGE_BUSY_UNCERTAIN", set()))
+
+    def run_sender(self, screen, *, fail_key=None):
         calls = []
 
         def run(argv, **_):
             calls.append(argv)
             if argv[:2] == ["tmux", "capture-pane"]:
+                if fail_key == "capture-pane":
+                    return subprocess.CompletedProcess(argv, 1, "", "pane unavailable")
                 return subprocess.CompletedProcess(argv, 0, screen, "")
+            if argv[:2] == ["tmux", "send-keys"] and fail_key in argv:
+                reason = "submit refused" if fail_key == "C-q" else "send refused"
+                return subprocess.CompletedProcess(argv, 1, "", reason)
             return subprocess.CompletedProcess(argv, 0, "", "")
 
         return calls, run
+
+    @contextlib.contextmanager
+    def sender_context(self, run, *, last_sent=None, pending=()):
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", last_sent, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", list(pending), create=True),
+        ):
+            yield
+
+    def attempt_page(self, screen, message, *, fail_key=None):
+        calls, run = self.run_sender(screen, fail_key=fail_key)
+        with self.sender_context(run):
+            sent = fiw.send_pane1(message)
+        return sent, calls
+
+    def assert_no_idle_transport(self, calls):
+        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
 
     def test_busy_spinner_in_last_four_lines_queues_without_enter(self):
         screen = (
@@ -1325,12 +1636,7 @@ class ConductorPaging(unittest.TestCase):
             "S0.68 ▶─────"
         )
         calls, run = self.run_sender(screen)
-        with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
-        ):
+        with self.sender_context(run):
             self.assertTrue(fiw.send_pane1("alert text"))
 
         sends = [call for call in calls if call[:2] == ["tmux", "send-keys"]]
@@ -1339,86 +1645,40 @@ class ConductorPaging(unittest.TestCase):
             ["-l", "-t", f"{fiw.SESSION}:0.1", "alert text"],
         )
         self.assertEqual(sends[1][2:], ["-t", f"{fiw.SESSION}:0.1", "C-q"])
-        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assert_no_idle_transport(calls)
         self.assertFalse(any("Enter" in call for call in calls))
 
     def test_spinner_above_last_four_lines_does_not_mark_pane_busy(self):
         screen = "⠋ old activity\none\ntwo\nthree\nprompt"
-        calls, run = self.run_sender(screen)
-        with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
-        ):
-            self.assertTrue(fiw.send_pane1("idle alert"))
+        sent, calls = self.attempt_page(screen, "idle alert")
+        self.assertTrue(sent)
 
         self.assertTrue(any(call[:2] == ["ntm", "send"] for call in calls))
         self.assertFalse(any(call[:2] == ["tmux", "send-keys"] for call in calls))
 
     def test_capture_failure_fails_closed_without_sending(self):
-        calls = []
-
-        def run(argv, **_):
-            calls.append(argv)
-            return subprocess.CompletedProcess(argv, 1, "", "pane unavailable")
-
-        with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
-        ):
-            self.assertFalse(fiw.send_pane1("unverified pane"))
+        sent, calls = self.attempt_page("", "unverified pane", fail_key="capture-pane")
+        self.assertFalse(sent)
 
         self.assertEqual(len(calls), 1)
         self.assertEqual(calls[0][:2], ["tmux", "capture-pane"])
 
     def test_failed_busy_queue_never_falls_back_to_ntm_send(self):
-        calls = []
+        sent, calls = self.attempt_page("⠋ active", "busy alert", fail_key="-l")
+        self.assertFalse(sent)
 
-        def run(argv, **_):
-            calls.append(argv)
-            if argv[:2] == ["tmux", "capture-pane"]:
-                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
-            if argv[:2] == ["tmux", "send-keys"] and "-l" in argv:
-                return subprocess.CompletedProcess(argv, 1, "", "send refused")
-            return subprocess.CompletedProcess(argv, 0, "", "")
-
-        with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
-        ):
-            self.assertFalse(fiw.send_pane1("busy alert"))
-
-        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assert_no_idle_transport(calls)
         self.assertFalse(
             any(call[:2] == ["tmux", "send-keys"] and "C-q" in call for call in calls)
         )
 
     def test_failed_busy_submit_is_not_retried_or_entered(self):
-        calls = []
+        calls, run = self.run_sender("⠋ active", fail_key="C-q")
 
-        def run(argv, **_):
-            calls.append(argv)
-            if argv[:2] == ["tmux", "capture-pane"]:
-                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
-            if argv[:2] == ["tmux", "send-keys"] and "C-q" in argv:
-                return subprocess.CompletedProcess(argv, 1, "", "submit refused")
-            return subprocess.CompletedProcess(argv, 0, "", "")
-
-        with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", 0.0, create=True),
-            mock.patch.object(
-                fiw, "PAGE_BUSY_PENDING", ["previous alert"], create=True
-            ),
-        ):
+        with self.sender_context(run, last_sent=0.0, pending=["previous alert"]):
             self.assertFalse(fiw.flush_pending_page1(now=600.0))
-            self.assertEqual(fiw.PAGE_BUSY_PENDING, [])
+            self.assertEqual(fiw.PAGE_BUSY_PENDING, ["previous alert"])
+            self.assertEqual(fiw.PAGE_BUSY_UNCERTAIN, {"previous alert"})
             self.assertFalse(fiw.flush_pending_page1(now=660.0))
 
         self.assertEqual(
@@ -1431,44 +1691,30 @@ class ConductorPaging(unittest.TestCase):
             ),
             1,
         )
-        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assert_no_idle_transport(calls)
         self.assertFalse(any("Enter" in call for call in calls))
 
-    def test_failed_initial_busy_submit_discards_batch_without_enter(self):
-        calls = []
-
-        def run(argv, **_):
-            calls.append(argv)
-            if argv[:2] == ["tmux", "capture-pane"]:
-                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
-            if argv[:2] == ["tmux", "send-keys"] and "C-q" in argv:
-                return subprocess.CompletedProcess(argv, 1, "", "submit refused")
-            return subprocess.CompletedProcess(argv, 0, "", "")
+    def test_failed_initial_busy_submit_retains_uncertain_batch_without_enter(self):
+        calls, run = self.run_sender("⠋ active", fail_key="C-q")
 
         with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            self.sender_context(run, pending=["buffered alert"]),
             mock.patch.object(fiw.time, "monotonic", return_value=600.0),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(
-                fiw, "PAGE_BUSY_PENDING", ["buffered alert"], create=True
-            ),
         ):
             self.assertFalse(fiw.send_pane1("new alert"))
-            self.assertEqual(fiw.PAGE_BUSY_PENDING, [])
+            self.assertEqual(fiw.PAGE_BUSY_PENDING, ["buffered alert", "new alert"])
+            self.assertEqual(fiw.PAGE_BUSY_UNCERTAIN, {"buffered alert", "new alert"})
+            self.assertFalse(fiw.flush_pending_page1(now=1200.0))
 
-        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assert_no_idle_transport(calls)
         self.assertFalse(any("Enter" in call for call in calls))
 
     def test_busy_pages_coalesce_and_flush_no_more_than_once_per_ten_minutes(self):
         screen = "status\nprompt\n⠋ working"
         calls, run = self.run_sender(screen)
         with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            self.sender_context(run),
             mock.patch.object(fiw.time, "monotonic", side_effect=[0.0, 30.0, 60.0]),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
         ):
             self.assertTrue(fiw.send_pane1("first alert"))
             self.assertTrue(fiw.send_pane1("second alert"))
@@ -1498,11 +1744,8 @@ class ConductorPaging(unittest.TestCase):
             return subprocess.CompletedProcess(argv, 0, screen, "")
 
         with (
-            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
-            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            self.sender_context(run),
             mock.patch.object(fiw.time, "monotonic", side_effect=[0.0, 30.0]),
-            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
-            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
         ):
             self.assertTrue(fiw.send_pane1("first alert"))
             self.assertTrue(fiw.send_pane1("deferred alert"))
@@ -1510,16 +1753,6 @@ class ConductorPaging(unittest.TestCase):
 
         idle_sends = [call for call in calls if call[:2] == ["ntm", "send"]]
         self.assertEqual(idle_sends[0][-1], "deferred alert")
-        self.assertEqual(
-            len(
-                [
-                    call
-                    for call in calls
-                    if call[:2] == ["tmux", "send-keys"] and "-l" in call
-                ]
-            ),
-            1,
-        )
         self.assertEqual(
             len(
                 [
@@ -1848,6 +2081,7 @@ class SurfaceHeartbeat(unittest.TestCase):
             "heartbeat": {
                 "source": "jsonl",
                 "eligible_event": "tool_result",
+                "eligible_profiles": ["default"],
                 "path": str(self.telemetry_path),
                 "status_field": "status",
                 "error_rate_ceiling": 0.25,
@@ -2099,6 +2333,7 @@ class SurfaceHeartbeat(unittest.TestCase):
                                 "source": "omp_session",
                                 "eligible_event": "tool_call",
                                 "eligible_tool_names": ["bash"],
+                                "eligible_profiles": ["default"],
                                 "custom_types": [custom_type],
                                 "error_rate_ceiling": 0.25,
                                 "minimum_error_rows": 3,
@@ -2200,6 +2435,7 @@ class SurfaceHeartbeat(unittest.TestCase):
             "heartbeat": {
                 "source": "jsonl",
                 "eligible_event": "tool_result",
+                "eligible_profiles": ["default"],
                 "path": str(other_log),
                 "status_field": "status",
                 "error_rate_ceiling": 0.25,

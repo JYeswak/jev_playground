@@ -29,13 +29,13 @@ Alert  = after POLLS idle polls, page pane 1 only when no route was accepted. If
          Enter. Busy pages coalesce and flush at most once per 600 s; when idle use `ntm send`.
          Re-alert gaps still double from REALERT to REALERT_MAX (measured 2026-10-01: a fixed
          600 s re-page sent pane 1 300 pages for 56 idle episodes).
-Mail   = every round, each urgent/high Agent Mail message in the conductor's archive inbox that
-         was never paged goes to pane 1 once as `MAIL <importance> from <from>: <subject> (id <id>,
-         <HH:MM>Z)` (bead jev-lqfm). Paged ids persist in JEV_WATCH_INBOX_STATE, so a restart
-         does not re-page; with no state file, mail created before start - 15 min is history,
-         recorded and never paged. One `Inbox:` line per round; `Inbox: NOT_RUN <reason>` when
-         the inbox or the state file cannot be read. Why: 2026-09-25 an urgent key-leak report
-         to AmberWillow sat unread 42 minutes, because pane 1 does not poll Agent Mail.
+Mail   = urgent/high Agent Mail messages stay eligible regardless of age. At most four IDs enter
+         a round/coalesced mail batch; the remainder stays unread in the archive. Exact pending
+         IDs and payloads persist in JEV_WATCH_INBOX_STATE before transport. Admission is not
+         paging: only confirmed tmux/ntm transport moves IDs to paged (not an application ACK).
+         Failed/uncertain attempts retain evidence without automatic retries; a pre-transport
+         capture failure leaves a queued batch safe to try later. Owner changes isolate marks
+         and pending payloads. One `Inbox:` line reports pending/uncertain/archive backlog.
 Key    = every round, the census's `Key exposure 24h:` line (surface-census.py --fleet-line) is
          printed, and each session file it names as holding a TypeSafe-shaped key goes to pane 1
          once as `KEY EXPOSURE: <path> holds a TypeSafe-shaped key (modified <HH:MM>Z); ...`
@@ -162,9 +162,7 @@ INBOX_ROOT = (
 )
 INBOX_STATE = "~/.local/state/jev/inbox-paged.json"
 PAGE_IMPORTANCE = ("urgent", "high")
-INBOX_LOOKBACK = (
-    15 * 60
-)  # with no state file, mail created before start - this is history
+INBOX_DISPATCH_LIMIT = 4  # at most four admitted mail IDs per round / coalesced batch
 # Agent Mail's canonical per-pane identity bindings; the watcher resolves names from pane ids here.
 IDENTITY_ROOT = "~/.config/agent-mail/identity"
 CONDUCTOR_PANE = 1
@@ -966,6 +964,7 @@ def submit_enter(index: int) -> bool:
 PAGE_BATCH_INTERVAL = 600.0
 PAGE_BUSY_LAST_SENT: float | None = None
 PAGE_BUSY_PENDING: list[str] = []
+PAGE_BUSY_UNCERTAIN: set[str] = set()
 PAGE_SEND_ACTION = "sent"
 
 
@@ -1024,66 +1023,225 @@ def _send_idle_page1(message: str) -> bool:
     return done.returncode == 0
 
 
-def send_pane1(message: str) -> bool:
-    """Send when pane 1 is idle; queue/coalesce without Enter while its spinner is visible."""
-    global PAGE_BUSY_LAST_SENT, PAGE_SEND_ACTION
-    if surface_heartbeat.record_dry_run_send(message, pane=1):
-        PAGE_SEND_ACTION = "dry-run"
-        return True
+def _write_page_state(state: Path, saved: dict) -> None:
+    """Persist evidence before transport; replace and sync both file and directory."""
+    state.parent.mkdir(parents=True, exist_ok=True)
+    tmp = state.with_name(f"{state.name}.{os.getpid()}.tmp")
+    with tmp.open("w", encoding="utf-8") as stream:
+        stream.write(json.dumps(saved) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(tmp, state)
+    directory = os.open(state.parent, os.O_RDONLY)
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
+
+
+def _load_inbox_state(state: Path, agent: str) -> dict:
+    saved = json.loads(state.read_text()) if state.exists() else {}
+    if not isinstance(saved, dict):
+        raise ValueError("inbox state must be an object")
+    owners = saved.get("other_agents", {})
+    if not isinstance(owners, dict):
+        raise ValueError("other_agents must be an object")
+    if saved.get("agent") and saved["agent"] != agent:
+        owners = dict(owners)
+        owners[saved["agent"]] = {key: value for key, value in saved.items()
+                                  if key != "other_agents"}
+        saved = dict(owners.pop(agent, {}))
+        saved["other_agents"] = owners
+    saved.setdefault("paged", [])
+    saved.setdefault("history", [])
+    saved.setdefault("pending", [])
+    saved["agent"] = agent
+    if not all(isinstance(saved[key], list) for key in ("paged", "history", "pending")):
+        raise ValueError("paged, history and pending must be lists")
+    if not all(type(value) is int for key in ("paged", "history") for value in saved[key]):
+        raise ValueError("mail marks must be integer IDs")
+    ids = set()
+    for entry in saved["pending"]:
+        if (not isinstance(entry, dict) or type(entry.get("id")) is not int
+                or not isinstance(entry.get("message"), str)
+                or entry.get("status") not in ("queued", "inflight", "uncertain")
+                or not isinstance(entry.get("not_before", 0), (int, float))
+                or entry["id"] in ids or entry["id"] in saved["paged"]):
+            raise ValueError("invalid pending mail evidence")
+        ids.add(entry["id"])
+        # A crash after write-ahead but before result commit has unknown side effects.
+        if entry["status"] == "inflight":
+            entry["status"] = "uncertain"
+    return saved
+
+
+def _pane1_mail_state() -> tuple[Path, dict]:
+    inbox, state = inbox_paths()
+    saved = _load_inbox_state(state, inbox.parent.name)
+    return state, saved
+
+
+def _deliver_page1(messages: list[str], busy: bool, state: Path, saved: dict) -> bool:
+    """Transport confirmation only, never an application acknowledgement."""
+    global PAGE_SEND_ACTION
+    entries = [entry for entry in saved["pending"]
+               if entry["status"] == "queued" and entry["message"] in messages]
+    payload = _combine_page_messages(messages)
+    if entries:
+        inbox, current_state = inbox_paths()
+        if current_state != state or inbox.parent.name != saved["agent"]:
+            PAGE_SEND_ACTION = "failed"
+            return False
+    for entry in entries:
+        entry["status"] = "inflight"
+        entry["attempt_payload"] = payload
+    try:
+        if entries:
+            _write_page_state(state, saved)
+    except OSError as err:
+        print(f"Inbox: NOT_RUN cannot persist transport intent ({err})", flush=True)
+        PAGE_SEND_ACTION = "failed"
+        return False
+    sent = _send_busy_page1(payload) if busy else _send_idle_page1(payload)
+    delivered = {entry["id"] for entry in entries}
+    if sent:
+        saved["paged"] = sorted(set(saved["paged"]) | delivered)
+        saved["pending"] = [entry for entry in saved["pending"] if entry["id"] not in delivered]
+    else:
+        for entry in entries:
+            entry["status"] = "uncertain"
+        PAGE_BUSY_UNCERTAIN.update(message for message in messages
+                                   if message in PAGE_BUSY_PENDING)
+    try:
+        if entries:
+            _write_page_state(state, saved)
+    except OSError as err:
+        # The durable pre-send inflight record remains; never re-send on lost commit.
+        print(f"Inbox: transport outcome NOT saved; delivery uncertain ({err})", flush=True)
+        sent = False
+    PAGE_SEND_ACTION = ("queued" if busy else "sent") if sent else "uncertain"
+    return sent
+
+
+def _queued_mail(saved: dict) -> list[dict]:
+    return [entry for entry in saved["pending"] if entry["status"] == "queued"][:INBOX_DISPATCH_LIMIT]
+
+
+def _prepare_page1_send(message: str, inbox_owner: tuple[Path, str] | None) -> tuple | None:
+    """Resolve owner/evidence and capture the pane before deciding admission or transport."""
+    global PAGE_SEND_ACTION
+    try:
+        state, saved = _pane1_mail_state()
+    except (OSError, ValueError, TypeError) as err:
+        print(f"Inbox: NOT_RUN pending state unreadable ({err})", flush=True)
+        PAGE_SEND_ACTION = "failed"
+        return None
+    if inbox_owner is not None and (state, saved["agent"]) != inbox_owner:
+        PAGE_SEND_ACTION = "failed"
+        return None
+    entries = _queued_mail(saved)
+    uncertain = {entry["message"] for entry in saved["pending"] if entry["status"] == "uncertain"}
+    if message in uncertain or message in PAGE_BUSY_UNCERTAIN:
+        PAGE_SEND_ACTION = "uncertain"
+        return None
     screen = _capture_pane1_screen()
     if screen is None:
         PAGE_SEND_ACTION = "failed"
-        return False
-    busy = _pane1_is_busy(screen)
-    now = time.monotonic()
-    messages = [*PAGE_BUSY_PENDING, message]
-    payload = _combine_page_messages(messages)
-    if (
-        busy
-        and PAGE_BUSY_LAST_SENT is not None
-        and now - PAGE_BUSY_LAST_SENT < PAGE_BATCH_INTERVAL
-    ):
-        if message and message not in PAGE_BUSY_PENDING:
-            PAGE_BUSY_PENDING.append(message)
-        PAGE_SEND_ACTION = "batched"
-        return True
-    sent = _send_busy_page1(payload) if busy else _send_idle_page1(payload)
-    if not sent:
-        # A failed send may have typed part of the payload into the composer.
-        # Do not retry it automatically: that could duplicate or submit stale text.
-        PAGE_BUSY_PENDING.clear()
+        return None
+    return state, saved, entries, _pane1_is_busy(screen)
+
+
+def _page1_messages(entries: list[dict], message: str = "") -> tuple[list[str], list[str]]:
+    mail_messages = [entry["message"] for entry in entries]
+    messages = [text for text in PAGE_BUSY_PENDING if text not in PAGE_BUSY_UNCERTAIN]
+    messages.extend(mail_messages)
+    if message and message not in messages:
+        messages.append(message)
+    return messages, mail_messages
+
+
+def _queue_untracked_page1(message: str, mail_messages: list[str], *, uncertain: bool = False) -> None:
+    if message and message not in mail_messages and message not in PAGE_BUSY_PENDING:
+        PAGE_BUSY_PENDING.append(message)
+        if uncertain:
+            PAGE_BUSY_UNCERTAIN.add(message)
+
+
+def _buffer_page1(message: str, entries: list[dict], state: Path, saved: dict,
+                  mail_messages: list[str], cooldown: float, deadline: float) -> bool:
+    """Persist the mail batch's restart-safe deadline before accepting admission."""
+    global PAGE_SEND_ACTION
+    for entry in entries:
+        entry["not_before"] = max(deadline, time.time() + cooldown)
+    try:
+        if entries:
+            _write_page_state(state, saved)
+    except OSError as err:
+        print(f"Inbox: NOT_RUN cannot persist batch ({err})", flush=True)
         PAGE_SEND_ACTION = "failed"
         return False
-    PAGE_BUSY_PENDING.clear()
+    _queue_untracked_page1(message, mail_messages)
+    PAGE_SEND_ACTION = "batched"
+    return True
+
+
+def _commit_page1_messages(messages: list[str], busy: bool, now: float) -> None:
+    global PAGE_BUSY_LAST_SENT
+    PAGE_BUSY_PENDING[:] = [text for text in PAGE_BUSY_PENDING if text not in messages]
     PAGE_BUSY_LAST_SENT = now if busy else None
-    PAGE_SEND_ACTION = "queued" if busy else "sent"
+
+
+def send_pane1(message: str, *, inbox_owner: tuple[Path, str] | None = None) -> bool:
+    """Decide immediate transport versus admission; uncertainty never grants a retry."""
+    global PAGE_SEND_ACTION
+    if surface_heartbeat.record_dry_run_send(message, pane=1):
+        PAGE_SEND_ACTION = "dry-run"
+        return True
+    prepared = _prepare_page1_send(message, inbox_owner)
+    if prepared is None:
+        return False
+    state, saved, entries, busy = prepared
+    now = time.monotonic()
+    messages, mail_messages = _page1_messages(entries, message)
+    cooldown = max(0.0, PAGE_BATCH_INTERVAL - (now - PAGE_BUSY_LAST_SENT)) if PAGE_BUSY_LAST_SENT is not None else 0.0
+    deadline = max((entry.get("not_before", 0.0) for entry in entries), default=0.0)
+    if busy and (cooldown > 0 or deadline > time.time()):
+        return _buffer_page1(message, entries, state, saved, mail_messages, cooldown, deadline)
+    if not _deliver_page1(messages, busy, state, saved):
+        _queue_untracked_page1(message, mail_messages, uncertain=True)
+        return False
+    _commit_page1_messages(messages, busy, now)
     return True
 
 
 def flush_pending_page1(now: float | None = None) -> bool:
-    """Deliver a coalesced busy-pane batch after its ten-minute cooldown."""
-    global PAGE_BUSY_LAST_SENT, PAGE_SEND_ACTION
-    if not PAGE_BUSY_PENDING or PAGE_BUSY_LAST_SENT is None:
+    """Recover durable queued mail, preserving uncertain attempts without blind retries."""
+    global PAGE_SEND_ACTION
+    if surface_heartbeat.DRY_RUN:
+        return False
+    try:
+        state, saved = _pane1_mail_state()
+    except (OSError, ValueError, TypeError) as err:
+        print(f"Inbox: NOT_RUN pending state unreadable ({err})", flush=True)
+        PAGE_SEND_ACTION = "failed"
+        return False
+    entries = _queued_mail(saved)
+    messages, _ = _page1_messages(entries)
+    if not messages:
         return False
     now = time.monotonic() if now is None else now
-    if now - PAGE_BUSY_LAST_SENT < PAGE_BATCH_INTERVAL:
+    if PAGE_BUSY_LAST_SENT is not None and now - PAGE_BUSY_LAST_SENT < PAGE_BATCH_INTERVAL:
+        return False
+    if any(entry.get("not_before", 0) > time.time() for entry in entries):
         return False
     screen = _capture_pane1_screen()
     if screen is None:
         PAGE_SEND_ACTION = "failed"
         return False
-    payload = _combine_page_messages(PAGE_BUSY_PENDING)
     busy = _pane1_is_busy(screen)
-    sent = _send_busy_page1(payload) if busy else _send_idle_page1(payload)
-    if not sent:
-        # The batch may already be in the composer; retrying could duplicate it.
-        PAGE_BUSY_PENDING.clear()
-        PAGE_BUSY_LAST_SENT = None
-        PAGE_SEND_ACTION = "failed"
+    if not _deliver_page1(messages, busy, state, saved):
         return False
-    PAGE_BUSY_PENDING.clear()
-    PAGE_BUSY_LAST_SENT = now if busy else None
-    PAGE_SEND_ACTION = "queued" if busy else "sent"
+    _commit_page1_messages(messages, busy, now)
     return True
 
 
@@ -1113,9 +1271,9 @@ def alert(index: int, since: float, words: str) -> None:
     )
 
 
-def page(message: str) -> bool:
+def page(message: str, *, inbox_owner: tuple[Path, str] | None = None) -> bool:
     """Page pane 1, or record the attempt in dry-run mode."""
-    ok = send_pane1(message)
+    ok = send_pane1(message, inbox_owner=inbox_owner) if inbox_owner is not None else send_pane1(message)
     if surface_heartbeat.DRY_RUN and ok:
         said = "would page"
     elif not ok:
@@ -1230,77 +1388,118 @@ def read_mail(path: Path) -> dict:
 def save_state(
     state: Path, paged: set[int], history: set[int], agent: str = ""
 ) -> None:
-    """Write the state file atomically: a sibling temp file, then os.replace."""
-    state.parent.mkdir(parents=True, exist_ok=True)
-    tmp = state.with_name(f"{state.name}.{os.getpid()}.tmp")
-    tmp.write_text(
-        json.dumps({"agent": agent, "paged": sorted(paged), "history": sorted(history)})
-        + "\n"
-    )
-    os.replace(tmp, state)
+    """Keep the key/stranger consumers' existing state shape and atomic writes."""
+    _write_page_state(state, {"agent": agent, "paged": sorted(paged), "history": sorted(history)})
 
 
-def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
-    """Page every urgent/high message not paged before; return this round's `Inbox:` line.
-    `send(message) -> bool`; a False leaves the id unrecorded so the next round retries it.
-    State: {"agent": inbox owner, "paged": ids sent, "history": urgent/high ids older than the
-    first-run cutoff}. When pane 1 restarts under a new name, the new owner's existing backlog is
-    history, exactly like a first run (2026-10-04: a rename paged 3 resolved day-old mails)."""
-    agent = inbox.parent.name
-    if not inbox.is_dir():
-        return f"Inbox: NOT_RUN no inbox dir {inbox}"
-    first_run = not state.exists()
-    try:
-        saved = {} if first_run else json.loads(state.read_text())
-        paged, history = set(saved.get("paged", [])), set(saved.get("history", []))
-    except (OSError, ValueError, AttributeError, TypeError) as err:
-        return f"Inbox: NOT_RUN state file {state} unreadable ({type(err).__name__}: {err})"
-    try:
-        files = sorted(inbox.glob("*/*/*.md"))
-    except OSError as err:
-        return f"Inbox: NOT_RUN cannot list {inbox} ({err})"
+def _read_inbox_messages(files: list[Path]) -> tuple[list[dict], list[str]]:
     mails, malformed = [], []
     for path in files:
         try:
             mails.append(read_mail(path))
         except (OSError, ValueError, KeyError, TypeError):
             malformed.append(path.name)
-    renamed = bool(saved.get("agent")) and saved.get("agent") != agent
-    if first_run:
-        cutoff = started - INBOX_LOOKBACK
-    elif renamed:
-        cutoff = time.time() - INBOX_LOOKBACK
+    return mails, malformed
+
+
+def _inbox_admission(saved: dict, mails: list[dict], paged: set[int]) -> tuple[list[dict], int]:
+    """Select bounded admission without changing unread evidence's eligibility."""
+    known = paged | {entry["id"] for entry in saved["pending"]}
+    eligible = [mail for mail in sorted(mails, key=lambda mail: (mail["created"], mail["id"]))
+                if mail["importance"] in PAGE_IMPORTANCE and mail["id"] not in known]
+    queued_count = sum(entry["status"] == "queued" for entry in saved["pending"])
+    admitted = eligible[:max(0, INBOX_DISPATCH_LIMIT - queued_count)]
+    return admitted, len(eligible) - len(admitted)
+
+
+def _admit_inbox_mail(state: Path, saved: dict, mail: dict, native_send: bool) -> dict:
+    """Write the exact mail payload and callback intent before any side effect."""
+    message = (f"MAIL {mail['importance']} from {mail['from']}: {mail['subject']}"
+               f" (id {mail['id']}, {mail['hhmm']}Z)")
+    entry = {"id": mail["id"], "message": message, "status": "queued"}
+    saved["pending"].append(entry)
+    if not native_send:
+        entry["status"] = "inflight"
+        entry["attempt_payload"] = message
+    _write_page_state(state, saved)
+    return entry
+
+
+def _commit_inbox_callback(state: Path, saved: dict, entry: dict, ok: bool) -> None:
+    """Keep callback admission separate from transport confirmation and uncertainty."""
+    if ok and PAGE_SEND_ACTION not in ("batched", "dry-run"):
+        saved["paged"] = sorted(set(saved["paged"]) | {entry["id"]})
+        saved["pending"].remove(entry)
     else:
-        cutoff = None
-    sent = failed = 0
-    for mail in sorted(mails, key=lambda m: m["created"]):
-        if mail["importance"] not in PAGE_IMPORTANCE or mail["id"] in paged | history:
-            continue
-        if cutoff is not None and mail["created"] < cutoff:
-            history.add(mail["id"])
-            continue
-        message = (
-            f"MAIL {mail['importance']} from {mail['from']}: {mail['subject']}"
-            f" (id {mail['id']}, {mail['hhmm']}Z)"
-        )
-        if send(message):
-            paged.add(mail["id"])
-            sent += 1
-        else:
-            failed += 1
-    notes = [inbox.parent.name, f"{len(files)} messages"]
+        entry["status"] = "queued" if ok else "uncertain"
+    _write_page_state(state, saved)
+
+
+def _dispatch_inbox_mail(state: Path, saved: dict, agent: str, mail: dict,
+                         send, native_send: bool) -> tuple[dict, bool, str | None]:
+    global PAGE_SEND_ACTION
+    if mail["id"] in {entry["id"] for entry in saved["pending"]} | set(saved["paged"]):
+        return saved, False, None
     try:
-        save_state(state, paged, history, agent)
+        entry = _admit_inbox_mail(state, saved, mail, native_send)
     except OSError as err:
-        notes.append(f"state NOT saved, next round re-pages ({err})")
+        return saved, False, f"Inbox: NOT_RUN cannot persist pending IDs before transport ({err})"
+    PAGE_SEND_ACTION = "sent"
+    ok = send(entry["message"], inbox_owner=(state, agent)) if native_send else send(entry["message"])
+    if native_send:
+        return _load_inbox_state(state, agent), not ok, None
+    try:
+        _commit_inbox_callback(state, saved, entry, ok)
+    except OSError as err:
+        return saved, not ok, f"Inbox: transport outcome NOT saved; pending delivery uncertain ({err})"
+    return saved, not ok, None
+
+
+def _inbox_round_note(agent: str, file_count: int, saved: dict, initial_paged: set[int],
+                      remaining: int, malformed: list[str], failed: int) -> str:
+    sent = len(set(saved["paged"]) - initial_paged)
+    uncertain = sum(entry["status"] == "uncertain" for entry in saved["pending"])
+    notes = [agent, f"{file_count} messages", f"{len(saved['pending'])} pending", f"{remaining} queued in archive"]
+    if uncertain:
+        notes.append(f"{uncertain} delivery uncertain; no automatic retry")
     if malformed:
         notes.append(f"{len(malformed)} malformed: {', '.join(malformed)}")
     if failed:
-        notes.append(f"{failed} send failed, retried next round")
-    return (
-        f"Inbox: {sent} urgent/high paged this round, {len(paged)} paged total"
-        f" ({'; '.join(notes)})"
-    )
+        notes.append(f"{failed} send failed; pending evidence retained")
+    return (f"Inbox: {sent} urgent/high paged this round, {len(saved['paged'])} paged total"
+            f" ({'; '.join(notes)})")
+
+
+def inbox_round(inbox: Path, state: Path, send) -> str:
+    """Persist bounded admission, dispatch it, and report retained evidence by owner.
+
+    queued is admission, paged is confirmed transport, uncertain requires reconciliation.
+    Legacy history marks do not suppress unread urgent evidence. Owners retain separate marks
+    and pending records; changing pane identity never transplants the previous owner's batch.
+    """
+    agent = inbox.parent.name
+    if not inbox.is_dir():
+        return f"Inbox: NOT_RUN no inbox dir {inbox}"
+    try:
+        saved = _load_inbox_state(state, agent)
+        _write_page_state(state, saved)
+    except (OSError, ValueError, AttributeError, TypeError) as err:
+        return f"Inbox: NOT_RUN state file {state} unreadable or unwritable ({type(err).__name__}: {err})"
+    try:
+        files = sorted(inbox.glob("*/*/*.md"))
+    except OSError as err:
+        return f"Inbox: NOT_RUN cannot list {inbox} ({err})"
+    mails, malformed = _read_inbox_messages(files)
+    initial_paged = set(saved["paged"])
+    admitted, remaining = _inbox_admission(saved, mails, initial_paged)
+    failed = 0
+    native_send = isinstance(send, type(inbox_round)) and (send is page or send is send_pane1)
+    for mail in admitted:
+        saved, send_failed, error = _dispatch_inbox_mail(state, saved, agent, mail, send, native_send)
+        if error is not None:
+            return error
+        failed += send_failed
+    return _inbox_round_note(agent, len(files), saved, initial_paged, remaining, malformed, failed)
 
 
 def key_state_path() -> Path:
@@ -2121,7 +2320,7 @@ def main() -> int:
         note = key_round(census, key_state_path(), page)
         if note:
             print(note)
-        print(inbox_round(*inbox_paths(), time.time(), page), flush=True)
+        print(inbox_round(*inbox_paths(), page), flush=True)
         note = stale_lock_round(REPO_ROOT, time.time(), page)
         if note:
             print(note, flush=True)
@@ -2153,7 +2352,6 @@ def main() -> int:
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
     next_hook_load = 0.0
     next_heartbeat = 0.0
-    started = time.time()  # Stable first-run cutoff, even if the inbox appears later.
     while True:
         now = time.time()
         monotonic_now = time.monotonic()
@@ -2294,7 +2492,7 @@ def main() -> int:
         note = stranger_round(ci, stranger_state_path(), page)
         if note:
             print(f"{stamp} {note}", flush=True)
-        inbox_line = inbox_round(*inbox_paths(), started, page)
+        inbox_line = inbox_round(*inbox_paths(), page)
         print(f"{stamp} {inbox_line}", flush=True)
         # The census each round (about 2 s on 2026-09-25), so a printed key pages within one round.
         census = judge_lines()

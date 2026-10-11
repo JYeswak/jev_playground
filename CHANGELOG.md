@@ -61,11 +61,18 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
 - Local shadow timeout (`jev-a5ny`): the opt-in local scorer now shares one
   2 s deadline across a commit's hunks; a slow loopback endpoint test proves it
   aborts within budget and skips later local requests.
-- Fleet watcher (`jev-06wt`): pane-1 pages detect a spinner in the last four
-  lines; busy notices are literal-queued and coalesced without Enter, while
-  idle notices use `ntm send`. Failed submissions are discarded, not retried.
-  Heartbeat logic remains keyless; production registry coordination and
-  supervised-service activation are pending.
+- Fleet delivery/telemetry (`jev-06wt`): exact mail IDs and payloads persist
+  before transport; queued admission is not delivery. Confirmed sends commit
+  only delivered IDs, while failed/uncertain flushes retain evidence without
+  blind retries. Catch-up is bounded without discarding unread backlog.
+  Heartbeat denominators/decisions now use actual session-storage profiles
+  and declared installed scope; missing scope is unknown, not healthy.
+  Existing thresholds and intentional OFF markers remain unchanged.
+  Offline source-path smoke and 135 watcher / 16 sampler regressions pass;
+  service reactivation and supervised live delivery are not claimed.
+- Publication canary: user-approved cleanup now retains repo-owned `.owner`
+  scratch for the reaper instead of direct removal. Assertions/refusals are
+  unchanged; real fire/quiet and no-op-checker rejection controls pass.
 - Stranger-run CI (`jev-qx7b`): classify the complete typed doctor envelope
   before the 300-character diagnostic display limit. The original
   `NOT_RUN-no-key` expectation stays unchanged; malformed, unsupported and
