@@ -49,6 +49,9 @@ branch. The script scans the EXPORT, never the working tree.
     whole line and its hit count. A row cannot cover another file, an edited line or a second key on
     the same line. No path-wide, directory-wide or pattern-wide rows. The evidence for each row is in
     `docs/evidence/jev-x5cy-key-hit-rulings-20261011.md`.
+  - `REDACT` rows in the same file are not exemptions: for an uncertain key-shaped line (not proven
+    synthetic) the export copy gets every key-shaped match replaced by `KEY_SHAPE_REDACTED`; same
+    binding as an exact row, source untouched, and a stale row stops the build (exit 4).
   - Any NEW hit is a fail-closed ERROR, never a silent pass.
 - `0` blob-shaped `thinkingSignature` values (`"thinkingSignature": "` followed by 100+ of
   `A-Za-z0-9+/=_-`). Transform 3 removes them; the scan still refuses any that remain.

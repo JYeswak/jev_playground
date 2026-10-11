@@ -159,5 +159,30 @@ if d=$(mini planted); then
   assert "refused before git init" no_export_repo
 else no "fixture repo build failed"; fi
 
+# 9. An uncertain key-shaped line: a REDACT row redacts it in the export copy, grants NO exemption, keeps the source, and a
+#    stale row stops the build (exit 4). The planted line is built from parts and never printed.
+line9="captured sample: id ${k_aws} twice ${k_aws} end"
+sha9=$(printf '%s' "$line9" | shasum -a 256 | cut -d' ' -f1)
+printf 'REDACT data/cap.txt | %s | 2 | uncertain capture, redacted not excused\n' "$sha9" > "$tmp/red-exc.txt"
+if d=$(mini redact "$tmp/red-exc.txt"); then
+  printf '%s\n' "$line9" > "$d/data/cap.txt"
+  git -C "$d" add data/cap.txt && git -C "$d" -c user.name=pes -c user.email=pes@example.invalid commit -q -m 'cap [test]'
+  out=$(bash "$d/scripts/publish-export.sh" 2>&1); rc=$?
+  expect "a REDACT row lets the build pass by redacting the line" 0
+  e9="$tmp/redact/jev_playground-export/data/cap.txt"
+  redacted_ok() { grep -q -F 'KEY_SHAPE_REDACTED' "$e9" && ! grep -q -F "$q16" "$e9"; }
+  assert "export copy holds the marker and no key text" redacted_ok
+  assert "source still holds the original (evidence preserved)" git -C "$d" grep -q -F "$q16" HEAD -- data/cap.txt
+  assert "output carries no planted text" lacks "$q16"
+  mkdir -p "$tmp/red-scan/data"; printf '%s\n' "$line9" > "$tmp/red-scan/data/cap.txt"
+  SCAN_SCRIPT="$d/scripts/publish-export.sh" run_scan "$tmp/red-scan"
+  expect "the same row is NOT an exemption: --scan of the unredacted line fails" 1
+  assert "and names it as path:line" has "data/cap.txt:1"
+  printf 'changed line\n%s x\n' "$line9" > "$d/data/cap.txt"
+  git -C "$d" add data/cap.txt && git -C "$d" -c user.name=pes -c user.email=pes@example.invalid commit -q -m 'edit [test]'
+  out=$(bash "$d/scripts/publish-export.sh" 2>&1); rc=$?
+  expect "an edited line makes the REDACT row stale: the build stops" 4
+  assert "stale row says so" has "matched no line"
+else no "fixture repo build failed"; fi
 printf 'selftest-publish-export-scan: pass=%d fail=%d\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

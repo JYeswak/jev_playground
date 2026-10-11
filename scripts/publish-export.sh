@@ -78,22 +78,45 @@ files_with() {
 #   EXEMPT <export-relative path> | <sha256 of the whole line, no newline> | <key-pattern hits on it> | <reason>
 # A row binds the path, the full line content and the hit count together, so it cannot cover another file,
 # an edited line, or a second key added to the same line. No path-wide or pattern-wide rows.
-EXC_KEYS=""
+EXC_KEYS=""; RED_ROWS=""
 load_exceptions() {
-  local raw f1 f2 f3 f4 n=0 name=${KEY_EXCEPTIONS#"$ROOT"/}
-  EXC_KEYS=""
+  local raw f1 f2 f3 f4 kind n=0 name=${KEY_EXCEPTIONS#"$ROOT"/}
+  EXC_KEYS=""; RED_ROWS=""
   [ -f "$KEY_EXCEPTIONS" ] || { echo "SCAN ERROR  exceptions file missing: $name"; return 4; }
   while IFS= read -r raw || [ -n "$raw" ]; do
     n=$((n+1))
     case $raw in ''|'#'*) continue ;; esac
-    case $raw in 'EXEMPT '*) ;; *) echo "SCAN ERROR  $name:$n is not an EXEMPT row"; return 4 ;; esac
-    IFS='|' read -r f1 f2 f3 f4 <<<"${raw#EXEMPT }"
+    case $raw in 'EXEMPT '*) kind=EXEMPT ;; 'REDACT '*) kind=REDACT ;; *) echo "SCAN ERROR  $name:$n is not an EXEMPT or REDACT row"; return 4 ;; esac
+    IFS='|' read -r f1 f2 f3 f4 <<<"${raw#"$kind" }"
     f1=$(trim "$f1"); f2=$(trim "$f2"); f3=$(trim "$f3"); f4=$(trim "${f4-}")
     if [ -z "$f1" ] || [[ $f1 == /* ]] || ! [[ $f2 =~ ^[0-9a-f]{64}$ ]] || ! [[ $f3 =~ ^[1-9][0-9]*$ ]] || [ -z "$f4" ]; then
-      echo "SCAN ERROR  $name:$n is malformed (need: EXEMPT path | 64-hex line sha256 | hit count | reason)"; return 4
+      echo "SCAN ERROR  $name:$n is malformed (need: EXEMPT|REDACT path | 64-hex line sha256 | hit count | reason)"; return 4
     fi
-    EXC_KEYS+="$f1|$f2|$f3"$'\n'
+    if [ "$kind" = REDACT ]; then RED_ROWS+="$f1|$f2|$f3"$'\n'; else EXC_KEYS+="$f1|$f2|$f3"$'\n'; fi
   done < "$KEY_EXCEPTIONS"
+}
+
+# redact_rows: for each REDACT row, find the exported line with that sha256 (after transforms 1-3) in that file and replace every
+# key-shaped match on it with KEY_SHAPE_REDACTED. Path, whole-line hash and hit count must all match or the build stops (exit 4):
+# a stale row is an error, never a silent skip. A REDACT row is NOT an exemption; the source is untouched.
+redact_rows() {
+  local row p sha cnt f tmp line got hits done_
+  while IFS= read -r row; do
+    [ -n "$row" ] || continue
+    p=${row%%|*}; sha=${row#*|}; cnt=${sha#*|}; sha=${sha%%|*}; f="$EXPORT/$p"; done_=0
+    [ -f "$f" ] || { echo "SCAN ERROR  REDACT row names a file absent from the export: $p"; return 4; }
+    tmp="$f.redact.tmp"; : > "$tmp"
+    while IFS= read -r line || [ -n "$line" ]; do
+      got=$(printf '%s' "$line" | shasum -a 256 | cut -d' ' -f1)
+      if [ "$got" = "$sha" ]; then
+        hits=$(printf '%s' "$line" | grep -o -E -- "$KEYPAT" | awk 'END{print NR}')
+        [ "$hits" = "$cnt" ] || { rm -f "$tmp"; echo "SCAN ERROR  REDACT row hit count mismatch for $p"; return 4; }
+        printf '%s\n' "$(printf '%s' "$line" | sed -E "s/$KEYPAT/KEY_SHAPE_REDACTED/g")" >> "$tmp"; done_=1
+      else printf '%s\n' "$line" >> "$tmp"; fi
+    done < "$f"
+    [ "$done_" = 1 ] || { rm -f "$tmp"; echo "SCAN ERROR  REDACT row matched no line in $p (edited or stale)"; return 4; }
+    mv "$tmp" "$f"
+  done <<<"$RED_ROWS"
 }
 
 # lit_check <dir> <label> <grep args...>: refuse any match; print the count and path:line only.
@@ -226,6 +249,9 @@ while IFS= read -r f; do
   [ -n "$f" ] || continue
   sed -i '' -E "$SIG_SED" "$f"
 done <<<"$list"
+# REDACT rows (docs/publish-key-exceptions.txt): individual uncertain key-shaped lines, redacted the same way.
+load_exceptions || { echo "EXPORT SCAN ERROR: exceptions unreadable"; exit 4; }
+redact_rows || exit 4
 
 # The lane's absolute core.hooksPath would enforce lane commit-subject discipline
 # inside the export too; the export is a build artifact, not the lane, so it opts

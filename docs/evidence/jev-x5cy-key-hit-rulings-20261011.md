@@ -47,14 +47,14 @@ Fingerprints are of the exported line (what the scan hashes); "hits" is the key-
 |---|---|---|---|---|---|
 | 1 | `docs/demos/upstream-repro/issue-1-state-preview-plaintext-credentials.md:48` | 1 | `682c74bc` | the match is the PEM header marker (21 chars); the whole value is header + the literal word `FAKE` + footer, no key body; the sibling lines of the same block are labelled fake (`...FAKE-EXAMPLE-NOT-A-REAL-KEY`); added by `bdd1c9a6` as an upstream defect report | **synthetic, proven by the line's own content. Exact exception row.** |
 | 2 | `.omp/hooks/post/jev-gate-observe.test.mjs:235` | 1 | `c4e0c5d8` | the element is the PEM header marker alone, in a unit-test array of secret shapes whose neighbours are generated with `repeat()`; added by `1e16af45` | **synthetic test input, no key material. Exact exception row.** |
-| 3 | `work/jev-hqha/hqha.errsample.json:1` | 2 | `f5904f4b` | one 20-char key-shaped string occurring twice (match sha256 prefix `4ad17f43`) inside a captured error sample quoting a test generator's `SECRETS` list, next to "(fake, 900-range never issued)"; its first 13 characters equal the AWS documentation example key and its last 7 letters differ, so it is a hand-edited placeholder; occurs nowhere else in the tracked tree; added by `0d2d2beb` | **almost certainly synthetic; not independently proven by a second source. Exact exception row, with that caveat written in the row.** If the owner of `jev-hqha` can show it was ever a live credential it must be rotated; nothing here can verify that offline |
+| 3 | `work/jev-hqha/hqha.errsample.json:1` | 2 | `f5904f4b` | one 20-char AWS-shaped identifier occurring twice (match sha256 prefix `4ad17f43`) inside a captured error sample quoting a test generator's `SECRETS` list; its first 13 characters equal the AWS documentation example and its last 7 letters differ; occurs nowhere else in the tracked tree; added by `0d2d2beb` | **uncertain: NOT proven synthetic (reviewer `779d84f6` rejected the exemption). REDACT row, no exemption**: the export copy has both matches replaced by `KEY_SHAPE_REDACTED`; the source file is untouched. If the `jev-hqha` owner can show it was ever live it must be rotated; not verifiable offline |
 | 4 | `work/jevcache-probe/repro-4-state-preview-credentials.sh:46` | 1 | `b50782ff` | the same FAKE-bodied PEM stub as #1, in the probe that produced it; added by `bdd1c9a6` | **synthetic. Exact exception row.** |
 | 5 | `work/gate-question-gap/extract-5-extension.jsonl:895` | 1 | `b07c898a` | the match (17 chars) is a PEM-marker search term inside the `-E` alternation of a `git grep` command in a recorded session command; no key material; added by `f3f544fb` | **search term, not a value. Exact exception row.** |
 
 Each row binds path + whole-line hash + hit count, so none of them covers another file, an edited line, or a second key
-on the same line (arms below). Rows 1, 2, 4 and 5 are proven by the line's own content; row 3 is a judgment and says so.
-The redaction alternative (replace the token in the export by a hash-keyed fingerprint list) was considered for #3 and not
-built: it would add a second mechanism for one token whose provenance already points at the documentation placeholder.
+on the same line (arms below). Rows 1, 2, 4 and 5 are EXEMPT rows, proven by the line's own content (the reviewer accepted these
+four as structural non-key text). Row 3 is a REDACT row: it grants no permission, it removes the value from the export copy, and a
+stale or edited row stops the build (exit 4) instead of being skipped.
 
 ## 4. The 280 `thinkingSignature` lines
 
@@ -82,10 +82,10 @@ All on disposable clones; the live checkout's `.git/config` sha256 was `8c986e2a
 | `GIT_DIR`, with the script's `unset GIT_DIR ...` line deleted (mutant) | 0 | **config, HEAD, reflog, staged entries and index all changed** | RED, the scrub is load-bearing |
 
 This is the full script (archive, transforms, scan, `git init`, commit), not a replay, and it reached `git init`: the item that
-was "not exercised" in `jev-90id` is now exercised. The scan summary on the real tree: 22 flagged lines, 17 explained by the
-AWS documentation example, 0 in the redactor source, 5 by exact rows, 0 unexplained, 0 signature blobs, 0 home paths.
+was "not exercised" in `jev-90id` is now exercised. The scan summary on the real tree after rework: 21 flagged lines, 17 explained by the
+AWS documentation example, 0 in the redactor source, 4 by exact exception rows, 0 unexplained, 0 signature blobs, 0 home paths.
 
-**`scripts/selftest-publish-export-scan.sh`, 40 arms, ~2 s**, run for real (`--scan DIR` over fixtures and the full build inside a
+**`scripts/selftest-publish-export-scan.sh`, 48 arms, ~4 s**, run for real (`--scan DIR` over fixtures and the full build inside a
 tiny fixture repo whose sibling export is the fixture's): the full fake-key negative (one planted line per key shape, six
 shapes, built from parts so the selftest holds no key-shaped literal) is refused with all six `path:line` and none of the planted
 text in the output; a no-match tree is clean (the original defect); a planted home path, `encrypted_content` and a signature blob are
@@ -114,8 +114,8 @@ stages 10-20, 40-97 PASS (stage 70 registry, stage 80 including both new selftes
 - **Stage 30 `30-no-secrets` is RED on origin/main independently of this change**: `work/x7-gate-rules/test_replay.py:136`,
   `TYPESAFE_API_KEY value (value withheld)`, present at `d1226888` and in a clone without these files. Not touched; belongs to the x7 lane
   (the same file whose three tests fail for the missing `replay.py`).
-- Passing the scan is not proof the export is free of secrets; it is the existing allowlist of shapes plus five proven-synthetic
-  lines. Row 3 is a judgment, not a proof. The scan's history leg still checks only `/Users/josh` and `encrypted_content`
+- Passing the scan is not proof the export is free of secrets; it is the existing allowlist of shapes plus four proven-synthetic
+  lines. The hqha line is redacted, not excused (rework). The scan's history leg still checks only `/Users/josh` and `encrypted_content`
   (unchanged from before).
 - The real `jev_playground-export` was not rebuilt or scanned; building and publishing it is the owner's act.
 - The installed commit-msg hook copy still differs from source (`jev-n3lx` live restoration, guarded).
@@ -135,3 +135,20 @@ stages 10-20, 40-97 PASS (stage 70 registry, stage 80 including both new selftes
   (`-F`); neither pattern had a metacharacter, so the match set is identical.
 - Not covered: BSD `sed -E` and `grep -E` only; no GNU or Windows behaviour is claimed. Quote-escaped signature values inside an
   embedded JSON string (`\"thinkingSignature\":`) are not the refused shape and are unchanged, as before.
+
+## 8. Rework after reviewer FAIL `779d84f6`
+
+Finding: the exemption for row 3 labelled an unproven AWS-shaped identifier benign. Accepted. The four structural non-key rows stay.
+
+- `docs/publish-key-exceptions.txt`: row 3 is now `REDACT`, not `EXEMPT`; no permission remains for it. `publish-export.sh` gained
+  `redact_rows`: for each REDACT row it finds the exported line by sha256 (after the existing transforms), checks the hit count, and
+  replaces every key-shaped match on it with `KEY_SHAPE_REDACTED` in the export copy only. A missing file, a hit-count mismatch or a
+  line that no longer matches stops the build (exit 4): a stale row is never skipped.
+- Real tree, fresh clone, full script: export line redacted (2 markers, 0 residual key shapes, line count equal to the source);
+  the source blob is unchanged; scan summary 21 flagged, 17 AWS example, 4 exact rows, 0 unexplained. Full run rc 0 in 65-66 s under
+  no env, `GIT_DIR`, and `GIT_DIR` + absent work tree + index; caller config/HEAD/reflog/staged/index unchanged each time; with the
+  `unset GIT_DIR ...` line deleted all five change.
+- New selftest arms (40 -> 48): a REDACT row redacts the planted uncertain line in the export and leaves no key text; the source keeps
+  it; the same row is not an exemption (`--scan` of the unredacted line fails with path:line); an edited line makes the row stale (exit 4).
+  Mutants (arms RED): the original six 14/3/2/4/1/2, plus redact_rows doing nothing 2, a REDACT row that also exempts 2, a redaction that
+  leaves the key text 2.
