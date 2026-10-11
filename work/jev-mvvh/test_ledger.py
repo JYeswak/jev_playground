@@ -240,12 +240,52 @@ class LedgerTests(unittest.TestCase):
     def test_strict_gate_rejects_an_unmeasured_claimed_on_surface(self) -> None:
         expected = [{"id": "smart-stop", "expect": "on"}]
         rows = [{"id": "smart-stop", "live": "on", "verdict": "UNMEASURED"}]
-        self.assertTrue(strict_failures(expected, rows))
+        self.assertEqual(
+            strict_failures(expected, rows),
+            ["smart-stop: verdict is UNMEASURED, not KEEP/PROMOTE"],
+        )
 
     def test_strict_gate_rejects_kill_surface_still_live(self) -> None:
         expected = [{"id": "vendor-shadow", "expect": "on"}]
         rows = [{"id": "vendor-shadow", "live": "on", "verdict": "KILL"}]
-        self.assertTrue(strict_failures(expected, rows))
+        self.assertEqual(
+            strict_failures(expected, rows),
+            ["vendor-shadow: KILL surface is still live"],
+        )
+
+    def test_strict_gate_rejects_live_kill_even_with_off_proof_fields(self) -> None:
+        expected = [{"id": "vendor-shadow", "expect": "on"}]
+        rows = [
+            {
+                "id": "vendor-shadow",
+                "live": "on",
+                "verdict": "KILL",
+                "switch_verified_off": True,
+                "fresh_session_rows": 0,
+            }
+        ]
+        self.assertEqual(
+            strict_failures(expected, rows),
+            ["vendor-shadow: KILL surface is still live"],
+        )
+
+    def test_strict_gate_rejects_kill_whose_off_switch_is_not_verified(self) -> None:
+        expected = [{"id": "vendor-shadow", "expect": "on"}]
+        for switch in (False, None, "yes"):
+            with self.subTest(switch_verified_off=switch):
+                rows = [
+                    {
+                        "id": "vendor-shadow",
+                        "live": "off",
+                        "verdict": "KILL",
+                        "switch_verified_off": switch,
+                        "fresh_session_rows": 0,
+                    }
+                ]
+                self.assertEqual(
+                    strict_failures(expected, rows),
+                    ["vendor-shadow: off switch is not verified"],
+                )
 
     def test_strict_gate_allows_measured_kill_only_when_live_off(self) -> None:
         expected = [{"id": "vendor-shadow", "expect": "on"}]
@@ -275,7 +315,10 @@ class LedgerTests(unittest.TestCase):
                 "fresh_session_rows": 1,
             }
         ]
-        self.assertTrue(strict_failures(expected, rows))
+        self.assertEqual(
+            strict_failures(expected, rows),
+            ["vendor-shadow: fresh session has rows or no zero-row proof"],
+        )
 
     def test_screen_rows_without_repo_or_session_are_refused(self) -> None:
         with self.assertRaises(LedgerInputError):
