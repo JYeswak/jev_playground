@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_2eba778cf30d0bd4fa1b5a9b2628c024d0decd46ddb63df16a4ff7f0432a96b0",
+ "limitations": [
+  "Offline CLI plumbing only; not a live backend or family-addition cost measure"
+ ],
+ "operation": "jev-b35c.2-independent-isolated-acceptance",
+ "parameters": {
+  "decisive_output": "isolated-registry-errors20/20-exit0;isolated-full-kit200/200-exit0;capabilities-smoke-exit0",
+  "isolation": "scrubbed-director-HOME;TYPESAFE_API_KEY-and-JEV_API_KEY-unset;worker-no-local-clone",
+  "source_commit": "ea91b274f75a3d740842f60c0cf56d8e7b77db46"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 4223,
+  "sha256": "44e0fa6e06a656d9438d7d7eeddae20086db9ef3ff198778cfb15c2335c25b10"
+ }
+}
