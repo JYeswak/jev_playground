@@ -70,28 +70,28 @@ else
     printf 'CANARY_REFUSED reason=checker-missing path=%s\n  claim-discipline checker absent or not executable; refusing commit (fail-closed).\n' "$_checker" >&2
     exit 1
   fi
-  _canary=$(mktemp -d "${TMPDIR:-/tmp}/kit-claim-canary.XXXXXX") || {
+  _canary_root="$_repo/var/agent-tmp"
+  mkdir -p "$_canary_root"
+  if ! _canary=$(mktemp -d "$_canary_root/kit-claim-canary.XXXXXX"); then
     printf 'CANARY_REFUSED reason=tmpdir\n  cannot create canary temp dir; refusing commit (fail-closed).\n' >&2
     exit 1
-  }
+  fi
+  printf 'pid=%s\nlabel=kit-claim-canary\nrepo=%s\ncreated=%s\n' "$$" "$_repo" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$_canary/.owner"
   printf 'hello\n' > "$_canary/readme.md"
   printf 'new TypeSafeClient\n' > "$_canary/proof.txt"
   printf 'label\treadme_pattern\tcapability_key\texpected_substr\tproof_path\tenforce\tnotes\n' > "$_canary/bad.tsv"
   printf 'planted-miss\tTHIS PATTERN IS NOT IN THE README\tcap\tnew TypeSafeClient\t%s\tyes\tcanary\n' "$_canary/proof.txt" >> "$_canary/bad.tsv"
   if _canary_out=$("$_checker" "$_canary/bad.tsv" "$_canary/readme.md" "$_canary" 2>&1); then
     printf 'CANARY_REFUSED reason=checker-blind\n  claim-discipline checker said GREEN on a false canary claim; refusing commit.\n%s\n' "$_canary_out" >&2
-    rm -rf "$_canary"
     exit 1
   fi
   case "$_canary_out" in
     *planted-miss*) ;;
     *)
       printf 'CANARY_REFUSED reason=checker-blind\n  canary RED did not name planted-miss; refusing commit.\n%s\n' "$_canary_out" >&2
-      rm -rf "$_canary"
       exit 1
       ;;
   esac
-  rm -rf "$_canary"
 fi
 
 # ── lane 0c: installed hook/extension parse and import resolution ───────────────────────────────
