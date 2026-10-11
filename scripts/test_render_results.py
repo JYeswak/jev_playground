@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -18,6 +19,20 @@ render_results = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(render_results)
 
 
+def missing_evidence_paths(table: str, root: Path) -> list[str]:
+    """File-like tokens in the last column of each table row that are absent from root."""
+    missing = []
+    for line in table.splitlines():
+        cells = line.rstrip().rstrip("|").rsplit("|", 1)
+        if len(cells) != 2 or "`" not in cells[1]:
+            continue
+        for part in cells[1].strip().strip("`").split(";"):
+            token = part.split()[0].split("@")[0] if part.split() else ""
+            if re.search(r"\.\w{2,5}$", token) and not (root / token).exists():
+                missing.append(token)
+    return missing
+
+
 class RenderResultsTest(unittest.TestCase):
     def test_render_is_idempotent_against_committed_readme(self):
         readme = (ROOT / "README.md").read_text()
@@ -28,6 +43,14 @@ class RenderResultsTest(unittest.TestCase):
         readme = (ROOT / "README.md").read_text()
         planted = readme.replace("2467/3080", "2466/3080", 1)
         self.assertNotEqual(render_results.render_readme_text(planted, ROOT), planted)
+
+    def test_evidence_cells_name_files_that_exist(self):
+        table = render_results.render_table(ROOT)
+        self.assertEqual(missing_evidence_paths(table, ROOT), [])
+        planted = "| Surface | Result | Shape | `work/no-such-dir/receipt.json; EVAL.md@abc` |"
+        self.assertEqual(
+            missing_evidence_paths(planted, ROOT), ["work/no-such-dir/receipt.json"]
+        )
 
     def test_nfcorpus_failed_joint_bar_discloses_both_payers(self):
         receipt = json.loads(

@@ -62,7 +62,7 @@ The bead graph is reviewed in rounds by five independent lenses (mission coverag
 
 ## Quickstart
 
-**Publication boundary (2026-09-30):** public GitHub `main` was observed at `b3e1cd89a5ba1e09ec318471cb325481590231f4` by a fresh `git ls-remote` check. The P9 keyless acceptance recorded in `EVAL.md` §jev-p9 ran against that public SHA: 14 README command rows (12 exit 0; doctor and real no-key Choice exit 2/`NOT_RUN`). At this observation, the corrected local README/LEDGER had not been published; a public same-HEAD readback of those revisions is required for P9 closure. This is offline keyless CLI acceptance, not a live Jev answer, omp activation, or a complete P1 installer/gate handoff. Check `git remote get-url origin` and `git rev-parse HEAD` in your clone; a different public HEAD needs its own same-revision readback. `git cat-file -e` proves object presence, not public-branch inclusion.
+**Keyless check:** [`docs/demos/upstream-repro/stranger-run.md`](docs/demos/upstream-repro/stranger-run.md) records every command below run against a fresh public clone with no API key in the environment: the clone commit, and the exit status and wall time of each command. The command that regenerates it is in that file. It shows the offline commands run; it is not a live Jev answer, omp activation, or an installability proof with a key. Check `git remote get-url origin` and `git rev-parse HEAD` in your clone; a different HEAD needs its own run.
 
 From a fresh public clone:
 
@@ -115,7 +115,7 @@ The stranger-runnable top-1 rerank verb uses one Choice over all candidate passa
 ```bash
 npx --prefix kit --no-install classifier rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot
 ```
-For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same pinned Choice command without `--fake`. Without a key, doctor reports `NOT_RUN` and the live command refuses locally (exit 1); a configured key alone is not proof of API authorization:
+For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same pinned Choice command without `--fake`. Without a key, doctor reports `NOT_RUN` (exit 1) and the live command refuses locally (exit 2); a configured key alone is not proof of API authorization:
 
 ```bash
 if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install classifier ask choice --state kit/examples/state.json --question kit/examples/question.json --robot || { rc=$?; exit "$rc"; }
@@ -125,7 +125,7 @@ The pinned model is `jev-1.13.0`.
 
 The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls.
 
-At the 2026-09-30 04:20 UTC snapshot, the corrected local stage-15 gate passed (431/431 enforced), while the ordinary foundation aggregate remained **RED at stage 80** (consumer-check 11/12 and a selftest referencing a missing pre-commit hook); the aggregate `--selftest` passed at 04:41 UTC. A later stage-15 claim-coverage RED (115/119, then 116/118 against the then-unchanged 119/120 floor) was repaired in `2ae763c6`: its targeted gate passed 432 claims with 0 failed, 3 skipped, and coverage 121/122. After source-backed claim additions, the coverage floor was strengthened again; the 2026-09-30 targeted run recorded in `EVAL.md` §jev-p9 passed 432 claims with 0 failed, 3 skipped, coverage 123/124, and the stage's planted-negative `--selftest` passed. A later floor sync to 124/124 with its claims.tsv rows keeps the targeted gate at 433 passed, 0 failed.
+Foundation gate stage 15 (`foundation/gates.d/15-kit-claim.sh`, run with bash from the repository root) checks the claims in [`docs/LEDGER.md`](docs/LEDGER.md) against `foundation/kit/claims.tsv`. It does not check the prose of this README. Its run on 2026-10-11 UTC passed 433 enforced claims, 0 failed, 3 skipped, with ledger claim coverage 124/124.
 
 ## What Jev answers
 
@@ -147,7 +147,7 @@ The table summarizes measured results, including a failed NFCorpus joint bar, wh
 | Banking77 intent classification | Jev 2467/3080 (80.1%) vs Haiku 2267/3080 (73.6%) | Choice | `work/choice-banking77/score.py --set full-prompted` |
 | SST-5 sentiment scoring | Jev 273/500, MAE 0.488 vs Haiku 251/500, MAE 0.556 | Score | `work/score-sst5/score.py` |
 | SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
-| Replicated web-screen | Jev+local 68/78 own attacks; 135/256 deepset; Hermes own 15/40 fresh S-Labs; 0/1,437 clean withheld; pinned jev-1.13.0 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; work/omp-hermes-screen/hermes-own-live-receipt-20260926.json; kerpopule/hermes-jev-skills@cf9e84c` |
+| Replicated web-screen | Jev+local 68/78 own attacks; 135/256 deepset; Hermes own 15/40 fresh S-Labs; 0/1,437 clean withheld; pinned jev-1.13.0 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; work/hermes-webscreen-repro/hermes-own-live-receipt-20260926.json; kerpopule/hermes-jev-skills@cf9e84c` |
 | MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
 | BEIR NFCorpus rerank | Jev top-1 70.9% vs BM25 58.1% (McNemar 45 vs 15, p=0.00013); free LLM 66.7% vs Jev 70.9% (McNemar 18 vs 28, p=0.184); nDCG free LLM 0.434 vs Jev 0.448; joint bar FAIL: top-1 +0.128 met +0.10, nDCG@10 +0.027 missed +0.05; free LLM p50 25.9s, $0 by unchanged usage; Jev eligible run $0.0882 ($0.3354 including discarded run); 15+1 free LLM retries disclosed | Choice rerank / free incumbent | `work/rerank-scifact/receipt-nfcorpus-v2.json; work/rerank-scifact/receipt-jev-97bq.json` |
 | BEIR FiQA rerank confirmation | Jev top-1 76.2% vs BM25 39.3% (McNemar 129 vs 10, p=1.65e-27); nDCG@10 delta +0.157; confirmatory top-1 bar passed; $0.119 | Choice rerank | `work/rerank-scifact/receipt-fiqa-mkex.json` |
@@ -191,7 +191,7 @@ Local models: nimble/tev1 LOSE-TO-JEV except nimble as cascade first pass (jev-u
 
 TTSR judged rules: rules below 0.80 precision retired (R132 `jev-key-canonical-source`); `claim-without-evidence` retired earlier (R130, precision 0.571).
 
-Fleet watcher (`scripts/fleet-idle-watch.py`), ON again since 2026-10-05T15:55Z after the 2026-10-04 overnight pause. An idle worker waiting on a human pages pane 1 with the 140-char excerpt (jev-7aj1 verified: recall 10/10, 0/10 false pages), and an idle pane whose omp steering queue holds an undelivered message gets one nudge (`jev-of3b`). Enrichment beyond the excerpt is deleted (jev-zljn, R136: n=1, fragile).
+Fleet watcher (`scripts/fleet-idle-watch.py`): **STOPPED**. It was ON from 2026-10-05T15:55Z; no standing LaunchAgent is loaded now, and idle paging through the native fleet watcher has been paused since 2026-10-10 (`AGENTS.md`, "What is ON"); the supervised acceptance bead `jev-06wt` is still open. Its measured page quality while on: an idle worker waiting on a human paged pane 1 with the 140-char excerpt (jev-7aj1 verified: recall 10/10, 0/10 false pages), and an idle pane whose omp steering queue held an undelivered message got one nudge (`jev-of3b`). Enrichment beyond the excerpt is deleted (jev-zljn, R136: n=1, fragile).
 
 ## Read next
 
