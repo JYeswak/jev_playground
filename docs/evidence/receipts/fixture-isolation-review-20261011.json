@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_e3253fe3181b88cff75728376c6e80be793b7a4662f1e88d579db645b4bf3054",
+ "limitations": [
+  "177-run sweep is worker evidence; own rerun7 arms; live restoration and hook activation AC3 not performed"
+ ],
+ "operation": "jev-n3lx-independent-fixture-isolation",
+ "parameters": {
+  "decisive_output": "pass7-fail0-exit0;three-planted-leaks-detected;live-config-sha-unchanged",
+  "live_config_sha256": "8c986e2a6548e039aca12b15b0cf5cabb9110a5f6a4cdcbb99914a447b18688b",
+  "source_commit": "1cbe4bb0"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 561,
+  "sha256": "dd31301ad5a5ae8eb688fe53f351efd696100ab60ff8c1cca316c70254535bf9"
+ }
+}
