@@ -10,6 +10,12 @@ import types
 import unittest
 from pathlib import Path
 
+# jev-n3lx: these tests build their own repos. A caller's repo-steering git environment must not reach
+# them, or `git init` / `git config` rewrite the caller's .git/config (found by an inherited-GIT_DIR sentinel).
+for _name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_CONFIG"):
+    os.environ.pop(_name, None)
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from phase_gate import AttemptPanic, call_after_bar

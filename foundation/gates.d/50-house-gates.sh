@@ -56,7 +56,11 @@ if [ "${1:-}" = "--selftest" ]; then
         # commit-evidence-lint.sh --selftest fails with the ambient config and PASSES with
         # GIT_CONFIG_GLOBAL=/dev/null ("3 known-bad flagged, 3 clean controls passed"), which is
         # the discriminating proof that the fixture, not the gate, was broken.
-        out=$(GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null "$KIT/$g" --selftest 2>&1)
+        # jev-n3lx: and scrubbed of the caller's repo-steering git environment. commit-evidence-lint.sh
+        # --selftest commits seven fixture commits; under an inherited GIT_DIR they land in the CALLER's repo.
+        out=$(env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_COMMON_DIR -u GIT_OBJECT_DIRECTORY \
+                  -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_NAMESPACE -u GIT_CONFIG \
+                  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null "$KIT/$g" --selftest 2>&1)
         code=$?
         if [ "$code" -eq 0 ]; then
             echo "  selftest PASS  $g"

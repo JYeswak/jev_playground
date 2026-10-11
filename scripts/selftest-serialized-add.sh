@@ -3,6 +3,10 @@
 # foundation/gates.d/80 via the scripts/selftest-*.sh glob. Every arm plants
 # a real condition and requires the stated outcome.
 set -uo pipefail
+# jev-n3lx: this selftest builds its own fixture repo. A caller that exported GIT_DIR / GIT_WORK_TREE /
+# GIT_INDEX_FILE (to point a gate at a candidate tree) must not steer the fixture's `git config` and
+# `git commit` at the caller's repository: under an inherited GIT_DIR they rewrite its .git/config.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 cd "$root" || exit 2
 S="$root/scripts/git-commit-serialized.sh"

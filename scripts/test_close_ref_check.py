@@ -11,6 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+# jev-n3lx: these tests build their own repos. A caller's repo-steering git environment must not reach
+# them, or `git init` / `git config` rewrite the caller's .git/config (found by an inherited-GIT_DIR sentinel).
+for _name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_CONFIG"):
+    os.environ.pop(_name, None)
+
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "scripts" / "close-ref-check.py"
 
