@@ -123,7 +123,7 @@ if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --pr
 
 The pinned model is `jev-1.13.0`.
 
-The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls.
+The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0`, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls.
 
 Foundation gate stage 15 (`foundation/gates.d/15-kit-claim.sh`, run with bash from the repository root) checks the claims in [`docs/LEDGER.md`](docs/LEDGER.md) against `foundation/kit/claims.tsv`: each registered claim needs a proof file that contains the cited figure, and the share of ledger claim sentences that are registered may only rise. A match shows that the figure is present in its proof file; it does not show that the figure is right. It does not check the prose of this README. Run it for the current counts.
 
