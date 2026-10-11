@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_2a6eea219da76a0ced52d213f0a84781fd6b8707daddf4da168ef0756bdee8f5",
+ "limitations": [
+  "Disposable export only; one full caller env shape independently exercised; stage30 preexisting failure not rerun or green; shape scan not comprehensive secret-freedom proof"
+ ],
+ "operation": "jev-x5cy-independent-full-export",
+ "parameters": {
+  "decisive_output": "selftest48/48-exit0;full-real-tree-export-exit0;five-caller-fingerprints-unchanged;export-one-commit",
+  "source_commit": "f40cbb60"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 503,
+  "sha256": "8a6d3fab653dcc3a72f522b7147aec327872bbafd15da11792479d3af4b50148"
+ }
+}
