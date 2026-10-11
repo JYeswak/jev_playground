@@ -34,6 +34,7 @@ tool directory is one where nobody can tell a live instrument from an abandoned 
 | `sync-docs.sh` | fetches the mirrored primary sources; `--check` verifies every byte against `MANIFEST.tsv` | — |
 | `jev-probe.mjs` | one live Jev call, or `--replay` to decode a recorded response with no network and no key | 2 no key present |
 | `render-results.py` | renders the README Measured wins table from committed scorer/receipt outputs; `--check` fails on drift | 1 on drift |
+| `repro-commit-only-sweep.py [REV]` | jev-rknc acceptance: rebuilds the real e03ef53d state (1 owned bead row plus 2 peers' edited rows in `.beads/issues.jsonl`) in a throwaway repo. `git commit --only` must sweep the peers' rows; a private-index row overlay must land only the owned row with the worktree untouched. Retire the RAW arm when LAND1 ships | 1 defect not reproduced or control dirty, 2 refused before any git write |
 
 ## Conventions these share
 
