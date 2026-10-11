@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_9338f47e216ea189a4221039d2bffa65f9741ed4626fe0605e32ce9ee5338a6f",
+ "limitations": [
+  "Full real-tree independent build withheld pending removal of unproven EXEMPT policy; author full-build claim not inflated to independent proof"
+ ],
+ "operation": "jev-x5cy-independent-policy-reject",
+ "parameters": {
+  "decisive_output": "selftest40/40-exit0;live-config-unchanged;exception-row13-acknowledges-unproven-synthetic-status;acceptance-REJECT",
+  "source_commit": "295e879545bcc54679b307a0a52b29a875edcf88",
+  "worker_doc_committed_sha256": "7346203b05009551ab65dbe277f0bebac10fffa2065bf6e89cb81e737a6f9fa9"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 1910,
+  "sha256": "c894bee6285f89766c39c9c6f4fbb55e9809a0b31b94a8ece88ed4b73dde40f9"
+ }
+}
