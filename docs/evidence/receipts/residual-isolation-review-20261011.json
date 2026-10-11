@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4c941353a793fc286bda3c3472d3d27cef069364a2d3133c2383256d72c518c9",
+ "limitations": [
+  "Missing publish-export/run-registered-suites/x7 sentinel evidence; installed hook not updated; no close"
+ ],
+ "operation": "jev-90id-partial-independent-review",
+ "parameters": {
+  "decisive_output": "sentinel9/9-exit0;live-config-sha-unchanged;installed-hook-hash-differs",
+  "source_commit": "93e33e0b"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 725,
+  "sha256": "56ddd66501ca981ac39e8cc74584d7a9788781837ffca4f0664089de7a46266b"
+ }
+}
