@@ -24,7 +24,9 @@ FILES = (
     "findings-cfsios.jsonl",
     "findings-uds.jsonl",
 )
-ENDPOINT = "http://127.0.0.1:8010/v1/systemone"
+ENDPOINT = "http://127.0.0.1:11300/jev/clef-flash/classify"
+IDENTITY_URL = "http://127.0.0.1:11300/jev/clef-flash/"
+REQUEST_ID_HEADER = "X-Localbench-Request-Id"
 MODEL = "clef-flash"
 SEED = 20261005
 MAX_CALLS = 700
@@ -184,7 +186,20 @@ def build_request_payload(finding: str) -> dict[str, Any]:
     }
 
 
-def request_local(finding: str, timeout: float = 30) -> dict[str, Any]:
+def request_identity(url: str = IDENTITY_URL) -> dict[str, Any]:
+    if url != IDENTITY_URL:
+        raise ValueError("identity URL differs from the pinned gateway route")
+    with urllib.request.urlopen(url, timeout=5) as response:  # nosec B310: pinned loopback gateway
+        identity = json.loads(response.read())
+    models = identity.get("models") if isinstance(identity, dict) else None
+    if not isinstance(models, list) or not any(
+        isinstance(m, dict) and m.get("id") == MODEL for m in models
+    ):
+        raise ValueError("gateway identity does not list clef-flash")
+    return identity
+
+
+def request_local(finding: str, timeout: float = 60) -> dict[str, Any]:
     payload = build_request_payload(finding)
     request = urllib.request.Request(
         ENDPOINT,
@@ -194,6 +209,9 @@ def request_local(finding: str, timeout: float = 30) -> dict[str, Any]:
     )
     started = time.monotonic()
     with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310: endpoint is a pinned loopback URL
+        request_id = response.headers.get(REQUEST_ID_HEADER)
+        if not isinstance(request_id, str) or not request_id.strip():
+            raise ValueError("response lacks localbench guard request id")
         body = json.loads(response.read())
     elapsed = (time.monotonic() - started) * 1000
     raw = body["answers"]["cls"]
@@ -202,6 +220,7 @@ def request_local(finding: str, timeout: float = 30) -> dict[str, Any]:
         "probabilities": raw.get("probabilities"),
         "latency_ms": elapsed,
         "model": body.get("model", MODEL),
+        "localbench_request_id": request_id,
     }
 
 
@@ -388,6 +407,7 @@ def main() -> int:
         ]
         print(json.dumps(score_rows(rows), sort_keys=True))
         return 0
+    request_identity()
     rows = load_rows()
     assign_split(rows)
     dev = [row for row in rows if row["split"] == "dev"]

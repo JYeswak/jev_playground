@@ -27,10 +27,17 @@ request state.
 - **Keyword rule:** on dev only, count normalized whitespace tokens by class.
   At prediction, sum each token's dev counts per class and select the largest;
   ties break by offered-class order; no seen tokens selects dev majority.
-- **Clef-Flash:** one Choice request per held-out finding to local
-  `http://127.0.0.1:8010/v1/systemone`, model `clef-flash`, with the ordered
-  offered set above. `state` contains only the finding; instructions ask for
-  the single best canonical process-finding class. No remote service or paid
+- **Clef-Flash:** one Choice request per held-out finding through the localbench
+  gateway `http://127.0.0.1:11300/jev/clef-flash/classify`, model `clef-flash`,
+  with the ordered offered set above. **Amendment 2026-10-10** (before any
+  successful call; the single prior attempt on 2026-10-05 errored with HTTPError
+  before any response): requests go through the gateway's
+  `/jev/clef-flash/<route>` route — never `:8010` directly — and every row must
+  carry the gateway's `X-Localbench-Request-Id`; a response without it is an
+  error and stops the run. Direct-`:8010` was allowed by the original text but
+  violates ROADMAP pillar 4 and the kit's own URL rule; this amendment fixes the
+  transport, nothing else. `state` contains only the finding; instructions ask
+  for the single best canonical process-finding class. No remote service or paid
   model.
 
 ## Frozen bar
