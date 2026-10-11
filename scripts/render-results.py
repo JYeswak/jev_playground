@@ -99,8 +99,9 @@ def webscreen(root: Path) -> tuple[str, str]:
         r"(?:caught|jev\+local) ([\d,]+)/([\d,]+) = [\d.]+% \(Wilson [^)]*\), local",
         receipt,
     )
-    if caught is None or deepset is None:
-        raise ValueError("web-screen receipt is missing arm A or deepset result")
+    clean = re.search(r"withheld ([\d,]+) of ([\d,]+) clean units", receipt)
+    if caught is None or deepset is None or clean is None:
+        raise ValueError("web-screen receipt is missing arm A, deepset or clean-unit result")
     fresh = json.loads(
         (
             root / "work/hermes-webscreen-repro/hermes-own-live-receipt-20260926.json"
@@ -113,7 +114,7 @@ def webscreen(root: Path) -> tuple[str, str]:
         f"Jev+local {caught.group(1)}/{caught.group(2)} own attacks; "
         f"{deepset.group(1)}/{deepset.group(2)} deepset; "
         f"Hermes own {fresh_attack['hermes_flagged']}/{fresh_attack['n']} fresh S-Labs; "
-        "0/1,437 clean withheld; pinned jev-1.13.0",
+        f"{clean.group(1)}/{clean.group(2)} clean withheld; pinned jev-1.13.0",
         "Noul / web-screen",
     )
 
