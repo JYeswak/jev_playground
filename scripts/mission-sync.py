@@ -132,7 +132,10 @@ def _failure_condition(text: str) -> bool:
 def _extract_check(cell: str, pillar: str) -> str:
     commands: list[str] = []
     for span in _inline_code_spans(cell):
-        command = _shell_commands(span)
+        try:
+            command = _shell_commands(span)
+        except MissionSyncError as error:
+            raise MissionSyncError(f"pillar {pillar!r}: {error}") from error
         if command is not None:
             commands.append(command)
     if not commands:
@@ -287,7 +290,11 @@ def _set_field(section: list[str], key: str, value: Any) -> list[str]:
 
 
 def _validate_check(value: str, pillar: str) -> None:
-    if _shell_commands(value) is None:
+    try:
+        command = _shell_commands(value)
+    except MissionSyncError as error:
+        raise MissionSyncError(f"pillar {pillar!r}: {error}") from error
+    if command is None:
         raise MissionSyncError(f"pillar {pillar!r} check is not an exit-coded command: {value!r}")
 
 def _protocol_check(root: Path) -> None:
@@ -321,7 +328,10 @@ def _mismatch_messages(expected: list[dict[str, Any]], actual: list[dict[str, An
         if mission["beads"] != source["beads"]:
             missing = [bead for bead in source["beads"] if bead not in mission["beads"]]
             extra = [bead for bead in mission["beads"] if bead not in source["beads"]]
-            messages.append(f"pillar {pillar_id!r}: beads differ; missing={missing}, extra={extra}")
+            if missing or extra:
+                messages.append(f"pillar {pillar_id!r}: beads differ; missing={missing}, extra={extra}")
+            else:
+                messages.append(f"pillar {pillar_id!r}: beads differ only in order or duplicates")
         try:
             _validate_check(mission["check"], pillar_id)
         except MissionSyncError as error:
