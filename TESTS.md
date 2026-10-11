@@ -60,7 +60,8 @@ claim nobody can check:
   `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` (exit 1 today; STATUS not written).
 - `scripts/test_render_results.py` — receipt-backed README results rendering for Banking77, SST-5,
   SciFact, BEIR rerank, MiniWoB v3, and the explicit not-measured OMP judge usage row; the
-  planted README-number mutation fails the drift check. Run: `python3 -m unittest scripts/test_render_results.py` (3 tests).
+  planted README-number mutation fails the drift check, and the web-screen clean-unit count follows
+  its receipt (jev-qx7b: README said 1,437 where the receipt says 1,082). Run: `python3 -m unittest scripts/test_render_results.py` (6 tests).
 - `kit/experiment/test_run.py` — shared JSONL checkpoint/resume and detached-launch contract: fsync rows, trailing-line repair, interruption resume, OMP child refusal, PID/heartbeat. Run: `python3 -m unittest kit/experiment/test_run.py` (5 tests).
  - `.omp/hooks/post/jev-webscreen.test.mjs` — offline web-screen hook and handler tests: healthy pass-through, planted withholding, redaction, fail-open, shadow, and enforce paths, plus WIRE hostile out-of-range refusal. Run: `node --experimental-strip-types --test .omp/hooks/post/jev-webscreen.test.mjs` (13 tests).
  - `.omp/hooks/post/jev-web-duel.test.mjs` — duel equivalence + edge tests (jev-n4eu): orchestration preserves every decision (duel === serial), shadow silence, byte preservation, merge precedence, and overhead; recorded live injection scores, deterministic webscreen fakes. Run: `node --test .omp/hooks/post/jev-web-duel.test.mjs` (5 tests).

@@ -84,6 +84,24 @@ class RenderResultsTest(unittest.TestCase):
         ):
             render_results.nfcorpus_rerank(ROOT)
 
+    def test_webscreen_clean_count_follows_the_receipt(self):
+        result, _ = render_results.webscreen(ROOT)
+        self.assertIn("0/1,082 clean withheld", result)
+        original_read_text = Path.read_text
+
+        def planted_read_text(path, *args, **kwargs):
+            text = original_read_text(path, *args, **kwargs)
+            if path.name == "RECEIPT.md" and path.parent.name == "hermes-webscreen-repro":
+                return text.replace(
+                    "withheld 0 of 1,082 clean units", "withheld 3 of 999 clean units"
+                )
+            return text
+
+        with patch.object(Path, "read_text", planted_read_text):
+            planted, _ = render_results.webscreen(ROOT)
+        self.assertIn("3/999 clean withheld", planted)
+        self.assertNotIn("1,437", planted)
+
 
 if __name__ == "__main__":
     unittest.main()
