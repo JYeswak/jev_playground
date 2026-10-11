@@ -22,6 +22,20 @@ awk -F'\t' -v OFS='\t' '$1 ~ /^readme-/ && $6 == "no" { $6 = "yes" } { print }' 
 cat "$tmp" > foundation/kit/claims.tsv
 rm -f "$tmp"
 echo "flipped $off readme- rows to enforce=yes"
+# The two prose statements that describe stage 15 change in the same step, each anchored on an exact
+# sentence that must occur once (the edit refuses otherwise).
+python3 - <<'PY'
+def sub(path, old, new):
+    text = open(path).read()
+    assert text.count(old) == 1, (path, "anchor must occur exactly once")
+    open(path, "w").write(text.replace(old, new))
+sub("README.md",
+    "It does not check the prose of this README. Run it for the current counts.",
+    "It also checks this README: each number-bearing or pass/fail sentence must match a row labelled `readme-` in that file, so a changed figure, a new unregistered claim, or a proof file that lost its text turns the stage red. Run it for the current counts.")
+sub("GATES.md",
+    "and removed-claim RED arms. | `foundation/gates.sh` |",
+    "and removed-claim RED arms. Rows labelled `readme-` are `README.md` claims, checked the same way against `README.md` (floor keys `readme_covered`, `readme_candidates`); the selftest also proves the README's planted-claim, drifted-figure and no-rows RED arms (jev-qx7b). | `foundation/gates.sh` |")
+PY
 bash foundation/gates.d/15-kit-claim.sh | tail -3
 bash foundation/gates.d/15-kit-claim.sh --selftest
 bash foundation/gates.d/17-kit-demotion.sh | tail -2
