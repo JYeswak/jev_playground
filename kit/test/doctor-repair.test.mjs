@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { chmod, lstat, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
+import { chmod, lstat, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { acquireDoctorLock } from '../dist/doctor/lock.js';
 import { mutate } from '../dist/doctor/mutate.js';
@@ -413,7 +413,7 @@ test('uninstall quarantines every managed file and undo restores it byte-identic
   }
 });
 
-test('a directly unlinked managed file fails the quarantine proof', async () => {
+test('a managed file removed without recorded quarantine fails the quarantine proof', async () => {
   const home = await freshHome('classifier-uninstall-direct-unlink');
   const repo = join(home, 'repo');
   const doctorDir = join(home, 'doctor-state');
@@ -426,7 +426,9 @@ test('a directly unlinked managed file fails the quarantine proof', async () => 
 
   const rel = '.omp/tools/jev-gate.ts';
   const bytes = await readFile(join(repo, ...rel.split('/')));
-  await unlink(join(repo, ...rel.split('/')));
+  const displaced = join(home, 'managed-file-preserved-outside-quarantine');
+  await rename(join(repo, ...rel.split('/')), displaced);
+  assert.ok((await readFile(displaced)).equals(bytes));
 
   await assert.rejects(assertQuarantined({ repo, doctorDir, originals: new Map([[rel, bytes]]) }), /not quarantined/);
 });
