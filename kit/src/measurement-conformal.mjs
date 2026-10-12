@@ -66,11 +66,11 @@ function validFrame(frame) {
   return typeof calibration.name === 'string' && Boolean(calibration.name.trim())
     && typeof test.name === 'string' && Boolean(test.name.trim())
     && calibration.name !== test.name
-    && calibration.targetPopulation === frame.targetPopulation
-    && test.targetPopulation === frame.targetPopulation;
+    && typeof calibration.targetPopulation === 'string'
+    && typeof test.targetPopulation === 'string';
 }
 
-function validateRows(rows, group, frame, labels, ids) {
+function validateRows(rows, group, frame, labels, ids, floor) {
   if (!Array.isArray(rows) || rows.length === 0) return { reason: 'empty_split' };
   const scores = [];
   for (const row of rows) {
@@ -100,7 +100,7 @@ function validateRows(rows, group, frame, labels, ids) {
     if (!Number.isFinite(total) || Math.abs(total - 1) > 1e-6) {
       return { reason: 'invalid_probability_vector' };
     }
-    const probability = Math.max(row.probabilities[row.trueLabel], row.probabilityFloor ?? 0.005);
+    const probability = Math.max(row.probabilities[row.trueLabel], floor);
     scores.push({ id: row.id, trueLabel: row.trueLabel, score: 1 - probability, probabilities: row.probabilities });
   }
   return { scores };
@@ -122,17 +122,21 @@ export function splitConformalLac(input) {
   if (!finiteProbability(alpha) || alpha === 0 || alpha === 1) return refuse('invalid_alpha');
   if (!finiteProbability(floor)) return refuse('invalid_probability_floor');
   if (!validFrame(samplingFrame)) return refuse('named_sampling_frame_required');
+  if (samplingFrame.calibrationGroup.targetPopulation !== samplingFrame.targetPopulation
+      || samplingFrame.testGroup.targetPopulation !== samplingFrame.targetPopulation) {
+    return refuse('groups_not_from_same_target_population');
+  }
   if (!Array.isArray(calibration) || !Array.isArray(test)
       || calibration.length === 0 || test.length === 0) return refuse('empty_split');
 
   const labelSet = new Set(labels);
   const calibrationIds = new Set();
   const calibrationResult = validateRows(
-    calibration, samplingFrame.calibrationGroup, samplingFrame, labelSet, calibrationIds,
+    calibration, samplingFrame.calibrationGroup, samplingFrame, labelSet, calibrationIds, floor,
   );
   if (calibrationResult.reason) return refuse(calibrationResult.reason);
   const testIds = new Set();
-  const testResult = validateRows(test, samplingFrame.testGroup, samplingFrame, labelSet, testIds);
+  const testResult = validateRows(test, samplingFrame.testGroup, samplingFrame, labelSet, testIds, floor);
   if (testResult.reason) return refuse(testResult.reason);
   for (const id of testIds) {
     if (calibrationIds.has(id)) return refuse('overlapping_split_ids');
