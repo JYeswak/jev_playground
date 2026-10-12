@@ -59,6 +59,10 @@ function completion(res, model, message, finishReason, stream) {
   }));
 }
 
+// Assigned by run(): the outer catch below must tear down the same child/server the
+// session started, or a timed-out route lingers (2026-10-11 CI stall).
+let activeTeardown = () => {};
+
 async function run(masking, inspectResult) {
   const marker = fakeSecret();
   let scratch;
@@ -116,6 +120,23 @@ async function run(masking, inspectResult) {
   let lines;
   let timeoutId;
   let server;
+  const sockets = new Set();
+  // Hard teardown: the 2026-10-11 CI stall was node lingering after the 45 s timer
+  // fired (child + open keep-alive sockets hold the loop; exitCode alone never exits).
+  // Every exit path below goes through here; a wedged loop still exits via watchdog.
+  function teardown() {
+    try {
+      clearTimeout(timeoutId);
+      try { child?.stdin?.end(); } catch { /* already gone */ }
+      try { child?.kill("SIGTERM"); } catch { /* never spawned */ }
+      setTimeout(() => { try { child?.kill("SIGKILL"); } catch { /* gone */ } }, 2000).unref();
+      for (const s of sockets) { try { s.destroy(); } catch { /* gone */ } }
+      try { server?.closeAllConnections?.(); } catch { /* old node */ }
+      try { server?.close(); } catch { /* never listened */ }
+      if (scratch) rm(scratch, { recursive: true, force: true }).catch(() => {});
+    } catch { /* teardown never throws */ }
+  }
+  activeTeardown = teardown;
 
   server = createServer(async (req, res) => {
     try {
@@ -176,6 +197,7 @@ async function run(masking, inspectResult) {
       rejectComplete(error);
     }
   });
+  server.on("connection", (s) => { sockets.add(s); s.on("close", () => sockets.delete(s)); });
 
   server.listen(0, "127.0.0.1");
   server.once("listening", () => {
@@ -260,11 +282,8 @@ async function run(masking, inspectResult) {
       });
       await rm(scratch, { recursive: true, force: true });
     } catch (error) {
-      clearTimeout(timeoutId);
-      child?.kill("SIGTERM");
-      lines?.close();
-      server.close();
-      await rm(scratch, { recursive: true, force: true });
+      try { lines?.close(); } catch { /* gone */ }
+      teardown();
       rejectCapture(error);
       rejectComplete(error);
     }
@@ -296,6 +315,8 @@ if (masking === bypass) {
     process.stdout.write(JSON.stringify(output) + "\n");
   } catch (error) {
     process.stderr.write(`NOT_RUN: ${error?.message ?? error}\n`);
+    activeTeardown();
     process.exitCode = 2;
+    setTimeout(() => process.exit(2), 8000).unref();
   }
 }
