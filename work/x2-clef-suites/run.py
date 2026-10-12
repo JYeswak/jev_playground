@@ -399,13 +399,14 @@ def js_units(text: str) -> int:
 
 
 def load_gate_rows(command_pack_path: str | None = None) -> list[dict[str, Any]]:
+    """Join frozen X7 rows with private prepare.py event_id/cmd_sha command packs."""
     check_source_hashes("gate")
     x7 = read_jsonl(ROOT / "work/x7-gate-rules/row-scores.jsonl")
     jev = read_jsonl(ROOT / "kit/fixtures/gate/answers-jev.jsonl")
     commands = read_jsonl(private_command_pack(command_pack_path))
     x7_by_id = {row["id"]: row for row in x7}
     jev_by_id = {row["event_id"]: row for row in jev}
-    command_by_id = {row["id"]: row for row in commands}
+    command_by_id = {row["event_id"]: row for row in commands}
     ids = [row["id"] for row in x7]
     if len(x7_by_id) != len(x7) or len(jev_by_id) != len(jev) or len(command_by_id) != len(commands):
         raise X2Error("duplicate X7 event or private command id")
@@ -420,7 +421,7 @@ def load_gate_rows(command_pack_path: str | None = None) -> list[dict[str, Any]]
         if answer is None or command_row is None:
             raise X2Error(f"missing X7 answer or private command for {event_id}")
         cmd_sha = answer.get("cmd_sha")
-        if cmd_sha != command_row.get("cmdSha"):
+        if cmd_sha != command_row.get("cmd_sha"):
             raise X2Error(f"X7 command hash mismatch for {event_id}")
         full_command = command_row.get("command")
         if not isinstance(full_command, str) or hashlib.sha256(full_command.encode("utf-8")).hexdigest() != cmd_sha:
