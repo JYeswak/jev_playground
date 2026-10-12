@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import collections
 import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -17,11 +18,72 @@ for _name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "G
     os.environ.pop(_name, None)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 import run
 
 
 class X2InputTests(unittest.TestCase):
+    def _write_public_pack(self, rows: list[dict[str, object]]) -> str:
+        temp = tempfile.TemporaryDirectory(prefix="x2-command-pack-")
+        self.addCleanup(temp.cleanup)
+        path = Path(temp.name) / "commands.jsonl"
+        path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+        path.chmod(0o600)
+        return str(path)
+
+    def _public_answers(self) -> list[dict[str, object]]:
+        return run.read_jsonl(run.ROOT / "kit/fixtures/gate/answers-jev.jsonl")
+
+    def test_synthetic_command_pair_uses_production_hash_join(self) -> None:
+        commands = {
+            "synthetic:alpha": "echo harmless-alpha",
+            "synthetic:beta": "echo harmless-beta",
+        }
+        answers = {
+            event_id: {"event_id": event_id, "cmd_sha": hashlib.sha256(command.encode("utf-8")).hexdigest()}
+            for event_id, command in commands.items()
+        }
+        command_rows = {
+            event_id: {"event_id": event_id, "cmd_sha": answers[event_id]["cmd_sha"], "command": command}
+            for event_id, command in commands.items()
+        }
+
+        answer, joined = run.validate_command_pack_row("synthetic:alpha", answers, command_rows)
+
+        self.assertEqual(answer["event_id"], "synthetic:alpha")
+        self.assertEqual(joined, commands["synthetic:alpha"])
+
+    def test_gate_command_pack_one_canonical_row_refuses_exact_population(self) -> None:
+        answer = self._public_answers()[0]
+        pack = [{"event_id": answer["event_id"], "cmd_sha": answer["cmd_sha"], "command": "date -u +%FT%TZ"}]
+        path = self._write_public_pack(pack)
+
+        with self.assertRaisesRegex(run.X2Error, "^X7 family inputs must contain exactly 396 rows$"):
+            run.load_gate_rows(path)
+
+    def test_gate_command_pack_wrong_safe_command_digest_refuses(self) -> None:
+        answers = self._public_answers()
+        safe_command = "date -u +%FT%TZ"
+        pack = [
+            {"event_id": answer["event_id"], "cmd_sha": answer["cmd_sha"], "command": safe_command}
+            for answer in answers
+        ]
+        path = self._write_public_pack(pack)
+
+        with self.assertRaisesRegex(run.X2Error, "^private command does not match recorded hash for "):
+            run.load_gate_rows(path)
+
+    def test_gate_command_pack_duplicate_event_id_refuses(self) -> None:
+        answers = self._public_answers()
+        pack = [
+            {"event_id": answer["event_id"], "cmd_sha": answer["cmd_sha"], "command": "date -u +%FT%TZ"}
+            for answer in answers
+        ]
+        pack[-1]["event_id"] = pack[0]["event_id"]
+        path = self._write_public_pack(pack)
+
+        with self.assertRaisesRegex(run.X2Error, "^duplicate X7 event or private command id$"):
+            run.load_gate_rows(path)
+
     def test_injection_uses_all_recorded_x1_rows(self) -> None:
         rows = run.load_injection_rows()
 
@@ -62,19 +124,7 @@ class X2InputTests(unittest.TestCase):
             "105f08afdb985c3017c507a32a012d0eb8e60e27f212f08f32116cb337ccab7a",
         )
 
-    def test_gate_source_is_exact_private_pack_and_x7_rows(self) -> None:
-        rows = run.load_gate_rows()
 
-        self.assertEqual(len(rows), 396)
-        self.assertEqual(len({row["event_id"] for row in rows}), 396)
-        self.assertEqual(len({row["cmd_sha"] for row in rows}), 380)
-        self.assertEqual(collections.Counter(row["split"] for row in rows), {"dev": 149, "held": 247})
-        self.assertTrue(all(row["jev_score"] == row["recorded_max_score"] for row in rows))
-
-    def test_gate_uses_the_recorded_command_projection(self) -> None:
-        rows = run.load_gate_rows()
-        self.assertTrue(all(run.js_units(row["command"]) == row["command_view_chars"] for row in rows))
-        self.assertEqual(sum(row["command_projection_truncated"] for row in rows), 296)
 
     def test_gate_recall_context_keeps_x7_stratum_caveat(self) -> None:
         run.validate_gate_recall_context(run.X7_RECALL_CONTEXT)
@@ -103,26 +153,6 @@ class X2SafetyTests(unittest.TestCase):
         self.assertEqual(receipt["clef_calls"], 1347)
         self.assertEqual(len(calls), 1347)
         self.assertEqual(receipt["answers"][0]["input_sha256"], rows[0]["input_sha256"])
-
-    def test_gate_full_population_runs_descriptively_below_power_target(self) -> None:
-        rows = run.load_gate_rows()
-        power = run.power_check("gate", rows)
-        calls: list[str] = []
-
-        receipt = run.run_calls(
-            suite="gate",
-            rows=rows,
-            power=power,
-            call=lambda _row: calls.append("called") or {"scores": {"risk": 0.1}},
-        )
-
-        self.assertEqual(power["held_n"], 247)
-        self.assertLess(power["minimum_metric_power"], 0.8)
-        self.assertEqual(power["status"], "DESCRIPTIVE")
-        self.assertEqual(receipt["status"], "COMPLETE")
-        self.assertEqual(receipt["clef_calls"], 396)
-        self.assertEqual(len(calls), 396)
-        self.assertEqual(receipt["answers"][0]["cmd_sha"], rows[0]["cmd_sha"])
 
     def test_call_eligibility_keeps_gate_descriptive(self) -> None:
         self.assertTrue(run.suite_is_eligible_for_calls("injection", {"status": "POWERED"}))
@@ -338,6 +368,52 @@ class X2SafetyTests(unittest.TestCase):
         self.assertEqual(urls, [f"{run.GATEWAY}/jev/clef-flash/"])
         self.assertNotIn(":8010", urls[0])
 
+
+class X2HistoricalPrivateTests(unittest.TestCase):
+    """Full frozen 396-row join: local-only, requires the private owner pack."""
+
+    def test_gate_source_is_exact_private_pack_and_x7_rows(self) -> None:
+        rows = run.load_gate_rows()
+
+        self.assertEqual(len(rows), 396)
+        self.assertEqual(len({row["event_id"] for row in rows}), 396)
+        self.assertEqual(len({row["cmd_sha"] for row in rows}), 380)
+        self.assertEqual(collections.Counter(row["split"] for row in rows), {"dev": 149, "held": 247})
+        self.assertTrue(all(row["jev_score"] == row["recorded_max_score"] for row in rows))
+
+    def test_gate_uses_the_recorded_command_projection(self) -> None:
+        rows = run.load_gate_rows()
+        self.assertTrue(all(run.js_units(row["command"]) == row["command_view_chars"] for row in rows))
+        self.assertEqual(sum(row["command_projection_truncated"] for row in rows), 296)
+
+    def test_gate_full_population_runs_descriptively_below_power_target(self) -> None:
+        rows = run.load_gate_rows()
+        power = run.power_check("gate", rows)
+        calls: list[str] = []
+
+        receipt = run.run_calls(
+            suite="gate",
+            rows=rows,
+            power=power,
+            call=lambda _row: calls.append("called") or {"scores": {"risk": 0.1}},
+        )
+
+        self.assertEqual(power["held_n"], 247)
+        self.assertLess(power["minimum_metric_power"], 0.8)
+        self.assertEqual(power["status"], "DESCRIPTIVE")
+        self.assertEqual(receipt["status"], "COMPLETE")
+        self.assertEqual(receipt["clef_calls"], 396)
+        self.assertEqual(len(calls), 396)
+        self.assertEqual(receipt["answers"][0]["cmd_sha"], rows[0]["cmd_sha"])
+
+
+def load_tests(loader, standard_tests, pattern):
+    """CI discovers only public/keyless classes; frozen 396-row integration is local-only."""
+    _ = standard_tests, pattern
+    suite = unittest.TestSuite()
+    suite.addTests(loader.loadTestsFromTestCase(X2InputTests))
+    suite.addTests(loader.loadTestsFromTestCase(X2SafetyTests))
+    return suite
 
 if __name__ == "__main__":
     unittest.main()

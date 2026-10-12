@@ -397,6 +397,23 @@ def js_prefix(text: str, units: int) -> str:
 def js_units(text: str) -> int:
     return len(text.encode("utf-16-le", "surrogatepass")) // 2
 
+def validate_command_pack_row(
+    event_id: str,
+    jev_by_id: dict[str, dict[str, Any]],
+    command_by_id: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any], str]:
+    """Validate one event-to-command join using the production hash contract."""
+    answer = jev_by_id.get(event_id)
+    command_row = command_by_id.get(event_id)
+    if answer is None or command_row is None:
+        raise X2Error(f"missing X7 answer or private command for {event_id}")
+    cmd_sha = answer.get("cmd_sha")
+    if cmd_sha != command_row.get("cmd_sha"):
+        raise X2Error(f"X7 command hash mismatch for {event_id}")
+    full_command = command_row.get("command")
+    if not isinstance(full_command, str) or hashlib.sha256(full_command.encode("utf-8")).hexdigest() != cmd_sha:
+        raise X2Error(f"private command does not match recorded hash for {event_id}")
+    return answer, full_command
 
 def load_gate_rows(command_pack_path: str | None = None) -> list[dict[str, Any]]:
     """Join frozen X7 rows with private prepare.py event_id/cmd_sha command packs."""
@@ -416,16 +433,8 @@ def load_gate_rows(command_pack_path: str | None = None) -> list[dict[str, Any]]
     rows = []
     for event_id in ids:
         sample = x7_by_id[event_id]
-        answer = jev_by_id.get(event_id)
-        command_row = command_by_id.get(event_id)
-        if answer is None or command_row is None:
-            raise X2Error(f"missing X7 answer or private command for {event_id}")
+        answer, full_command = validate_command_pack_row(event_id, jev_by_id, command_by_id)
         cmd_sha = answer.get("cmd_sha")
-        if cmd_sha != command_row.get("cmd_sha"):
-            raise X2Error(f"X7 command hash mismatch for {event_id}")
-        full_command = command_row.get("command")
-        if not isinstance(full_command, str) or hashlib.sha256(full_command.encode("utf-8")).hexdigest() != cmd_sha:
-            raise X2Error(f"private command does not match recorded hash for {event_id}")
         view_chars = sample.get("commandViewChars")
         if not isinstance(view_chars, int) or not 0 <= view_chars <= 200:
             raise X2Error(f"invalid recorded X7 command view for {event_id}")
