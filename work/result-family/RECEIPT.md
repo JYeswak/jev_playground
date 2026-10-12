@@ -24,7 +24,7 @@ Primary result: **PASS** (equal HELD miss count; Jev savings strictly greater). 
 
 ## Distinct prior replication failure
 
-The earlier independent 7-day replication in comments 1527/1534 remains a separate FAIL: savings 21.6 against an 82.8 bar. The temporal dataset above neither replaces nor reverses that result. The preregistration is not itself a run; this receipt's temporal result is backed by the committed rows and scorer rerun.
+The earlier independent 7-day replication in comment 1527 remains a separate FAIL: savings 21.6 against an 82.8 bar. Comment 1540 records the separate time-window preregistration, not a run. The temporal dataset above neither replaces nor reverses the earlier result; this receipt's temporal result is backed by the committed rows and scorer rerun.
 
 ## Boundary
 
