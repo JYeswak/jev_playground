@@ -1,132 +1,107 @@
-"""Offline tests for the installed jev-latest canary runner."""
+"""Tests for scripts/jev-latest-canary-run.sh: exit mapping, AUTH override,
+notifications, log shape, and no repository paths. Hermetic: the canary is an
+injected stub (no live calls, no keys, no network); all state lands in tmp dirs
+under TMPDIR. Follows jev-jh6f acceptance items 1-5."""
 
 import os
 import subprocess
 import tempfile
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-RUNNER = ROOT / "scripts" / "jev-latest-canary-run.sh"
+RUNNER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jev-latest-canary-run.sh")
+
+AUTH_TEXT = "Failed to automatically trigger login flow"
+
+STUB = """#!/usr/bin/env python3
+import os, sys
+print(os.environ.get("STUB_OUT", "ok"))
+sys.exit(int(os.environ.get("STUB_RC", "0")))
+"""
 
 
-class CanaryRunnerTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.temp = tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR"))
-        self.addCleanup(self.temp.cleanup)
-        self.work = Path(self.temp.name)
-        self.home = self.work / "home"
-        self.home.mkdir()
-        self.notify_log = self.work / "notifications.log"
-        self.python_args_log = self.work / "python-args.log"
-        self.infisical = self.work / "infisical"
-        self.infisical.write_text(
-            "#!/bin/sh\n"
-            'if [ "${CANARY_SECRET_MODE:-run}" = auth ]; then\n'
-            "  echo 'Failed to automatically trigger login flow'\n"
-            "  exit 1\n"
-            "fi\n"
-            '[ "$1" = run ] || exit 91\n'
-            "shift\n"
-            'while [ "$1" != -- ]; do shift; done\n'
-            "shift\n"
-            'exec "$@"\n'
-        )
-        self.infisical.chmod(0o755)
-        self.python = self.work / "python-stub"
-        self.python.write_text(
-            "#!/bin/sh\n"
-            'printf \'%s\\n\' "$@" > "$CANARY_PYTHON_ARGS_LOG"\n'
-            "printf '%s\\n' \"${CANARY_SCRIPT_OUTPUT:-stub output}\"\n"
-            'exit "${CANARY_SCRIPT_RC:-0}"\n'
-        )
-        self.python.chmod(0o755)
-        self.notify = self.work / "notify"
-        self.notify.write_text(
-            "#!/bin/sh\n" 'printf \'%s\\n\' "$*" >> "$JEV_CANARY_NOTIFY_LOG"\n'
-        )
-        self.notify.chmod(0o755)
+def run_canary(env_extra, *argv):
+    env = dict(os.environ)
+    env.pop("TYPESAFE_API_KEY", None)
+    env.update(env_extra)
+    proc = subprocess.run(
+        ["bash", RUNNER, *argv], capture_output=True, text=True, timeout=60, env=env
+    )
+    return proc
 
-    def run_runner(
-        self, *args: str, **extra_env: str
-    ) -> subprocess.CompletedProcess[str]:
-        env = os.environ.copy()
-        env.update(
-            {
-                "HOME": str(self.home),
-                "JEV_CANARY_INFISICAL_BIN": str(self.infisical),
-                "JEV_CANARY_PYTHON_BIN": str(self.python),
-                "JEV_CANARY_NOTIFY_BIN": str(self.notify),
-                "JEV_CANARY_NOTIFY_LOG": str(self.notify_log),
-                "CANARY_PYTHON_ARGS_LOG": str(self.python_args_log),
-            }
-        )
-        env.update(extra_env)
-        return subprocess.run(
-            ["bash", str(RUNNER), *args],
-            cwd=ROOT,
-            env=env,
-            text=True,
-            capture_output=True,
-            check=False,
-            timeout=30,
+
+class CanaryRunnerTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="canary-run-")
+        self.stub = os.path.join(self.tmp, "stub-canary.py")
+        with open(self.stub, "w", encoding="utf-8") as handle:
+            handle.write(STUB)
+        os.chmod(self.stub, 0o755)
+        self.log = os.path.join(self.tmp, "canary.log")
+
+    def tearDown(self):
+        import shutil
+
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def invoke(self, rc, out):
+        return run_canary(
+            {"STUB_RC": str(rc), "STUB_OUT": out},
+            "--canary", self.stub, "--log-file", self.log,
         )
 
-    def notifications(self) -> list[str]:
-        if not self.notify_log.exists():
-            return []
-        return self.notify_log.read_text().splitlines()
+    def log_lines(self):
+        with open(self.log, encoding="utf-8") as handle:
+            return [line.rstrip("\n") for line in handle if line.strip()]
 
-    def log_line(self) -> str:
-        log = self.home / ".local/state/jev/jev-latest-canary.log"
-        return log.read_text().splitlines()[-1]
+    def test_ok_records_no_notification(self):
+        proc = self.invoke(0, "OK: jev-latest resolves to jev-1.13.0")
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.stdout.strip(), "")
+        (line,) = self.log_lines()
+        self.assertRegex(line, r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z rc=0 OK: ")
 
-    def test_infisical_login_failure_is_auth_not_moved(self):
-        result = self.run_runner(CANARY_SECRET_MODE="auth")
-        self.assertEqual(result.returncode, 4)
-        self.assertEqual(len(self.notifications()), 1)
-        self.assertIn("AUTH", self.notifications()[0])
-        self.assertNotIn("moved off", self.notifications()[0])
-        self.assertIn("Failed to automatically trigger login flow", self.log_line())
-        self.assertRegex(self.log_line(), r"^\S+ rc=4 ")
+    def test_moved_notifies(self):
+        proc = self.invoke(1, "MOVED: jev-latest resolves to jev-9.9.9")
+        self.assertEqual(proc.returncode, 1)
+        self.assertIn("NOTIFY MOVED:", proc.stdout)
+        (line,) = self.log_lines()
+        self.assertIn("rc=1", line)
 
-    def test_each_nonzero_script_outcome_has_its_own_notification(self):
-        expected = {
-            1: ("MOVED", "moved off"),
-            2: ("NOT_RUN", "NOT_RUN"),
-            3: ("ERROR", "ERROR"),
-        }
-        for exit_code, (outcome, notice) in expected.items():
-            with self.subTest(exit_code=exit_code):
-                self.notify_log.unlink(missing_ok=True)
-                result = self.run_runner(
-                    CANARY_SCRIPT_RC=str(exit_code),
-                    CANARY_SCRIPT_OUTPUT=f"{outcome}: captured result",
-                )
-                self.assertEqual(result.returncode, exit_code)
-                self.assertEqual(len(self.notifications()), 1)
-                self.assertIn(notice, self.notifications()[0])
-                self.assertRegex(self.log_line(), rf"^\S+ rc={exit_code} ")
-                self.assertTrue(self.log_line().endswith(f"{outcome}: captured result"))
+    def test_not_run_notifies(self):
+        proc = self.invoke(2, "NOT_RUN: no key")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("NOTIFY NOT_RUN:", proc.stdout)
 
-    def test_success_is_logged_without_notification(self):
-        result = self.run_runner(
-            CANARY_SCRIPT_RC="0", CANARY_SCRIPT_OUTPUT="OK: pinned version"
-        )
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(self.notifications(), [])
-        self.assertRegex(self.log_line(), r"^\S+ rc=0 OK: pinned version$")
-        self.assertEqual(
-            self.python_args_log.read_text().splitlines(),
-            [str(ROOT / "scripts" / "jev-latest-canary.py")],
-        )
+    def test_error_notifies(self):
+        proc = self.invoke(3, "ERROR: bad response")
+        self.assertEqual(proc.returncode, 3)
+        self.assertIn("NOTIFY ERROR:", proc.stdout)
 
-    def test_help_is_offline_and_runner_has_no_checkout_path(self):
-        result = self.run_runner("--help")
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("usage:", result.stdout.lower())
-        self.assertNotIn(str(ROOT), RUNNER.read_text())
-        self.assertFalse(self.notify_log.exists())
+    def test_auth_text_overrides_exit_1_with_own_code(self):
+        proc = self.invoke(1, AUTH_TEXT + ". Please run login manually.")
+        self.assertEqual(proc.returncode, 4)
+        self.assertIn("NOTIFY AUTH:", proc.stdout)
+        self.assertNotIn("MOVED", proc.stdout)
+
+    def test_unknown_exit_fails_closed(self):
+        proc = self.invoke(9, "weird")
+        self.assertEqual(proc.returncode, 3)
+        self.assertIn("NOTIFY ERROR:", proc.stdout)
+
+    def test_help_has_no_repository_paths(self):
+        proc = run_canary({}, "--help")
+        self.assertEqual(proc.returncode, 0)
+        for token in ("/Users/", "$PWD", os.getcwd()):
+            self.assertNotIn(token, proc.stdout)
+        with open(RUNNER, encoding="utf-8") as handle:
+            body = handle.read()
+        for token in ("/Users/", "$PWD"):
+            self.assertNotIn(token, body)
+
+    def test_log_line_shape_matches_history(self):
+        self.invoke(1, "MOVED: x")
+        (line,) = self.log_lines()
+        self.assertRegex(line, r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z rc=1 MOVED: x$")
 
 
 if __name__ == "__main__":
