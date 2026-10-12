@@ -133,7 +133,7 @@ class ReplaySandboxTests(unittest.TestCase):
             command = "python3 -c " + shlex.quote(probe)
             write_pack(pack, [command])
 
-            with patch.dict(os.environ, {"TYPESAFE_API_KEY": "synthetic-test-sentinel"}):
+            with patch.dict(os.environ, {"TYPESAFE_API_KEY": "test-sentinel"}):
                 results = module.run_pack(
                     repo=repo,
                     commit=commit,
