@@ -235,19 +235,48 @@ GIT_OPTIONAL_LOCKS=0 git -C "$ROOT" archive HEAD \
 list=$(files_with "$EXPORT" -F -e "/Users/josh")
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  sed -i '' 's|/Users/josh|~|g' "$f"
+  # Portable in-place edit: BSD sed -i '' is a fatal operand on GNU sed, so
+  # transform to a temp file and overwrite the original (a rename would lose
+  # the mode). Any transform miss aborts the build, never passes silently.
+  pe_tmp="$f.sedtmp"
+  if sed 's|/Users/josh|~|g' "$f" > "$pe_tmp"; then
+    cat "$pe_tmp" > "$f" && rm -f "$pe_tmp"
+  else
+    pe_rc=$?
+    rm -f "$pe_tmp"
+    echo "publish-export: home-path transform failed for $f (rc=$pe_rc)" >&2
+    exit 4
+  fi
 done <<<"$list"
 list=$(files_with "$EXPORT" -F -e "encrypted_content")
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  sed -i '' 's|encrypted_content|ENCRYPTED_BLOB|g' "$f"
+  # Portable in-place edit, same contract as the home-path transform above.
+  pe_tmp="$f.sedtmp"
+  if sed 's|encrypted_content|ENCRYPTED_BLOB|g' "$f" > "$pe_tmp"; then
+    cat "$pe_tmp" > "$f" && rm -f "$pe_tmp"
+  else
+    pe_rc=$?
+    rm -f "$pe_tmp"
+    echo "publish-export: blob transform failed for $f (rc=$pe_rc)" >&2
+    exit 4
+  fi
 done <<<"$list"
 # jev-x5cy: an opaque thinkingSignature value never leaves the private repo; the key and the prose around
 # it stay. The sources are untouched (original evidence is preserved), only the export copy is redacted.
 list=$(files_with "$EXPORT" -E "$SIGPAT")
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  sed -i '' -E "$SIG_SED" "$f"
+  # Portable in-place edit, same contract as the home-path transform above.
+  pe_tmp="$f.sedtmp"
+  if sed -E "$SIG_SED" "$f" > "$pe_tmp"; then
+    cat "$pe_tmp" > "$f" && rm -f "$pe_tmp"
+  else
+    pe_rc=$?
+    rm -f "$pe_tmp"
+    echo "publish-export: signature transform failed for $f (rc=$pe_rc)" >&2
+    exit 4
+  fi
 done <<<"$list"
 # REDACT rows (docs/publish-key-exceptions.txt): individual uncertain key-shaped lines, redacted the same way.
 load_exceptions || { echo "EXPORT SCAN ERROR: exceptions unreadable"; exit 4; }

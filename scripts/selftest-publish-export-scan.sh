@@ -147,6 +147,21 @@ if d=$(mini full); then
   assert "home path transform still applies" grep -q -F "${tilde}/x" "$e/data/path.txt"
 else no "fixture repo build failed"; fi
 
+  tilde=$(printf '\176')   # local copy: arm 7 may not have run (see its else branch)
+# 7b. Transforms preserve the executable bit: the portable edit overwrites through
+# the original file (a rename would leave the default mode behind). A BSD-only
+# regression of the transform would also fail arm 7 on GNU, but only this arm pins
+# the mode on both platforms.
+if d=$(mini mode); then
+  printf '#!/usr/bin/env bash\necho home %s/x\n' "$home" > "$d/bin-tool.sh"
+  chmod +x "$d/bin-tool.sh"
+  git -C "$d" add bin-tool.sh && git -C "$d" -c user.name=pes -c user.email=pes@example.invalid commit -q -m 'tool [test]'
+  out=$(bash "$d/scripts/publish-export.sh" 2>&1); rc=$?
+  expect "a build with an executable carrying a transformed path succeeds" 0
+  assert "the export copy is still executable" test -x "$tmp/mode/jev_playground-export/bin-tool.sh"
+  assert "and its path is transformed" grep -q -F "${tilde}/x" "$tmp/mode/jev_playground-export/bin-tool.sh"
+else no "fixture repo build failed"; fi
+
 # 8. Full build with a planted key in a tracked file: refused before init, nothing printed, no export repo.
 if d=$(mini planted); then
   printf 'x %s y\n' "$k_gh" > "$d/data/key.txt"
