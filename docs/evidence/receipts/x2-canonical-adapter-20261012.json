@@ -1,0 +1,20 @@
+{
+ "authority": "pending",
+ "confidence": "observed",
+ "evidence_id": "ev_77fab96691052e6aaada03b16e45a588db9db930b97306cc2b19cf14caaf589a",
+ "limitations": [
+  "Full396 valid join and registered-suite/main CI acceptance remain unproven; no .31 completion claim."
+ ],
+ "operation": "jev-b35c.31-canonical-adapter-boundary",
+ "parameters": {
+  "decisive_output": "canonical admission: one row refused by exact396 guard; canonical396-row wrong-command negative refused by original digest guard; exit0; full396 valid join NOT_RUN",
+  "independent_grade": "ee9d1a7-narrow-PASS-pane22",
+  "source_blob": "0ad42cd45bfbf57a3bdace3a9ef9147fef9a2ff6",
+  "source_commit": "4bb8b8160cc5668e94466ffc2a9e4151029da95c"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 163,
+  "sha256": "726d5360782b4a6a26f402c603c98e80ccbc5b34f0a2ed766e3873bd6abcac03"
+ }
+}
