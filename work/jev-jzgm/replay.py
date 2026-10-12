@@ -363,6 +363,8 @@ def gate_report(
         "free_screens": free,
         "free_screen_share": share,
         "free_screen_wilson95": interval,
+        "reference_status": "PROVISIONAL",
+        "reference_status_reason": "no pinned X7 gate reference; PASS requires a preregistered TOST or lower-bound rule against the pinned reference",
         "reference_96pct_in_wilson95": interval is not None
         and interval[0] <= 0.96 <= interval[1],
         "would_reach_paid_jev": paid,
@@ -581,6 +583,7 @@ def main() -> int:
                 "legacy_aggregate_reference"
             ]["matches_exactly"],
             "gate_96pct_in_wilson95": gate["reference_96pct_in_wilson95"],
+            "gate_reference_status": gate["reference_status"],
             "noop_zero_delta": not noop
             or (
                 all(value == 0 for value in memory["cap3"]["noop_delta"].values())
