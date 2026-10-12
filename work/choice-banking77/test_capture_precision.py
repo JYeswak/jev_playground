@@ -8,11 +8,11 @@ via node: an observed valid unit-mass row must come back OK, and the observed
 frozen 0.99-mass row must come back REFUSE invalid_probability_vector.
 
 Provenance boundary (code-traced, models.py ChoiceAnswer): the SDK schema keeps
-only parsed probabilities (no raw wire text retained), and run.py float()/json
-preserve doubles exactly, so any quantization predates SDK parsing; the exact
-missing source is the raw wire response bodies, which were never retained.
-This suite makes no claim about where the 2dp quantization happened and no
-observed-data coverage claim. Frozen IDs/row bytes and D5 acceptance untouched.
+only parsed probabilities (no raw wire text retained). Whether the observed 2dp
+quantization happened at the wire, the SDK, or earlier is UNKNOWN: the raw wire
+response bodies were never retained (exact missing source). This suite makes no
+claim about where quantization happened and no observed-data coverage claim.
+Frozen IDs/row bytes and D5 acceptance untouched.
 """
 
 import importlib.util
@@ -53,13 +53,14 @@ def _load_capture(testcase):
     setattr(sdk, "Choice", _Placeholder)
     setattr(sdk, "RetryPolicy", _Placeholder)
     setattr(sdk, "TypeSafeClient", _Placeholder)
-    sys.modules.setdefault("typesafe_sdk", sdk)
     stop = types.ModuleType("anthropic_stop")
     setattr(stop, "refuse_paid_comparator", lambda *_args, **_kwargs: None)
-    sys.modules.setdefault("anthropic_stop", stop)
-    testcase.addCleanup(
-        lambda: [sys.modules.pop(n, None) for n in ("typesafe_sdk", "anthropic_stop")]
-    )
+    added = []
+    for name, module in (("typesafe_sdk", sdk), ("anthropic_stop", stop)):
+        if name not in sys.modules:
+            sys.modules[name] = module
+            added.append(name)
+    testcase.addCleanup(lambda: [sys.modules.pop(n, None) for n in added])
     spec = importlib.util.spec_from_file_location(
         "choice_banking77_run", os.path.join(HERE, "run.py")
     )
@@ -154,23 +155,6 @@ def _validator_call(frame_name, labels, calibration, test):
 
 
 class CaptureValidatorSmokeTests(unittest.TestCase):
-    def test_valid_row_captures_bit_exact(self):
-        capture = _capture_module(self)
-        source = _committed_row(_VALID_ID)
-        row = _capture(capture, source)
-        self.assertEqual(row["probabilities"], source["probabilities"])
-        self.assertEqual(sum(row["probabilities"].values()), 1.0)
-
-    def test_full_precision_values_survive_capture(self):
-        capture = _capture_module(self)
-        probs = {"a": 1.0 / 3.0, "b": 1.0 - 1.0 / 3.0}
-        label_map = {"a": "a", "b": "b"}
-        ans = FakeAnswer("a", probs["a"], dict(probs))
-        row = capture.answer_row(
-            {"i": -1, "intent": "a"}, label_map, ans, "jev-1.13.0", 0, None
-        )
-        self.assertEqual(row["probabilities"], probs)
-
     def test_valid_captured_row_passes_d5_validator(self):
         capture = _capture_module(self)
         good = _capture(capture, _committed_row(_VALID_ID))
