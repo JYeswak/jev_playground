@@ -22,6 +22,7 @@ import subprocess
 import sys
 import unittest
 import types
+from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -43,7 +44,13 @@ _CAPTURE = None
 
 
 def _load_capture(testcase):
-    """Exec run.py with stubbed metered/network imports, cleaned up afterwards."""
+    """Exec run.py with stubbed metered/network imports, scoped to exec_module.
+
+    unittest.mock.patch.dict swaps the stubs in for exactly the exec_module
+    call and restores pre-existing modules on exit, so stubs never leak into
+    the node subprocess window or later tests. Unused parameter kept for callers.
+    """
+    del testcase
     sdk = types.ModuleType("typesafe_sdk")
 
     class _Placeholder:
@@ -55,18 +62,15 @@ def _load_capture(testcase):
     setattr(sdk, "TypeSafeClient", _Placeholder)
     stop = types.ModuleType("anthropic_stop")
     setattr(stop, "refuse_paid_comparator", lambda *_args, **_kwargs: None)
-    added = []
-    for name, module in (("typesafe_sdk", sdk), ("anthropic_stop", stop)):
-        if name not in sys.modules:
-            sys.modules[name] = module
-            added.append(name)
-    testcase.addCleanup(lambda: [sys.modules.pop(n, None) for n in added])
     spec = importlib.util.spec_from_file_location(
         "choice_banking77_run", os.path.join(HERE, "run.py")
     )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    with mock.patch.dict(
+        sys.modules, {"typesafe_sdk": sdk, "anthropic_stop": stop}
+    ):
+        spec.loader.exec_module(module)
     return module
 
 
