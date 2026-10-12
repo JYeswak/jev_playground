@@ -331,6 +331,10 @@ def main():
             ),
             flush=True,
         )
+    out = os.path.join(HERE, "candidates.json")
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump({"window_days": float(DAYS), "candidates": cands}, fh, indent=1)
+        fh.write("\n")
     print("wrote " + out, flush=True)
 
 
