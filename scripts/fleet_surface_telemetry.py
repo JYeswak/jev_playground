@@ -327,6 +327,7 @@ def is_error(row: dict, surface: Surface) -> bool:
 
 def read_jsonl(path: Path, surface: Surface, start: float, end: float) -> Telemetry:
     telemetry = Telemetry()
+    pause_timestamps: set[float] = set()
     try:
         handle = path.open(encoding="utf-8")
     except OSError:
@@ -356,10 +357,19 @@ def read_jsonl(path: Path, surface: Surface, start: float, end: float) -> Teleme
             if stamp is None:
                 telemetry.invalid_rows += 1
             elif start <= stamp < end:
+                status = row.get(surface.status_field) if surface.status_field else None
+                if (
+                    isinstance(status, str)
+                    and status.casefold() in surface.paused_statuses
+                ):
+                    # A pause is a state marker; duplicate rows at the same instant are one pause.
+                    if stamp in pause_timestamps:
+                        continue
+                    pause_timestamps.add(stamp)
                 telemetry.add(
                     stamp,
                     is_error(row, surface),
-                    row.get(surface.status_field) if surface.status_field else None,
+                    status,
                 )
     return telemetry
 

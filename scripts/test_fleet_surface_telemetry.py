@@ -187,8 +187,14 @@ class ProfileEligibility(unittest.TestCase):
         events, _, _ = self.scan([surface])
         self.assertEqual(events[surface.id], [stamp])
         log = self.root / "webscreen.jsonl"
-        log.write_text(json.dumps({"ts": stamp, "status": "local-only"}) + "\n", encoding="utf-8")
-        self.assertEqual(self.assess(events[surface.id], telemetry.read_jsonl(log, surface, self.start, self.end), surface).state, "paused")
+        log.write_text(
+            json.dumps({"ts": float(stamp), "status": "local-only"}) + "\n"
+            + json.dumps({"ts": float(stamp), "status": "local-only"}) + "\n"
+            , encoding="utf-8"
+        )
+        paused = telemetry.read_jsonl(log, surface, self.start, self.end)
+        self.assertEqual([row.timestamp for row in paused.observations], [float(stamp)])
+        self.assertEqual(self.assess(events[surface.id], paused, surface).state, "paused")
 
     def test_route_counts_only_in_profile_user_turns(self) -> None:
         surface = self.surfaces["jev-lab-route"]
