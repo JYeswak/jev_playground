@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_95dc13d6ca8243184ccb468fa272b7922936aaf20d6733f1ee0534ed68a94de9",
+ "limitations": [
+  "Keyless local recorded-row smoke only. Original raw wire bodies unavailable; no root resolution, observed coverage, paid/model-quality or main-CI claim."
+ ],
+ "operation": "x940-independent-capture-consumer-import-grade",
+ "parameters": {
+  "candidate": "f8e087fb",
+  "decisive_output": "import stubs absent immediately after exec_module; exact preexisting modules restored; capture->D5 OK; frozen0.99 REFUSE invalid_probability_vector; two consumer tests exit0; original wire precision UNKNOWN",
+  "dependency_blobs": "work/choice-banking77/test_capture_precision.py:d7814b9d274b053ece9ccfe8cfc471cf8863265c;work/choice-banking77/run.py:94e6596c348c577d1f765f9fd4a0eef1b9a3acd1;kit/src/measurement-conformal.mjs:6c1e41972dc70c100c621e300d468d68a3b516ac"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 206,
+  "sha256": "9465412e0e4aeb12151f39c12ccb78d9079f45a2e7958bbef55e6982354cb3b9"
+ }
+}
