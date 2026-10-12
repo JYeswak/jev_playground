@@ -12,7 +12,9 @@
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { askJev, type AskOptions, type JevResult } from "../../kit/src/client.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
@@ -32,6 +34,36 @@ export const MAX_MEMO = 2000;
 
 // One extension load serves one session process: rows stay attributable.
 const INSTANCE = randomUUID().slice(0, 8);
+const INSTANCE_STARTED_AT = new Date().toISOString();
+
+function isCommitId(value: string): boolean {
+  if (value.length !== 40 && value.length !== 64) return false;
+  for (const char of value) {
+    if (!"0123456789abcdef".includes(char)) return false;
+  }
+  return true;
+}
+
+function loadedCommitForInstance(): string | null {
+  const modulePath = fileURLToPath(import.meta.url);
+  const parts = modulePath.split(sep);
+  const pinIndex = parts.lastIndexOf("jev-pinned");
+  const pinnedCommit = pinIndex < 0 ? undefined : parts[pinIndex + 1];
+  if (pinnedCommit && isCommitId(pinnedCommit)) return pinnedCommit;
+  try {
+    const repoRoot = resolve(dirname(modulePath), "../..");
+    const head = execFileSync("git", ["-C", repoRoot, "rev-parse", "--verify", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 1000,
+    }).trim();
+    return isCommitId(head) ? head : null;
+  } catch {
+    return null;
+  }
+}
+
+const LOADED_COMMIT = loadedCommitForInstance();
 
 type Ask = (options: AskOptions) => Promise<JevResult>;
 
@@ -261,7 +293,12 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   const enqueue = (file: string, row: Record<string, unknown>): Promise<void> => {
     if (pendingRows >= MAX_PENDING_LOG_ROWS) return Promise.resolve();
     pendingRows += 1;
-    const line = JSON.stringify({ ...row, repo: fireRepo }) + "\n";
+    const line = JSON.stringify({
+      ...row,
+      instanceStartedAt: INSTANCE_STARTED_AT,
+      loadedCommit: LOADED_COMMIT,
+      repo: fireRepo,
+    }) + "\n";
     logQueue = logQueue
       .then(() => append(file, line))
       .catch(() => {

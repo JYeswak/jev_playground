@@ -1,4 +1,5 @@
 import test from "node:test";
+import { execFileSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -280,6 +281,10 @@ test("enforce OFF returns without scoring and records scoring-off rows", async (
   const rows = rowsOf(logPath);
   assert.equal(rows.length, 2);
   assert.ok(rows.every((row) => row.status === "scoring-off" && row.decision === "keep"));
+  const head = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  assert.equal(new Set(rows.map((row) => row.instanceStartedAt)).size, 1);
+  assert.ok(typeof rows[0].instanceStartedAt === "string" && Number.isFinite(Date.parse(rows[0].instanceStartedAt)));
+  assert.ok(rows.every((row) => row.loadedCommit === head));
 });
 
 test("enforce ON in-scope removes dropped bullets and keeps kept ones", async () => {
