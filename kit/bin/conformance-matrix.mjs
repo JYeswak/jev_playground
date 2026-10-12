@@ -1,8 +1,31 @@
+import { readFileSync } from "node:fs";
 import { readdir, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { CONDITION_CLAUSES } from "../conformance/runner.mjs";
 
 export const CLAUSES = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"];
+
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+function sourceRefIsBound(reference) {
+  if (typeof reference !== "string") return false;
+  const separator = reference.lastIndexOf(":");
+  if (separator <= 0) return false;
+  const sourcePath = reference.slice(0, separator);
+  const lineText = reference.slice(separator + 1);
+  const line = Number(lineText);
+  if (!sourcePath.startsWith("kit/") || sourcePath.split("/").includes("..") || !Number.isSafeInteger(line) || line < 1) return false;
+  const absolutePath = resolve(REPO_ROOT, sourcePath);
+  const fromRoot = relative(REPO_ROOT, absolutePath);
+  if (fromRoot.startsWith("..") || isAbsolute(fromRoot)) return false;
+  try {
+    const sourceLines = readFileSync(absolutePath, "utf8").split("\n");
+    return line <= sourceLines.length && sourceLines[line - 1].trim().length > 0;
+  } catch {
+    return false;
+  }
+}
 
 export function validateFixtureProvenance(fixtures) {
   for (const fixture of fixtures) {
@@ -30,7 +53,18 @@ export function generateCoverageMatrix({ contracts, adapters, clauseResults, con
           return "";
         }
         if (result.status === "PASS") return "PASS";
-        if (result.status === "XFAIL" && discrepancyFor(discrepancies, adapter.id, clause)) return `XFAIL:${discrepancyFor(discrepancies, adapter.id, clause).id}`;
+        if (result.status === "XFAIL") {
+          const discrepancy = discrepancyFor(discrepancies, adapter.id, clause);
+          if (!discrepancy) {
+            errors.push(`${contract.family}/${adapter.id}/${clause} has no current discrepancy entry`);
+            return "XFAIL:UNREGISTERED";
+          }
+          if (!sourceRefIsBound(discrepancy.source_ref)) {
+            errors.push(`${contract.family}/${adapter.id}/${clause} discrepancy ${discrepancy.id} lacks a valid source reference`);
+            return `XFAIL:${discrepancy.id}:UNBOUND`;
+          }
+          return `XFAIL:${discrepancy.id}`;
+        }
         errors.push(`${contract.family}/${adapter.id}/${clause} has unrecognized status ${result.status}`);
         return result.status;
       });
@@ -40,7 +74,17 @@ export function generateCoverageMatrix({ contracts, adapters, clauseResults, con
   const conditionRows = ["| Family | Condition | Status |", "|---|---|---|"];
   for (const contract of contracts) {
     const rows = conditionResults.filter((entry) => entry.family === contract.family);
-    for (const entry of rows) conditionRows.push(`| ${contract.family} | ${entry.condition} | ${entry.status} |`);
+    for (const [condition] of CONDITION_CLAUSES) {
+      const matches = rows.filter((entry) => entry.condition === condition);
+      const entry = matches.length === 1 ? matches[0] : undefined;
+      const status = entry?.status === "PASS" ? "PASS" : "";
+      if (matches.length !== 1) errors.push(`${contract.family}/${condition} condition is ${matches.length === 0 ? "untested" : "duplicated"}`);
+      else if (status === "") errors.push(`${contract.family}/${condition} has unrecognized status ${entry.status}`);
+      conditionRows.push(`| ${contract.family} | ${condition} | ${status} |`);
+    }
+    for (const row of rows) {
+      if (!CONDITION_CLAUSES.some(([condition]) => condition === row.condition)) errors.push(`${contract.family}/${row.condition} is an unknown condition`);
+    }
   }
   const markdown = [
     "# Classifier conformance coverage",

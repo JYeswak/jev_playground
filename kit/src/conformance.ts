@@ -4,6 +4,7 @@ import { validateContract, type DecisionContract, type SafeAction } from "./cont
 
 export type BackendAnswer = {
   choice?: string;
+  confidence?: number;
   probabilities?: Record<string, number>;
   modelId?: string;
   costUsd?: number | null;
@@ -76,6 +77,7 @@ function probabilityError(answer: BackendAnswer, contract: DecisionContract, ada
   if (!options) return undefined;
   if (typeof answer.choice !== "string" || !Object.hasOwn(options, answer.choice)) return "choice-out-of-options";
   if (adapter.probabilities === "unsupported" && answer.probabilities === undefined) return undefined;
+  if (typeof answer.confidence !== "number" || !Number.isFinite(answer.confidence) || answer.confidence < 0 || answer.confidence > 1) return "confidence-invalid";
   if (answer.probabilities === undefined) return "probabilities-missing";
   const ids = Object.keys(options);
   const probabilities = answer.probabilities;

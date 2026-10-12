@@ -24,6 +24,7 @@ C1–C7 run offline over recorded answers with injected transports. Blank cells 
 | conformance-command-gate | privacy-allowlist | PASS |
 | conformance-command-gate | deterministic-replay | PASS |
 | conformance-command-gate | log-redaction | PASS |
+| conformance-command-gate | probability-confidence | PASS |
 | conformance-result-screen | out-of-options | PASS |
 | conformance-result-screen | timeout | PASS |
 | conformance-result-screen | daily-cap | PASS |
@@ -31,3 +32,4 @@ C1–C7 run offline over recorded answers with injected transports. Blank cells 
 | conformance-result-screen | privacy-allowlist | PASS |
 | conformance-result-screen | deterministic-replay | PASS |
 | conformance-result-screen | log-redaction | PASS |
+| conformance-result-screen | probability-confidence | PASS |

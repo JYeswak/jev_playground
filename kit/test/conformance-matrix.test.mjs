@@ -41,20 +41,33 @@ if (api?.generateCoverageMatrix) {
     );
   });
 
-  test("probability limitations are XFAIL with a DISC entry, never SKIP", () => {
-    const statuses = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"].map((clause) => ({
-      family: "screen", backend: "regex-rule", clause, status: "PASS",
+  test("C2 XFAIL requires source-bound discrepancy and complete condition coverage, never SKIP", () => {
+    const clauses = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"].map((clause) => ({
+      family: "screen", backend: "regex-rule", clause, status: clause === "C2" ? "XFAIL" : "PASS",
     }));
+    const conditionNames = ["daily-cap", "deterministic-replay", "log-redaction", "out-of-options", "oversize", "privacy-allowlist", "probability-confidence", "timeout"];
+    const conditions = conditionNames.map((condition) => ({ family: "screen", condition, status: "PASS" }));
     const input = {
       contracts: [{ family: "screen", shipped_backends: ["regex-rule"] }],
       adapters: [{ id: "regex-rule" }],
-      clauseResults: statuses,
-      conditionResults: [],
-      discrepancies: [{ id: "DISC-001", backend: "regex-rule", clause: "C2", status: "ACCEPTED", review_date: "2026-10-06" }],
+      clauseResults: clauses,
+      conditionResults: conditions,
+      discrepancies: [{ id: "DISC-001", backend: "regex-rule", clause: "C2", status: "ACCEPTED", review_date: "2026-10-06", source_ref: "kit/conformance/registered-adapters.mjs:14" }],
     };
     input.clauseResults[1].status = "SKIP";
     assert.equal(api.generateCoverageMatrix(input).ok, false);
     input.clauseResults[1].status = "XFAIL";
     assert.equal(api.generateCoverageMatrix(input).ok, true);
+    const missingSource = structuredClone(input);
+    delete missingSource.discrepancies[0].source_ref;
+    assert.equal(api.generateCoverageMatrix(missingSource).ok, false);
+    const invalidSource = structuredClone(input);
+    invalidSource.discrepancies[0].source_ref = "kit/no-such-source.mjs:1";
+    assert.equal(api.generateCoverageMatrix(invalidSource).ok, false);
+    const missingCondition = structuredClone(input);
+    missingCondition.conditionResults = conditions.filter((row) => row.condition !== "probability-confidence");
+    const incomplete = api.generateCoverageMatrix(missingCondition);
+    assert.equal(incomplete.ok, false);
+    assert.ok(incomplete.markdown.includes("| screen | probability-confidence |  |"));
   });
 }

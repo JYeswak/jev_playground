@@ -8,12 +8,21 @@ const readJson = async (url) => JSON.parse(await readFile(url, "utf8"));
 const contractDir = new URL("../contracts/fixtures/", import.meta.url);
 const fixtureUrl = new URL("../test/fixtures/recorded-answer-rows.json", import.meta.url);
 const discrepancyUrl = new URL("./DISCREPANCIES.md", import.meta.url);
+export const CONDITION_CLAUSES = [
+  ["out-of-options", "C1"], ["timeout", "C3"], ["daily-cap", "C4"],
+  ["oversize", "C5"], ["privacy-allowlist", "C5"], ["deterministic-replay", "C6"], ["log-redaction", "C7"],
+  ["probability-confidence", "C2"],
+];
 
 function parseDiscrepancies(markdown) {
   return markdown.split("\n").flatMap((line) => {
     const cells = line.split("|").map((cell) => cell.trim());
-    if (cells.length < 7 || !cells[1].startsWith("DISC-")) return [];
-    return [{ id: cells[1], backend: cells[2], clause: cells[3], status: cells[4], review_date: cells[5] }];
+    if (cells.length < 8 || !cells[1].startsWith("DISC-")) return [];
+    const evidence = cells[7] ?? "";
+    const lead = evidence.split(";")[0].trim();
+    const prefix = "source=";
+    const source_ref = lead.startsWith(prefix) ? lead.slice(prefix.length).trim() : "";
+    return [{ id: cells[1], backend: cells[2], clause: cells[3], status: cells[4], review_date: cells[5], source_ref, evidence }];
   });
 }
 
@@ -72,7 +81,7 @@ export async function runConformanceSuite() {
       } else {
         const invalidProbability = {
           ...adapter,
-          async evaluate() { return { choice: allowed[0], probabilities: Object.fromEntries(allowed.map((id, index) => [id, index === 0 ? Number.NaN : 0])), costUsd: 0 }; },
+          async evaluate() { return { choice: allowed[0], confidence: record.answers.choice.confidence, probabilities: Object.fromEntries(allowed.map((id, index) => [id, index === 0 ? Number.NaN : 0])), costUsd: 0 }; },
         };
         const c2 = await decide({ contract, adapter: invalidProbability, ...familyInput, transport: recordedTransport });
         clauseResults.push(testResult(contract.family, adapter.id, "C2", c2.status === "refused" && c2.action === contract.safe_side));
@@ -133,10 +142,7 @@ export async function runConformanceSuite() {
         !JSON.stringify(logRow).includes(record.id) && logged.logRow === logRow);
       clauseResults.push(testResult(contract.family, adapter.id, "C7", c7));
     }
-    const conditions = [
-      ["out-of-options", "C1"], ["timeout", "C3"], ["daily-cap", "C4"],
-      ["oversize", "C5"], ["privacy-allowlist", "C5"], ["deterministic-replay", "C6"], ["log-redaction", "C7"],
-    ];
+    const conditions = CONDITION_CLAUSES;
     for (const [condition, clause] of conditions) {
       const outcomes = clauseResults.filter((entry) => entry.family === contract.family && entry.clause === clause);
       const complete = outcomes.length === registeredAdapters.length && outcomes.every((entry) => ["PASS", "XFAIL"].includes(entry.status));

@@ -32,6 +32,9 @@ test("shared suite executes C1-C7 for every registered adapter without network",
     globalThis.fetch = originalFetch;
   }
   assert.equal(ambientFetchCalls, 0);
+  const discrepancy = suite.discrepancies.find((entry) => entry.id === "DISC-001");
+  assert.equal(discrepancy?.source_ref, "kit/conformance/registered-adapters.mjs:19");
+  const expectedConditions = ["daily-cap", "deterministic-replay", "log-redaction", "out-of-options", "oversize", "privacy-allowlist", "probability-confidence", "timeout"];
   for (const contract of suite.contracts) {
     for (const adapter of suite.adapters) {
       const rows = suite.clauseResults.filter((row) => row.family === contract.family && row.backend === adapter.id);
@@ -41,6 +44,9 @@ test("shared suite executes C1-C7 for every registered adapter without network",
           `${contract.family}/${adapter.id}/${row.clause}: ${row.detail}`);
       }
     }
+    const conditions = suite.conditionResults.filter((row) => row.family === contract.family);
+    assert.deepEqual(conditions.map((row) => row.condition).sort(), expectedConditions);
+    assert.ok(conditions.every((row) => row.status === "PASS"), `${contract.family}: every condition is covered`);
   }
 });
 
@@ -104,8 +110,9 @@ if (api?.decide && contractsApi?.validateContract && registry?.registeredAdapter
     assert.ok(hasWord(result.reason, ["choice", "option"]));
   });
 
-  test("C2 rejects non-finite, rescaled and chosen-below-max distributions", async () => {
+  test("C2 rejects malformed probability and confidence values from a recorded answer", async () => {
     const chosen = recorded.answers.choice.choice;
+    const confidence = recorded.answers.choice.confidence;
     const other = options.find((id) => id !== chosen);
     const nanDistribution = Object.fromEntries(options.map((id, index) => [id, index === 0 ? Number.NaN : 0]));
     const rescaledDistribution = Object.fromEntries(options.map((id) => [id, 0.1]));
@@ -117,12 +124,33 @@ if (api?.decide && contractsApi?.validateContract && registry?.registeredAdapter
     ]) {
       const adapter = {
         id: "hostile-probabilities", modelId: "hostile-probabilities", probabilities: "required",
-        async evaluate() { return { choice, probabilities, costUsd: 0 }; },
+        async evaluate() { return { choice, confidence, probabilities, costUsd: 0 }; },
       };
       const result = await api.decide({ contract: choiceContract, adapter, ...input, transport: noNetwork });
       assert.equal(result.status, "refused");
       assert.equal(result.action, "refuse");
       assert.ok(hasWord(result.reason, ["probabil"]));
+    }
+    for (const confidenceValue of [undefined, Number.NaN, -0.01, 1.01]) {
+      const answer = { ...structuredClone(recorded.answers.choice), confidence: confidenceValue };
+      const adapter = {
+        id: "hostile-confidence", modelId: "hostile-confidence", probabilities: "required",
+        async evaluate() { return { ...answer, costUsd: 0 }; },
+      };
+      const result = await api.decide({ contract: choiceContract, adapter, ...input, transport: noNetwork });
+      assert.equal(result.status, "refused");
+      assert.equal(result.action, "refuse");
+      assert.ok(hasWord(result.reason, ["confidence"]));
+    }
+    for (const confidenceValue of [0, 1]) {
+      const answer = { ...structuredClone(recorded.answers.choice), confidence: confidenceValue };
+      const adapter = {
+        id: "boundary-confidence", modelId: "boundary-confidence", probabilities: "required",
+        async evaluate() { return { ...answer, costUsd: 0 }; },
+      };
+      const result = await api.decide({ contract: choiceContract, adapter, ...input, transport: noNetwork });
+      assert.equal(result.status, "answered");
+      assert.equal(result.action, "pass");
     }
   });
 
@@ -133,14 +161,14 @@ if (api?.decide && contractsApi?.validateContract && registry?.registeredAdapter
     ]) {
       const adapter = {
         id: "boundary-probabilities", modelId: "boundary-probabilities", probabilities: "required",
-        async evaluate() { return { choice: "c1", probabilities, costUsd: 0 }; },
+        async evaluate() { return { choice: "c1", confidence: recorded.answers.choice.confidence, probabilities, costUsd: 0 }; },
       };
       const result = await api.decide({ contract: choiceContract, adapter, ...input, transport: noNetwork });
       assert.equal(result.status, status);
     }
   });
 
-  test("C3 timeout applies each contract safe side, returns within budget and logs timeout", async () => {
+  test("C3 timeout applies each contract safe side, returns within budget and logs timeout", { timeout: 2000 }, async () => {
     for (const [contract, state, action, resultValue] of [
       [gate, gateState, "refuse", undefined],
       [screen, screenState, "pass", input.result],

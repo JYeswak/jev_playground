@@ -4,7 +4,7 @@ Migrated from `kit/test/wire-conformance-DISCREPANCIES.md` (source bead `jev-745
 
 | ID | Backend | Clause | Status | Review date | Prior ID | Evidence and disposition |
 |---|---|---|---|---|---|---|
-| DISC-001 | regex-rule | C2 | ACCEPTED | 2026-10-06 | none | A regex rule emits a choice without a probability distribution. C2 is therefore XFAIL for this adapter; the other C1-C7 clauses remain required and run. |
+| DISC-001 | regex-rule | C2 | ACCEPTED | 2026-10-06 | none | source=kit/conformance/registered-adapters.mjs:19; regex-rule declares probabilities unsupported and returns only choice, modelId, and costUsd; confidence and a probability distribution are unavailable, so C2 is XFAIL for this adapter; all other clauses remain required and run. |
 
 ## Migrated report (old ID: jev-745g)
 
