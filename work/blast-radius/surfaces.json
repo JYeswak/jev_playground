@@ -56,7 +56,7 @@
         "eligible_event": "tool_result",
         "eligible_profiles": ["default", "claude", "codex", "grok", "muse"],
         "eligible_tool_names": ["web_search", "web_extract"],
-        "exclude_cwd_roots": ["/Users/josh/Developer/jev"],
+        "exclude_cwd_roots": ["."],
         "path": "~/.local/state/jev/webscreen-shadow.jsonl",
         "timestamp_field": "ts",
         "status_field": "status",

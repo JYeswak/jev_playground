@@ -196,6 +196,20 @@ class ProfileEligibility(unittest.TestCase):
         self.assertEqual([row.timestamp for row in paused.observations], [float(stamp)])
         self.assertEqual(self.assess(events[surface.id], paused, surface).state, "paused")
 
+    def test_relative_excluded_cwd_root_resolves_to_repo_root(self) -> None:
+        registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+        entry = next(item for item in registry["surfaces"] if item["id"] == "webscreen-global")
+        entry["heartbeat"]["exclude_cwd_roots"] = ["."]
+        path = self.root / "relative-registry.json"
+        path.write_text(json.dumps({"schema_version": registry["schema_version"], "surfaces": [entry]}), encoding="utf-8")
+        previous_cwd = Path.cwd()
+        try:
+            os.chdir(self.root)
+            surface = telemetry.load_registry(path)[0]
+        finally:
+            os.chdir(previous_cwd)
+        self.assertEqual(surface.exclude_cwd_roots, (REPO.resolve(),))
+
     def test_route_counts_only_in_profile_user_turns(self) -> None:
         surface = self.surfaces["jev-lab-route"]
         stamp = self.current + 10

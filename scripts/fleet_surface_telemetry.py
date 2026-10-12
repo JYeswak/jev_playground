@@ -11,6 +11,7 @@ HOUR = 3600
 HISTORY_HOURS = 7 * 24
 HISTORY_SECONDS = HISTORY_HOURS * HOUR
 ERROR_STATUSES = frozenset({"error", "failed", "failure", "timeout", "invalid"})
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class HeartbeatError(ValueError):
@@ -125,6 +126,11 @@ def parse_timestamp(value: object) -> float | None:
         return None
     stamp = parsed.timestamp()
     return stamp if math.isfinite(stamp) else None
+
+
+def _resolve_excluded_cwd_root(value: str) -> Path:
+    path = Path(value).expanduser()
+    return (path if path.is_absolute() else REPO_ROOT / path).resolve()
 
 
 def load_registry(path: Path) -> list[Surface]:
@@ -304,7 +310,7 @@ def load_registry(path: Path) -> list[Surface]:
                 switch_path=switch_path,
                 switch_polarity=switch_polarity,
                 eligible_tool_names=frozenset(eligible_tools),
-                exclude_cwd_roots=tuple(Path(item).resolve() for item in excluded_cwds),
+                exclude_cwd_roots=tuple(_resolve_excluded_cwd_root(item) for item in excluded_cwds),
                 paused_statuses=frozenset(item.casefold() for item in paused_statuses),
                 operator_off_path=operator_off_path,
                 eligible_profiles=frozenset(eligible_profiles) if eligible_profiles is not None else None,
