@@ -95,30 +95,6 @@ def record(path, row):
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-STRICT_MASS_TOLERANCE = 1e-6
-
-
-def conformal_mass_eligible(probabilities):
-    """Strict conformal eligibility for a captured probability vector.
-
-    Same rule as the D5 split-conformal validator (kit/.../measurement-conformal.mjs):
-    every value finite in [0, 1] and the mass within STRICT_MASS_TOLERANCE of 1.
-    Returns True only; never normalizes, filters, or relabels the input.
-    """
-    if not isinstance(probabilities, dict) or not probabilities:
-        return False
-    total = 0.0
-    for value in probabilities.values():
-        if not isinstance(value, (int, float)) or isinstance(value, bool):
-            return False
-        if not (0.0 <= value <= 1.0):
-            return False
-        if value != value or value in (float("inf"), float("-inf")):
-            return False
-        total += value
-    return abs(total - 1.0) <= STRICT_MASS_TOLERANCE
-
-
 def answer_row(item, label_map, ans, model, elapsed_ms, usage, extra=None):
     return {
         "i": item["i"],
