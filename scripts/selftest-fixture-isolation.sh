@@ -98,8 +98,10 @@ mutant() { # mutant <name> <awk-filter> <symlink target...>: build $tmp/<name>/s
 m=$(mutant pin-liveness '/^unset GIT_DIR/{next} {print}' scripts/pin-liveness.sh docs/demos/STATUS.tsv)
 if [ "$m" = vacuous ]; then no "mutant pin-liveness: scrub line not found, the mutant equals the original"; else expect_leak "selftest-pin-liveness without its scrub" "$m"; fi
 # serialized-add stops right after its fixture config (its arms would otherwise run against the decoy for ~30s).
-m=$(mutant serialized-add '/^unset GIT_DIR/{next} {print} /config user.name serialized-add-selftest/{print "exit 0"}' scripts/git-commit-serialized.sh scripts/git-commitd.py)
-if [ "$m" = vacuous ]; then no "mutant serialized-add: scrub line not found, the mutant equals the original"; else expect_leak "selftest-serialized-add without its scrub" "$m"; fi
+# The mutant removes BOTH the entry unset and the helper's explicit GIT_CONFIG binding: either layer alone
+# (unset, or per-command binding) keeps the decoy clean, so only the joint removal is genuinely unsafe.
+m=$(mutant serialized-add '/^unset GIT_DIR/{next} { gsub(/GIT_CONFIG="\$1\/\.git\/config" /, ""); print } /config user.name serialized-add-selftest/{print "exit 0"}' scripts/git-commit-serialized.sh scripts/git-commitd.py)
+if [ "$m" = vacuous ]; then no "mutant serialized-add: scrub/binding lines not found, the mutant equals the original"; else expect_leak "selftest-serialized-add without scrub/binding" "$m"; fi
 # jev-90id: the commit-msg hook's own --selftest, as shipped and with its scrub deleted (standalone copy).
 expect_untouched "commit-msg hook --selftest" "$root/githooks/commit-msg-verification-level.sh" --selftest
 awk '/^ *unset GIT_DIR/{next} {print}' "$root/githooks/commit-msg-verification-level.sh" > "$tmp/hook-mutant.sh"; chmod +x "$tmp/hook-mutant.sh"
