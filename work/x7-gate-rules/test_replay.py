@@ -53,6 +53,7 @@ def make_repo(root: Path) -> tuple[Path, str]:
     subprocess.run(["git", "-C", str(repo), "config", "user.email", "x7@example.invalid"], check=True)
     (repo / "tracked.txt").write_text("committed source\n")
     subprocess.run(["git", "-C", str(repo), "add", "tracked.txt"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "core.hooksPath", "/dev/null"], check=True)
     subprocess.run(["git", "-C", str(repo), "commit", "--quiet", "-m", "fixture"], check=True)
     commit = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
     return repo, commit
@@ -64,7 +65,7 @@ def write_pack(path: Path, commands: list[str]) -> None:
             stream.write(json.dumps({
                 "event_id": f"event-{index}",
                 "command": command,
-                "cmd_sha256": hashlib.sha256(command.encode()).hexdigest(),
+                "cmd_sha": hashlib.sha256(command.encode()).hexdigest(),
             }, sort_keys=True) + "\n")
     path.chmod(0o600)
 
@@ -157,7 +158,7 @@ class ReplaySandboxTests(unittest.TestCase):
             receipt = scratch / "receipt.jsonl"
             write_pack(pack, ["touch should-not-exist"])
             row = json.loads(pack.read_text())
-            row["cmd_sha256"] = "0" * 64
+            row["cmd_sha"] = "0" * 64
             pack.write_text(json.dumps(row) + "\n")
             pack.chmod(0o600)
 
