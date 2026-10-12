@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_77e6b780ec271d8be47bdece4360053efe1072d4de4cf97ad5072b2e364f9512",
+ "limitations": [
+  "non-author review pending; CI re-run pending, no main-green claim"
+ ],
+ "operation": "jev-oc6t fixture-isolation mutant verification",
+ "parameters": {
+  "commit": "d8dbd924da9ca490f089773ff8823930e03bb569",
+  "script_blob": "5b13e057d10d0e545c469639af992a2cb92efd06"
+ },
+ "producer": "RainyKite",
+ "result_ref": {
+  "bytes": 1277,
+  "sha256": "1a655867739134733bf88b03977097ca8fe4c9630540d41a0e35f8698d4006d9"
+ }
+}
