@@ -277,12 +277,14 @@ jobs:
       - name: Run registered suites
         env:
           PLANT: ${{ inputs.plant_red }}
+          TMPDIR: ${{ github.workspace }}/var/agent-tmp
         run: |
           set -u
           set +e
-          python3 scripts/run-registered-suites.py > /tmp/suites.tsv
+          mkdir -p "$TMPDIR"
+          python3 scripts/run-registered-suites.py > "$TMPDIR/suites.tsv"
           rc=$?
-          cat /tmp/suites.tsv
+          cat "$TMPDIR/suites.tsv"
           case "$PLANT" in
             suite) row=work/sr-adopt/test_prereg.py ;;
             runonly) row=work/oracle-kit/selector-guard.mjs ;;
@@ -291,7 +293,7 @@ jobs:
             *) exit "$rc" ;;
           esac
           # Exact first column: the selector-guard scan row must not match its --selftest row.
-          if awk -F'\t' -v r="$row" '$1 == r && $NF == "FAIL" { f = 1 } END { exit !f }' /tmp/suites.tsv; then
+          if awk -F'\t' -v r="$row" '$1 == r && $NF == "FAIL" { f = 1 } END { exit !f }' "$TMPDIR/suites.tsv"; then
             echo "RED named $row"
             exit 1
           fi
