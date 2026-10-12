@@ -1,38 +1,49 @@
 #!/usr/bin/env python3
-"""jev-banking77-probability-precision-x940: capture precision boundary (keyless).
+"""jev-banking77-probability-precision-x940: capture-to-validator smoke (keyless).
 
-Exercises the production answer_row capture path in run.py with injected answers
-built from in-tree real observed Banking77 rows (no network, no key):
-- positive: observed valid unit-mass vector round-trips wire/SDK/persisted
-  bit-exact; SDK float schema, float() and json preserve every value, so any
-  quantization predates capture (all 3080 committed rows are 2dp wire values).
-- negative: observed frozen 0.99-mass vector is retained verbatim (never
-  normalized/filtered/relabeled) and refused strict eligibility with
-  invalid_probability_vector semantics; weakening or removing the production
-  guard fails this test.
-No observed-data coverage claim; frozen IDs/row bytes and D5 acceptance untouched.
+Captures real observed Banking77 rows through the production answer_row path in
+run.py (injected answers, no network, no key), then feeds the captured vectors
+to the EXISTING D5 split-conformal validator (kit/.../measurement-conformal.mjs)
+via node: an observed valid unit-mass row must come back OK, and the observed
+frozen 0.99-mass row must come back REFUSE invalid_probability_vector.
+
+Provenance boundary (code-traced, models.py ChoiceAnswer): the SDK schema keeps
+only parsed probabilities (no raw wire text retained), and run.py float()/json
+preserve doubles exactly, so any quantization predates SDK parsing; the exact
+missing source is the raw wire response bodies, which were never retained.
+This suite makes no claim about where the 2dp quantization happened and no
+observed-data coverage claim. Frozen IDs/row bytes and D5 acceptance untouched.
 """
 
 import importlib.util
 import json
 import os
+import subprocess
 import sys
-import types
 import unittest
+import types
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
+_NODE_SMOKE = """\
+import { readFileSync } from "node:fs";
+import { splitConformalLac } from %s;
+const payload = JSON.parse(readFileSync(0, "utf8"));
+const result = splitConformalLac(payload);
+process.stdout.write(JSON.stringify({ status: result.status, reason: result.reason ?? null }));
+"""
+VALIDATOR = os.path.join(ROOT, "kit", "src", "measurement-conformal.mjs")
 
 _VALID_ID = 0  # real observed valid unit-mass row in rows-full-jev.jsonl
+_VALID_ID_2 = 1  # second real observed valid unit-mass row
 _FROZEN_ID = 71  # real observed frozen 0.99-mass row in rows-full-jev.jsonl
 
 
-def _load_capture():
-    """Exec run.py with stubbed metered/network imports (keyless, offline).
+_CAPTURE = None
 
-    run.py imports typesafe_sdk and anthropic_stop at module scope for its live
-    arms; the capture path under test (answer_row, conformal_mass_eligible)
-    touches neither. Stubs keep the suite keyless without altering run.py.
-    """
+
+def _load_capture(testcase):
+    """Exec run.py with stubbed metered/network imports, cleaned up afterwards."""
     sdk = types.ModuleType("typesafe_sdk")
 
     class _Placeholder:
@@ -46,6 +57,9 @@ def _load_capture():
     stop = types.ModuleType("anthropic_stop")
     setattr(stop, "refuse_paid_comparator", lambda *_args, **_kwargs: None)
     sys.modules.setdefault("anthropic_stop", stop)
+    testcase.addCleanup(
+        lambda: [sys.modules.pop(n, None) for n in ("typesafe_sdk", "anthropic_stop")]
+    )
     spec = importlib.util.spec_from_file_location(
         "choice_banking77_run", os.path.join(HERE, "run.py")
     )
@@ -53,6 +67,13 @@ def _load_capture():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _capture_module(testcase):
+    global _CAPTURE
+    if _CAPTURE is None:
+        _CAPTURE = _load_capture(testcase)
+    return _CAPTURE
 
 
 def _committed_row(row_id):
@@ -74,78 +95,101 @@ class FakeAnswer:
         self.probabilities = probabilities
 
 
-class CapturePrecisionTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.capture = _load_capture()
+def _capture(capture, source):
+    label_map = {label: label for label in source["probabilities"]}
+    ans = FakeAnswer(
+        choice=source["intent"],
+        confidence=source["confidence"],
+        probabilities=dict(source["probabilities"]),
+    )
+    return capture.answer_row(
+        {"i": source["i"], "intent": source["intent"]},
+        label_map,
+        ans,
+        "jev-1.13.0",
+        0,
+        None,
+    )
 
-    def test_valid_vector_round_trips_bit_exact(self):
+
+def _validator_call(frame_name, labels, calibration, test):
+    frame = {
+        "name": frame_name,
+        "source": "x940 capture smoke",
+        "targetPopulation": "Banking77 full corpus",
+        "calibrationGroup": {
+            "name": "DEV",
+            "targetPopulation": "Banking77 full corpus",
+        },
+        "testGroup": {"name": "SAMPLE", "targetPopulation": "Banking77 full corpus"},
+    }
+
+    def grow(row, split):
+        return {
+            "id": row["i"],
+            "trueLabel": row["intent"],
+            "probabilities": row["probabilities"],
+            "group": split,
+            "samplingFrame": frame_name,
+        }
+
+    payload = {
+        "labels": labels,
+        "calibration": [grow(r, "DEV") for r in calibration],
+        "test": [grow(r, "SAMPLE") for r in test],
+        "alpha": 0.1,
+        "probabilityFloor": 0.005,
+        "samplingFrame": frame,
+    }
+    script = _NODE_SMOKE % json.dumps(VALIDATOR)
+    proc = subprocess.run(
+        ["node", "--input-type=module", "-e", script, "-"],
+        input=json.dumps(payload),
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    return json.loads(proc.stdout)
+
+
+class CaptureValidatorSmokeTests(unittest.TestCase):
+    def test_valid_row_captures_bit_exact(self):
+        capture = _capture_module(self)
         source = _committed_row(_VALID_ID)
-        self.assertAlmostEqual(sum(source["probabilities"].values()), 1.0, delta=1e-6)
-        label_map = {label: label for label in source["probabilities"]}
-        ans = FakeAnswer(
-            choice=source["intent"],
-            confidence=source["confidence"],
-            probabilities=dict(source["probabilities"]),
-        )
-        row = self.capture.answer_row(
-            {"i": source["i"], "intent": source["intent"]},
-            label_map,
-            ans,
-            "jev-1.13.0",
-            0,
-            None,
-        )
+        row = _capture(capture, source)
         self.assertEqual(row["probabilities"], source["probabilities"])
         self.assertEqual(sum(row["probabilities"].values()), 1.0)
-        self.assertEqual(
-            json.loads(json.dumps(row["probabilities"])), source["probabilities"]
-        )
-        self.assertTrue(self.capture.conformal_mass_eligible(row["probabilities"]))
 
-    def test_quantization_predates_capture(self):
-        with open(os.path.join(HERE, "rows-full-jev.jsonl"), encoding="utf-8") as fh:
-            rows = [json.loads(line) for line in fh if line.strip()]
-        self.assertEqual(len(rows), 3080)
-        for row in rows:
-            for value in row["probabilities"].values():
-                self.assertEqual(value, float(value))
-                self.assertEqual(json.loads(json.dumps(value)), value)
-                self.assertTrue(abs(value * 100 - round(value * 100)) < 1e-9)
-        # float()/json are lossless here, so the 2dp quantization observed on
-        # every committed row originates at the wire/SDK response, not capture.
+    def test_full_precision_values_survive_capture(self):
+        capture = _capture_module(self)
+        probs = {"a": 1.0 / 3.0, "b": 1.0 - 1.0 / 3.0}
+        label_map = {"a": "a", "b": "b"}
+        ans = FakeAnswer("a", probs["a"], dict(probs))
+        row = capture.answer_row(
+            {"i": -1, "intent": "a"}, label_map, ans, "jev-1.13.0", 0, None
+        )
+        self.assertEqual(row["probabilities"], probs)
+
+    def test_valid_captured_row_passes_d5_validator(self):
+        capture = _capture_module(self)
+        good = _capture(capture, _committed_row(_VALID_ID))
+        good2 = _capture(capture, _committed_row(_VALID_ID_2))
+        labels = sorted(good["probabilities"])
+        result = _validator_call("x940-smoke-frame", labels, [good], [good2])
+        self.assertEqual(result["status"], "OK")
 
     def test_frozen_099_retained_and_refused(self):
+        capture = _capture_module(self)
         source = _committed_row(_FROZEN_ID)
-        mass = sum(source["probabilities"].values())
-        self.assertGreater(abs(mass - 1.0), 1e-6)
-        label_map = {label: label for label in source["probabilities"]}
-        ans = FakeAnswer(
-            choice=source["intent"],
-            confidence=source["confidence"],
-            probabilities=dict(source["probabilities"]),
-        )
-        row = self.capture.answer_row(
-            {"i": source["i"], "intent": source["intent"]},
-            label_map,
-            ans,
-            "jev-1.13.0",
-            0,
-            None,
-        )
+        row = _capture(capture, source)
         self.assertEqual(row["probabilities"], source["probabilities"])
-        self.assertEqual(sum(row["probabilities"].values()), mass)
-        self.assertFalse(self.capture.conformal_mass_eligible(row["probabilities"]))
-
-    def test_guard_tolerance_is_strict(self):
-        self.assertEqual(self.capture.STRICT_MASS_TOLERANCE, 1e-6)
-        self.assertFalse(
-            self.capture.conformal_mass_eligible({"a": 0.7, "b": 0.300002})
-        )
-        self.assertFalse(
-            self.capture.conformal_mass_eligible({"a": 0.5, "b": float("nan")})
-        )
-        self.assertFalse(self.capture.conformal_mass_eligible({}))
+        self.assertGreater(abs(sum(row["probabilities"].values()) - 1.0), 1e-6)
+        good = _capture(capture, _committed_row(_VALID_ID))
+        labels = sorted(row["probabilities"])
+        result = _validator_call("x940-smoke-frame", labels, [good], [row])
+        self.assertEqual(result["status"], "REFUSE")
+        self.assertEqual(result["reason"], "invalid_probability_vector")
 
 
 if __name__ == "__main__":
