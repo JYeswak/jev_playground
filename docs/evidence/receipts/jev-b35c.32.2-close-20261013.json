@@ -1,0 +1,21 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_cbe3335b82f0726b12f65fb308df267dcec9d5dc6a0cff7e455bab1742a57f40",
+ "limitations": [
+  "No live Jev/API calls; graph-state review only.",
+  "Global wip_multi and hidden_by_parent metrics are recorded separately from the eight owner-queue criterion."
+ ],
+ "operation": "jev-b35c.32.2.review",
+ "parameters": {
+  "bead": "jev-b35c.32.2",
+  "evidence_path": "docs/evidence/receipts/jev-b35c.32.2-review-evidence-20261013.txt",
+  "origin_main": "d66cc379e627e43fec2dcca37256207873a0f581",
+  "reviewer": "RainyKite"
+ },
+ "producer": "RainyKite",
+ "result_ref": {
+  "bytes": 2754,
+  "sha256": "9d170b804143938cd9146ad5b36a7992b74d734ad98163f2929beb5dd09553e1"
+ }
+}

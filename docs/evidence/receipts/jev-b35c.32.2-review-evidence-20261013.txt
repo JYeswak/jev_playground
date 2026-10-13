@@ -1,0 +1,19 @@
+jev-b35c.32.2 — fresh non-author review
+Reviewer: RainyKite. Bead: in_review, assigned BeigeDog, created_by BrownGoose. Audit showed CobaltCoyote as the in_progress setter; comment authors are BrownGoose/CobaltCoyote; no RainyKite authorship or setter. Prior BeigeDog gate was not relied on.
+
+origin/main: d66cc379e627e43fec2dcca37256207873a0f581
+
+Command: FLEET_PULSE_SKIP_PANES=1 sh /Users/josh/Developer/omp-kit/scripts/fleet-pulse.sh /Users/josh/Developer/jev
+Exit: 0
+Output: ts=2026-10-13T16:53:46Z; blocked_no_fix=0; dag_isolated=0; dag_cycles=0; blocked_fix_idle=1; blocked_fix_external=3; hidden_by_parent=2; in_progress=7; wip_multi=2.
+Interpretation: the eight acceptance owner queues are b35c.25->BeigeDog, mimq->AmberWillow, nwo1->CyanPeak, 65nk->WildCarp, jg23->CyanLake, pbl3/4ezx/aqxb->BrownGoose. All eight beads are assigned; among these owners, BeigeDog and CyanLake each have one in_progress bead and the other listed owners have none. The global wip_multi=2 is Josh/CobaltCoyote, outside these eight queues; this review does not claim project-wide wip_multi=0. The one blocked_fix_idle chain is b35c.34->v9cl: .34 references upstream oh-my-pi#14605 and Joshua's per-PR go-ahead; v9cl is the explicit chief grant/deny trigger recorded in Mail 52272. This meets the AC's explicit-trigger/owner exception; it is not one of the eight idlefix owner queues.
+
+Current root edges from br show: x940 --blocks--> b35c.33 (open, josh); acs2 --blocks--> b35c.35 (open, BeigeDog); k3yw --blocks--> b35c.36 (open, BrownGoose); pcw7 --blocks--> b35c.34 (blocked, explicit upstream trigger). The fixes have relevant source/prerequisite evidence in their Bead descriptions. x940's cited work/choice-banking77/run.py lines 105-106 are present and the file matches origin/main. work/plan-20261004/specs/conformance-goldens.md (sections 1, 4, 5) is present and matches origin/main. Candidate 0120b698 for .35 is local and not on origin/main; .35 remains open/assigned, so this review does not claim publication or completion of that fix.
+
+Command: FLEET_PULSE_SKIP_PANES=1 sh /Users/josh/Developer/omp-kit/scripts/fleet-pulse.sh --selftest
+Exit: 0; output: fleet-pulse selftest: PASS (13 fields). The fixture includes no-edge, related-only, and closed-history edges and confirms they do not manufacture a fix.
+
+Command: br dep cycles --no-auto-flush --no-auto-import --json
+Exit: 0; output: count=0, active_count=0, cycles=[]. The live fleet-pulse output also reports dag_isolated=0 and dag_cycles=0.
+
+Verdict: PASS for the stated .32.2 acceptance; no fake edge or false implementation claim. No source changes or live Jev/API calls in this review. The global hidden_by_parent=2 and global multi-owner count are recorded above, not misreported as zero.
