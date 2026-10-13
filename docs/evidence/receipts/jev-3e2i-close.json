@@ -1,0 +1,13 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_276c845f80424af98c4755b96b8cced74c1a550e1a7631eb63fce0fd4bb91589",
+ "limitations": [],
+ "operation": "jev-3e2i-close-rerun",
+ "parameters": {},
+ "producer": "CobaltCoyote",
+ "result_ref": {
+  "bytes": 2383,
+  "sha256": "227e2f259c8797cc1d9ef97e14aba9cc6d610ee91e0603df9d764cbe871d5b76"
+ }
+}
