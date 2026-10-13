@@ -1,0 +1,32 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_1270ebfb74e50ee345fd109b725aca18e71e25677e2444117e581176f4e8d906",
+ "limitations": [
+  "Does not establish that the amended X1 preregistration is correct or establish any X1/X2 result.",
+  "The X1 collection timeline remains undetermined; follow-up stays on jev-x1-injection-encoders-e2gp."
+ ],
+ "operation": "committed-byte-acceptance-review",
+ "parameters": {
+  "ci_38359627499": "gate70_only_red_registered_suites_success",
+  "ci_38366769335": "success_x2_test_run_PASS20",
+  "ci_38398436010": "success_current_main",
+  "commit": "a216345606feaf1c769f959cbd9b3a4f6ec6b89a",
+  "e2gp_timeline": "undetermined_comment_3026",
+  "parent": "cd5536262de77c5c98f0315fc5710c0e6d0265a2",
+  "paths": "A:work/x1-injection-encoders/PREREG-AMENDMENT-20261012.md;M:work/x1-injection-encoders/PREREG.md",
+  "payload_bytes": "7143",
+  "payload_cmp": "identical",
+  "pre_fix_sha256": "670578d55bee0587c9c9002ebd8e21f162904dcaa8f1f2afd70cc74130f002ce",
+  "private_index": "comment_3027",
+  "restored_sha256": "dfebc6fa10b1aa5c8c81c490e9b07f18f78f5114a3056748c996ab65f99b4912",
+  "review_gate": "127_min_reviewers_pass",
+  "split_mentions_amendment": "0",
+  "split_pin": "dfebc6fa10b1aa5c8c81c490e9b07f18f78f5114a3056748c996ab65f99b4912"
+ },
+ "producer": "jev-b35c.37",
+ "result_ref": {
+  "bytes": 1546,
+  "sha256": "34292aa4d93822cabc058c3bce57699f6ba47d2a661111674b6fc2d3eeb2cec0"
+ }
+}
