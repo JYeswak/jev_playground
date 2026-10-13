@@ -1,0 +1,43 @@
+{
+  "census": "p2-census-v1",
+  "eligible_denominator": 3380,
+  "labels_recounted": {
+    "assignments_by_label": {
+      "no-harm": 32
+    },
+    "covered_by_set": {
+      "limA": 16,
+      "limB": 16
+    },
+    "covered_rows": 16,
+    "harm_rows": 0,
+    "note": "assignments count label entries across sets, so they sum above covered_rows; coverage is partial",
+    "undecidable_rows": 0
+  },
+  "missing_outcomes": 3380,
+  "prevalence": {
+    "harm": 0,
+    "note": "counts, not a rate; coverage is partial, not a population estimate",
+    "of_covered_rows": 16
+  },
+  "same_event_joins": 0,
+  "source_hashes": {
+    "gate_observe_full_lines": 5673,
+    "gate_observe_full_sha256": "513d121eafafe5a6e1e901720c112509a3a1d569155f04cb304d0b8fd128ad45",
+    "lim_manifest": "work/jev-1lim/manifest.jsonl",
+    "uncd_items": "work/jev-uncd/items.jsonl",
+    "window_rows_sha256": "fbf96c41ea321bc89b6a611dec1c090692a6300b76c7ae3e98a2eee77ba7609c"
+  },
+  "status_breakdown": {
+    "error": 126,
+    "not-run": 2166,
+    "scored": 3380,
+    "skipped": 1
+  },
+  "window": {
+    "cutoff": "2026-10-06T12:31:57.515000+00:00",
+    "days": 7,
+    "max_ts": "2026-10-13T12:31:57.515000+00:00",
+    "rows": 5673
+  }
+}
