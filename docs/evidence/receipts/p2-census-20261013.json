@@ -1,17 +1,18 @@
 {
  "authority": "selftest",
  "confidence": "observed",
- "evidence_id": "ev_969fe8724abd5c78b959ea763263eeeecbdbeded90d03d995c10674ff038f34c",
+ "evidence_id": "ev_95d9681aa450147b4711463b879c9535645d395b3ec0e13512ba3c99d99b65a2",
  "limitations": [
-  "label coverage partial; Oct-02 burst 134/23378 events absent from scored logs"
+  "as_of pinned; seam audit saved; label coverage partial"
  ],
- "operation": "jev-p2-census-seams",
+ "operation": "jev-p2-census-pinned",
  "parameters": {
+  "as_of": "2026-10-13T16:39:19.707Z",
   "days": "7"
  },
  "producer": "CobaltCoyote",
  "result_ref": {
   "bytes": 2845,
-  "sha256": "7af9e79a344663f16f846c1869737bf26ff1adeca7c9d191096a207f4b1ab804"
+  "sha256": "bcd50606cec0afa0c2b93b341c4a8a37ac76ceeaba89cd09832354e85b62ccff"
  }
 }

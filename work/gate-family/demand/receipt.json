@@ -1,6 +1,6 @@
 {
   "census": "p2-census-v2",
-  "eligible_denominator": 15464,
+  "eligible_denominator": 15481,
   "labels_recounted": {
     "assignments_by_label": {
       "no-harm": 90
@@ -14,7 +14,7 @@
     "note": "assignments count label entries across sets, so they sum above covered_rows; coverage is partial",
     "undecidable_rows": 0
   },
-  "missing_outcomes": 15464,
+  "missing_outcomes": 15481,
   "prevalence": {
     "harm": 0,
     "note": "counts, not a rate; coverage is partial, not a population estimate",
@@ -22,8 +22,8 @@
   },
   "same_event_joins": 0,
   "source_hashes": {
-    "concatenated_lines": 63906,
-    "concatenated_sha256": "ef23b8fd10470fbbebb08bdd676ff0dc2f97dc9db4ef770065cbbc7f885b9934",
+    "concatenated_lines": 64067,
+    "concatenated_sha256": "d0e7e1154fef9c11441657ccc836faeb0fb68a9991fb0600a0024c3efa51c89a",
     "historic_9bae04e5": "reproduced 2026-10-13 from archive 1 (2750 rows, file order): sha256 9bae04e5fc6a2e81d5ee9982f0be0657b88d119cef92d7a00b7d89efc055b12a",
     "lim_manifest": "work/jev-1lim/manifest.jsonl",
     "source_files": [
@@ -46,32 +46,32 @@
         "path": "gate-observe.jsonl.1791839197367.6f631519-f612-460e-be88-c93914f82344.archive"
       },
       {
-        "kept_lines": 6950,
-        "kept_sha256": "2fc80e33e3397d1b10e82da2a87f189f0384ebdbd01cdb830d0f0d7e9d6137dd",
-        "lines": 6950,
+        "kept_lines": 6977,
+        "kept_sha256": "aec771488151c42cb705d98ee50e5a0d260e1f9ba741c6178a9c3a9c5b47e633",
+        "lines": 7111,
         "path": "gate-observe.jsonl"
       }
     ],
     "source_note": "scored logs: rotated gate-observe.jsonl archives in epoch order plus the live tail; gate-observe-full.jsonl carries no outcomes and is not a source",
     "uncd_items": "work/jev-uncd/items.jsonl",
     "window_row_order": "file order across epoch-ordered archives plus live log",
-    "window_rows_sha256": "9996b404bafd2d55252bdb38da34de1921d6ff3b045b8924457d714fa50d46f1"
+    "window_rows_sha256": "12efb85b28cbe24f505536f98fe18f588c8664305024ca08144b828a23425f66"
   },
   "status_breakdown": {
-    "error": 174,
-    "not-run": 2540,
-    "scored": 15464,
+    "error": 176,
+    "not-run": 2528,
+    "scored": 15481,
     "skipped": 25
   },
   "window": {
     "actual_span_hours": 168.0,
-    "actual_start": "2026-10-06T16:34:15.908000+00:00",
-    "anchor": "2026-10-13T16:32:53.788000+00:00",
+    "actual_start": "2026-10-06T16:39:44.541000+00:00",
+    "anchor": "2026-10-13T16:39:19.707000+00:00",
     "covers_requested_span": true,
-    "cutoff": "2026-10-06T16:32:53.788000+00:00",
+    "cutoff": "2026-10-06T16:39:19.707000+00:00",
     "days": 7,
-    "file_max_ts": "2026-10-13T16:32:53.788000+00:00",
-    "rows": 18203,
+    "file_max_ts": "2026-10-13T17:24:53.235000+00:00",
+    "rows": 18210,
     "span_note": "window fully covers the requested span"
   }
 }
