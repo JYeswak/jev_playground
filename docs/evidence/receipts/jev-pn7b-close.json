@@ -1,0 +1,23 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_7405f2d67f1830c3b919c7686e779a9d28bc704ea137b82f4fc1e05ceaa86057",
+ "limitations": [
+  "The cited EVAL row is committed evidence; no fresh 7-day census or 24-hour follow-up was run. The 24-hour proof remains jev-6pjh; no savings claim."
+ ],
+ "operation": "pn7b-committed-evidence-check",
+ "parameters": {
+  "bead": "jev-pn7b",
+  "command": "git show --stat 55394f47; git show 55394f47 -- EVAL.md work/jev-inventory/expected.json; git merge-base --is-ancestor 55394f47 origin/main",
+  "commit": "55394f47deb875a9436ed15a2d349005a8429ad1",
+  "expected_json": "tracked; origin blob changed later from cited commit",
+  "investigation": "work/jev-inventory/expected.json",
+  "merge_base": "ancestor",
+  "origin_main": "f56de42f933d7da69549b9f790bed6a49618923c"
+ },
+ "producer": "BeigeDog",
+ "result_ref": {
+  "bytes": 3288,
+  "sha256": "71ea439c7c81d17eae26d58cf87b41b239890ffaa520d34833e00ac6629acf68"
+ }
+}

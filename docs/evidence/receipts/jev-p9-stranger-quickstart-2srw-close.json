@@ -1,0 +1,23 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_cde943f99ddcee146ac5d227e8be3146935bfa5250d18fede7dc067966af70ef",
+ "limitations": [
+  "Bounded public README stranger run only; no full README/LEDGER audit or product-readiness claim."
+ ],
+ "operation": "p9-stranger-run",
+ "parameters": {
+  "bead": "jev-p9-stranger-quickstart-2srw",
+  "command": "python3 scripts/stranger-run-jev-playground.py --source https://github.com/JYeswak/jev_playground.git --expect docs/demos/upstream-repro/stranger-run-expected.tsv --timeout 600",
+  "commit": "282502469ed8bac0ff722b450f733e8e6b29fdef",
+  "exit_summary": "14 exit 0; doctor exit 1 expected no-key; key-required ask exit 2 expected no-key",
+  "investigation": "scripts/stranger-run-jev-playground.py",
+  "rows": "16",
+  "source_commit": "f56de42f933d7da69549b9f790bed6a49618923c"
+ },
+ "producer": "BeigeDog",
+ "result_ref": {
+  "bytes": 2333,
+  "sha256": "7cb9523b00ef97009e91d7ffabe2c2b59b08b73ae751d1aff7e486524ef533c9"
+ }
+}
