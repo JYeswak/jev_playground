@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_91c7ef608561d3c4587f2fced6ebd6dd40488549622135d355721b50b0091504",
+ "limitations": [
+  "Director-run, not an independent reviewer gate. Proves the two roll-ups have identical blocks-edge sets to their originals at 2026-10-13 ~15:30Z; does not prove the originals' coverage (that is the .4.1/.4.2 review). Tracker state, not a repo file."
+ ],
+ "operation": "jev-b35c.32.4.3-and-.4.4-duplicate-rollup-close",
+ "parameters": {
+  "bead": "jev-b35c.32.4.3,jev-b35c.32.4.4",
+  "command": "br show <id> --json | jq blocks-edge ids sorted; compare .4.1 vs .4.3 and .4.2 vs .4.4 (Bun sha256 of sorted id list)",
+  "ruling": "chief AM 52895"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 496,
+  "sha256": "0cc66c64b394d47c7cc9697910294f4344560cf80e17cecc26ba8e5a80e409d0"
+ }
+}
