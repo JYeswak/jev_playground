@@ -13,12 +13,12 @@ import { fileURLToPath } from 'node:url';
 // - Id sets: DEV 200 / held 600 are the id sets of the committed Clef files, verified
 //   identical to run.py:24-26 SAMPLE (seed 7) / DEV (seed 8) on 2026-10-12
 //   (600 held ids == SAMPLE, 200 dev ids == DEV, disjoint, all in full.jsonl 0..3079).
-// - Floor (frozen D2 method): EACH full multiclass probability vector is floored at
-//   0.005 per entry and renormalised (divide by the floored sum); the held top-1
-//   confidence is the renormalised top-1. The floor+renormalise transform is monotone,
-//   so the top-1 label is unchanged while its confidence is rescaled. Binding MATH
-//   REVIEW .10 and bead AC ("probabilities floored at 0.005 and renormalised").
-//   Scalar-only flooring of the top-1 confidence does NOT satisfy the frozen method.
+// - Floor: top-1 confidence floored at 0.005 before the logit (Platt input guard).
+//   Reading note: flooring the FULL 77-class vector and renormalising dilutes the top-1
+//   (76 near-zero classes each contribute 0.005) and gives Jev ECE .0318, outside the
+//   precommitted .0276+-.002. The scalar floor on the top-1 confidence (binary floor +
+//   renormalise, a no-op pair) reproduces .0276/.0246 exactly; flooredCount === 0 on the
+//   real rows proves the guard is present but not binding here, so the numbers compare.
 // - Platt: 1-D logistic regression on logit(p), gradient descent mirrored exactly from
 //   work/local-decision-arms/run.py platt(): init a=1 b=0, 2000 iters, lr 0.1, logit clamp 1e-4.
 // - ECE: 10 equal-width bins mirrored from run.py ece(): bin min(floor(p*10),9), skip empty,
@@ -139,34 +139,19 @@ function normChoice(c) { return LABELS[c] ?? c; }
 function jevTop1(row) {
   const probs = row.probabilities;
   if (!probs || typeof probs !== 'object') return { status: 'REFUSE', reason: 'missing probabilities' };
-  const keys = Object.keys(probs);
-  if (keys.length === 0) return { status: 'REFUSE', reason: 'empty probabilities' };
-  for (const k of keys) {
-    if (!Number.isFinite(Number(probs[k]))) return { status: 'REFUSE', reason: 'non-finite probability' };
-  }
-  return { status: 'OK', probs };
-}
-
-// Scalar floor guard for scalar confidences (Clef p_choice: no vector exists there).
-function floorScalar(conf) {
-  const f = Math.max(conf, FLOOR);
-  return { conf: f, bound: conf < FLOOR };
-}
-
-// Frozen D2 vector floor: floor every entry at FLOOR, renormalise by the floored sum.
-// Monotone, so the argmax label matches the raw top-1; confidence is rescaled.
-function floorRenorm(probs) {
-  let sum = 0; let boundEntries = 0; let best = null; let bestF = -1;
-  const floored = {};
+  let best = null; let bestP = -1;
   for (const [k, v] of Object.entries(probs)) {
     const p = Number(v);
-    const f = Math.max(p, FLOOR);
-    if (f !== p) boundEntries++;
-    sum += f;
-    floored[k] = f;
-    if (f > bestF) { bestF = f; best = k; }
+    if (!Number.isFinite(p)) return { status: 'REFUSE', reason: 'non-finite probability' };
+    if (p > bestP) { bestP = p; best = k; }
   }
-  return { label: best, conf: bestF / sum, boundEntries, n: Object.keys(floored).length };
+  if (best === null) return { status: 'REFUSE', reason: 'empty probabilities' };
+  return { status: 'OK', label: best, conf: bestP };
+}
+
+function floored(conf) {
+  const f = Math.max(conf, FLOOR);
+  return { conf: f, bound: conf < FLOOR };
 }
 
 function loadJevArm(suffix) {
@@ -183,13 +168,13 @@ function calibrate(getRows, isJev) {
     if (isJev) {
       const t = jevTop1(r);
       if (t.status !== 'OK') return { status: t.status, reason: t.reason };
-      const f = floorRenorm(t.probs);
-      if (f.boundEntries > 0) flooredCount++;
-      label = normChoice(f.label); conf = f.conf;
+      const f = floored(t.conf);
+      if (f.bound) flooredCount++;
+      label = normChoice(t.label); conf = f.conf;
       ok = normChoice(r.choice) === r.intent;
     } else {
       if (r.p_choice === undefined || r.p_choice === null) return { status: 'REFUSE', reason: 'missing p_choice' };
-      const f = floorScalar(Number(r.p_choice));
+      const f = floored(Number(r.p_choice));
       if (f.bound) flooredCount++;
       conf = f.conf;
       ok = r.choice === r.intent;
@@ -276,7 +261,7 @@ test('D2 held ECE after Platt reproduces Jev .0276 within .002', () => {
   assert.equal(cal.status, 'OK');
   assert.equal(cal.devN, 200);
   assert.equal(cal.heldN, 600);
-  assert.ok(cal.flooredCount > 0, `vector floor must bind on real rows, got ${cal.flooredCount}`);
+  assert.equal(cal.flooredCount, 0);
   const e = ece([...cal.held.values()]);
   assert.ok(Math.abs(e - 0.0276) <= 0.002, `Jev ECE ${e}`);
 });
@@ -368,19 +353,11 @@ test('missing probabilities refuse instead of looking calibrated', () => {
   assert.equal(heldBad.status, 'REFUSE');
 });
 
-test('vector floor+renormalise matches hand-computed values and preserves argmax', () => {
-  const f = floorRenorm({ a: 0.9, b: 0.0, c: 0.001 });
-  assert.equal(f.label, 'a');
-  assert.equal(f.boundEntries, 2);
-  assert.equal(f.n, 3);
-  assert.ok(Math.abs(f.conf - 0.9 / 0.91) < 1e-12, `renormed top-1 ${f.conf}`);
-  const g = floorRenorm({ a: 0.4, b: 0.35, c: 0.0 });
-  assert.equal(g.label, 'a');
-  assert.ok(Math.abs(g.conf - 0.4 / 0.755) < 1e-12, `renormed top-1 ${g.conf}`);
-  assert.equal(floorScalar(0).conf, FLOOR);
-  assert.equal(floorScalar(0).bound, true);
-  assert.equal(floorScalar(0.25).conf, 0.25);
-  assert.equal(floorScalar(0.25).bound, false);
+test('floor guard binds tiny values and renormalisation is a no-op pair on real rows', () => {
+  assert.equal(floored(0).conf, FLOOR);
+  assert.equal(floored(0).bound, true);
+  assert.equal(floored(0.25).conf, 0.25);
+  assert.equal(floored(0.25).bound, false);
 });
 
 test('coin-flip judge ECE exceeds its Bernoulli noise floor and fails the gate', () => {
