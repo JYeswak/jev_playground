@@ -1,0 +1,26 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_7e0762a508d89ec61bfa5dfdb622c979d4fff1e93b81953e190ca544b397d11b",
+ "limitations": [
+  "Fold disposition only; jev-b35c.22 remains open.",
+  "No install behavior, L3, L4, or organic-quality result is asserted."
+ ],
+ "operation": "folded-history-nonauthor-review",
+ "parameters": {
+  "claims": "no_implementation_L3_L4_or_receiver_completion",
+  "commit": "0bf23c5b44f89dc0be350b5c9d2525c855d0d02d",
+  "finding": "duplicate-integration-bead",
+  "fold_status": "superseded-history-only",
+  "investigation_path": "work/plan-20261004/convergence/r4/L4-HonestyR4.jsonl",
+  "l4_line": "103",
+  "prior_receipt": "ev_84fa24fdd1eb83af61b6d1a51f02fb8576fa8ad3dbfee2c3141ccf2bb890dd15_preserved",
+  "receiver": "jev-b35c.22:open",
+  "review_gate": "137:min_reviewers:pass:reviewer-BeigeDog"
+ },
+ "producer": "jev-b35c.8",
+ "result_ref": {
+  "bytes": 583,
+  "sha256": "ed8c51bf89f0f2912acf7bd0c266a403d122ea7fea740baf178c25b5d41ce7f3"
+ }
+}

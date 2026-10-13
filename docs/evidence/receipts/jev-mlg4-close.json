@@ -1,0 +1,33 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_5aef4786607c07347a4c3e92c4498a490a4c40af29a4825b320ad83155f863e5",
+ "limitations": [
+  "FIND results show no ON win; the wave-D scorer is a single-arm capability check, not a paired A/B effect.",
+  "INJECTION and MEMORY remain UNVERIFIED because their wave-a/b rows are not committed."
+ ],
+ "operation": "committed-wave-result-nonauthor-review",
+ "parameters": {
+  "assignment": "WildCarp_cleared_then_BeigeDog_assigned",
+  "attempted": "14",
+  "attempted_off": "6",
+  "attempted_on": "8",
+  "bar": "0.80_single_arm_fail",
+  "commit": "5a10a0d29b2f1d6a97730089da594bbf20170c3a",
+  "jq_off": "42/48_passed",
+  "jq_on": "40/48_passed",
+  "review_gate": "139_min_reviewers_pass_reviewer-BeigeDog",
+  "score_rows": "42",
+  "score_waved_sha256": "e7736bee91685dcf5f8e3376a25bf54c6bea3121d3d975ce3f88a1643d125983",
+  "wave_a": "unverified_no_committed_rows",
+  "wave_b": "unverified_no_committed_rows",
+  "wave_d_rows_sha256": "a5e2448aa2b2b82c11fa3a12744dfa48af40220541ab57e2c1acbd09acae87e5",
+  "wavec_results_sha256": "ffae181a3276c334932f01127b2327c6a19dc8fa646f1ecbb1322321f2ad034b",
+  "would_catch_on": "2/8"
+ },
+ "producer": "jev-mlg4",
+ "result_ref": {
+  "bytes": 617,
+  "sha256": "320cc9b27ae5413cf9ba6376bdb4cb321357a5b47c945b095f1caee2e5fd3516"
+ }
+}

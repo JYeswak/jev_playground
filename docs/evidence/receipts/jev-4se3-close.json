@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_afb329b47f2c70ab0ea5b000527c0e578e5848699124338e2b883b03c9070cd7",
+ "limitations": [
+  "re-close per chief AM52512; fold verification only, no experiment PASS claimed"
+ ],
+ "operation": "jev-4se3-reclose",
+ "parameters": {
+  "reviewer": "non-author-worker"
+ },
+ "producer": "CobaltCoyote",
+ "result_ref": {
+  "bytes": 219,
+  "sha256": "79223a387e88e03c20e811a36267570138e144040a055aa3045da10e4afdbcb7"
+ }
+}
