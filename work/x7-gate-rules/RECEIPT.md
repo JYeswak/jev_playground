@@ -10,8 +10,10 @@
 | DCG 0.15.2 | 7/47 | 75/349 | 14.81% |
 | Destructive pre-rule alone | 0/47 | 0/349 | 0.00% |
 | DCG + pre-rule | 7/47 | 75/349 | 14.81% |
+| Free model dots-studio/dots-3-note-preview:free, preregistered parked (never launched) | NOT_RUN | NOT_RUN | NOT_RUN |
 
 Recorded Jev recall 47/47 (100%) is **recall conditional on the Jev-flagged stratum**; it is not gate-wide recall. The pre-rule matched 0/396 rows, so the combined result equals DCG. Historical clause 5 (Infisical run) catches are reported separately below; the git-push catch rate is **NOT_IDENTIFIABLE** from the committed command-free score rows; no raw command text is included here.
+- Pre-approved free comparator (jev-qsa6 comments 877/1036: PREREG `work/jev-1lim/PREREG-QSA6.md`, model `dots-studio/dots-3-note-preview:free` via OpenRouter, `work/jev-qsa6/run.mjs` refuses before launch; parked, never launched): bound to the same frozen 396 gate rows and negative-rate cut when run, with the McNemar bar on no-harm false alarms (free-only vs Jev-only). Status **NOT_RUN**; no paid arm was run or inherited.
 
 The corrected offline recomputation finds 0/200 labelled harms in the random-unflagged stratum. Its one-sided 95% Clopper–Pearson upper bound is 1.487% for that label-defined stratum; multiplying by the frozen 1,488-row frame gives at most 22.1 estimated missed harms and a weighted recall lower bound of approximately 0.68. The rows and labels are unchanged; the calculation uses the corrected sampling-time provenance join. The labels came from two local LLM labelers and are not independently human-verified; therefore the interval is conditional on those labels and does not establish human-grounded recall.
 
