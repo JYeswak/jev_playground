@@ -32,6 +32,16 @@ class ReplayTest(unittest.TestCase):
         self.assertEqual(sum(row["items"] for row in rows), manifest["sidecar_items"])
         self.assertEqual(manifest["sidecar_items"], 3238)
 
+    def test_cap3_reference_loader_accepts_rows_file_path(self) -> None:
+        expected_manifest, expected_rows = cap3.load_cap3_reference(
+            HERE / "cap3-reference.json"
+        )
+        actual_manifest, actual_rows = cap3.load_cap3_reference(
+            HERE / "cap3-reference.jsonl"
+        )
+        self.assertEqual(actual_manifest, expected_manifest)
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_cap3_reference_loader_rejects_changed_source_rows(self) -> None:
         original_read_bytes = Path.read_bytes
 

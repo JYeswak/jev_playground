@@ -31,8 +31,16 @@ def canonical_rows_bytes(rows: list[dict[str, Any]]) -> bytes:
 
 
 def load_cap3_reference(
-    manifest_path: Path,
+    reference_path: Path,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    requested_rows_path = (
+        reference_path.resolve() if reference_path.suffix == ".jsonl" else None
+    )
+    manifest_path = (
+        reference_path.with_suffix(".json")
+        if requested_rows_path is not None
+        else reference_path
+    )
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if (
         not isinstance(manifest, dict)
@@ -47,7 +55,12 @@ def load_cap3_reference(
         raise ValueError(
             "cap3 reference manifest SHA-256 differs from the preregistered bar"
         )
-    rows_bytes = (manifest_path.parent / rows_name).read_bytes()
+    rows_path = manifest_path.parent / rows_name
+    if requested_rows_path is not None and rows_path.resolve() != requested_rows_path:
+        raise ValueError(
+            "cap3 reference manifest does not point to the requested rows file"
+        )
+    rows_bytes = rows_path.read_bytes()
     actual_hash = hashlib.sha256(rows_bytes).hexdigest()
     if actual_hash != expected_hash:
         raise ValueError("cap3 reference rows SHA-256 mismatch")
