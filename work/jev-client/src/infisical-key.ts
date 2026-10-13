@@ -59,6 +59,18 @@ function parseExport(text: string, name: string): string | undefined {
   return raw.split(" #", 1)[0].trim() || undefined;
 }
 
+/** API URL only, for the pre-approval origin check: the machine secret must
+ * not be extracted until the origin is approved (u07). Exported as the
+ * ordering seam the u07 extraction test observes. */
+export function machineApiUrl(home: string = homedir(), read: FileReader = (file) => readFileSync(file, "utf8")): string | undefined {
+  try {
+    const text = read(path.join(home, ".config", "infisical", "zeststream.env"));
+    return parseExport(text, "INFISICAL_API_URL");
+  } catch {
+    return undefined;
+  }
+}
+
 export function machineIdentityConfig(home: string = homedir(), read: FileReader = (file) => readFileSync(file, "utf8")): MachineConfig | undefined {
   try {
     const text = read(path.join(home, ".config", "infisical", "zeststream.env"));
@@ -108,8 +120,10 @@ async function machineIdentityKey(
 ): Promise<string | undefined> {
   if (!approved) return undefined;
   try {
+    const apiUrl = machineApiUrl(home, read);
+    if (!apiUrl || !matchesApprovedOrigin(apiUrl, approved.baseUrl)) return undefined;
     const config = machineIdentityConfig(home, read);
-    if (!config || !matchesApprovedOrigin(config.apiUrl, approved.baseUrl)) return undefined;
+    if (!config || config.apiUrl !== apiUrl) return undefined;
     // Infisical CLI universal-auth requires --client-secret, which exposes it in argv.
     // The documented login API accepts the same credentials in the request body.
     const url = new URL("/api/v1/auth/universal-auth/login", approved.baseUrl);

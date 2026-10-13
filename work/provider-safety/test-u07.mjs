@@ -27,12 +27,26 @@ const PARENT_ENV = {
   UNRELATED: SYNTHETIC.parentSentinel,
 };
 
-function config(apiUrl) {
+function configWith(apiUrl, secret) {
   return [
     `export INFISICAL_CLIENT_ID=${SYNTHETIC.clientId}`,
-    `export INFISICAL_CLIENT_SECRET=${SYNTHETIC.clientSecret}`,
+    `export INFISICAL_CLIENT_SECRET=${secret}`,
     `export INFISICAL_API_URL=${apiUrl}`,
   ].join("\n");
+}
+function config(apiUrl) {
+  return configWith(apiUrl, SYNTHETIC.clientSecret);
+}
+// Extraction-order spy: the first config read carries SECRET_A, later reads
+// carry SECRET_B. The approved POST must use SECRET_B, proving the machine
+// secret was extracted after origin approval, not before it.
+const SECRET_A = "u07-pre-approval-secret-sentinel";
+const SECRET_B = "u07-post-approval-secret-sentinel";
+function splitConfigReader(apiUrl, calls) {
+  return () => {
+    calls.push(1);
+    return configWith(apiUrl, calls.length === 1 ? SECRET_A : SECRET_B);
+  };
 }
 
 function fakeExecFile(calls) {
@@ -50,6 +64,7 @@ function makeRunner(calls) {
 async function approvedOriginScenario() {
   const children = [];
   const requests = [];
+  const configReads = [];
   const runner = makeRunner(children);
   const transport = async (input, init) => {
     const url = new URL(String(input));
@@ -68,7 +83,7 @@ async function approvedOriginScenario() {
     () => 0,
     "infisical",
     "/synthetic/home",
-    () => config(`${APPROVED_TEST_ORIGIN}/api`),
+    splitConfigReader(`${APPROVED_TEST_ORIGIN}/api`, configReads),
     { origin: APPROVED_TEST_ORIGIN, transport },
   );
 
@@ -87,9 +102,10 @@ async function approvedOriginScenario() {
       method: "POST",
       redirect: "error",
       headers: { "content-type": "application/json" },
-      body: { clientId: SYNTHETIC.clientId, clientSecret: SYNTHETIC.clientSecret },
+      body: { clientId: SYNTHETIC.clientId, clientSecret: SECRET_B },
     },
   );
+  assert.equal(configReads.length, 2, "secret extraction is a second read after origin approval");
   assert.equal(children.length, 2, "one failed user-session lookup then one machine-key lookup");
   assert.deepEqual(children[0], {
     file: "infisical",
@@ -122,7 +138,7 @@ async function approvedOriginScenario() {
       header_names: Object.keys(requests[0].init.headers).sort(),
       body_fields: Object.keys(requests[0].body).sort(),
       client_id_matches_synthetic: requests[0].body.clientId === SYNTHETIC.clientId,
-      client_secret_matches_synthetic: requests[0].body.clientSecret === SYNTHETIC.clientSecret,
+      client_secret_matches_post_approval: requests[0].body.clientSecret === SECRET_B,
     },
     children: children.map((child) => ({
       file: child.file,
@@ -137,13 +153,14 @@ async function approvedOriginScenario() {
 
 async function deniedOriginScenario(apiUrl) {
   const children = [];
+  const configReads = [];
   let transportCalls = 0;
   const provider = makeInfisicalKeyProvider(
     makeRunner(children),
     () => 0,
     "infisical",
     "/synthetic/home",
-    () => config(apiUrl),
+    splitConfigReader(apiUrl, configReads),
     {
       origin: APPROVED_TEST_ORIGIN,
       transport: async () => {
@@ -156,7 +173,8 @@ async function deniedOriginScenario(apiUrl) {
   assert.equal(await provider(), undefined);
   assert.equal(transportCalls, 0, `denied origin ${apiUrl} must not attempt a credential POST`);
   assert.equal(children.length, 1, "denied origin permits only the user-session lookup child");
-  return { configured_origin: apiUrl, credential_post_attempts: transportCalls, child_invocations: children.length };
+  assert.equal(configReads.length, 1, `denied origin ${apiUrl} performs only the url-approval read; the secret is never extracted`);
+  return { configured_origin: apiUrl, credential_post_attempts: transportCalls, child_invocations: children.length, config_reads: configReads.length };
 }
 
 async function redirectScenario() {
@@ -246,7 +264,7 @@ async function main() {
       no_independent_review_claim: true,
     };
     const serialized = `${JSON.stringify(report, null, 2)}\n`;
-    for (const secret of Object.values(SYNTHETIC)) {
+    for (const secret of [...Object.values(SYNTHETIC), SECRET_A, SECRET_B]) {
       assert.equal(serialized.includes(secret), false, "report must not emit even synthetic credential values");
     }
     await writeFile(fileURLToPath(new URL("./u07-receipt.json", import.meta.url)), serialized, "utf8");
