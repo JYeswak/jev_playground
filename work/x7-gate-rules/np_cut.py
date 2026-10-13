@@ -1,4 +1,4 @@
-"""Fit and audit an X7 score cutoff using disjoint no-harm rows only."""
+"""Fit and audit an X7 Jev-score cutoff using disjoint no-harm rows only."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ DELTA = 0.05
 ROOT = Path(__file__).resolve().parents[2]
 ROW_SCORES = ROOT / "work/x7-gate-rules/row-scores.jsonl"
 DCG_ANSWERS = ROOT / "kit/fixtures/gate/answers-dcg.jsonl"
+JEV_ANSWERS = ROOT / "kit/fixtures/gate/answers-jev.jsonl"
 
 HARM_LABELS = {f"harm:{clause}" for clause in range(1, 6)}
 
@@ -101,6 +102,7 @@ def fit_and_audit(
         "alpha": alpha,
         "delta": delta,
         "required_negative_count": required,
+        "score_source": "jev-max_score",
         "fit_n": fit_n,
         "audit_n": audit_n,
         "status": "NOT_RUN",
@@ -134,6 +136,13 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 def load_committed_rows() -> list[dict[str, Any]]:
     scores = _read_jsonl(ROW_SCORES)
     answers = _read_jsonl(DCG_ANSWERS)
+    jev_answers = _read_jsonl(JEV_ANSWERS)
+    by_jev: dict[str, dict[str, Any]] = {}
+    for answer in jev_answers:
+        event_id = answer.get("event_id")
+        if not isinstance(event_id, str) or event_id in by_jev:
+            raise ValueError("recorded Jev answers have missing or duplicate IDs")
+        by_jev[event_id] = answer
     by_id: dict[str, dict[str, Any]] = {}
     for answer in answers:
         event_id = answer.get("event_id")
@@ -158,14 +167,20 @@ def load_committed_rows() -> list[dict[str, Any]]:
         combined = "deny" if row["dcgDecision"] == "deny" or row["preRuleMatch"] else "allow"
         if answer.get("combined_decision") != combined:
             raise ValueError("recorded combined answer disagrees with its components")
+        jev = by_jev.pop(event_id, None)
+        if not jev or jev.get("status") != "scored":
+            raise ValueError("recorded Jev answers do not exactly cover score rows")
+        max_score = jev.get("max_score")
+        if isinstance(max_score, bool) or not isinstance(max_score, (int, float)) or not math.isfinite(max_score) or not 0 <= max_score <= 1:
+            raise ValueError("recorded Jev max_score must be a finite value in [0, 1]")
         if label == "no-harm":
             rows.append({
                 "event_id": event_id,
                 "label": "no-harm",
-                "score": 1.0 if combined == "deny" else 0.0,
+                "score": float(max_score),
             })
-    if by_id:
-        raise ValueError("recorded deterministic answers include unknown row IDs")
+    if by_id or by_jev:
+        raise ValueError("recorded answers include unknown row IDs")
     return rows
 
 
