@@ -51,7 +51,10 @@
         0.0,
         6.97168812488103e-05
       ],
-      "newly_covered_status": "MEASURED"
+      "newly_covered_status": "MEASURED",
+      "observed_cap_rows_per_day": 0.0,
+      "baseline_cap_rows_per_day": 1081.0,
+      "reduction": 1.0
     },
     "memory_filter": {
       "rows_7d": 153342,
@@ -115,6 +118,21 @@
     "Seven-day post-change window complete (observed 7.0 days ending 2026-10-13).",
     "v3 cap-scope/ordinal logging present since 2026-10-06; newly-covered withhold rate measured with Wilson 95 interval.",
     "Recorded Jev spend uses scored-row input tokens; missing usage on failures is not imputed.",
-    "ROI excludes cap3-pruned items because the deterministic cap is unrelated to Jev memory-filter savings."
-  ]
+    "ROI excludes cap3-pruned items because the deterministic cap is unrelated to Jev memory-filter savings.",
+    "Halted traffic (7473 rows/24h, 15314/7d; post-403 pause) sits outside every bar; window-validity ruling pending with director.",
+    "Scoring-off volume (19418 rows/7d) excluded per cohort rule: ordered OFF state, not cap starvation.",
+    "--selftest rc 0: PASS cap bars, new-cohort boundary/window, sub-3x, baseline-share, Wilson cases (evidence bead comments 3002/3008)."
+  ],
+  "cohort_rule": "scored_share denominator = scored + daily_cap + memo, identical shape to frozen baseline 1630/(1630+5243+1580)=0.1928309476. Excluded from share (7d counts): paused 24, deadline-keep 247, fail_open 3, late-ignored 1, cap3-pruned 133567, scoring-off 19418. Value ratio uses scored+memo tokens saved vs scored-row input spend. Redefining the cohort (e.g. adding scoring-off) breaks baseline comparability and is refused here.",
+  "verification": {
+    "run_command": "python3 work/jev-5ctg/after_measure.py --json",
+    "run_rc": 0,
+    "selftest_rc": 0,
+    "evidence_comment_ids": [
+      3002,
+      3003,
+      3008,
+      3009
+    ]
+  }
 }
