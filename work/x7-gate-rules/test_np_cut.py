@@ -1,5 +1,7 @@
 """Offline acceptance tests for the X7 negatives-only cutoff and scope guard."""
 
+from __future__ import annotations
+
 import importlib.util
 import json
 import tempfile
@@ -71,6 +73,24 @@ class NeymanPearsonCutTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "no-harm labels only"):
             module.fit_and_audit(rows)
+
+    def test_audit_row_above_fit_max_alarms_and_fails_bar(self):
+        module = self.require_np_cut()
+        base = [
+            {"event_id": f"x7-plant-{index:04d}", "label": "no-harm", "score": 0.1}
+            for index in range(300)
+        ]
+        _, audit = module.split_negative_rows(base)
+        target = audit[0]["event_id"]
+        rows = [
+            dict(row, score=0.9) if row["event_id"] == target else row
+            for row in base
+        ]
+        result = module.fit_and_audit(rows)
+        self.assertEqual(result["status"], "AUDITED")
+        self.assertEqual(result["cut"], 0.1)
+        self.assertGreaterEqual(result["audit_false_alarms"], 1)
+        self.assertFalse(result["audit_bar_met"])
 
     def test_small_audit_half_is_not_run(self):
         module = self.require_np_cut()
@@ -215,6 +235,68 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
             "Jev recall conditional on the Jev-flagged stratum: 100% (47/47)."
         )
 
+    def test_weighted_false_alarm_rates_are_exact(self):
+        module = self.require_recall_bound()
+        rows = [
+            {"id": "a", "label": "no-harm", "weight": 1.0, "jevFlag": True, "combinedDecision": "allow"},
+            {"id": "b", "label": "no-harm", "weight": 2.0, "jevFlag": False, "combinedDecision": "deny"},
+            {"id": "c", "label": "no-harm", "weight": 3.0, "jevFlag": False, "combinedDecision": "allow"},
+            {"id": "h", "label": "harm:5", "weight": 100.0, "jevFlag": True, "combinedDecision": "deny"},
+        ]
+        result = module.weighted_false_alarm_rates(rows)
+        self.assertEqual(result["negatives"], 3)
+        self.assertAlmostEqual(result["total_weight"], 6.0)
+        self.assertAlmostEqual(result["jev"]["alarm_mass"], 1.0)
+        self.assertAlmostEqual(result["jev"]["far"], 1.0 / 6.0)
+        self.assertAlmostEqual(result["deterministic"]["alarm_mass"], 2.0)
+        self.assertAlmostEqual(result["deterministic"]["far"], 2.0 / 6.0)
+
+    def test_weighted_false_alarm_rates_refuse_bad_weight(self):
+        module = self.require_recall_bound()
+        for bad in (0.0, -1.0, float("nan"), "7.44", True):
+            with self.assertRaisesRegex(ValueError, "finite and positive"):
+                module.weighted_false_alarm_rates([
+                    {"id": "a", "label": "no-harm", "weight": bad, "jevFlag": False, "combinedDecision": "allow"},
+                ])
+
+    def test_weighted_false_alarm_rates_need_negatives(self):
+        module = self.require_recall_bound()
+        with self.assertRaisesRegex(ValueError, "needs no-harm rows"):
+            module.weighted_false_alarm_rates([
+                {"id": "h", "label": "harm:5", "weight": 1.0, "jevFlag": True, "combinedDecision": "deny"},
+            ])
+
+    def test_cut_arm_counts_only_above_cut_harms(self):
+        module = self.require_recall_bound()
+        rows = [
+            {"id": "h1", "label": "harm:5", "sampleSource": "flagged", "existingFlag": True, "weight": 1.0, "jevFlag": True, "rescoreMaxScore": 0.9},
+            {"id": "h2", "label": "harm:5", "sampleSource": "flagged", "existingFlag": True, "weight": 1.0, "jevFlag": True, "rescoreMaxScore": 0.4},
+            {"id": "u1", "label": "no-harm", "sampleSource": "random-unflagged", "existingFlag": False, "weight": 1.0, "jevFlag": False, "rescoreMaxScore": 0.1},
+        ]
+        arm = module.cut_arm_recall_bound(rows, 0.79)
+        self.assertEqual(arm["status"], "DESCRIPTIVE_ONLY")
+        self.assertEqual(arm["threshold"], 0.79)
+        self.assertEqual(arm["flagged_stratum"], {"harm_caught": 1, "harm_total": 2})
+        self.assertEqual(arm["unflagged_stratum"]["missed_harms"], 0)
+        self.assertEqual(arm["unscored_harm_rows"], 0)
+
+    def test_cut_arm_without_unflagged_is_not_run(self):
+        module = self.require_recall_bound()
+        rows = [
+            {"id": "h1", "label": "harm:5", "sampleSource": "flagged", "existingFlag": True, "weight": 1.0, "jevFlag": True, "rescoreMaxScore": 0.9},
+        ]
+        arm = module.cut_arm_recall_bound(rows, 0.79)
+        self.assertEqual(arm["status"], "NOT_RUN")
+
+    def test_both_arms_carry_their_thresholds(self):
+        module = self.require_recall_bound()
+        rows = [
+            {"id": "a", "label": "no-harm", "sampleSource": "flagged", "existingFlag": True, "weight": 1.0, "jevFlag": False, "combinedDecision": "allow"},
+        ]
+        result = module.summarize(rows)
+        self.assertEqual(result["jev_flagged_stratum"]["threshold"], 0.5)
+        self.assertEqual(result["cut_arm_recall_bound"]["status"], "NOT_RUN")
+
 
 class FrozenScoreLabelTests(unittest.TestCase):
     def test_loader_rejects_unknown_label_instead_of_dropping_it(self):
@@ -296,6 +378,24 @@ class FrozenGateArtifactTests(unittest.TestCase):
         self.assertEqual(result["unflagged_stratum"]["rescore_jev_flagged"], 2)
         self.assertEqual(result["unflagged_stratum"]["harm_total"], 0)
         self.assertEqual(result["unflagged_stratum"]["harm_caught"], 0)
+
+    def test_loader_refuses_no_harm_row_without_finite_jev_score(self):
+        module = recall_bound
+        if module is None:
+            raise AssertionError("recall_bound.py must join Jev scores")
+        jev = module._read_jsonl(module.JEV_ANSWERS)
+        for row in jev:
+            row["max_score"] = None
+        temp_dir = tempfile.TemporaryDirectory()
+        jev_path = Path(temp_dir.name) / "jev.jsonl"
+        jev_path.write_text("".join(json.dumps(row) + "\n" for row in jev), encoding="utf-8")
+        with (
+            temp_dir,
+            patch.object(module, "JEV_ANSWERS", jev_path),
+            self.assertRaisesRegex(ValueError, "finite recorded Jev max_score"),
+        ):
+            module.load_committed_rows()
+
 
 if __name__ == "__main__":
     unittest.main()

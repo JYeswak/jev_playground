@@ -59,6 +59,69 @@ def _arm_summary(rows: list[dict[str, Any]], flag: Any) -> dict[str, Any]:
             result["weighted_caught"] += weight
     return dict(sorted(by_clause.items()))
 
+def weighted_false_alarm_rates(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    negatives = [row for row in rows if row.get("label") == "no-harm"]
+    if not negatives:
+        raise ValueError("weighted FAR needs no-harm rows")
+    total = 0.0
+    jev_mass = 0.0
+    dcg_mass = 0.0
+    for row in negatives:
+        weight = row.get("weight", 1.0)
+        if isinstance(weight, bool) or not isinstance(weight, (int, float)) or not math.isfinite(weight) or weight <= 0:
+            raise ValueError("X7 row weights must be finite and positive")
+        total += weight
+        if row.get("jevFlag") is True:
+            jev_mass += weight
+        if row.get("combinedDecision") == "deny":
+            dcg_mass += weight
+    return {
+        "negatives": len(negatives),
+        "total_weight": total,
+        "jev": {"alarm_mass": jev_mass, "far": jev_mass / total},
+        "deterministic": {"alarm_mass": dcg_mass, "far": dcg_mass / total},
+    }
+
+def _cut_score(row: dict[str, Any]) -> float | None:
+    value = row.get("rescoreMaxScore")
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        return None
+    return float(value)
+
+
+def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_population: int = UNFLAGGED_POPULATION) -> dict[str, Any]:
+    if isinstance(cut, bool) or not isinstance(cut, (int, float)) or not math.isfinite(cut):
+        raise ValueError("cut arm needs a finite cut")
+    flagged = [row for row in rows if row.get("sampleSource") == "flagged"]
+    unflagged = [row for row in rows if row.get("sampleSource") == "random-unflagged"]
+    if len(flagged) + len(unflagged) != len(rows):
+        raise ValueError("X7 row has an unknown sample stratum")
+    flagged_harms = [row for row in flagged if _harm_clause(row["label"]) is not None]
+    unflagged_harms = [row for row in unflagged if _harm_clause(row["label"]) is not None]
+    unflagged_n = len(unflagged)
+    caught_flagged = sum(1 for row in flagged_harms if (_s := _cut_score(row)) is not None and _s > cut)
+    missed_unflagged = sum(1 for row in unflagged_harms if (_s := _cut_score(row)) is None or _s <= cut)
+    unscored = sum(1 for row in flagged_harms + unflagged_harms if _cut_score(row) is None)
+    if unflagged_n == 0:
+        return {"status": "NOT_RUN", "reason": "no unflagged rows", "threshold": cut}
+    unflagged_upper = _np_module().clopper_pearson_upper(missed_unflagged, unflagged_n, 0.05)
+    flagged_harm_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms)
+    caught_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms if (_s := _cut_score(row)) is not None and _s > cut)
+    total_upper = flagged_harm_weight + unflagged_population * unflagged_upper
+    return {
+        "status": "DESCRIPTIVE_ONLY",
+        "threshold": cut,
+        "threshold_source": "np_cut fit max on recorded Jev max_score, not the 0.5 decision",
+        "flagged_stratum": {"harm_caught": caught_flagged, "harm_total": len(flagged_harms)},
+        "unflagged_stratum": {"missed_harms": missed_unflagged, "sample_n": unflagged_n, "harm_fraction_upper_95": unflagged_upper},
+        "weighted_recall_interval": {
+            "lower_95": caught_weight / total_upper if total_upper else 0.0,
+            "upper": 1.0,
+            "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms at the cut threshold",
+        },
+        "unscored_harm_rows": unscored,
+    }
+
 
 def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_POPULATION) -> dict[str, Any]:
     if not isinstance(unflagged_population, int) or unflagged_population < 0:
@@ -115,10 +178,20 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
         }
 
     flagged_caught = sum(row.get("jevFlag") is True for row in flagged_harms)
+    scored_negatives = [
+        {"event_id": row["id"], "label": "no-harm", "score": score}
+        for row in rows
+        if row.get("label") == "no-harm" and (score := _cut_score(row)) is not None
+    ]
+    cut_fit = _np_module().fit_and_audit(scored_negatives)
+    if cut_fit.get("status") == "AUDITED":
+        cut_arm = cut_arm_recall_bound(rows, cut_fit["cut"], unflagged_population)
+    else:
+        cut_arm = {"status": "NOT_RUN", "reason": "no audited cut fit from scored negatives"}
     return {
         "status": "DESCRIPTIVE_ONLY",
         "historical_claim_scope": SCOPE,
-        "jev_flagged_stratum": {"harm_caught": flagged_caught, "harm_total": len(flagged_harms)},
+        "jev_flagged_stratum": {"threshold": 0.5, "harm_caught": flagged_caught, "harm_total": len(flagged_harms)},
         "unflagged_stratum": {
             "harm_caught": sum(row.get("jevFlag") is True for row in unflagged_harms),
             "harm_total": len(unflagged_harms),
@@ -139,6 +212,8 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
             "upper": 1.0,
             "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms",
         },
+        "weighted_false_alarm_rates": weighted_false_alarm_rates(rows),
+        "cut_arm_recall_bound": cut_arm,
         "per_clause": per_clause,
         "clause_5_infisical_run": {
             "jev": per_clause["jev"].get("5", {"caught": 0, "total": 0}),
@@ -194,6 +269,9 @@ def load_committed_rows() -> list[dict[str, Any]]:
             raise ValueError("sampling source differs from the frozen X7 manifest")
         if type(sample.get("existing_flag")) is not bool:
             raise ValueError("X7 manifest existing_flag provenance must be boolean")
+        max_score = jev.get("max_score")
+        if row.get("label") == "no-harm" and (isinstance(max_score, bool) or not isinstance(max_score, (int, float)) or not math.isfinite(max_score)):
+            raise ValueError("no-harm rows need a finite recorded Jev max_score")
         joined.append({
             **row,
             "existingFlag": sample["existing_flag"],
