@@ -1,0 +1,17 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_455341e9ed3ea3ba5de515b71eb17dd5720f9b9f6d58417f8a1b9057b27fe53a",
+ "limitations": [
+  "label coverage partial (16/3380 rows); trailing-7d window from live log max_ts, digests point-in-time"
+ ],
+ "operation": "jev-p2-census",
+ "parameters": {
+  "days": "7"
+ },
+ "producer": "CobaltCoyote",
+ "result_ref": {
+  "bytes": 1207,
+  "sha256": "2ea9cd96519a6991aa8c48068b1db04e77a5d636a9cd094109257830c506476a"
+ }
+}
