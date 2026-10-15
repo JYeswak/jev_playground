@@ -2424,6 +2424,26 @@ class SurfaceHeartbeat(unittest.TestCase):
             "3/3 telemetry rows errored", state["surfaces"]["test-surface"]["reason"]
         )
 
+    def test_wrong_polarity_action_leaves_surface_on(self):
+        # Acceptance (converge r4): a presence-ON surface turns off by file
+        # removal, a presence-OFF surface by file creation. The crossed
+        # actions must not switch a surface off: a polarity-blind
+        # "create means off" implementation fails this test.
+        on_surface = self.write_registry("presence-ON")
+        self.switch.write_text("enabled\n", encoding="utf-8")
+        self.assertTrue(self.heartbeat.switch_is_on(on_surface))
+        # Wrong action for presence-ON (creation): still ON.
+        self.switch.write_text("enabled\n", encoding="utf-8")
+        self.assertTrue(self.heartbeat.switch_is_on(on_surface))
+
+        off_surface = self.write_registry("presence-OFF")
+        # Correct OFF state for presence-OFF is file present.
+        self.switch.write_text("fleet heartbeat auto-off: setup\n", encoding="utf-8")
+        self.assertFalse(self.heartbeat.switch_is_on(off_surface))
+        # Wrong action for presence-OFF (removal): back ON, never OFF.
+        self.switch.unlink()
+        self.assertTrue(self.heartbeat.switch_is_on(off_surface))
+
     def test_auto_off_is_scoped_to_failed_surface(self):
         self.write_registry()
         data = json.loads(self.registry.read_text(encoding="utf-8"))
