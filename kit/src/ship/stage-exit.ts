@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 /**
  * Stage-exit source gates for jev-uzq1 (jev-uzq1.2).
  *
@@ -82,4 +84,27 @@ export function checkAdoption(receipt: AdoptionReceipt): { eligible: true } {
     fail(`elapsed ${receipt.elapsedMinutes} minutes reaches the ${ADOPTION_MAX_MINUTES}-minute bound`);
   }
   return { eligible: true };
+}
+
+/**
+ * Load a stage receipt artifact from its canonical path. Missing,
+ * unreadable, or unparsable artifacts refuse: no eligibility verdict
+ * can be grounded without the artifact itself. The reader is injectable
+ * (test seam) and defaults to the filesystem.
+ */
+export async function loadStageReceipt(
+  url: string | URL,
+  read: typeof readFile = readFile,
+): Promise<unknown> {
+  let text: string;
+  try {
+    text = await read(url, "utf8");
+  } catch {
+    fail(`stage receipt artifact missing or unreadable: ${String(url)}`);
+  }
+  try {
+    return JSON.parse(text!);
+  } catch {
+    fail(`stage receipt artifact is not valid JSON: ${String(url)}`);
+  }
 }

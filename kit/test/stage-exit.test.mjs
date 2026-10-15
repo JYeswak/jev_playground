@@ -1,10 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   ADOPTION_MAX_MINUTES,
   DROPPED_UNLABELLED_MAX,
   checkAdoption,
   checkDroppedUnlabelled,
+  loadStageReceipt,
 } from "../src/ship/stage-exit.ts";
 
 // Receipt-bound stage-exit gates (jev-uzq1.2 rework for LavenderDune 3523).
@@ -85,4 +89,25 @@ test("missing receipt or 60+ minutes fail", () => {
     () => checkAdoption({ elapsedMinutes: 95, source: SOURCE }),
     /bound/,
   );
+});
+
+test("absent canonical stage receipt refuses eligibility", async () => {
+  const missing = new URL("../../work/uzq1/stage-receipt.json", import.meta.url);
+  await assert.rejects(loadStageReceipt(missing), /missing or unreadable/);
+});
+
+test("valid receipt artifact loads for checks", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "stage-exit-"));
+  const file = join(dir, "stage-receipt.json");
+  writeFileSync(file, JSON.stringify({ outcomePositives: 12 }), "utf8");
+  assert.deepEqual(await loadStageReceipt(new URL(`file://${file}`)), {
+    outcomePositives: 12,
+  });
+});
+
+test("malformed receipt artifact fails", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "stage-exit-"));
+  const file = join(dir, "stage-receipt.json");
+  writeFileSync(file, "{not json", "utf8");
+  await assert.rejects(loadStageReceipt(new URL(`file://${file}`)), /not valid JSON/);
 });
