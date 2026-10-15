@@ -186,7 +186,9 @@ const readApproved = () => configText(APPROVED);
   check("both-fail output is secret-free", !blob.includes(SYN.clientSecret) && !blob.includes(SYN.accessToken));
 }
 
-// --- Planted negative: denied route attempting credential acquisition must fail ---
+// --- Planted negative (machine route): denied approval + expired session ->
+// undefined with zero transport and no machine child. This is THE denial
+// control: approval gates the machine fallback only.
 {
   const calls = [];
   const tCalls = [];
@@ -208,8 +210,10 @@ const readApproved = () => configText(APPROVED);
   );
 }
 
-// --- Planted control: denied approval + working user session -> user key,
-// approval path never consulted (RubyMeadow review 3274 scope gap). ---
+// --- Authorized-user control (director contract 3346): denied approval +
+// working user session -> user key with zero machine transport. The user
+// session is prior and independent (infisical-key.ts:168); approval is never
+// consulted on this leg. NOT a planted negative.
 {
   const calls = [];
   const tCalls = [];
