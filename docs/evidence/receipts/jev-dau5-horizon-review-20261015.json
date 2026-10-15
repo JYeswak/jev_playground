@@ -1,0 +1,129 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_1cc450ff9852d3a0e4d2208daa0a97aa226f7e1fd886d3057e9d31673b0baf57",
+ "limitations": [
+  "New collector and downstream counterexamples exit1; frozen200-row impact remains unverified.",
+  "Recorded primary arithmetic PASS is not rejected or relabeled; no new inference or rollout authorized."
+ ],
+ "operation": "jev.dau5.non-author.horizon-review",
+ "parameters": {
+  "bead": "jev-dau5"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bead": "jev-dau5",
+  "collector_control": {
+   "controls": [
+    {
+     "actual_referenced": true,
+     "probe_occurs_later_in_same_file": true,
+     "unrelated_padding_rows": 0
+    },
+    {
+     "actual_referenced": false,
+     "probe_occurs_later_in_same_file": true,
+     "unrelated_padding_rows": 450
+    }
+   ],
+   "exit_code": 1,
+   "fixture_directory_sha256": "86bc20f84b2e5d84c1bfb7f4070dafa7247e79807cd775499ba00ab2e82f30ef",
+   "fixture_kind": "metadata-only transformed actual scorer output; not original cohort text",
+   "model_calls": 0,
+   "sanitized_only": true,
+   "source_observation_sha256": "2986358e156a8403ebab359637031e54032dfee5c66ce3220b795b83f4ce4f39"
+  },
+  "downstream_control": {
+   "controls": [
+    {
+     "collector_ref": true,
+     "expected_reference_drops": 1,
+     "padding": 0,
+     "reported_reference_drops": 1,
+     "reread_in_same_file": true
+    },
+    {
+     "collector_ref": false,
+     "expected_reference_drops": 1,
+     "padding": 450,
+     "reported_reference_drops": 0,
+     "reread_in_same_file": true
+    }
+   ],
+   "exit_code": 1,
+   "model_calls": 0,
+   "scope": "planted downstream scorer control, not changed frozen cohort"
+  },
+  "frozen_data_impact": "UNVERIFIED; no claim that any of the original200labels is affected",
+  "held_agreement": {
+   "agree": 45,
+   "n": 100,
+   "table": [
+    [
+     "drop",
+     "drop",
+     5
+    ],
+    [
+     "drop",
+     "keep",
+     19
+    ],
+    [
+     "keep",
+     "drop",
+     4
+    ],
+    [
+     "keep",
+     "keep",
+     40
+    ],
+    [
+     "summarize",
+     "drop",
+     8
+    ],
+    [
+     "summarize",
+     "keep",
+     24
+    ]
+   ],
+   "threshold": 50955
+  },
+  "limitations": [
+   "All three planned recomputations pass as recorded; qualification is withheld for the additional source/prereg fidelity counterexample.",
+   "The original extractor also has a400line cap; no new regression is alleged. Provide pre-call horizon authority or audit actual cohort against the stated full-file rule.",
+   "Do not silently relabel frozen data, change the bar, invoke N1 or run new TypeSafe calls.",
+   "Official uv replay usedPython3.14.2; Python3.9.6 preflight differed by one diagnostic ULP. The reviewer restored only that incidental receipt line to original bytes; primary integer counts/verdict unchanged.",
+   "No source, EVAL or data-input edits; author assignment preserved; no publication or live deployment claim."
+  ],
+  "new_model_calls": 0,
+  "new_spend_usd": "0.00",
+  "planned_commands": {
+   "baseline_saved_chars": 429328,
+   "corpus2_exit": 0,
+   "corpus2_scope": "EXPLORED; DEV-fitted4percent method dropsnothing and is not the preregistered comparison",
+   "held_n": 100,
+   "historical_spend_usd": "0.006258",
+   "jev_saved_chars": 752560,
+   "matched_reference_drops_each": 11,
+   "negative_suite_exit": 0,
+   "negative_tests_passed": 6,
+   "recorded_calls": 200,
+   "referenced_held": 44,
+   "secondary_original_bar": false,
+   "temporal_exit": 0,
+   "temporal_primary_on_recorded_labels": "PASS"
+  },
+  "review_status": "REWORK_LABEL_HORIZON_FIDELITY",
+  "source": {
+   "collector_line": 156,
+   "collector_sha256": "028acfc33f01f4437f1ada3540a26f31d12b7f2e218ab22b51f009f20a7b4099",
+   "original_extractor_line": 102,
+   "prereg_lines": "21-24",
+   "prereg_sha256": "9c2fa1ced69d3c843784cc009c676b7059c79ffc9ca1624933824ff00206fb02"
+  }
+ }
+}
