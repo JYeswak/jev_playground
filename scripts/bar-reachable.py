@@ -336,13 +336,97 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-minority-class", type=int)
     parser.add_argument("--positive-count", type=int)
     parser.add_argument("--negative-count", type=int)
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="emit the verdict as JSON (output is JSON either way)",
+    )
     return parser
 
+def _cohort_only_args(args: argparse.Namespace) -> bool:
+    return (
+        args.prereg is not None
+        and args.items is None
+        and args.floor is None
+        and args.manifest is None
+        and args.used_rows is None
+        and args.score_receipt is None
+        and args.trials is None
+        and args.positive_count is None
+        and args.negative_count is None
+        and args.comparator_archive is None
+        and args.preflight is None
+        and args.threshold is None
+        and args.min_minority_class is None
+        and args.flip_fixture is None
+    )
+
+
+def cohort_verdict(prereg_path: Path) -> dict:
+    """Terminal cohort verdict driven by a preregistration and its sibling
+    reach.json counts. Zero-class cohorts refuse as NOT_REACHABLE instead
+    of raising; present classes run the same mode math as CLI arguments."""
+    declared_mode = None
+    for line in prereg_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("reach-mode:"):
+            declared_mode = line.partition(":")[2].strip()
+            break
+    if declared_mode not in {"mcnemar", "rate", "auc"}:
+        raise ValueError(f"{prereg_path} must declare reach-mode: mcnemar|rate|auc")
+    cohort_path = prereg_path.parent / "reach.json"
+    if not cohort_path.is_file():
+        raise ValueError(f"cohort counts file missing: {cohort_path}")
+    cohort = json.loads(cohort_path.read_text(encoding="utf-8"))
+    meta = {
+        "mode": declared_mode,
+        "prereg_path": str(prereg_path.resolve()),
+        "prereg_sha256": hashlib.sha256(prereg_path.read_bytes()).hexdigest(),
+        "cohort_path": str(cohort_path.resolve()),
+        "cohort_sha256": hashlib.sha256(cohort_path.read_bytes()).hexdigest(),
+    }
+    if declared_mode == "auc":
+        positive = cohort.get("positive_count", cohort.get("harm_rows"))
+        negative = cohort.get("negative_count", cohort.get("clean_rows"))
+        if positive is None or negative is None:
+            raise ValueError("reach.json must carry positive/negative (or harm/clean) counts")
+        if positive == 0 or negative == 0:
+            return {
+                "status": "NOT_REACHABLE",
+                "reason": (
+                    f"auc minority class empty: positive={positive} "
+                    f"negative={negative}; infeasible input: labelled "
+                    f"{'harmful' if positive == 0 else 'clean'} outcomes"
+                ),
+                **meta,
+            }
+        threshold = cohort.get("threshold")
+        if threshold is None:
+            raise ValueError("reach.json needs threshold once both classes are present")
+        return {
+            **auc_reachability(positive, negative, threshold, cohort.get("min_minority_class")),
+            **meta,
+        }
+    if declared_mode == "rate":
+        for key in ("trials", "threshold"):
+            if cohort.get(key) is None:
+                raise ValueError(f"reach.json must carry {key} for rate mode")
+        return {
+            **rate_reachability(
+                cohort["trials"],
+                cohort["threshold"],
+                cohort.get("minority_count"),
+                cohort.get("min_minority_class"),
+            ),
+            **meta,
+        }
+    raise ValueError("mcnemar cohort path needs floor/manifest inputs, not reach.json")
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        if args.flip_fixture:
+        if _cohort_only_args(args):
+            result = cohort_verdict(args.prereg)
+        elif args.flip_fixture:
             result = flip_fixture_result(args.flip_fixture)
         elif args.mode == "rate":
             if args.trials is None or args.threshold is None:
@@ -413,7 +497,7 @@ def main(argv: list[str] | None = None) -> int:
                     result["oracle_headroom_source"] = (
                         "committed preflight oracle winner count"
                     )
-        if args.prereg is not None or args.items is not None:
+        if "cohort_path" not in result and (args.prereg is not None or args.items is not None):
             if args.prereg is None or args.items is None:
                 raise ValueError("--prereg and --items must be supplied together")
             result.update(_receipt_metadata(args.prereg, args.items, result["mode"]))

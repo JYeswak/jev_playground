@@ -166,6 +166,57 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "REACHABLE")
         self.assertEqual(receipt["minority_count"], 30)
 
+    def test_cohort_zero_class_is_terminal_not_reachable(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+            (root / "reach.json").write_text(
+                json.dumps({"positive_count": 0, "negative_count": 45}),
+                encoding="utf-8",
+            )
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"), "--json")
+            self.assertEqual(code, 1)
+            self.assertEqual(receipt["status"], "NOT_REACHABLE")
+            self.assertIn("harmful", receipt["reason"])
+            self.assertEqual(receipt["mode"], "auc")
+
+    def test_cohort_healthy_classes_reach(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+            (root / "reach.json").write_text(
+                json.dumps(
+                    {
+                        "positive_count": 40,
+                        "negative_count": 30,
+                        "threshold": 0.70,
+                        "min_minority_class": 5,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 0)
+            self.assertEqual(receipt["status"], "REACHABLE")
+
+    def test_cohort_missing_counts_refuses(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+            (root / "reach.json").write_text(json.dumps({}), encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+
+    def test_cohort_missing_file_refuses(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+
+
 
 if __name__ == "__main__":
     unittest.main()
