@@ -20,13 +20,17 @@ sys.exit(int(os.environ.get("STUB_RC", "0")))
 """
 
 # Stub secret manager: SM_MODE=auth prints the Infisical login failure and
-# exits 1 without running the canary; SM_MODE=passthrough execs argv after
-# the lone `--` (the canary), like `infisical run -- <canary>`.
+# exits 1 without running the canary; SM_MODE=silent-fail exits 1 with no
+# output and no exec (an unknown-wording pre-child failure); SM_MODE=passthrough
+# execs argv after the lone `--` (the canary), like `infisical run -- <canary>`.
 SM_STUB = """#!/usr/bin/env bash
 mode="${SM_MODE:-passthrough}"
 if [ "$mode" = "auth" ]; then
   echo "%s. Please run login manually." >&2
   echo "%s"
+  exit 1
+fi
+if [ "$mode" = "silent-fail" ]; then
   exit 1
 fi
 while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do shift; done
@@ -82,6 +86,7 @@ class CanaryRunnerTest(unittest.TestCase):
                 "SM_MODE": sm_mode,
                 "NOTIFY_RC": notify_rc,
                 "NOTIFY_LOG": self.notify_log,
+                "TMPDIR": self.tmp,
             },
             "--secret-manager", self.sm,
             "--notify-bin", self.notify_bin,
@@ -166,6 +171,40 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertEqual(parts[-1], f"MOVED: {evil}")
         for code in parts[1:-1:2]:
             self.assertNotIn(evil, code)
+
+    def test_prechild_silent_failure_reports_auth(self):
+        # Unknown-wording pre-child exit 1: the canary never starts, so this
+        # is failed acquisition (AUTH), never MOVED, whatever the message says.
+        proc = self.invoke(1, "canary must not run", sm_mode="silent-fail")
+        self.assertEqual(proc.returncode, 4)
+        self.assertIn("NOTIFY AUTH:", proc.stdout)
+        self.assertNotIn("MOVED", proc.stdout)
+        (line,) = self.log_lines()
+        self.assertIn("rc=4", line)
+
+    def test_missing_tmpdir_refuses_without_tmp_files(self):
+        env = {
+            "STUB_RC": "0",
+            "STUB_OUT": "ok",
+            "SM_MODE": "passthrough",
+            "NOTIFY_RC": "0",
+            "NOTIFY_LOG": self.notify_log,
+        }
+        base = dict(os.environ)
+        base.pop("TYPESAFE_API_KEY", None)
+        base.pop("TMPDIR", None)
+        base.update(env)
+        proc = subprocess.run(
+            ["bash", RUNNER,
+             "--secret-manager", self.sm,
+             "--notify-bin", self.notify_bin,
+             "--canary", self.canary,
+             "--log-file", self.log],
+            capture_output=True, text=True, timeout=60, env=base,
+        )
+        self.assertEqual(proc.returncode, 3)
+        self.assertIn("NOTIFY ERROR:", proc.stdout)
+        self.assertIn("TMPDIR", proc.stdout)
 
     def test_auth_text_overrides_canary_exit_1(self):
         # The planted Infisical failure exits 1 like a MOVED canary; only the
