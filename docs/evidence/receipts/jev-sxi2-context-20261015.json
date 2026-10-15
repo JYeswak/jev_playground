@@ -1,0 +1,35 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_f0416b52231268679d730b641cff11dcb9a64fef3f26df495ec7ad3c2bfc104f",
+ "limitations": [
+  "Existing shadow context regression only; AC3 incumbent/winner shipping gate missing under jev-sxi2.1. No full acceptance or live deployment claim."
+ ],
+ "operation": "sxi2-context-preservation-regression",
+ "parameters": {
+  "bead": "jev-sxi2.2",
+  "subject_sha256": "52fb445fd796511f9cf9764de9b8c359fe6e12cb13f2b12d5630433268df9d48"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "command": "node --test .omp/extensions/jev-longres-shadow.test.mjs",
+  "exit": 0,
+  "failed": 0,
+  "models_called": 0,
+  "mutation_exit": 1,
+  "mutation_failed_case": "above floor: logs would- row with hash, size, decision; context untouched",
+  "mutation_stdout_bytes": 22298,
+  "mutation_stdout_sha256": "6034631962e73185c8ddb4ff92324dc1ddee05fe06edffe8b3597506fdcb90f1",
+  "passed": 5,
+  "quality_delta_exit": 0,
+  "quality_regressions": 0,
+  "ship_result_test_exit": 1,
+  "ship_result_test_reason": "missing file",
+  "tests": 5,
+  "ubs_critical": 0,
+  "ubs_exit": 0,
+  "ubs_status": "ok",
+  "ubs_warning": 4,
+  "warning_triage": "existing test JSON.parse must throw on malformed logger output; no catch added"
+ }
+}

@@ -55,7 +55,10 @@ test("above floor: logs would- row with hash, size, decision; context untouched"
     switchPath: SWITCH,
     now: () => "2026-10-02T00:00:00.000Z",
   });
-  assert.equal(await handler({ toolName: "read", content: BIG }), undefined);
+  const context = [{ type: "text", text: BIG }];
+  const before = structuredClone(context);
+  assert.equal(await handler({ toolName: "read", content: context }), undefined);
+  assert.deepEqual(context, before);
   assert.equal(rows.length, 1);
   assert.equal(rows[0].screen, "would-summarize");
   assert.equal(rows[0].size, BIG.length);
