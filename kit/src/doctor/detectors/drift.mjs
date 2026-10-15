@@ -172,9 +172,8 @@ async function outsideRepoFindings(ctx) {
     }
     ids.add(surface.id);
     if (surface.expect === 'off' && surface.log) {
-      // Only rerank's canonical inventory semantics define 3h silence as OFF.
-      // Extension logs alone cannot establish that their configured switch is OFF.
-      if (surface.id !== 'websearch-rerank') report(surface, 'off_switch_coverage_unavailable', {}, true);
+      // Silence cannot establish a configured OFF switch, even for an idle writer.
+      report(surface, 'off_switch_coverage_unavailable', {}, true);
       if (!safeInventoryPath(surface.log) || surface.log.includes('/')) {
         report(surface, 'unsupported_log_path', {}, true);
         continue;
@@ -183,17 +182,20 @@ async function outsideRepoFindings(ctx) {
         const text = await readFile(join(ctx.stateDir, surface.log), 'utf8');
         let recent = 0;
         let invalid = false;
+        let future = 0;
         for (const line of text.split('\n')) {
           if (!line.trim()) continue;
           try {
             const row = JSON.parse(line);
             const ts = typeof row.ts === 'number' ? row.ts : Date.parse(row.ts);
             if (!Number.isFinite(ts)) invalid = true;
+            else if (ts > ctx.now) future += 1;
             else if (ts >= ctx.now - 3 * 60 * 60 * 1000) recent += 1;
           } catch { invalid = true; }
         }
         if (recent) report(surface, 'declared_off_writer_active', { recent_rows: recent, window_ms: 3 * 60 * 60 * 1000 });
         if (invalid) report(surface, 'writer_log_unparseable', {}, true);
+        if (future) report(surface, 'writer_log_future_timestamp', { future_rows: future }, true);
       } catch (error) {
         // A missing log is not evidence that an OFF writer has stopped.
         report(surface, 'writer_log_unavailable', { code: error?.code ?? 'UNKNOWN' }, true);

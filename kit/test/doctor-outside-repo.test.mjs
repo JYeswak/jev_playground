@@ -85,22 +85,42 @@ test('outside audit rejects missing required source and committed-source drift',
   assert.equal((await f.run()).exit_code, 0);
 });
 
-test('outside audit detects declared-OFF writer activity and restores old-log control', async () => {
+test('outside audit clears OFF-writer activity on restoration but never treats silence as switch proof', async () => {
   const f = await fixture();
   const off = f.inventory.surfaces.find((surface) => surface.id === 'websearch-rerank');
   f.ctx.inventory.surfaces.push(off);
   const log = join(f.stateDir, off.log);
   const old = `${JSON.stringify({ ts: new Date(f.ctx.now - 4 * 60 * 60 * 1000).toISOString(), status: 'answered' })}\n`;
   await writeFile(log, old);
-  assert.equal((await f.run()).exit_code, 0);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable']);
   await writeFile(log, `${old}${JSON.stringify({ ts: new Date(f.ctx.now).toISOString(), status: 'answered' })}\n`);
-  assert.deepEqual(reasons(await f.run()), ['declared_off_writer_active']);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable', 'declared_off_writer_active']);
   await writeFile(log, old);
-  assert.equal((await f.run()).exit_code, 0);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable']);
+  await writeFile(log, '');
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable']);
   await rename(log, `${log}.preserved`);
-  assert.deepEqual(reasons(await f.run()), ['writer_log_unavailable']);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable', 'writer_log_unavailable']);
   await writeFile(log, '{');
-  assert.deepEqual(reasons(await f.run()), ['writer_log_unparseable']);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable', 'writer_log_unparseable']);
+});
+
+test('outside audit treats future timestamps as UNKNOWN, not known current writer activity', async () => {
+  const f = await fixture();
+  const off = f.inventory.surfaces.find((surface) => surface.id === 'websearch-rerank');
+  f.ctx.inventory.surfaces.push(off);
+  const log = join(f.stateDir, off.log);
+  for (const timestamp of [f.ctx.now + 1, new Date(f.ctx.now + 1).toISOString()]) {
+    await writeFile(log, `${JSON.stringify({ ts: timestamp, status: 'answered' })}\n`);
+    const future = await f.run();
+    assert.equal(future.exit_code, 1);
+    assert.deepEqual(reasons(future), ['off_switch_coverage_unavailable', 'writer_log_future_timestamp']);
+    assert.equal(future.findings[1].evidence.future_rows, 1);
+    await writeFile(log, `${JSON.stringify({ ts: f.ctx.now, status: 'answered' })}\n`);
+    const restored = await f.run();
+    assert.deepEqual(reasons(restored), ['off_switch_coverage_unavailable', 'declared_off_writer_active']);
+    assert.equal(restored.findings[1].evidence.recent_rows, 1);
+  }
 });
 
 test('outside audit uses the doctor clock when callers omit now', async () => {
@@ -109,7 +129,7 @@ test('outside audit uses the doctor clock when callers omit now', async () => {
   f.ctx.inventory.surfaces.push(off);
   delete f.ctx.now;
   await writeFile(join(f.stateDir, off.log), `${JSON.stringify({ ts: new Date().toISOString(), status: 'answered' })}\n`);
-  assert.deepEqual(reasons(await f.run()), ['declared_off_writer_active']);
+  assert.deepEqual(reasons(await f.run()), ['off_switch_coverage_unavailable', 'declared_off_writer_active']);
 });
 
 test('outside audit keeps unsupported schema, scope and unsafe install paths non-green', async () => {
