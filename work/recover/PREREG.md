@@ -53,3 +53,28 @@ would need its own design, max calls, and max USD recorded here first;
 - `work/fleet-schema/task.json` (pointer; schema_version 1).
 - `work/fleet-schema/fixtures/sessions.jsonl` as committed at scoring time
   (sha256 recorded in RECEIPT.md; any byte change voids this preregistration).
+
+## Amendment v2 (2026-10-15, committed before any v2 scoring)
+
+Supersedes the v1 "Held: none yet" section only; all v1 design (estimand,
+margin 0.10, min_n 10, no model arms, frozen-inputs rule) stands unchanged.
+
+### Task-file contract
+
+`rule.py` reads N0's task file (default
+`work/fleet-schema/task.json`) for schema_version, as_of, window_days and
+the fixture path (resolved relative to the task file's directory). A
+missing task file, unknown schema_version, or missing fixture refuses with
+nonzero exit and no score. The task identity (as_of, window_days, fixture
+sha256) is recorded in every report; rows never come from a bare --rows
+path without the task envelope.
+
+### Session split (dev vs held)
+
+Sessions ordered by (timestamp, id); dev = first two sessions, held = the
+rest. On the current 3-session fixture that is dev {a, b}, held {c}. The
+rule is mechanical, not fitted: it may not be re-cut after seeing results.
+Cohorts are reported separately for dev and held; the min_n gate applies
+within each half. Expected on current data: NOT_POWERED everywhere (zero
+R-class episodes in fixture); the split machinery itself is the deliverable
+under test, with honest underpowered output.
