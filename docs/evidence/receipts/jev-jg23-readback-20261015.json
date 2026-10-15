@@ -1,0 +1,94 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4c75739b5e23c23f50b41bd616f8ddb911cc8ab9d1ed8c434816a5867cdb218f",
+ "limitations": [
+  "Partial readback only; not historical restoration acceptance or permission to mutate shared config."
+ ],
+ "operation": "jev.jg23.readback",
+ "parameters": {
+  "bead": "jev-fixture-config-live-restore-jg23"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": {
+   "exit_code": 0,
+   "identity_sha256": "b495af2dba753032f4f44bf55afa36c3a7ef613d28a86c47847933e76e63249c",
+   "is_fixture": false,
+   "matches_global": true
+  },
+  "bead": "jev-fixture-config-live-restore-jg23",
+  "canonical_config": {
+   "bytes": 311,
+   "matches_recorded_after": "738f79c458f48511bc6145b7f9e75963aa5f01a9187ed2c24bc6e7e0991d7482",
+   "sha256": "738f79c458f48511bc6145b7f9e75963aa5f01a9187ed2c24bc6e7e0991d7482"
+  },
+  "effective_hooks": {
+   "command": "git rev-parse --git-path hooks/commit-msg",
+   "controls": [
+    {
+     "case": "without-level.msg",
+     "exit": 1,
+     "stderr": "  a commit subject must say what it PROVED. add one of: pending receipt selftest test mutation oracle live\n  forms: \"[test]\"  or  \"(code-first, test pending)\"  or  \"selftest-verified\"\n  the level stands ALONE in its brackets: \"[test]\" not \"[cp-123; test]\" — a bead id is not a claim\n  example: \"fix(gate): split admission lock from worker lock [selftest]\"\n",
+     "stdout": "verification-level REFUSE reason=no-level subject=controlled\\ probe\\ without\\ a\\ verification\\ marker\n"
+    },
+    {
+     "case": "with-level.msg",
+     "exit": 0,
+     "stderr": "",
+     "stdout": "verification-level PASS level=test\n"
+    }
+   ],
+   "exit_code": 0,
+   "path": ".git/hooks/commit-msg",
+   "sha256": "420af8f6d4af0c520cafa22e94c9c573fafe39adfe02358827698a1f7cc70ce1"
+  },
+  "historical_scope": {
+   "guarded_restore_and_outside_key_negative": "UNKNOWN",
+   "historical_before_backup_location": "UNKNOWN",
+   "keys": [
+    "core.hooksPath",
+    "user.name",
+    "user.email"
+   ],
+   "source_comments": [
+    2330,
+    2331,
+    2566,
+    2677
+   ]
+  },
+  "limitations": [
+   "Read-only observations; no live configuration repair was performed or requested to be repeated.",
+   "Historical before-byte backup and exact owner/G9 guarded restore negative are still needed for full acceptance.",
+   "Direct hook controls plus native hook-path resolution are scoped proofs; no unsupported system-config read was reissued."
+  ],
+  "local_fixture_keys": [
+   {
+    "exit": 1,
+    "key": "core.hooksPath",
+    "present": false,
+    "valueSha256": null
+   },
+   {
+    "exit": 1,
+    "key": "user.name",
+    "present": false,
+    "valueSha256": null
+   },
+   {
+    "exit": 1,
+    "key": "user.email",
+    "present": false,
+    "valueSha256": null
+   }
+  ],
+  "mutations": {
+   "history": 0,
+   "live_config": 0,
+   "model_calls": 0,
+   "services": 0
+  },
+  "status": "PARTIAL_READBACK_NOT_REPAIR_ACCEPTANCE"
+ }
+}
