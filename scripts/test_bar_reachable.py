@@ -306,7 +306,31 @@ class BarReachabilityTests(unittest.TestCase):
             (root / "reach.json").write_text(json.dumps(cohort), encoding="utf-8")
             code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
             self.assertEqual(code, 2)
+            self.assertIn("rows_sha256 disagrees with rows file bytes", receipt["error"])
             self.assertEqual(receipt["status"], "ERROR")
+
+    def test_unchanged_copy_passes_binding(self):
+        # Positive control: an unmodified copy of the frozen source passes
+        # source binding and reaches the zero-harm NOT_REACHABLE verdict.
+        real_rows = ROOT / "work/gate-family/demand/rows-hash-only.jsonl"
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shutil.copy(real_rows, root / "rows.jsonl")
+            shutil.copy(ROOT / "work/gate-family/prereg/PREREG.md", root / "PREREG.md")
+            shutil.copy(ROOT / "work/gate-family/prereg/reach.json", root / "reach.json")
+            shutil.copy(
+                ROOT / "work/gate-family/demand/receipt.json", root / "demand.json"
+            )
+            cohort = json.loads((root / "reach.json").read_text(encoding="utf-8"))
+            cohort["source"] = {
+                "rows_file": "rows.jsonl",
+                "window_rows_sha256": cohort["source"]["window_rows_sha256"],
+                "receipt": "demand.json",
+            }
+            (root / "reach.json").write_text(json.dumps(cohort), encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 1)
+            self.assertEqual(receipt["status"], "NOT_REACHABLE")
 
 
 
