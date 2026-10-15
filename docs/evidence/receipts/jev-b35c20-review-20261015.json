@@ -1,0 +1,81 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_38dc53bc9a16a53ffcf43d50563cab84f3f43e19490e8037c29a640fcdddd69b",
+ "limitations": [
+  "Six shape tests and dry-run CLI pass but original canary/miner/consumer obligations do not; no complete installer capability claim",
+  "Initial tsc-only CLI lacked generated questions.mjs; official npm prepare resolved setup, not reported as product defect",
+  "Installed absolute token rejection needs owner resolution; no host binary or job executed",
+  "Author-disclosed ServiceJobDef mapping and missing family eval dispatch remain unverified integration gaps; no claim based on archived schema",
+  "External SVC1 host-install prerequisite not exercised because no host install/activation occurred"
+ ],
+ "operation": "b35c20-nonauthor-daily-manifest-acceptance",
+ "parameters": {
+  "bead": "jev-b35c.20",
+  "subject_sha256": "9f6c1cfda8dd05eebd7b9e0e5f763dd7b42465de65c306b07e1ea153947b627c"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "ac4_required_miner_cap": 3000,
+  "ac4_runtime_check_exit": 1,
+  "ac4_stdout_sha256": "eb1f8f46993233291b0aef8ff37896b7cc984bb9db0e4380d063482b364c6980",
+  "author_assignee": "WildDog",
+  "date_utc": "2026-10-15",
+  "emitted_caps": [
+   600,
+   600,
+   600,
+   600,
+   600
+  ],
+  "emitted_command_prefixes": [
+   [
+    "classifier",
+    "classify",
+    "eval"
+   ],
+   [
+    "classifier",
+    "gate",
+    "eval"
+   ],
+   [
+    "classifier",
+    "rank",
+    "eval"
+   ],
+   [
+    "classifier",
+    "score",
+    "eval"
+   ],
+   [
+    "classifier",
+    "verify",
+    "eval"
+   ]
+  ],
+  "emitted_jobs": 5,
+  "emitted_labels": [
+   "classifier-classify-eval-daily",
+   "classifier-gate-eval-daily",
+   "classifier-rank-eval-daily",
+   "classifier-score-eval-daily",
+   "classifier-verify-eval-daily"
+  ],
+  "host_service_activation": false,
+  "live_model_calls": 0,
+  "named_test_exit": 0,
+  "named_tests_passed": 6,
+  "nonrepository_installed_token": "/opt/classifier/current/bin/classifier",
+  "nonrepository_installed_token_validation_exit": 1,
+  "prepare_exit": 0,
+  "prepared_cli_exit": 0,
+  "prepared_cli_stdout_sha256": "189be0071cdbf7846b1b8bd95f4eaf7e8d81292a5aca6c48c72f6fe4562c4d0c",
+  "private_home_unchanged_by_cli": true,
+  "reviewed_candidate": "40411257dcc843946be3f94d652bdf7b537f7bd7",
+  "reviewer": "LavenderDune",
+  "typescript_exit": 0,
+  "verdict": "REWORK"
+ }
+}
