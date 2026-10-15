@@ -11,12 +11,6 @@ import { readFile } from "node:fs/promises";
 export const HISTORY_RECEIPT_SUFFIX =
   "work/plan-20261004/receipts/x7-gate-rules-RECEIPT.md";
 
-/** One-sided 95% Clopper-Pearson upper bound for zero observed events. */
-export function zeroEventUpper95(n) {
-  if (!Number.isInteger(n) || n <= 0) throw new Error("refused: non-positive n");
-  return 1 - Math.pow(0.05, 1 / n);
-}
-
 function num(value, label) {
   const parsed = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
   if (!Number.isFinite(parsed)) throw new Error(`refused: non-numeric ${label}`);
@@ -46,9 +40,9 @@ export function locateReceipt({ canonicalPresent, historyPresent }) {
 
 /**
  * Validate a recall_bound.py --json bundle: descriptive-only status,
- * EXPLORED quality, NOT_RUN free arm, zero live calls, zero unflagged
- * harm total, consistent catch counts, sample within frame, and recomputed
- * bounds matching the stated values.
+ * EXPLORED quality, NOT_RUN free arm, zero live calls, consistent flagged
+ * catch counts, and a flagged-only shape. Retired unflagged-bound keys are
+ * refused outright so stale bundles cannot pass as current evidence.
  */
 export function classifyGateJson(bundle) {
   if (bundle === null || typeof bundle !== "object" || Array.isArray(bundle)) {
@@ -73,34 +67,13 @@ export function classifyGateJson(bundle) {
   if (caught > flaggedTotal) {
     throw new Error("refused: caught exceeds total");
   }
-  const unflagged = bundle.unflagged_stratum ?? {};
-  const total = num(unflagged.harm_total, "unflagged harm total");
-  if (total !== 0) {
-    throw new Error("refused: nonzero unflagged harm total needs a different method");
+  if (
+    "unflagged_stratum" in bundle ||
+    "weighted_recall_interval" in bundle
+  ) {
+    throw new Error("refused: bundle carries the retired unflagged bound");
   }
-  const missed = num(unflagged.harm_caught, "unflagged harm caught");
-  if (missed !== 0) {
-    throw new Error("refused: nonzero unflagged misses need a different method");
-  }
-  const sample = num(unflagged.sample_n, "unflagged sample");
-  const frame = num(unflagged.population_n, "frame population");
-  if (sample > frame) {
-    throw new Error("refused: sample exceeds frame population");
-  }
-  const upper = zeroEventUpper95(sample);
-  const statedUpper = num(unflagged.harm_fraction_upper_95, "stated upper bound");
-  if (Math.abs(upper - statedUpper) > 1e-9) {
-    throw new Error("refused: upper bound does not recompute");
-  }
-  const lower = caught / (caught + upper * frame);
-  const statedLower = num(
-    (bundle.weighted_recall_interval ?? {}).lower_95,
-    "stated lower bound",
-  );
-  if (Math.abs(lower - statedLower) > 1e-6) {
-    throw new Error("refused: lower bound does not recompute");
-  }
-  return { verdict: "EXPLORED", harmCaught: caught, lowerBound: lower };
+  return { verdict: "EXPLORED", harmCaught: caught };
 }
 
 export async function readGateReceipt(url) {

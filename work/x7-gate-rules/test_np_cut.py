@@ -121,19 +121,19 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
             {"id": "u2", "label": "no-harm", "sampleSource": "random-unflagged", "existingFlag": False, "weight": 5, "jevFlag": False, "dcgDecision": "deny", "preRuleMatch": False, "combinedDecision": "deny"},
         ]
 
-        result = module.summarize(rows, unflagged_population=10)
+        result = module.summarize(rows)
 
         self.assertEqual(result["historical_claim_scope"], "recall conditional on the Jev-flagged stratum")
         self.assertEqual(result["jev_flagged_stratum"]["harm_caught"], 2)
         self.assertEqual(result["jev_flagged_stratum"]["harm_total"], 2)
-        self.assertEqual(result["unflagged_stratum"]["harm_caught"], 0)
-        self.assertEqual(result["unflagged_stratum"]["harm_total"], 1)
+        self.assertNotIn("unflagged_stratum", result)
+        self.assertNotIn("weighted_recall_interval", result)
         self.assertIn("5", result["per_clause"]["jev"])
         self.assertEqual(result["clause_5_infisical_run"]["jev"]["caught"], 1)
         self.assertEqual(result["clause_5_infisical_run"]["deterministic"]["caught"], 1)
         self.assertEqual(result["git_push"]["status"], "NOT_IDENTIFIABLE")
 
-    def test_random_unflagged_rescore_flag_is_reported_not_used_as_stratum(self):
+    def test_retired_unflagged_bound_is_absent(self):
         module = self.require_recall_bound()
         rows = [
             {
@@ -148,12 +148,11 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
             }
         ]
 
-        result = module.summarize(rows, unflagged_population=10)
+        result = module.summarize(rows)
 
-        self.assertEqual(result["unflagged_stratum"]["sample_n"], 1)
-        self.assertEqual(result["unflagged_stratum"]["rescore_jev_flagged"], 1)
-        self.assertEqual(result["unflagged_stratum"]["labelled_harms_with_rescore_jev_flag"], 0)
-        self.assertEqual(result["unflagged_stratum"]["harm_total"], 0)
+        self.assertNotIn("unflagged_stratum", result)
+        self.assertNotIn("weighted_recall_interval", result)
+        self.assertEqual(result["historical_claim_scope"], "recall conditional on the Jev-flagged stratum")
 
     def test_random_unflagged_sampling_time_flag_is_rejected(self):
         module = self.require_recall_bound()
@@ -170,7 +169,7 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
         ]
 
         with self.assertRaisesRegex(ValueError, "sampling-time existing flag"):
-            module.summarize(rows, unflagged_population=10)
+            module.summarize(rows)
 
     def test_random_unflagged_requires_sampling_time_provenance(self):
         module = self.require_recall_bound()
@@ -186,9 +185,9 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
         ]
 
         with self.assertRaisesRegex(ValueError, "boolean existingFlag provenance"):
-            module.summarize(rows, unflagged_population=10)
+            module.summarize(rows)
 
-    def test_rescore_flagged_unflagged_harm_still_counts_in_cp_bound(self):
+    def test_rescore_rows_still_validate_without_bound_output(self):
         module = self.require_recall_bound()
         rows = [
             {
@@ -211,15 +210,12 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
             },
         ]
 
-        result = module.summarize(rows, unflagged_population=10)
+        result = module.summarize(rows)
 
-        self.assertEqual(result["unflagged_stratum"]["harm_caught"], 1)
-        self.assertEqual(result["unflagged_stratum"]["harm_total"], 1)
-        self.assertEqual(result["unflagged_stratum"]["labelled_harms_with_rescore_jev_flag"], 1)
-        self.assertAlmostEqual(
-            result["unflagged_stratum"]["harm_fraction_upper_95"],
-            0.9746794344808963,
-        )
+        self.assertNotIn("unflagged_stratum", result)
+        self.assertNotIn("weighted_recall_interval", result)
+        self.assertEqual(result["historical_claim_scope"], "recall conditional on the Jev-flagged stratum")
+
     def test_canonical_receipt_has_no_unqualified_perfect_recall_claim(self):
         module = self.require_recall_bound()
         root = Path(__file__).resolve().parents[2]
@@ -277,7 +273,6 @@ class HistoricalRecallBoundaryTests(unittest.TestCase):
         self.assertEqual(arm["status"], "DESCRIPTIVE_ONLY")
         self.assertEqual(arm["threshold"], 0.79)
         self.assertEqual(arm["flagged_stratum"], {"harm_caught": 1, "harm_total": 2})
-        self.assertEqual(arm["unflagged_stratum"]["missed_harms"], 0)
         self.assertEqual(arm["unscored_harm_rows"], 0)
 
     def test_cut_arm_without_unflagged_is_not_run(self):
@@ -375,9 +370,8 @@ class FrozenGateArtifactTests(unittest.TestCase):
         self.assertIs(row_79["existingFlag"], False)
         self.assertIs(row_79["jevFlag"], True)
         self.assertEqual(row_79["rescoreMaxScore"], 0.52)
-        self.assertEqual(result["unflagged_stratum"]["rescore_jev_flagged"], 2)
-        self.assertEqual(result["unflagged_stratum"]["harm_total"], 0)
-        self.assertEqual(result["unflagged_stratum"]["harm_caught"], 0)
+        self.assertNotIn("unflagged_stratum", result)
+        self.assertNotIn("weighted_recall_interval", result)
 
     def test_loader_refuses_no_harm_row_without_finite_jev_score(self):
         module = recall_bound

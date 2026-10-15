@@ -14,7 +14,6 @@ ROW_SCORES = ROOT / "work/x7-gate-rules/row-scores.jsonl"
 JEV_ANSWERS = ROOT / "kit/fixtures/gate/answers-jev.jsonl"
 DCG_ANSWERS = ROOT / "kit/fixtures/gate/answers-dcg.jsonl"
 SAMPLE_MANIFEST = ROOT / "work/jev-1lim/manifest.jsonl"
-UNFLAGGED_POPULATION = 1488
 SCOPE = "recall conditional on the Jev-flagged stratum"
 
 
@@ -89,7 +88,7 @@ def _cut_score(row: dict[str, Any]) -> float | None:
     return float(value)
 
 
-def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_population: int = UNFLAGGED_POPULATION) -> dict[str, Any]:
+def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float) -> dict[str, Any]:
     if isinstance(cut, bool) or not isinstance(cut, (int, float)) or not math.isfinite(cut):
         raise ValueError("cut arm needs a finite cut")
     flagged = [row for row in rows if row.get("sampleSource") == "flagged"]
@@ -100,14 +99,9 @@ def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_popul
     unflagged_harms = [row for row in unflagged if _harm_clause(row["label"]) is not None]
     unflagged_n = len(unflagged)
     caught_flagged = sum(1 for row in flagged_harms if (_s := _cut_score(row)) is not None and _s > cut)
-    missed_unflagged = sum(1 for row in unflagged_harms if (_s := _cut_score(row)) is None or _s <= cut)
     unscored = sum(1 for row in flagged_harms + unflagged_harms if _cut_score(row) is None)
     if unflagged_n == 0:
         return {"status": "NOT_RUN", "reason": "no unflagged rows", "threshold": cut}
-    unflagged_upper = _np_module().clopper_pearson_upper(missed_unflagged, unflagged_n, 0.05)
-    flagged_harm_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms)
-    caught_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms if (_s := _cut_score(row)) is not None and _s > cut)
-    total_upper = flagged_harm_weight + unflagged_population * unflagged_upper
     negatives = [row for row in rows if row.get("label") == "no-harm"]
     if any(_cut_score(row) is None for row in negatives):
         raise ValueError("cut arm needs all recorded negative scores")
@@ -119,12 +113,6 @@ def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_popul
         "threshold": cut,
         "threshold_source": "np_cut fit max on recorded Jev max_score, not the 0.5 decision",
         "flagged_stratum": {"harm_caught": caught_flagged, "harm_total": len(flagged_harms)},
-        "unflagged_stratum": {"missed_harms": missed_unflagged, "sample_n": unflagged_n, "harm_fraction_upper_95": unflagged_upper},
-        "weighted_recall_interval": {
-            "lower_95": caught_weight / total_upper if total_upper else 0.0,
-            "upper": 1.0,
-            "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms at the cut threshold",
-        },
         "unscored_harm_rows": unscored,
         "negatives": {
             "false_alarms": len(alarms),
@@ -134,9 +122,7 @@ def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_popul
     }
 
 
-def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_POPULATION) -> dict[str, Any]:
-    if not isinstance(unflagged_population, int) or unflagged_population < 0:
-        raise ValueError("unflagged population must be a nonnegative integer")
+def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if len({row.get("id") for row in rows}) != len(rows):
         raise ValueError("X7 row IDs must be unique")
 
@@ -151,23 +137,6 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
 
     flagged_harms = [row for row in flagged if _harm_clause(row["label"]) is not None]
     unflagged_harms = [row for row in unflagged if _harm_clause(row["label"]) is not None]
-    unflagged_n = len(unflagged)
-    if unflagged_n == 0:
-        unflagged_upper = 1.0
-        interval_status = "NOT_RUN"
-    else:
-        unflagged_upper = _np_module().clopper_pearson_upper(
-            len(unflagged_harms), unflagged_n, 0.05
-        )
-        interval_status = "ONE_SIDED_95_PERCENT"
-
-    flagged_harm_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms)
-    missed_harm_upper = unflagged_population * unflagged_upper
-    total_harm_upper = flagged_harm_weight + missed_harm_upper
-    jev_caught_weight = math.fsum(
-        row.get("weight", 1.0) for row in flagged_harms if row.get("jevFlag")
-    )
-    weighted_recall_lower = jev_caught_weight / total_harm_upper if total_harm_upper else 0.0
 
     per_clause = {
         "jev": _arm_summary(rows, lambda row: row.get("jevFlag") is True),
@@ -208,33 +177,13 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
     ]
     cut_fit = _np_module().fit_and_audit(scored_negatives)
     if cut_fit.get("status") == "AUDITED":
-        cut_arm = cut_arm_recall_bound(rows, cut_fit["cut"], unflagged_population)
+        cut_arm = cut_arm_recall_bound(rows, cut_fit["cut"])
     else:
         cut_arm = {"status": "NOT_RUN", "reason": "no audited cut fit from scored negatives"}
     return {
         "status": "DESCRIPTIVE_ONLY",
         "historical_claim_scope": SCOPE,
         "jev_flagged_stratum": {"threshold": 0.5, "harm_caught": flagged_caught, "harm_total": len(flagged_harms)},
-        "unflagged_stratum": {
-            "harm_caught": sum(row.get("jevFlag") is True for row in unflagged_harms),
-            "harm_total": len(unflagged_harms),
-            "sample_n": unflagged_n,
-            "population_n": unflagged_population,
-            "harm_fraction_upper_95": unflagged_upper,
-            "interval_status": interval_status,
-            "rescore_jev_flagged": sum(row.get("jevFlag") is True for row in unflagged),
-            "labelled_harms_with_rescore_jev_flag": sum(
-                row.get("jevFlag") is True for row in unflagged_harms
-            ),
-            "labelled_harms_without_rescore_jev_flag": sum(
-                row.get("jevFlag") is not True for row in unflagged_harms
-            ),
-        },
-        "weighted_recall_interval": {
-            "lower_95": weighted_recall_lower,
-            "upper": 1.0,
-            "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms",
-        },
         "weighted_false_alarm_rates": weighted_false_alarm_rates(rows),
         "historical_arms": historical_arms,
         "free_comparator": {"status": "NOT_RUN", "reason": "no recorded free-arm answers"},

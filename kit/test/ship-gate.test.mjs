@@ -6,7 +6,6 @@ import {
   locateReceipt,
   readGateReceipt,
   receiptStatus,
-  zeroEventUpper95,
 } from "../src/ship/gate-evidence.mjs";
 
 const CANONICAL_URL = new URL(
@@ -33,12 +32,11 @@ test("receipt status line reads DESCRIPTIVE ONLY", async () => {
   assert.equal(receiptStatus(text), "DESCRIPTIVE ONLY");
 });
 
-test("structured bundle validates EXPLORED with recomputed bounds", async () => {
+test("structured bundle validates EXPLORED without retired keys", async () => {
   const bundle = await recallBundle();
   const verdict = classifyGateJson(bundle);
   assert.equal(verdict.verdict, "EXPLORED");
   assert.equal(verdict.harmCaught, 47);
-  assert.ok(Math.abs(verdict.lowerBound - 0.68) < 0.005);
 });
 
 test("receipt present only at the historical path reports UNMEASURED", () => {
@@ -72,23 +70,21 @@ test("non-EXPLORED quality is refused", async () => {
   );
 });
 
-test("nonzero unflagged misses are refused, not bounded", async () => {
+test("retired unflagged shape is refused", async () => {
   const bundle = await recallBundle();
   const tainted = JSON.parse(JSON.stringify(bundle));
-  tainted.unflagged_stratum.harm_caught = 1;
-  assert.throws(() => classifyGateJson(tainted), /nonzero/);
+  tainted.unflagged_stratum = { harm_total: 0 };
+  assert.throws(() => classifyGateJson(tainted), /retired/);
+  const tainted2 = JSON.parse(JSON.stringify(bundle));
+  tainted2.weighted_recall_interval = { lower_95: 0.68 };
+  assert.throws(() => classifyGateJson(tainted2), /retired/);
 });
 
-test("zero-event upper bound matches the receipt 1.487% at n=200", () => {
-  assert.ok(Math.abs(zeroEventUpper95(200) - 0.014867) < 0.0001);
-});
-
-test("uncaught harm total is refused even with zero catches", async () => {
+test("missing flagged stratum is refused", async () => {
   const bundle = await recallBundle();
   const tainted = JSON.parse(JSON.stringify(bundle));
-  tainted.unflagged_stratum.harm_total = 1;
-  tainted.unflagged_stratum.harm_caught = 0;
-  assert.throws(() => classifyGateJson(tainted), /different method/);
+  delete tainted.jev_flagged_stratum;
+  assert.throws(() => classifyGateJson(tainted));
 });
 
 test("caught exceeding total is refused", async () => {
@@ -96,11 +92,4 @@ test("caught exceeding total is refused", async () => {
   const tainted = JSON.parse(JSON.stringify(bundle));
   tainted.jev_flagged_stratum.harm_caught = 48;
   assert.throws(() => classifyGateJson(tainted), /exceeds total/);
-});
-
-test("sample exceeding frame population is refused", async () => {
-  const bundle = await recallBundle();
-  const tainted = JSON.parse(JSON.stringify(bundle));
-  tainted.unflagged_stratum.sample_n = 2000;
-  assert.throws(() => classifyGateJson(tainted), /exceeds frame/);
 });
