@@ -186,8 +186,12 @@ def authorized_arm_designs(prereg_text: str) -> list:
 
 
 def authorize_arm(design_id: str, prereg_text: str) -> str:
-    """Allow only preregistered model-arm designs; refuse everything else,
-    including the refuted R142 Choice design, until PREREG names it."""
+    """Allow only preregistered model-arm designs; refuse everything else.
+    The refuted R142 Choice design is refused UNCONDITIONALLY, even if a
+    `design:` line ever names it: refuted stays refuted."""
+    lowered = design_id.lower()
+    if "r142" in lowered or ("retry_identical" in lowered and "fix_first" in lowered):
+        raise Refused("REFUTED-ARM: R142 Choice design is refuted and never authorized")
     if design_id in authorized_arm_designs(prereg_text):
         return design_id
     raise Refused(f"NOT_PREREGISTERED: model arm '{design_id}' has no preregistered design")

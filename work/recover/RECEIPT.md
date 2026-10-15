@@ -88,3 +88,12 @@ and not a substitute for fleet-session measurement with real labels.
 ```json
 {"answers_rows": 2, "answers_sha256": "6fc2ae2e3b9f44ef5d8c5e40b4097b4bdd102a56e979e4b50fd2d53256f465d8", "cohorts_dev": {}, "cohorts_held": {}, "unclassified_errors": 2}
 ```
+
+## Run v6 (recompute binding + R142 hard refusal)
+
+- R142 refuted unconditionally (even if listed); unlisted designs refused;
+  listed non-refuted designs authorized (all tested).
+- Recompute test derives dev/held cohorts from the answers file via the
+  fixture task split, verifies answers sha256 against file bytes, and fails
+  a mutated block; synthetic nonempty cohort proves the SCORED branch.
+- Unit suite: 38/38. Fixture re-run rc=0 unchanged.

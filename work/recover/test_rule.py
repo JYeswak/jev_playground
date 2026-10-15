@@ -244,37 +244,73 @@ class SessionIsolationTest(unittest.TestCase):
 class RecordedAnswersTest(unittest.TestCase):
     ANSWERS = Path(__file__).resolve().parent.parent.parent / "kit" / "fixtures" / "recover" / "answers-observed.jsonl"
     RECEIPT = Path(__file__).resolve().parent / "RECEIPT.md"
+    TASK = "work/fleet-schema/task.json"
+
+    def load_block(self):
+        text = self.RECEIPT.read_text(encoding="utf-8")
+        start = text.index("```json", text.index("## Machine block"))
+        return json.loads(text[start + len("```json"):text.index("```", start + 7)])
 
     def test_answers_recompute_matches_receipt_block(self):
+        import hashlib
         rows = [json.loads(line) for line in self.ANSWERS.read_text(encoding="utf-8").splitlines() if line.strip()]
         self.assertEqual(len(rows), 2)
         for row in rows:
             self.assertNotIn("command", json.dumps(row))
-        summary = summarize(rows)
-        text = self.RECEIPT.read_text(encoding="utf-8")
-        start = text.index("```json", text.index("## Machine block"))
-        block = json.loads(text[start + len("```json"):text.index("```", start + 7)])
+        file_sha = hashlib.sha256(self.ANSWERS.read_bytes()).hexdigest()
+        _, fixture_rows, _ = load_task(self.TASK)
+        dev_ids, held_ids = split_sessions(fixture_rows)
+        dev_rows = [r for r in rows if r.get("session") in dev_ids]
+        held_rows = [r for r in rows if r.get("session") in held_ids]
+        block = self.load_block()
+        self.assertEqual(block["answers_sha256"], file_sha)
         self.assertEqual(block["answers_rows"], len(rows))
         self.assertEqual(block["unclassified_errors"],
                          sum(1 for r in rows if not r.get("class")))
-        self.assertEqual(block["cohorts_dev"], summary)
-        self.assertEqual(block["cohorts_held"], {})
+        self.assertEqual(block["cohorts_dev"], summarize(dev_rows))
+        self.assertEqual(block["cohorts_held"], summarize(held_rows))
+
+    def test_mutated_block_fails_recompute(self):
+        rows = [json.loads(line) for line in self.ANSWERS.read_text(encoding="utf-8").splitlines() if line.strip()]
+        block = self.load_block()
+        mutated = dict(block, unclassified_errors=block["unclassified_errors"] + 999)
+        self.assertNotEqual(mutated["unclassified_errors"],
+                            sum(1 for r in rows if not r.get("class")))
+
+    def test_scored_branch_on_synthetic_nonempty_cohort(self):
+        synthetic = ([{"class": "timeout", "agree": True, "next_ok": True}] * 6 +
+                     [{"class": "timeout", "agree": True, "next_ok": False}] * 4 +
+                     [{"class": "timeout", "agree": False, "next_ok": True}] * 7 +
+                     [{"class": "timeout", "agree": False, "next_ok": False}] * 3)
+        out = summarize(synthetic)
+        self.assertEqual(out["timeout"]["status"], "SCORED")
+        self.assertAlmostEqual(out["timeout"]["agree_rate"], 0.6)
+        self.assertAlmostEqual(out["timeout"]["disagree_rate"], 0.7)
+        self.assertIn("agree_ci95", out["timeout"])
 
 
 class ArmGateTest(unittest.TestCase):
     def test_r142_choice_design_refused(self):
         with self.assertRaises(Refused) as ctx:
             authorize_arm("R142 Choice retry_identical/fix_first", "Model arms\n\nNone in this bead.\n")
-        self.assertIn("NOT_PREREGISTERED", str(ctx.exception))
+        self.assertIn("REFUTED-ARM", str(ctx.exception))
+
+    def test_r142_refused_even_when_listed(self):
+        prereg = "Model arms\n\ndesign: R142 Choice retry_identical/fix_first\n"
+        with self.assertRaises(Refused) as ctx:
+            authorize_arm("R142 Choice retry_identical/fix_first", prereg)
+        self.assertIn("REFUTED-ARM", str(ctx.exception))
 
     def test_unlisted_design_refused(self):
-        with self.assertRaises(Refused):
+        with self.assertRaises(Refused) as ctx:
             authorize_arm("error-class-features-plus-stderr", "Model arms\n\nNone in this bead.\n")
+        self.assertIn("NOT_PREREGISTERED", str(ctx.exception))
 
     def test_listed_design_authorized(self):
         prereg = "Model arms\n\ndesign: error-class-features-plus-stderr\n"
         self.assertEqual(authorize_arm("error-class-features-plus-stderr", prereg),
                          "error-class-features-plus-stderr")
+
 
 if __name__ == "__main__":
     unittest.main()
