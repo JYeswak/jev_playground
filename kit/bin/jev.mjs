@@ -17,7 +17,8 @@ import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
-import { FAMILY_REGISTRY } from "../dist/families/registry.js";
+import { FAMILIES, FAMILY_REGISTRY } from "../dist/families/registry.js";
+import { buildDailyJobs, defaultSpecForFamilies } from "../dist/install/daily-jobs.js";
 import { runDoctor } from "../src/doctor/engine.mjs";
 import { runRepair } from "../dist/doctor/repair.js";
 import { runHealth } from "../src/doctor/readiness.mjs";
@@ -229,18 +230,25 @@ async function runInstaller(command, args, parsed) {
   if (parsed.positionals.length > 1) return usageFailure(`classifier ${command} accepts one target or all`);
   const target = parsed.positionals[0] ?? "all";
   const plan = await createInstallPlan({ target, dir: option(args, "--dir") });
+  const dailyJobs = command === "install" && target === "daily"
+    ? buildDailyJobs(defaultSpecForFamilies(FAMILIES), {
+      stateDir: join(process.env.HOME ?? homedir(), ".local/state/classifier"),
+    })
+    : undefined;
   const apply = hasFlag(args, "--apply");
 
   if (target !== "omp-project") {
     if (apply) return usageFailure(`--apply is not available for ${target}; use --dry-run to inspect its plan`);
+    const base = command === "install" ? plan : {
+      status: plan.status,
+      target: plan.target,
+      mode: "dry-run",
+      steps: plan.steps,
+    };
     return {
       ok: true,
-      ...(command === "install" ? plan : {
-        status: plan.status,
-        target: plan.target,
-        mode: "dry-run",
-        steps: plan.steps,
-      }),
+      ...base,
+      ...(dailyJobs ? { jobs: dailyJobs } : {}),
     };
   }
 
