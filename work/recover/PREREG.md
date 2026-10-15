@@ -87,3 +87,11 @@ mismatch it prints the reason to stderr and exits 2 with no score output
 (fail closed on drifted receipt). A missing machine block skips
 verification with `receipt_unverified` noted (bootstrapping must remain
 possible). V1 design/MIN_N/margin/model-arm rules all stand.
+
+## Amendment v4 (2026-10-15, committed before any v4 scoring)
+
+Supersedes v3's bootstrapping exception: there is no UNVERIFIED path.
+Missing answers file, missing machine block, or corrupt JSON refuses
+with nonzero exit and no score output. The artifacts already exist, so
+no bootstrap escape hatch is provided; a future family needing one must
+preregister its own explicit mechanism first.
