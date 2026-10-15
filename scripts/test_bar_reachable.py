@@ -166,14 +166,38 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "REACHABLE")
         self.assertEqual(receipt["minority_count"], 30)
 
+    @staticmethod
+    def _cohort_tree(root, *, rows, covered, harm, extra=None):
+        lines = [f'{{"id": {i}}}' for i in range(rows)]
+        (root / "rows.jsonl").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        digest = hashlib.sha256("\n".join(lines).encode() + b"\n").hexdigest()
+        demand = {
+            "eligible_denominator": rows,
+            "labels_recounted": {"covered_rows": covered, "harm_rows": harm},
+            "missing_outcomes": rows - covered,
+            "source_hashes": {"window_rows_sha256": digest},
+        }
+        (root / "demand.json").write_text(json.dumps(demand), encoding="utf-8")
+        cohort = {
+            "eligible_denominator": rows,
+            "covered_rows": covered,
+            "harm_rows": harm,
+            "missing_outcomes": rows - covered,
+            "source": {
+                "rows_file": "rows.jsonl",
+                "window_rows_sha256": digest,
+                "receipt": "demand.json",
+            },
+        }
+        if extra:
+            cohort.update(extra)
+        (root / "reach.json").write_text(json.dumps(cohort), encoding="utf-8")
+        (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+        return root
+
     def test_cohort_zero_class_is_terminal_not_reachable(self):
         with TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
-            (root / "reach.json").write_text(
-                json.dumps({"positive_count": 0, "negative_count": 45}),
-                encoding="utf-8",
-            )
+            root = self._cohort_tree(Path(tmp), rows=100, covered=45, harm=0)
             code, receipt = run_checker("--prereg", str(root / "PREREG.md"), "--json")
             self.assertEqual(code, 1)
             self.assertEqual(receipt["status"], "NOT_REACHABLE")
@@ -182,22 +206,40 @@ class BarReachabilityTests(unittest.TestCase):
 
     def test_cohort_healthy_classes_reach(self):
         with TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
-            (root / "reach.json").write_text(
-                json.dumps(
-                    {
-                        "positive_count": 40,
-                        "negative_count": 30,
-                        "threshold": 0.70,
-                        "min_minority_class": 5,
-                    }
-                ),
-                encoding="utf-8",
-            )
+            root = self._cohort_tree(Path(tmp), rows=100, covered=70, harm=40)
+            reach_path = root / "reach.json"
+            cohort = json.loads(reach_path.read_text(encoding="utf-8"))
+            cohort["threshold"] = 0.70
+            cohort["min_minority_class"] = 5
+            reach_path.write_text(json.dumps(cohort), encoding="utf-8")
             code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
             self.assertEqual(code, 0)
             self.assertEqual(receipt["status"], "REACHABLE")
+
+    def test_cohort_override_keys_refused(self):
+        with TemporaryDirectory() as tmp:
+            root = self._cohort_tree(Path(tmp), rows=100, covered=70, harm=40)
+            reach_path = root / "reach.json"
+            cohort = json.loads(reach_path.read_text(encoding="utf-8"))
+            cohort["positive_count"] = 40
+            cohort["threshold"] = 0.70
+            reach_path.write_text(json.dumps(cohort), encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+
+    def test_cohort_forged_counts_refuse(self):
+        with TemporaryDirectory() as tmp:
+            root = self._cohort_tree(Path(tmp), rows=100, covered=45, harm=0)
+            reach_path = root / "reach.json"
+            forged = json.loads(reach_path.read_text(encoding="utf-8"))
+            forged["harm_rows"] = 40
+            forged["threshold"] = 0.70
+            reach_path.write_text(json.dumps(forged), encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+            self.assertIn("disagrees with frozen source", receipt["error"])
 
     def test_cohort_missing_counts_refuses(self):
         with TemporaryDirectory() as tmp:
@@ -215,6 +257,7 @@ class BarReachabilityTests(unittest.TestCase):
             code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
             self.assertEqual(code, 2)
             self.assertEqual(receipt["status"], "ERROR")
+
 
 
 

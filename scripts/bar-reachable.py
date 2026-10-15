@@ -362,6 +362,69 @@ def _cohort_only_args(args: argparse.Namespace) -> bool:
     )
 
 
+def _resolve_cohort_source(path_value: object, cohort_path: Path) -> Path | None:
+    if not isinstance(path_value, str) or not path_value:
+        return None
+    candidate = Path.cwd() / path_value
+    if candidate.is_file():
+        return candidate
+    sibling = cohort_path.parent / path_value
+    return sibling if sibling.is_file() else None
+
+
+def _bind_cohort_to_frozen_source(cohort: dict, cohort_path: Path) -> None:
+    """Bind reach.json counts to the frozen demand source it cites. A cohort
+    whose counts disagree with its own cited receipt/rows is refused: forged
+    counts must not yield a verdict against a zero-harm source."""
+    source = cohort.get("source")
+    if not isinstance(source, dict):
+        raise ValueError("reach.json must carry a source block with receipt and rows_file")
+    rows_path = _resolve_cohort_source(source.get("rows_file"), cohort_path)
+    if rows_path is None:
+        raise ValueError(
+            f"reach.json rows_file missing or unreadable: {source.get('rows_file')!r}"
+        )
+    try:
+        with open(rows_path, "rb") as handle:
+            row_count = sum(1 for line in handle if line.strip())
+    except OSError as exc:
+        raise ValueError(f"reach.json rows_file unreadable: {exc}") from exc
+    receipt_path = _resolve_cohort_source(source.get("receipt"), cohort_path)
+    if receipt_path is None:
+        raise ValueError(f"reach.json receipt missing or unreadable: {source.get('receipt')!r}")
+    demand = json.loads(receipt_path.read_text(encoding="utf-8"))
+    if row_count != demand.get("eligible_denominator"):
+        raise ValueError(
+            f"rows file holds {row_count} rows, receipt eligible denominator "
+            f"is {demand.get('eligible_denominator')!r}"
+        )
+    hashes = demand.get("source_hashes", {}) if isinstance(demand.get("source_hashes"), dict) else {}
+    window = demand.get("window", {}) if isinstance(demand.get("window"), dict) else {}
+    want_digest = (
+        hashes.get("window_rows_sha256")
+        or window.get("window_rows_sha256")
+        or demand.get("window_rows_sha256")
+    )
+    if want_digest is None or source.get("window_rows_sha256") != want_digest:
+        raise ValueError(
+            "reach.json window_rows_sha256 disagrees with the demand receipt digest"
+        )
+    recount = demand.get("labels_recounted", {})
+    expected = {
+        "eligible_denominator": demand.get("eligible_denominator"),
+        "covered_rows": recount.get("covered_rows"),
+        "harm_rows": recount.get("harm_rows"),
+        "missing_outcomes": demand.get("missing_outcomes"),
+    }
+    for key, want in expected.items():
+        if want is None:
+            raise ValueError(f"demand receipt lacks {key}")
+        if cohort.get(key) != want:
+            raise ValueError(
+                f"reach.json {key}={cohort.get(key)!r} disagrees with frozen source {want!r}"
+            )
+
+
 def cohort_verdict(prereg_path: Path) -> dict:
     """Terminal cohort verdict driven by a preregistration and its sibling
     reach.json counts. Zero-class cohorts refuse as NOT_REACHABLE instead
@@ -377,6 +440,7 @@ def cohort_verdict(prereg_path: Path) -> dict:
     if not cohort_path.is_file():
         raise ValueError(f"cohort counts file missing: {cohort_path}")
     cohort = json.loads(cohort_path.read_text(encoding="utf-8"))
+    _bind_cohort_to_frozen_source(cohort, cohort_path)
     meta = {
         "mode": declared_mode,
         "prereg_path": str(prereg_path.resolve()),
@@ -385,10 +449,18 @@ def cohort_verdict(prereg_path: Path) -> dict:
         "cohort_sha256": hashlib.sha256(cohort_path.read_bytes()).hexdigest(),
     }
     if declared_mode == "auc":
-        positive = cohort.get("positive_count", cohort.get("harm_rows"))
-        negative = cohort.get("negative_count", cohort.get("clean_rows"))
-        if positive is None or negative is None:
-            raise ValueError("reach.json must carry positive/negative (or harm/clean) counts")
+        harm = cohort.get("harm_rows")
+        covered = cohort.get("covered_rows")
+        if harm is None or covered is None:
+            raise ValueError("reach.json must carry harm_rows and covered_rows")
+        for key in ("positive_count", "negative_count"):
+            if key in cohort:
+                raise ValueError(
+                    f"reach.json {key} overrides the source-bound split; remove it"
+                )
+        positive, negative = harm, covered - harm
+        if negative < 0:
+            raise ValueError("reach.json covered_rows below harm_rows")
         if positive == 0 or negative == 0:
             return {
                 "status": "NOT_REACHABLE",
@@ -409,7 +481,7 @@ def cohort_verdict(prereg_path: Path) -> dict:
     if declared_mode == "rate":
         for key in ("trials", "threshold"):
             if cohort.get(key) is None:
-                raise ValueError(f"reach.json must carry {key} for rate mode")
+                raise ValueError(f"reach.json needs {key} for rate mode")
         return {
             **rate_reachability(
                 cohort["trials"],
