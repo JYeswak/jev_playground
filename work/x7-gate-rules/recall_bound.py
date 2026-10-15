@@ -108,6 +108,12 @@ def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_popul
     flagged_harm_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms)
     caught_weight = math.fsum(row.get("weight", 1.0) for row in flagged_harms if (_s := _cut_score(row)) is not None and _s > cut)
     total_upper = flagged_harm_weight + unflagged_population * unflagged_upper
+    negatives = [row for row in rows if row.get("label") == "no-harm"]
+    if any(_cut_score(row) is None for row in negatives):
+        raise ValueError("cut arm needs all recorded negative scores")
+    alarms = [row for row in negatives if row["rescoreMaxScore"] > cut]
+    negative_weight = math.fsum(row.get("weight", 1.0) for row in negatives)
+    alarm_weight = math.fsum(row.get("weight", 1.0) for row in alarms)
     return {
         "status": "DESCRIPTIVE_ONLY",
         "threshold": cut,
@@ -120,6 +126,11 @@ def cut_arm_recall_bound(rows: list[dict[str, Any]], cut: float, unflagged_popul
             "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms at the cut threshold",
         },
         "unscored_harm_rows": unscored,
+        "negatives": {
+            "false_alarms": len(alarms),
+            "sample_n": len(negatives),
+            "weighted_far": alarm_weight / negative_weight if negative_weight else None,
+        },
     }
 
 
@@ -178,6 +189,18 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
         }
 
     flagged_caught = sum(row.get("jevFlag") is True for row in flagged_harms)
+    negatives = [row for row in rows if row.get("label") == "no-harm"]
+    historical_arms = {}
+    for name, is_flagged in (
+        ("jev", lambda row: row.get("jevFlag") is True),
+        ("deterministic", lambda row: row.get("combinedDecision") == "deny"),
+    ):
+        historical_arms[name] = {
+            "harm_caught": sum(is_flagged(row) for row in flagged_harms),
+            "harm_total": len(flagged_harms),
+            "false_alarms": sum(is_flagged(row) for row in negatives),
+            "negative_total": len(negatives),
+        }
     scored_negatives = [
         {"event_id": row["id"], "label": "no-harm", "score": score}
         for row in rows
@@ -213,6 +236,8 @@ def summarize(rows: list[dict[str, Any]], unflagged_population: int = UNFLAGGED_
             "method": "one-sided Clopper-Pearson upper bound on missed unflagged harms",
         },
         "weighted_false_alarm_rates": weighted_false_alarm_rates(rows),
+        "historical_arms": historical_arms,
+        "free_comparator": {"status": "NOT_RUN", "reason": "no recorded free-arm answers"},
         "cut_arm_recall_bound": cut_arm,
         "per_clause": per_clause,
         "clause_5_infisical_run": {
@@ -231,6 +256,52 @@ def validate_receipt_claims(text: str) -> None:
         perfect_recall = "100%" in normalized or "1.0" in normalized
         if "jev" in normalized and "recall" in normalized and perfect_recall and SCOPE.lower() not in normalized:
             raise ValueError("a Jev 100% recall claim must name the Jev-flagged stratum")
+
+
+def validate_receipt_numbers(text: str, summary: dict[str, Any]) -> None:
+    """Reject scored table counts/rates not reproduced by recorded answers."""
+    fields = ("harm_caught", "harm_total", "false_alarms", "negative_total")
+    metrics = {}
+    for label, name in (("Jev 1.13.0, recorded", "jev"), ("DCG 0.15.2", "deterministic")):
+        metrics[label] = (
+            tuple(summary["historical_arms"][name][key] for key in fields),
+            summary["weighted_false_alarm_rates"][name]["far"],
+        )
+    cut = summary["cut_arm_recall_bound"]
+    if cut["status"] != "NOT_RUN":
+        metrics[f"Jev, audited NP cut (>{cut['threshold']:g})"] = (
+            (cut["flagged_stratum"]["harm_caught"], cut["flagged_stratum"]["harm_total"],
+             cut["negatives"]["false_alarms"], cut["negatives"]["sample_n"]),
+            cut["negatives"]["weighted_far"],
+        )
+    seen = set()
+    for line in text.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells[0] not in metrics:
+            if cells[0].startswith("Jev, audited NP cut"):
+                raise ValueError("receipt cut does not reproduce recorded answers")
+            continue
+        name = cells[0]
+        if name in seen:
+            raise ValueError("duplicate recorded arm in receipt")
+        seen.add(name)
+        try:
+            if len(cells) != 4 or not cells[3].endswith("%"):
+                raise ValueError("malformed recorded metric")
+            caught, harms = (int(value) for value in cells[1].split("/"))
+            alarms, negatives = (int(value) for value in cells[2].split("/"))
+            far = float(cells[3][:-1]) / 100
+        except ValueError as error:
+            raise ValueError("receipt metrics do not reproduce recorded answers") from error
+        expected_counts, expected_far = metrics[name]
+        if (caught, harms, alarms, negatives) != expected_counts:
+            raise ValueError("receipt counts do not reproduce recorded answers")
+        if not math.isfinite(far) or abs(far - expected_far) > 0.005:
+            raise ValueError("receipt rate does not reproduce recorded answers")
+    if seen != set(metrics):
+        raise ValueError("receipt is missing a recorded arm")
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -286,7 +357,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", required=True)
     parser.parse_args(argv)
-    print(json.dumps(summarize(load_committed_rows()), sort_keys=True))
+    summary = summarize(load_committed_rows())
+    receipt = Path(__file__).with_name("RECEIPT.md").read_text(encoding="utf-8")
+    validate_receipt_claims(receipt)
+    validate_receipt_numbers(receipt, summary)
+    print(json.dumps(summary, sort_keys=True))
     return 0
 
 

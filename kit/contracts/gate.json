@@ -73,7 +73,7 @@
     "historical_claim": "47/47 is recall conditional on the Jev-flagged stratum, not gate-wide recall",
     "historical_weighted_false_alarm_ceiling": 0.02,
     "np_cut": {
-      "score": "binary deterministic combined decision: 1 if DCG denies or the pre-rule matches, 0 otherwise",
+      "score": "recorded Jev max_score from kit/fixtures/gate/answers-jev.jsonl; analysis cut only, distinct from the historical 0.5 decision and from binary deterministic decisions",
       "fit_and_audit_sets": "disjoint halves of no-harm rows, deterministic event-ID hash split",
       "alpha": 0.02,
       "delta": 0.05,

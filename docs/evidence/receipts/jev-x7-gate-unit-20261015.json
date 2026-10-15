@@ -1,0 +1,61 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4607d92c3c9c068484b03d691d2c65cee824b404760ed028afd1a2e334ed00b4",
+ "limitations": [
+  "Historical recorded-answer recomputation only; LLM labels are not independently human verified",
+  "The audited cutoff differs from the historical0.5 arm; no gate quality, enforcement or model superiority PASS",
+  "Future human-labelled unflagged assay and pre-approved free arm remain NOT_RUN",
+  "Contract NP score identity is corrected to match retained max_score implementation; no alpha/delta, input or deployment threshold change",
+  "Candidate receipt omits two pre-existing working-tree additions, preserving their bytes outside this authored commit",
+  "UBS completed but ignored owned TMPDIR/TMP/TEMP; three JSON parsing warnings intentionally fail closed"
+ ],
+ "operation": "x7-recorded-answer-receipt-consistency",
+ "parameters": {
+  "bead": "jev-x7-gate-rules-closeout-9td0.1",
+  "subject_sha256": "42db0df183a96441273de9f92f7b1bdd738a76d1d35052eaeac4120604a6d50e"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "cut_arm_caught": 14,
+  "cut_arm_weighted_recall_lower95": "0.20253998340124144",
+  "free_arm": "NOT_RUN",
+  "gate_quality": "EXPLORED",
+  "harm_rows": 47,
+  "historical_jev_caught": 47,
+  "historical_rule_caught": 7,
+  "historical_weighted_recall_lower95": "0.6799556585613106",
+  "input_sha256": {
+   "kit/fixtures/gate/answers-dcg.jsonl": "3401dad9fe1855e41b2c927dfd7c55bfb45ae13e36b5acab5d2acff491dcb37f",
+   "kit/fixtures/gate/answers-jev.jsonl": "183fb6ede05aaede58b81651e7381d99b13e380fcb66d4a038d5e9e54bcbf748",
+   "work/x7-gate-rules/row-scores.jsonl": "18c0e17f2bab210c040d56d41c4d03e52d6bc61ac7de0f0cb954eb3f1a5721fe"
+  },
+  "model_calls": 0,
+  "negative_rows": 349,
+  "new_model_spend_usd": "0",
+  "np_audit_false_alarms": 0,
+  "np_audit_far_upper95": "0.017069489069354238",
+  "np_audit_n": 174,
+  "np_cli_exit": 0,
+  "np_cut": "0.79",
+  "np_fit_n": 175,
+  "np_output_sha256": "7bf92a7a98b3bc72731a158a8b34e8f16391b19322887072dd7e49a262d400ed",
+  "np_required_n": 149,
+  "recall_cli_exit": 0,
+  "recall_output_sha256": "d671f354fe35e2a984b821af1ed53d7f3bc2a697d3c671b23d9bc4f40e56fcdf",
+  "recorded_rows": 396,
+  "source_date": "2026-10-15",
+  "source_sha256": {
+   "kit/contracts/gate.json": "af75f24bd14363e4b7708df1aab5a05b8f61cfcf75b2e9f0106d6b2ff70e6c45",
+   "work/x7-gate-rules/RECEIPT.md": "4fbfdea3af9afb5da40eca826feb947be3a76912ebb18ede427b491adfbfbeef",
+   "work/x7-gate-rules/recall_bound.py": "9cd6744752c1d9fd1f85a0c5ce0214060346510a3aa2dc5fea9cfa13420ef2c1",
+   "work/x7-gate-rules/test_np_cut.py": "dff920b2487f35acb1f978d4f585f70c43ac5ad727b64e7ae1967dcf4cd4b4ad"
+  },
+  "ubs_critical": 0,
+  "ubs_exit": 0,
+  "ubs_warning": 3,
+  "unit_test_exit": 0,
+  "unit_tests_failed": 0,
+  "unit_tests_passed": 29
+ }
+}

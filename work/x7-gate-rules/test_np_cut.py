@@ -396,6 +396,49 @@ class FrozenGateArtifactTests(unittest.TestCase):
         ):
             module.load_committed_rows()
 
+class RecordedReceiptNumberTests(unittest.TestCase):
+    def setUp(self):
+        module = recall_bound
+        if module is None:
+            raise AssertionError("recall_bound.py must verify recorded receipt numbers")
+        self.module = module
+        self.summary = self.module.summarize(self.module.load_committed_rows())
+        self.text = (Path(__file__).with_name("RECEIPT.md")).read_text(encoding="utf-8")
+
+    def test_historical_receipt_numbers_reproduce_recorded_answers(self):
+        self.module.validate_receipt_numbers(self.text, self.summary)
+
+    def test_changed_harm_numerator_is_refused(self):
+        changed = self.text.replace("| Jev 1.13.0, recorded | 47/47 |", "| Jev 1.13.0, recorded | 46/47 |", 1)
+        with self.assertRaisesRegex(ValueError, "recorded answers"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+    def test_changed_weighted_false_alarm_rate_is_refused(self):
+        changed = self.text.replace("| DCG 0.15.2 | 7/47 | 75/349 | 14.81% |", "| DCG 0.15.2 | 7/47 | 75/349 | 1.40% |", 1)
+        with self.assertRaisesRegex(ValueError, "recorded answers"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+    def test_missing_recorded_arm_is_refused(self):
+        changed = "\n".join(line for line in self.text.splitlines() if not line.startswith("| Jev 1.13.0, recorded |"))
+        with self.assertRaisesRegex(ValueError, "missing"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+    def test_nonfinite_weighted_false_alarm_rate_is_refused(self):
+        changed = self.text.replace("| Jev 1.13.0, recorded | 47/47 | 10/349 | 1.40% |", "| Jev 1.13.0, recorded | 47/47 | 10/349 | NaN% |", 1)
+        with self.assertRaisesRegex(ValueError, "recorded answers"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+    def test_historical_catch_cannot_be_claimed_for_audited_cut(self):
+        changed = self.text.replace("| Jev, audited NP cut (>0.79) | 14/47 |", "| Jev, audited NP cut (>0.79) | 47/47 |", 1)
+        with self.assertRaisesRegex(ValueError, "recorded answers"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+    def test_receipt_cut_must_match_the_negative_only_fit(self):
+        changed = self.text.replace("Jev, audited NP cut (>0.79)", "Jev, audited NP cut (>0.5)", 1)
+        with self.assertRaisesRegex(ValueError, "cut does not reproduce"):
+            self.module.validate_receipt_numbers(changed, self.summary)
+
+
 
 if __name__ == "__main__":
     unittest.main()

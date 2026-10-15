@@ -10,6 +10,7 @@
 | DCG 0.15.2 | 7/47 | 75/349 | 14.81% |
 | Destructive pre-rule alone | 0/47 | 0/349 | 0.00% |
 | DCG + pre-rule | 7/47 | 75/349 | 14.81% |
+| Jev, audited NP cut (>0.79) | 14/47 | 0/349 | 0.00% |
 
 Recorded Jev recall 47/47 (100%) is **recall conditional on the Jev-flagged stratum**; it is not gate-wide recall. The pre-rule matched 0/396 rows, so the combined result equals DCG. Historical clause 5 (Infisical run) catches are reported separately below; the git-push catch rate is **NOT_IDENTIFIABLE** from the committed command-free score rows; no raw command text is included here.
 
@@ -28,3 +29,17 @@ The 200 random-unflagged rows are selected by the manifest's sampling-time `exis
 ## Verification boundary
 
 Offline evidence: `uv run --no-project --offline --python 3.12 -m unittest work.x7-gate-rules.test_np_cut -v` passed 14/14; `np_cut.py --json` returned `AUDITED` (fit 175, audit 174, FAR 0, one-sided upper 0.01707); `recall_bound.py --json` returned 47/47 conditional flagged-stratum harm catches, 0/200 random-unflagged labelled harms, upper 0.014867, and weighted-recall lower bound 0.679956. The recorded rows show Jev clause 5 37/37 and deterministic clause 5 5/37; git-push remains `NOT_IDENTIFIABLE`. These are historical, label-dependent results, not a new label set or gate-quality pass. No successful Jev/free-model experiment call was made.
+
+## Audited cutoff is not the historical decision
+
+The disjoint negatives-only fit uses recorded Jev `max_score`, not the binary DCG decision. The fit half contains 175 negatives and the audit half 174; both exceed the frozen minimum of 149 at alpha 0.02 and delta 0.05. The fitted cutoff is **0.79**, applied with strict `>`: the audit has 0/174 false alarms and a one-sided 95% upper rate of 0.01706949. This certifies an **unweighted** audit rate only; the weighted false-alarm figures above remain descriptive.
+
+At this audited cutoff, the recorded arm catches **14/47** harms in the Jev-flagged stratum and its weighted recall lower bound is **0.20253998**, not the historical 0.5-arm bound. No harm row is silently dropped as unscored. The historical 0.5 arm has 10/349 unweighted false alarms (2.87%), so it fails the alpha 0.02 unweighted bar despite its lower descriptive weighted false-alarm rate. Neither arm earns a gate-quality PASS from these label-dependent data.
+
+The pre-approved free arm, `dots-studio/dots-3-note-preview:free` under `work/jev-1lim/PREREG-QSA6.md`, remains **NOT_RUN** on the same frozen gate rows and negative-rate comparison; there are no recorded free-arm answers to score or inherit. The fresh DCG-stratified human-labelled assay remains NOT_RUN under `unflagged-PREREG.md`; its old labels are not relabelled as prospective or human-grounded evidence.
+
+## Executable recorded-answer consistency
+
+`uv run --no-project --no-config python3 work/x7-gate-rules/recall_bound.py --json` now recomputes historical arm counts and weighted false-alarm rates from the exact joined recorded answers, then checks the canonical receipt table before emitting its descriptive report. Counts must match exactly; rate differences over 0.005 absolute, non-finite rates, missing arms and duplicate arms are refused. The original conditional-recall claim guard remains in force.
+
+`uv run --no-project --no-config python3 -m unittest work/x7-gate-rules/test_np_cut.py -v` covers the matching recorded receipt and planted changed harm counts, altered weighted false-alarm rates, missing recorded arms and non-finite rates, alongside the existing harm-exclusion, disjoint-audit, insufficient-sample and threshold controls. These are offline consistency checks, not new model or deployment evidence. The gate family stays EXPLORED until its original independent-human assay and shipping acceptance are met.
