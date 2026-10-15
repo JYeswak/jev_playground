@@ -1,0 +1,48 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_f631694943d8a57ec561db1c5484daae744a36c73f3c4282629931d4d42a612a",
+ "limitations": [
+  "First bounded authority/cohort investigation only; full original acceptance remains unmet and prior close credit stays withdrawn",
+  "Current source digests/timestamps are not original pre-call snapshots; no global absence claim for external private authority",
+  "Written later-in-same-file rule and referenced pre-call399-line code conflict; this audit does not choose or amend a horizon",
+  "Current full-tail diagnostics are not corrected labels, a smaller-cohort PASS or any model/N1 rescore",
+  "Original labels, rows, receipts, numeric bar and source/scorer are unchanged; investigation is append-only"
+ ],
+ "operation": "dau5-same200-source-horizon-authority-audit",
+ "parameters": {
+  "bead": "jev-dau5.1",
+  "subject_sha256": "5cad90f326f66b055fba7669a5b1dd811e9b0092eb37d5241bba8aa0fafa2c8b"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "authoritatively_qualified_rows": 0,
+  "bead": "jev-dau5.1",
+  "bounded_current_vs_stored_differences": 0,
+  "collector_sha256": "028acfc33f01f4437f1ada3540a26f31d12b7f2e218ab22b51f009f20a7b4099",
+  "date_utc": "2026-10-15",
+  "decision": "NO_GO",
+  "distant_at_or_after_close": 18,
+  "distant_before_collection_close": 46,
+  "full_current_vs_stored_differences": 64,
+  "matching_current_sources": 13,
+  "matching_events": 200,
+  "no_new_models": true,
+  "no_new_quality_verdict_from_current_labels": true,
+  "no_original_labels_rows_receipt_bar_or_scorer_changed": true,
+  "original_corpus_sha256": "706754624f46db70bb92fc1ced3aea8491911d945a631bb07b989a5974930a33",
+  "original_model_rows_sha256": "86a6d02ab9f2965df57f7039c07ee64fbf0ed4f2fa20bac307c7565ccc66d3c7",
+  "pre_call_blobs": {
+   "work/longres-rep/PREREG-timewindow.md": "fdc67fdb909adbc77be58d4eefd4bb3c7ca831ea",
+   "work/longres/PREREG-longres.md": "e6d1d74cb31996ce05bc39ad7fce1e9484b4273c",
+   "work/longres/extract.py": "6241fde61341f73b7a999113964152a50bfeb75d"
+  },
+  "pre_call_commit": "fba075a106574a9b9c8eecdbf1f890ddc9505b11",
+  "prereg_sha256": "9c2fa1ced69d3c843784cc009c676b7059c79ffc9ca1624933824ff00206fb02",
+  "report_path": "work/longres-rep/HORIZON-AUDIT-20261015.json",
+  "report_sha256": "5cad90f326f66b055fba7669a5b1dd811e9b0092eb37d5241bba8aa0fafa2c8b",
+  "same_frozen_identities": 200,
+  "status": "UNQUALIFIED",
+  "temporal_collector_in_pre_call_tree": false
+ }
+}
