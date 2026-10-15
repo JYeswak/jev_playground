@@ -41,3 +41,16 @@ No surface turned ON by this change (offline analysis only); AC4 vacuous.
 Threshold/cohort machinery only. Not a rule-quality verdict, not
 evidence any error class should be retried or changed in production,
 and not a substitute for fleet-session measurement with real labels.
+
+## Run v2 (PREREG amendment v2, task contract + session split)
+
+- Command: `python3 work/recover/rule.py --json` -> rc=0 (task envelope
+  `work/fleet-schema/task.json`, as_of 2026-10-04T00:48:27Z, window 14 d,
+  fixture sha256 `37f802e49811b4d9051a203e57eb99aaa8f48bdffd74edc3eacb3bec06f57258`).
+- Split: dev {synthetic-session-a, synthetic-session-b}, held
+  {synthetic-session-c} (mechanical first-two rule, PREREG v2).
+- `cohorts_dev`: {} — `cohorts_held`: {} — zero R-class episodes anywhere
+  in fixture; unclassified 2, unmarked 0. Both halves NOT_POWERED by
+  absence. No comparison computed or claimed.
+- Unit suite: 27/27 (24 v1 + task-missing refusal, task resolution,
+  deterministic split).

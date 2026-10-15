@@ -14,9 +14,11 @@ from work.recover.rule import (
     classify_edit_error,
     estimate_effect,
     flag_violation,
+    load_task,
     next_action_kind,
     prescribed_action,
     score_rows,
+    split_sessions,
     summarize,
     wilson_interval,
 )
@@ -159,6 +161,30 @@ class SummarizeTest(unittest.TestCase):
         lo, hi = wilson_interval(10, 10)
         self.assertEqual(hi, 1.0)
 
+
+class TaskContractTest(unittest.TestCase):
+    def test_missing_task_file_refuses(self):
+        with self.assertRaises(SystemExit):
+            load_task("work/recover/does-not-exist-task.json")
+
+    def test_task_resolves_fixture_from_envelope(self):
+        _, rows, identity = load_task("work/fleet-schema/task.json")
+        self.assertEqual(identity["as_of"], "2026-10-04T00:48:27Z")
+        self.assertEqual(identity["window_days"], 14)
+        self.assertTrue(len(rows) > 0)
+        self.assertRegex(identity["fixture_sha256"], r"^[0-9a-f]{64}$")
+
+
+class SplitTest(unittest.TestCase):
+    def test_dev_held_split_is_deterministic(self):
+        rows = [
+            {"type": "session", "id": "b", "timestamp": "2026-10-04T00:41:00Z"},
+            {"type": "session", "id": "a", "timestamp": "2026-10-04T00:40:00Z"},
+            {"type": "session", "id": "c", "timestamp": "2026-10-04T00:42:00Z"},
+        ]
+        dev, held = split_sessions(rows)
+        self.assertEqual(dev, {"a", "b"})
+        self.assertEqual(held, {"c"})
 
 if __name__ == "__main__":
     unittest.main()

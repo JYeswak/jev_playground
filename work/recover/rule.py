@@ -4,7 +4,6 @@ Rule R under test (frozen in work/recover/PREREG.md):
 - bash timeout / network / lock errors -> retry the call.
 - bash syntax / not-found / permission errors -> change the call.
 - edit stale_tag -> re-read before acting.
-
 Read-only over session rows. Never imputes outcomes: success 'under the
 rule' for rows where the agent did not follow R raises Refused as
 NOT_IDENTIFIABLE. All cohort figures are labelled OBSERVATIONAL.
@@ -14,6 +13,7 @@ No model calls, no keys, no network.
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import sys
 from pathlib import Path
@@ -95,15 +95,14 @@ def flag_violation(tool: str, error_class: str | None, action: str | None) -> bo
 
 
 def iter_calls(rows: list):
-    """Yield (call, result, next_call, next_result) tuples in row order.
-
-    Fixture schema is mixed: assistant tool calls arrive as content parts
-    ({type: toolCall}), while tool results arrive at message level
-    (role: toolResult with toolCallId/isError/content on the message).
-    """
+    """Yield (call, result, next_call, next_result, session) tuples."""
     pending: dict[str, dict] = {}
     order: list[str] = []
+    current_session: str | None = None
     for row in rows:
+        if row.get("type") == "session" and isinstance(row.get("id"), str):
+            current_session = row["id"]
+            continue
         if row.get("type") != "message":
             continue
         message = row.get("message", {})
@@ -124,6 +123,7 @@ def iter_calls(rows: list):
                 pending[cid] = {
                     "call": {"name": part.get("name"), "arguments": part.get("arguments", {})},
                     "result": None,
+                    "session": current_session,
                 }
                 order.append(cid)
     calls = [pending[cid] for cid in order]
@@ -131,7 +131,8 @@ def iter_calls(rows: list):
         nxt = calls[i + 1] if i + 1 < len(calls) else None
         yield (entry["call"], entry["result"],
                nxt["call"] if nxt else None,
-               nxt["result"] if nxt else None)
+               nxt["result"] if nxt else None,
+               entry["session"])
 
 
 def error_text(result: dict | None) -> str:
@@ -168,7 +169,7 @@ def wilson_interval(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 def score_rows(rows: list) -> dict:
     episodes: list[dict] = []
-    for call, result, nxt, next_result in iter_calls(rows):
+    for call, result, nxt, next_result, session in iter_calls(rows):
         if not result or not result.get("is_error"):
             continue
         tool = call.get("name")
@@ -180,7 +181,7 @@ def score_rows(rows: list) -> dict:
             klass = None
         action = next_action_kind(call, nxt)
         prescribed = prescribed_action(tool, klass)
-        episodes.append({"tool": tool, "class": klass, "action": action,
+        episodes.append({"tool": tool, "class": klass, "action": action, "session": session,
                          "agree": (action == prescribed) if (klass and action) else None,
                          "next_ok": next_succeeded(next_result)})
     return {"episodes": episodes}
@@ -214,21 +215,73 @@ def summarize(episodes: list) -> dict:
                       "agree_ci95": [lo_a, hi_a], "disagree_ci95": [lo_d, hi_d]}
     return out
 
+def load_task(task_path: str):
+    """Load N0's task envelope; refuse when it is missing or off-schema."""
+    import argparse
+    try:
+        task = json.loads(Path(task_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"task file unreadable: {exc}")
+    if task.get("schema_version") != 1 or not task.get("fixture"):
+        raise SystemExit("task file must carry schema_version 1 and a fixture path")
+    rows_path = Path(task_path).parent / task["fixture"]
+    try:
+        raw = rows_path.read_bytes()
+    except OSError as exc:
+        raise SystemExit(f"task fixture unreadable: {exc}")
+    rows = [json.loads(line) for line in raw.decode("utf-8").splitlines() if line.strip()]
+    identity = {"path": str(task_path), "as_of": task.get("as_of"),
+                "window_days": task.get("window_days"),
+                "fixture": task["fixture"],
+                "fixture_sha256": hashlib.sha256(raw).hexdigest()}
+    return task, rows, identity
+
+
+def split_sessions(rows: list) -> tuple[set, set]:
+    """Mechanical dev/held split: first two sessions by (timestamp, id)."""
+    seen: dict[str, str] = {}
+    for row in rows:
+        if row.get("type") == "session" and isinstance(row.get("id"), str):
+            seen.setdefault(row["id"], str(row.get("timestamp", "")))
+    ordered = sorted(seen, key=lambda sid: (seen[sid], sid))
+    return set(ordered[:2]), set(ordered[2:])
+
+
+def session_of(rows: list) -> dict[int, str | None]:
+    """Map row index to its enclosing session id (None before any marker)."""
+    current: str | None = None
+    mapping: dict[int, str | None] = {}
+    for i, row in enumerate(rows):
+        if row.get("type") == "session" and isinstance(row.get("id"), str):
+            current = row["id"]
+        mapping[i] = current
+    return mapping
+
+
 
 def main(argv: list[str]) -> int:
     import argparse
     parser = argparse.ArgumentParser(description="N4 observational recover-rule cohorts")
-    parser.add_argument("--rows", default="work/fleet-schema/fixtures/sessions.jsonl")
+    parser.add_argument("--task", default="work/fleet-schema/task.json",
+                        help="N0 task envelope carrying the rows path")
     parser.add_argument("--json", action="store_true",
                         help="emit the report as JSON (the sole output envelope)")
     args = parser.parse_args(argv)
-    rows = [json.loads(line) for line in Path(args.rows).read_text(encoding="utf-8").splitlines() if line.strip()]
+    _, rows, identity = load_task(args.task)
+    dev_ids, held_ids = split_sessions(rows)
     scored = score_rows(rows)
+    unmarked = [e for e in scored["episodes"] if e["session"] is None]
+    dev_eps = [e for e in scored["episodes"] if (e["session"] or "") in dev_ids]
+    held_eps = [e for e in scored["episodes"] if (e["session"] or "") in held_ids]
     report = {"tool": "rule.py", "bead": "jev-n4-recover-error-rule-1grh",
               "estimand": "OBSERVATIONAL",
+              "task": identity,
+              "split": {"dev_sessions": sorted(dev_ids), "held_sessions": sorted(held_ids)},
               "constants": CONSTANTS,
-              "cohorts": summarize(scored["episodes"]),
-              "unclassified_errors": sum(1 for e in scored["episodes"] if not e["class"])}
+              "cohorts_dev": summarize(dev_eps),
+              "cohorts_held": summarize(held_eps),
+              "unclassified_errors": sum(1 for e in scored["episodes"] if not e["class"]),
+              "unmarked_session_errors": len(unmarked)}
     print(json.dumps(report, indent=2))
     return 0
 
