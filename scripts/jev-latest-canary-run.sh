@@ -17,8 +17,10 @@
 #   canary rc 3  -> ERROR,   exit 3, notify.
 #   any other rc -> ERROR,   exit 3, notify (fail closed).
 # AUTH gets exit 4 (not 1) so it is never confused with MOVED. A notification
-# is one stdout line `NOTIFY <OUTCOME>: <detail>`; the log line keeps today's
-# shape `<UTC timestamp> rc=<runner rc> <last output line>`.
+# is a real notifier invocation (default: osascript display notification) plus
+# one stdout record line `NOTIFY <OUTCOME>: <detail>`; the log line keeps
+# today's shape `<UTC timestamp> rc=<runner rc> <last output line>`. A failing
+# notifier never changes the runner outcome.
 # The runner never embeds a repository path: the default canary resolves
 # relative to this script's directory, and all locations come from flags/env.
 set -u
@@ -26,17 +28,19 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CANARY="$SCRIPT_DIR/jev-latest-canary.py"
 SECRET_MANAGER="${JEV_CANARY_SECRET_MANAGER:-infisical}"
+NOTIFY_BIN="${JEV_CANARY_NOTIFY_BIN:-osascript}"
 PROJECT_ID="${JEV_CANARY_PROJECT_ID:-42b194c3-89d7-4ebb-895f-dd77ddf005ba}"
 LOG_FILE="${HOME}/.local/state/jev/jev-latest-canary.log"
 AUTH_TEXT="Failed to automatically trigger login flow"
 
 usage() {
   cat <<USAGE
-Usage: jev-latest-canary-run.sh [--secret-manager CMD] [--canary PATH] [--project-id ID] [--log-file PATH] [--help]
+Usage: jev-latest-canary-run.sh [--secret-manager CMD] [--notify-bin CMD] [--canary PATH] [--project-id ID] [--log-file PATH] [--help]
 Run the jev-latest canary once under its secret manager, classify the
-outcome, print a notification unless OK, and append a log line. Keyless
-offline operation is the caller's choice of doubles: pass stubs via
---secret-manager / --canary for hermetic runs.
+outcome, notify (via the notifier command) unless OK, print a NOTIFY record,
+and append a log line. Keyless offline operation is the caller's choice of
+doubles: pass stubs via --secret-manager / --notify-bin / --canary for
+hermetic runs.
 Outcomes: OK(0) MOVED(1) NOT_RUN(2) ERROR(3) AUTH(4).
 USAGE
 }
@@ -44,6 +48,7 @@ USAGE
 while [ $# -gt 0 ]; do
   case "$1" in
     --secret-manager) SECRET_MANAGER="$2"; shift 2;;
+    --notify-bin) NOTIFY_BIN="$2"; shift 2;;
     --canary) CANARY="$2"; shift 2;;
     --project-id) PROJECT_ID="$2"; shift 2;;
     --log-file) LOG_FILE="$2"; shift 2;;
@@ -54,6 +59,7 @@ done
 
 if [ ! -f "$CANARY" ]; then
   echo "NOTIFY ERROR: canary not found"
+  "$NOTIFY_BIN" -e "display notification \"ERROR: canary not found\" with title \"Jev canary\"" >/dev/null 2>&1 || :
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) rc=3 canary not found" >> "$LOG_FILE"
   exit 3
 fi
@@ -78,6 +84,7 @@ esac
 mkdir -p "$(dirname "$LOG_FILE")"
 if [ "$notify" -eq 1 ]; then
   echo "NOTIFY $outcome: $lastline"
+  "$NOTIFY_BIN" -e "display notification \"$outcome: $lastline\" with title \"Jev canary\"" >/dev/null 2>&1 || :
 fi
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) rc=$exitcode $lastline" >> "$LOG_FILE"
 exit "$exitcode"

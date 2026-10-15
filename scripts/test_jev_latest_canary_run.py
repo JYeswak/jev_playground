@@ -1,8 +1,8 @@
 """Tests for scripts/jev-latest-canary-run.sh: secret-manager boundary, exit
-mapping, AUTH override, notifications, log shape, and no repository paths.
-Hermetic: both the secret manager and the canary are injected stubs (no live
-calls, no keys, no network, no real notifications); all state lands in tmp
-dirs under TMPDIR. Follows jev-jh6f acceptance items 1-5."""
+mapping, AUTH override, real notifier delivery, log shape, and no repository
+paths. Hermetic: the secret manager, the notifier, and the canary are injected
+stubs (no live calls, no keys, no network, no real notifications); all state
+lands in tmp dirs under TMPDIR. Follows jev-jh6f acceptance items 1-5."""
 
 import os
 import subprocess
@@ -34,6 +34,12 @@ while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do shift; done
 exec "$@"
 """ % (AUTH_TEXT, AUTH_TEXT)
 
+# Stub notifier: records each invocation's arguments, exits $NOTIFY_RC.
+NOTIFY_STUB = """#!/usr/bin/env bash
+echo "$@" >> "$NOTIFY_LOG"
+exit "${NOTIFY_RC:-0}"
+"""
+
 
 def write_stub(directory, name, body):
     path = os.path.join(directory, name)
@@ -58,23 +64,38 @@ class CanaryRunnerTest(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(prefix="canary-run-")
         self.canary = write_stub(self.tmp, "stub-canary.py", CANARY_STUB)
         self.sm = write_stub(self.tmp, "stub-sm.sh", SM_STUB)
+        self.notify_bin = write_stub(self.tmp, "stub-notify.sh", NOTIFY_STUB)
         self.log = os.path.join(self.tmp, "canary.log")
+        self.notify_log = os.path.join(self.tmp, "notify.log")
 
     def tearDown(self):
         import shutil
 
         shutil.rmtree(self.tmp, ignore_errors=True)
 
-    def invoke(self, rc, out, sm_mode="passthrough"):
+    def invoke(self, rc, out, sm_mode="passthrough", notify_rc="0"):
         return run_canary(
-            {"STUB_RC": str(rc), "STUB_OUT": out, "SM_MODE": sm_mode},
+            {
+                "STUB_RC": str(rc),
+                "STUB_OUT": out,
+                "SM_MODE": sm_mode,
+                "NOTIFY_RC": notify_rc,
+                "NOTIFY_LOG": self.notify_log,
+            },
             "--secret-manager", self.sm,
+            "--notify-bin", self.notify_bin,
             "--canary", self.canary,
             "--log-file", self.log,
         )
 
     def log_lines(self):
         with open(self.log, encoding="utf-8") as handle:
+            return [line.rstrip("\n") for line in handle if line.strip()]
+
+    def notify_calls(self):
+        if not os.path.exists(self.notify_log):
+            return []
+        with open(self.notify_log, encoding="utf-8") as handle:
             return [line.rstrip("\n") for line in handle if line.strip()]
 
     def test_ok_records_no_notification(self):
@@ -101,11 +122,34 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 3)
         self.assertIn("NOTIFY ERROR:", proc.stdout)
 
+    def test_notifier_called_once_per_outcome_with_silence_on_ok(self):
+        proc = self.invoke(0, "OK: x")
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(self.notify_calls(), [])
+        for rc, out, outcome in [
+            (1, "MOVED: x", "MOVED"),
+            (2, "NOT_RUN: x", "NOT_RUN"),
+            (3, "ERROR: x", "ERROR"),
+        ]:
+            with self.subTest(outcome=outcome):
+                proc = self.invoke(rc, out)
+                self.assertEqual(proc.returncode, rc)
+        calls = self.notify_calls()
+        self.assertEqual(len(calls), 3)
+        for outcome in ("MOVED", "NOT_RUN", "ERROR"):
+            self.assertTrue(
+                any(outcome in call for call in calls),
+                f"no notifier call for {outcome}: {calls}",
+            )
+
     def test_auth_manager_failure_reports_auth_with_own_code(self):
         proc = self.invoke(1, "canary must not run", sm_mode="auth")
         self.assertEqual(proc.returncode, 4)
         self.assertIn("NOTIFY AUTH:", proc.stdout)
         self.assertNotIn("MOVED", proc.stdout)
+        calls = self.notify_calls()
+        self.assertEqual(len(calls), 1)
+        self.assertIn("AUTH", calls[0])
         (line,) = self.log_lines()
         self.assertIn("rc=4", line)
 
@@ -115,6 +159,12 @@ class CanaryRunnerTest(unittest.TestCase):
         proc = self.invoke(1, AUTH_TEXT + ". Please run login manually.", sm_mode="auth")
         self.assertEqual(proc.returncode, 4)
         self.assertNotIn("MOVED", proc.stdout)
+
+    def test_failing_notifier_leaves_runner_outcome_unchanged(self):
+        proc = self.invoke(1, "MOVED: x", notify_rc="1")
+        self.assertEqual(proc.returncode, 1)
+        self.assertIn("NOTIFY MOVED:", proc.stdout)
+        self.assertEqual(len(self.notify_calls()), 1)
 
     def test_unknown_exit_fails_closed(self):
         proc = self.invoke(9, "weird")
@@ -136,6 +186,7 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0)
         body = proc.stdout
         self.assertIn("--secret-manager", body)
+        self.assertIn("--notify-bin", body)
         for token in (os.getcwd(), os.path.expanduser("~"), ".local/state"):
             self.assertNotIn(token, body)
 
