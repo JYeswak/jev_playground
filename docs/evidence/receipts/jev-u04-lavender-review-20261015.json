@@ -1,0 +1,56 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_f4e0aa93d1a41304f5dd17c3d72049cfb830ac39912a78ef6c85768f0b6900cc",
+ "limitations": [
+  "Machine-fallback denial only; an independently pre-authorized valid user session remains usable with zero machine transport",
+  "Fake providers/config/transport and fakeExec capture only; no real credentials, Infisical request, TypeSafe call or live deployment proof",
+  "Committed review artifact is a summary schema, not raw CLI output; source hash and19-case/order/privacy summary independently matched",
+  "Parent P5/P15/U06 and fresh-live-session obligations remain separate"
+ ],
+ "operation": "u04-independent-machine-fallback-provider-review",
+ "parameters": {
+  "bead": "jev-u04-key-provider-check-p147",
+  "subject_sha256": "b76cb31011b5abe966ab8033c6c74da8b5d1572f7afcd06c2063cf9920fd6797"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "acquisition_order": [
+   "user-session",
+   "machine-fallback"
+  ],
+  "author_assignee": "WildDog",
+  "checks_failed": 0,
+  "checks_passed": 19,
+  "command": "node work/provider-safety/verify-u04.mjs --json",
+  "command_exit": 0,
+  "date_utc": "2026-10-15",
+  "global_fetch_calls": 0,
+  "injected_paths": [
+   "user-session-runner",
+   "machine-fallback-runner",
+   "approved-transport",
+   "synthetic-config-reader"
+  ],
+  "network_calls": 0,
+  "no_live_model_or_service": true,
+  "no_real_credentials": true,
+  "owner_clarification_comments": [
+   3346,
+   3367
+  ],
+  "reviewed_candidate": "1304806b8a522c6f82081d08eaf8adebdc3bf86d",
+  "reviewer": "LavenderDune",
+  "scope": "existing user-session-first plus owner-approved machine-fallback; not global user-session denial",
+  "source_sha256": {
+   "work/jev-client/src/infisical-key.ts": "98900c1a7d937c3425bb5c8312840dc95ee428386ef5f09c4da910467b1f6428",
+   "work/provider-safety/u04-review.json": "03afd63458785a4b3b16abd77faf7067240343409b212abee9a8f2ad0cb99a2f",
+   "work/provider-safety/verify-u04.mjs": "80a06b98b6ab89cc671819f43148c017358b4577a9a570ec2a1d5848ee02e030"
+  },
+  "stderr_bytes": 0,
+  "stdout_sha256": "a82583df4f7e7acf14e146f6418bacdaa1cfbbeb55c44f208c32dce5291eacca",
+  "stored_report_bytes_unchanged": true,
+  "stored_report_current_19_checks": true,
+  "stored_report_source_sha_matches": true
+ }
+}
