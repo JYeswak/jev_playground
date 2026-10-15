@@ -105,3 +105,9 @@ and not a substitute for fleet-session measurement with real labels.
   no score output.
 - Unit suite: 38/38 (verifier match + mutated-refusal via executable
   verify_receipt_block; R142 hard refusal even when listed).
+
+## Run v8 (fail-closed receipt check)
+
+- No UNVERIFIED path: missing answers/block or corrupt JSON refuses rc=2
+  with no score (tested: missing, malformed, missing-block, mutated).
+- Unit suite: 43/43. Fixture re-run rc=0 VERIFIED.

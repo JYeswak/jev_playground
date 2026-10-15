@@ -9,10 +9,10 @@ NOT_IDENTIFIABLE.
 import json
 import unittest
 from pathlib import Path
-
 from work.recover.rule import (
     Refused,
     authorize_arm,
+    check_receipt,
     classify_bash_error,
     classify_edit_error,
     estimate_effect,
@@ -296,6 +296,63 @@ class RecordedAnswersTest(unittest.TestCase):
         self.assertAlmostEqual(out["timeout"]["disagree_rate"], 0.7)
         self.assertIn("agree_ci95", out["timeout"])
 
+
+class CheckReceiptTest(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.mkdtemp(prefix="n4-check-")
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, True)
+        _, fixture_rows, _ = load_task("work/fleet-schema/task.json")
+        self.dev_ids, self.held_ids = split_sessions(fixture_rows)
+        self.answers = Path(self.tmp) / "answers.jsonl"
+        self.receipt = Path(self.tmp) / "RECEIPT.md"
+
+    def write_pair(self, answers_text, block):
+        self.answers.write_text(answers_text, encoding="utf-8")
+        self.receipt.write_text(
+            "# Receipt\n\n## Machine block\n\n```json\n" + json.dumps(block) + "\n```\n",
+            encoding="utf-8")
+
+    def test_matching_pair_passes(self):
+        block = {"answers_rows": 0, "answers_sha256": "x", "cohorts_dev": {},
+                 "cohorts_held": {}, "unclassified_errors": 0}
+        self.write_pair("", block)
+        import hashlib
+        block["answers_sha256"] = hashlib.sha256(b"").hexdigest()
+        self.write_pair("", block)
+        out = check_receipt(self.answers, self.receipt, self.dev_ids, self.held_ids)
+        self.assertEqual(out["status"], "VERIFIED")
+
+    def test_missing_answers_refused(self):
+        with self.assertRaises(Refused) as ctx:
+            check_receipt(Path(self.tmp) / "absent.jsonl", self.receipt,
+                          self.dev_ids, self.held_ids)
+        self.assertIn("MISSING", str(ctx.exception))
+
+    def test_malformed_answers_refused(self):
+        self.write_pair("{not json", {"answers_rows": 0, "answers_sha256": "x",
+                                      "cohorts_dev": {}, "cohorts_held": {},
+                                      "unclassified_errors": 0})
+        with self.assertRaises(Refused) as ctx:
+            check_receipt(self.answers, self.receipt, self.dev_ids, self.held_ids)
+        self.assertIn("MALFORMED", str(ctx.exception))
+
+    def test_missing_block_refused(self):
+        self.answers.write_text("", encoding="utf-8")
+        self.receipt.write_text("# Receipt with no machine block\n", encoding="utf-8")
+        with self.assertRaises(Refused) as ctx:
+            check_receipt(self.answers, self.receipt, self.dev_ids, self.held_ids)
+        self.assertIn("MISSING", str(ctx.exception))
+
+    def test_mutated_block_refused(self):
+        self.write_pair("", {"answers_rows": 0, "answers_sha256": "x",
+                             "cohorts_dev": {}, "cohorts_held": {},
+                             "unclassified_errors": 999})
+        import hashlib
+        _ = hashlib.sha256(b"").hexdigest()
+        with self.assertRaises(Refused) as ctx:
+            check_receipt(self.answers, self.receipt, self.dev_ids, self.held_ids)
+        self.assertIn("RECEIPT_MISMATCH", str(ctx.exception))
 
 class ArmGateTest(unittest.TestCase):
     def test_r142_choice_design_refused(self):

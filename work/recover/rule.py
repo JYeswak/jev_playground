@@ -214,6 +214,27 @@ def verify_receipt_block(block: dict, answers_rows: list, dev_ids: set, held_ids
         raise Refused(f"RECEIPT_MISMATCH: fields differ: {', '.join(mismatches)}")
     return {"ok": True, "checked": sorted(expected)}
 
+def check_receipt(answers_path, receipt_path, dev_ids: set, held_ids: set) -> dict:
+    """Load answers + committed machine block and verify; raise Refused on
+    any missing file, malformed JSON, or recompute mismatch. No UNVERIFIED
+    path: absence fails closed with nonzero exit at the caller."""
+    try:
+        answers_bytes = Path(answers_path).read_bytes()
+    except OSError as exc:
+        raise Refused(f"MISSING answers file: {exc}")
+    try:
+        answers_rows = [json.loads(line) for line in answers_bytes.decode("utf-8").splitlines() if line.strip()]
+    except ValueError as exc:
+        raise Refused(f"MALFORMED answers file: {exc}")
+    try:
+        receipt_text = Path(receipt_path).read_text(encoding="utf-8")
+        start = receipt_text.index("```json", receipt_text.index("## Machine block"))
+        block = json.loads(receipt_text[start + len("```json"):receipt_text.index("```", start + 7)])
+    except (OSError, ValueError) as exc:
+        raise Refused(f"MISSING machine block: {exc}")
+    return {"status": "VERIFIED", **verify_receipt_block(
+        block, answers_rows, dev_ids, held_ids, hashlib.sha256(answers_bytes).hexdigest())}
+
 class Refused(Exception):
     pass
 
@@ -338,18 +359,7 @@ def main(argv: list[str]) -> int:
     answers_path = root / "kit" / "fixtures" / "recover" / "answers-observed.jsonl"
     receipt_path = root / "work" / "recover" / "RECEIPT.md"
     try:
-        answers_bytes = answers_path.read_bytes()
-        answers_rows = [json.loads(line) for line in answers_bytes.decode("utf-8").splitlines() if line.strip()]
-        receipt_text = receipt_path.read_text(encoding="utf-8")
-        start = receipt_text.index("```json", receipt_text.index("## Machine block"))
-        block = json.loads(receipt_text[start + len("```json"):receipt_text.index("```", start + 7)])
-    except (OSError, ValueError) as exc:
-        report = {"tool": "rule.py", "receipt_check": {"status": "UNVERIFIED", "reason": str(exc)}}
-        print(json.dumps(report, indent=2))
-        return 0
-    try:
-        check = verify_receipt_block(block, answers_rows, dev_ids, held_ids,
-                                     hashlib.sha256(answers_bytes).hexdigest())
+        receipt_check = check_receipt(answers_path, receipt_path, dev_ids, held_ids)
     except Refused as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -362,7 +372,7 @@ def main(argv: list[str]) -> int:
               "cohorts_held": summarize(held_eps),
               "unclassified_errors": sum(1 for e in scored["episodes"] if not e["class"]),
               "unmarked_session_errors": len(unmarked),
-              "receipt_check": {"status": "VERIFIED", **check}}
+              "receipt_check": receipt_check}
     print(json.dumps(report, indent=2))
     return 0
 
