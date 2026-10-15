@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_b8a9418be6b53e03f42d69af7cb057b68933a980e48bd3c8090b9a048895e5b7",
+ "limitations": [
+  "Conditional descriptive recorded-label result only; free arm NOT_RUN, unflagged human assay unavailable, no global-quality/experiment/PUSHED/credential-containment claim"
+ ],
+ "operation": "X7 conditional descriptive original-AC non-author review",
+ "parameters": {
+  "bead": "jev-x7-gate-rules-closeout-9td0",
+  "candidate": "ec06a7ac8df9767a735c6c5e5d001740ea00288c",
+  "subject_sha256": "fa93789481d0dd6191d77b96b7ccd933fc507246610b9ea174d6b477bcecefef"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 9565,
+  "sha256": "7b1437a9684aaf27b1447020805edf1412aabeca15a3630187d6d2bfc1ce99bc"
+ }
+}

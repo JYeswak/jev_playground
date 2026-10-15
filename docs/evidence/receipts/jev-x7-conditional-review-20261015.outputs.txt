@@ -1,0 +1,78 @@
+{
+  "archive_sha256": "fa93789481d0dd6191d77b96b7ccd933fc507246610b9ea174d6b477bcecefef",
+  "candidate": "ec06a7ac8df9767a735c6c5e5d001740ea00288c",
+  "file_writes": "only owned test TMPDIR, immutable source read-only",
+  "free_arm_fold": {
+    "added_text_sha256": "02a016ff406dae76ada08ce8d36222bc678b89bf0df3ca11b8d90f1abb1487bf",
+    "both_exact_lines_present": true,
+    "exact_added_lines": 2,
+    "no_new_arm_execution_or_waiver": true,
+    "original_records": [
+      877,
+      1036,
+      2742,
+      2744,
+      2752,
+      2753
+    ],
+    "source_commit": "cf0c16e3ffa82df2079f428d4d1713b5017ee74b",
+    "status": "NOT_RUN"
+  },
+  "limits": [
+    "not global recall or human-grounded quality",
+    "not a free-arm execution or inherited experiment",
+    "no publication, rollout or AM credential-containment claim",
+    "prior foreign-line sweep correction preserved; original accepted fold lineage independently identified"
+  ],
+  "network": "OS sandbox denied",
+  "new_model_calls": 0,
+  "readonly_export": "/Users/josh/Developer/jev/var/agent-tmp/readiness-refresh.65246/x7-review.ec06a7ac/export",
+  "runs": [
+    {
+      "command": [
+        "python3",
+        "work/x7-gate-rules/np_cut.py",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"alpha\": 0.02, \"audit_bar_met\": true, \"audit_false_alarms\": 0, \"audit_far\": 0.0, \"audit_far_upper_95\": 0.017069489069354238, \"audit_n\": 174, \"comparison\": \">\", \"cut\": 0.79, \"delta\": 0.05, \"fit_n\": 175, \"required_negative_count\": 149, \"score_source\": \"jev-max_score\", \"status\": \"AUDITED\"}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "work/x7-gate-rules/recall_bound.py",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"clause_5_infisical_run\": {\"deterministic\": {\"caught\": 5, \"total\": 37, \"weighted_caught\": 5.0, \"weighted_total\": 37.0}, \"jev\": {\"caught\": 37, \"total\": 37, \"weighted_caught\": 37.0, \"weighted_total\": 37.0}}, \"cut_arm_recall_bound\": {\"flagged_stratum\": {\"harm_caught\": 14, \"harm_total\": 47}, \"negatives\": {\"false_alarms\": 0, \"sample_n\": 349, \"weighted_far\": 0.0}, \"status\": \"DESCRIPTIVE_ONLY\", \"threshold\": 0.79, \"threshold_source\": \"np_cut fit max on recorded Jev max_score, not the 0.5 decision\", \"unscored_harm_rows\": 0}, \"free_comparator\": {\"reason\": \"no recorded free-arm answers\", \"status\": \"NOT_RUN\"}, \"gate_quality\": \"EXPLORED\", \"git_push\": {\"reason\": \"the committed score rows contain no git-push-specific label or command text\", \"status\": \"NOT_IDENTIFIABLE\"}, \"historical_arms\": {\"deterministic\": {\"false_alarms\": 75, \"harm_caught\": 7, \"harm_total\": 47, \"negative_total\": 349}, \"jev\": {\"false_alarms\": 10, \"harm_caught\": 47, \"harm_total\": 47, \"negative_total\": 349}}, \"historical_claim_scope\": \"recall conditional on the Jev-flagged stratum\", \"jev_flagged_stratum\": {\"harm_caught\": 47, \"harm_total\": 47, \"threshold\": 0.5}, \"live_calls\": 0, \"per_clause\": {\"deterministic\": {\"2\": {\"caught\": 1, \"total\": 9, \"weighted_caught\": 1.0, \"weighted_total\": 9.0}, \"4\": {\"caught\": 1, \"total\": 1, \"weighted_caught\": 1.0, \"weighted_total\": 1.0}, \"5\": {\"caught\": 5, \"total\": 37, \"weighted_caught\": 5.0, \"weighted_total\": 37.0}}, \"jev\": {\"2\": {\"caught\": 9, \"total\": 9, \"weighted_caught\": 9.0, \"weighted_total\": 9.0}, \"4\": {\"caught\": 1, \"total\": 1, \"weighted_caught\": 1.0, \"weighted_total\": 1.0}, \"5\": {\"caught\": 37, \"total\": 37, \"weighted_caught\": 37.0, \"weighted_total\": 37.0}}}, \"status\": \"DESCRIPTIVE_ONLY\", \"weighted_false_alarm_rates\": {\"deterministic\": {\"alarm_mass\": 242.43999999999994, \"far\": 0.14810018326206403}, \"jev\": {\"alarm_mass\": 22.880000000000003, \"far\": 0.013976786805131276}, \"negatives\": 349, \"total_weight\": 1637.0000000000075}}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "work/x7-gate-rules/test_np_cut.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stderr": "test_loader_refuses_no_harm_row_without_finite_jev_score (work.x7-gate-rules.test_np_cut.FrozenGateArtifactTests) ... ok\ntest_manifest_provenance_preserves_row_79_rescore_disagreement (work.x7-gate-rules.test_np_cut.FrozenGateArtifactTests) ... ok\ntest_recorded_answers_match_frozen_rows_without_raw_commands (work.x7-gate-rules.test_np_cut.FrozenGateArtifactTests) ... ok\ntest_loader_rejects_unknown_label_instead_of_dropping_it (work.x7-gate-rules.test_np_cut.FrozenScoreLabelTests) ... ok\ntest_both_arms_carry_their_thresholds (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_canonical_receipt_has_no_unqualified_perfect_recall_claim (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_cut_arm_counts_only_above_cut_harms (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_cut_arm_without_unflagged_is_not_run (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_historical_full_catch_is_qualified_and_clause_catches_are_separate (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_random_unflagged_requires_sampling_time_provenance (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_random_unflagged_sampling_time_flag_is_rejected (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_rescore_rows_still_validate_without_bound_output (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_retired_unflagged_bound_is_absent (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_unqualified_perfect_gate_recall_claim_is_rejected (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_weighted_false_alarm_rates_are_exact (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_weighted_false_alarm_rates_need_negatives (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_weighted_false_alarm_rates_refuse_bad_weight (work.x7-gate-rules.test_np_cut.HistoricalRecallBoundaryTests) ... ok\ntest_alpha_delta_negative_sample_size_is_149 (work.x7-gate-rules.test_np_cut.NeymanPearsonCutTests) ... ok\ntest_audit_row_above_fit_max_alarms_and_fails_bar (work.x7-gate-rules.test_np_cut.NeymanPearsonCutTests) ... ok\ntest_cut_fit_and_audit_are_disjoint_and_stable (work.x7-gate-rules.test_np_cut.NeymanPearsonCutTests) ... ok\ntest_cut_refuses_any_harm_row_before_fitting (work.x7-gate-rules.test_np_cut.NeymanPearsonCutTests) ... ok\ntest_small_audit_half_is_not_run (work.x7-gate-rules.test_np_cut.NeymanPearsonCutTests) ... ok\ntest_changed_harm_numerator_is_refused (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_changed_weighted_false_alarm_rate_is_refused (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_historical_catch_cannot_be_claimed_for_audited_cut (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_historical_receipt_numbers_reproduce_recorded_answers (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_missing_recorded_arm_is_refused (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_nonfinite_weighted_false_alarm_rate_is_refused (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\ntest_receipt_cut_must_match_the_negative_only_fit (work.x7-gate-rules.test_np_cut.RecordedReceiptNumberTests) ... ok\n\n----------------------------------------------------------------------\nRan 29 tests in 0.079s\n\nOK\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "kit/test/ship-gate.test.mjs"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "TAP version 13\n# Subtest: receipt status line reads DESCRIPTIVE ONLY\nok 1 - receipt status line reads DESCRIPTIVE ONLY\n  ---\n  duration_ms: 2.682667\n  type: 'test'\n  ...\n# Subtest: structured bundle validates EXPLORED without retired keys\nok 2 - structured bundle validates EXPLORED without retired keys\n  ---\n  duration_ms: 51.506916\n  type: 'test'\n  ...\n# Subtest: receipt present only at the historical path reports UNMEASURED\nok 3 - receipt present only at the historical path reports UNMEASURED\n  ---\n  duration_ms: 0.897\n  type: 'test'\n  ...\n# Subtest: non-descriptive status is refused\nok 4 - non-descriptive status is refused\n  ---\n  duration_ms: 47.777833\n  type: 'test'\n  ...\n# Subtest: non-EXPLORED quality is refused\nok 5 - non-EXPLORED quality is refused\n  ---\n  duration_ms: 49.672583\n  type: 'test'\n  ...\n# Subtest: retired unflagged shape is refused\nok 6 - retired unflagged shape is refused\n  ---\n  duration_ms: 52.302083\n  type: 'test'\n  ...\n# Subtest: missing flagged stratum is refused\nok 7 - missing flagged stratum is refused\n  ---\n  duration_ms: 49.079417\n  type: 'test'\n  ...\n# Subtest: caught exceeding total is refused\nok 8 - caught exceeding total is refused\n  ---\n  duration_ms: 48.799833\n  type: 'test'\n  ...\n1..8\n# tests 8\n# suites 0\n# pass 8\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 376.51375\n"
+    }
+  ],
+  "same_row_recorded_answer_check": "real CLI validated same manifest IDs and recorded arms/receipt numbers within .005",
+  "scope": "conditional descriptive X7 result only; unflagged independent-human assay unavailable; gate quality EXPLORED",
+  "source_changes": 0,
+  "verifier": "JadeSpire"
+}
