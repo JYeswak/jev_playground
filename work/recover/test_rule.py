@@ -6,10 +6,13 @@ not-found-identical-retry is flagged, and imputed outcomes refuse as
 NOT_IDENTIFIABLE.
 """
 
+import json
 import unittest
+from pathlib import Path
 
 from work.recover.rule import (
     Refused,
+    authorize_arm,
     classify_bash_error,
     classify_edit_error,
     estimate_effect,
@@ -237,6 +240,41 @@ class SessionIsolationTest(unittest.TestCase):
         by_session = {e["session"]: e for e in eps}
         self.assertEqual(by_session["s1"]["class"], "timeout")
         self.assertEqual(by_session["s2"]["class"], "syntax")
+
+class RecordedAnswersTest(unittest.TestCase):
+    ANSWERS = Path(__file__).resolve().parent.parent.parent / "kit" / "fixtures" / "recover" / "answers-observed.jsonl"
+    RECEIPT = Path(__file__).resolve().parent / "RECEIPT.md"
+
+    def test_answers_recompute_matches_receipt_block(self):
+        rows = [json.loads(line) for line in self.ANSWERS.read_text(encoding="utf-8").splitlines() if line.strip()]
+        self.assertEqual(len(rows), 2)
+        for row in rows:
+            self.assertNotIn("command", json.dumps(row))
+        summary = summarize(rows)
+        text = self.RECEIPT.read_text(encoding="utf-8")
+        start = text.index("```json", text.index("## Machine block"))
+        block = json.loads(text[start + len("```json"):text.index("```", start + 7)])
+        self.assertEqual(block["answers_rows"], len(rows))
+        self.assertEqual(block["unclassified_errors"],
+                         sum(1 for r in rows if not r.get("class")))
+        self.assertEqual(block["cohorts_dev"], summary)
+        self.assertEqual(block["cohorts_held"], {})
+
+
+class ArmGateTest(unittest.TestCase):
+    def test_r142_choice_design_refused(self):
+        with self.assertRaises(Refused) as ctx:
+            authorize_arm("R142 Choice retry_identical/fix_first", "Model arms\n\nNone in this bead.\n")
+        self.assertIn("NOT_PREREGISTERED", str(ctx.exception))
+
+    def test_unlisted_design_refused(self):
+        with self.assertRaises(Refused):
+            authorize_arm("error-class-features-plus-stderr", "Model arms\n\nNone in this bead.\n")
+
+    def test_listed_design_authorized(self):
+        prereg = "Model arms\n\ndesign: error-class-features-plus-stderr\n"
+        self.assertEqual(authorize_arm("error-class-features-plus-stderr", prereg),
+                         "error-class-features-plus-stderr")
 
 if __name__ == "__main__":
     unittest.main()

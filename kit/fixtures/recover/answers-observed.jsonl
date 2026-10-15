@@ -1,0 +1,2 @@
+{"action": "change", "agree": null, "class": null, "id": "ep-001", "next_ok": true, "session": "synthetic-session-c", "tool": "bash"}
+{"action": "change", "agree": null, "class": null, "id": "ep-002", "next_ok": null, "session": "synthetic-session-c", "tool": "task"}

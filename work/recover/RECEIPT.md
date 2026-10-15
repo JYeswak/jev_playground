@@ -70,3 +70,21 @@ and not a substitute for fleet-session measurement with real labels.
 - `next_action_kind` recognizes edit -> same-file read as `re-read`
   (unrelated read stays `change`); end-to-end stale-tag tests both ways.
 - Unit suite: 31/31. Fixture re-run rc=0 unchanged.
+
+## Run v5 (recorded answers clause)
+
+- `kit/contracts/recover.json` created (family recover, rule-type question,
+  advisory surface, zero-call budget — nothing served); validates via
+  validateContract (family=recover, ad-hoc node check).
+- `kit/fixtures/recover/answers-observed.jsonl` generated from rule.py
+  scored episodes (2 rows, ids ep-001/002, no raw text); PROVENANCE.md
+  records alignment, SHAs, recompute method.
+- `authorize_arm` gate: refuses any design not named by `design:` lines in
+  PREREG text (R142 + unlisted refused, listed authorized — all tested).
+- Unit suite: 35/35 (31 v4 + recompute + 3 arm-gate).
+
+## Machine block (recomputed from kit/fixtures/recover/answers-observed.jsonl)
+
+```json
+{"answers_rows": 2, "answers_sha256": "6fc2ae2e3b9f44ef5d8c5e40b4097b4bdd102a56e979e4b50fd2d53256f465d8", "cohorts_dev": {}, "cohorts_held": {}, "unclassified_errors": 2}
+```
