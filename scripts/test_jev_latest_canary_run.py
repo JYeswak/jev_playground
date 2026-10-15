@@ -8,6 +8,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 RUNNER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jev-latest-canary-run.sh")
 
@@ -72,8 +73,27 @@ class CanaryRunnerTest(unittest.TestCase):
         self.notify_bin = write_stub(self.tmp, "stub-notify.sh", NOTIFY_STUB)
         self.log = os.path.join(self.tmp, "canary.log")
         self.notify_log = os.path.join(self.tmp, "notify.log")
+        self.default_notify_log = os.path.join(self.tmp, "unexpected-notify.log")
+        write_stub(
+            self.tmp,
+            "osascript",
+            '#!/bin/sh\nprintf "unexpected default notifier\\n" >> "$CANARY_DEFAULT_NOTIFY_LOG"\nexit 97\n',
+        )
+        self.host_env = patch.dict(
+            os.environ,
+            {
+                "PATH": self.tmp + os.pathsep + os.environ.get("PATH", os.defpath),
+                "CANARY_DEFAULT_NOTIFY_LOG": self.default_notify_log,
+            },
+        )
+        self.host_env.start()
 
     def tearDown(self):
+        self.host_env.stop()
+        self.assertFalse(
+            os.path.exists(self.default_notify_log),
+            "test escaped to the default notifier instead of the injected notifier",
+        )
         import shutil
 
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -226,13 +246,16 @@ class CanaryRunnerTest(unittest.TestCase):
 
     def test_missing_secret_manager_fails_closed(self):
         proc = run_canary(
-            {},
+            {"NOTIFY_LOG": self.notify_log, "TMPDIR": self.tmp},
             "--secret-manager", os.path.join(self.tmp, "no-such-sm"),
+            "--notify-bin", self.notify_bin,
             "--canary", self.canary,
             "--log-file", self.log,
         )
         self.assertEqual(proc.returncode, 3)
         self.assertIn("NOTIFY ERROR:", proc.stdout)
+        (call,) = self.notify_calls()
+        self.assertIn("ERROR", call)
 
     def test_help_has_no_repository_paths(self):
         proc = run_canary({}, "--help")

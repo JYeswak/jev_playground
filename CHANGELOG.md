@@ -38,6 +38,14 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
 
 ## 2026-10-01 → present — hardening and rollout
 
+- Legacy alias canary (`jev-jh6f`): the missing-secret-manager test now injects
+  its notifier, and a PATH trap rejects accidental default-notifier execution.
+  HTTP-boundary tests replace policy-only tests; non-object JSON reports ERROR
+  rather than raising AttributeError. Targeted 22 tests pass with network,
+  Apple Events and the system notifier denied; the deliberate omitted-injection
+  control is caught. This does not activate the legacy monitor or prove the
+  current Clef/Cloudflare judge chain healthy.
+
 - Cascade: paid fallback on local failure (`4fd0f367`), fence-tested live;
   deterministic pre-rule for the destructive class (`d5348d42`).
 - Memory filter: removal path with file switch, verified live both ways

@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_3274939210085ffa29ff542c69fe2882a333adf52eb76a8bc18c39b8926f8606",
+ "limitations": [
+  "Author verification only; no non-author close, live API/service/judge health, PUSHED or scanner temp-policy compliance claim"
+ ],
+ "operation": "jh6f hermetic notifier and actual HTTP-boundary author verification",
+ "parameters": {
+  "bead": "jev-jh6f",
+  "subject_sha256": "c927ecfa4bcff39e623e0db32743cd49e4a5b2ef21f4f1f8e470a203b276861b"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 9796,
+  "sha256": "d72b65f40fb8867a341349cfc96c620f1871a93511e1c257a97d5e1e068147e9"
+ }
+}

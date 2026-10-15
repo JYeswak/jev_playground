@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """One live call to `jev-latest`; exit 1 when it no longer resolves to the pinned version.
 
-omp's judge role (find, auto-thinking; ~1,700 calls/day) can only use the `jev-latest` alias,
-and omp logs only the alias. TypeSafe's response body carries the resolved model id, so one
-cheap call tells us whether the alias has moved (jev-v87h). Costs ~282 input tokens.
+Legacy standalone TypeSafe alias monitor, not a health check for omp's current
+local Clef -> Cloudflare judge chain. TypeSafe's response body carries the resolved
+model id; an explicitly invoked call checks that alias only (jev-v87h).
 
 Run:  infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
         python3 scripts/jev-latest-canary.py
@@ -59,6 +59,9 @@ def main() -> int:
             response = json.load(reply)
     except Exception as error:  # the key is never part of the message
         print(f"ERROR: {type(error).__name__}: {error}")
+        return 3
+    if not isinstance(response, dict):
+        print("ERROR: response is not a JSON object")
         return 3
     code, message = verdict(response, args.expected)
     print(message)

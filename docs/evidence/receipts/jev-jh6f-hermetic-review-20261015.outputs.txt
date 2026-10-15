@@ -1,0 +1,78 @@
+{
+  "bead": "jev-jh6f",
+  "source_sha256": {
+    "scripts/test_jev_latest_canary_run.py": "5a114ea40956a3018bcbdb3b91999c6186c1cbcae7c01cbd7a075b27f661384d",
+    "scripts/test_jev_latest_canary.py": "5c30034aacd054e3a62cf10264fd96582d79fa47e8419e739b45ad671ecc2de2",
+    "scripts/jev-latest-canary.py": "1edb576aba707cad422e41bf57465157d00019d39f46314132d4d02e13bb3fb1",
+    "CHANGELOG.md": "4a11440c2d976f531d38e5bb62a4d47a00edf76ee48dabe5c4036b258d1750f5"
+  },
+  "subject_sha256": "c927ecfa4bcff39e623e0db32743cd49e4a5b2ef21f4f1f8e470a203b276861b",
+  "authority": "test",
+  "author": "JadeSpire",
+  "non_author_review": "PENDING",
+  "sandbox_profile": "(version 1) (allow default) (deny network*) (deny appleevent-send) (deny process-exec (literal \"/usr/bin/osascript\"))",
+  "tests_exit_code": 0,
+  "keyless_cli_exit_code": 2,
+  "notifier_control_exit_code": 0,
+  "ubs_exit_code": 0,
+  "ubs_temp_compliance": "FAIL: despite explicitly inherited owned TMPDIR, scanner printed /var/folders shadow path; no compliance pass or unchanged retry"
+}
+
+TEST STDOUT
+
+TEST STDERR
+test_captured_http_response_is_unchanged (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_http_failure_is_error_not_alias_movement (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_missing_key_never_opens_http_transport (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_missing_model_is_error_not_moved_or_ok (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_moved_http_alias_fails_loudly (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_nonobject_http_json_is_error_not_traceback (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_truncated_http_json_is_error_not_moved (scripts.test_jev_latest_canary.CanaryHTTPTests) ... ok
+test_auth_manager_failure_reports_auth_with_own_code (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_auth_text_overrides_canary_exit_1 (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_error_notifies (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_failing_notifier_leaves_runner_outcome_unchanged (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_help_has_no_repository_paths (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_hostile_output_stays_argv_data (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_log_line_shape_matches_history (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_missing_secret_manager_fails_closed (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_missing_tmpdir_refuses_without_tmp_files (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_moved_notifies (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_not_run_notifies (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_notifier_called_once_per_outcome_with_silence_on_ok (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_ok_records_no_notification (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_prechild_silent_failure_reports_auth (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+test_unknown_exit_fails_closed (scripts.test_jev_latest_canary_run.CanaryRunnerTest) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 13.031s
+
+OK
+
+ACTUAL KEYLESS CLI
+NOT_RUN: TYPESAFE_API_KEY is not set
+
+NOTIFIER NEGATIVE
+{"runner_exit": 3, "omitted_injection_trapped": true, "test_guard_rejected": true, "real_notifier": "OS_DENIED"}
+
+ORIGINAL SOURCE COUNTEREXAMPLE
+{"source_sha256": "059a99d6cf2904213f4b50de08561d1f63889b1cd739791f10ba11657b6c192d", "result": null, "exception": "AttributeError", "boundary": "unmodified HEAD source in memory; transport replaced; no network"}
+UBS STDOUT
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.control-flow.unreachable-code","rule_id":"py.control-flow.unreachable-code","severity":"info","count":6,"title":"Possible unreachable code after return — return 3, f\"ERROR: response has no model field: {sorted(response)}\"","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":36,"code":"return 3, f\"ERROR: response has no model field: {sorted(response)}\"","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L36"},{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":51,"code":"return 2","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L51"},{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":62,"code":"return 3","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L62"}]}
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.functions.missing-returns","rule_id":"py.functions.missing-returns","severity":"info","count":19,"title":"Some functions may lack return statements — def verdict(response: dict, expected: str) -> tuple[int, str]:","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":32,"code":"def verdict(response: dict, expected: str) -> tuple[int, str]:","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L32"},{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":42,"code":"def main() -> int:","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L42"},{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary.py","line":29,"code":"def setUp(self):","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary.py#L29"}]}
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.functions.nested-defs","rule_id":"py.functions.nested-defs","severity":"info","count":29,"title":"Nested functions - verify closures and lifetimes — def setUp(self):","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary.py","line":29,"code":"def setUp(self):","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary.py#L29"},{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary.py","line":35,"code":"def invoke(self, body=None, *, error=None, key=\"not-a-real-credential\"):","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary.py#L35"},{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary.py","line":52,"code":"def test_captured_http_response_is_unchanged(self):","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary.py#L52"}]}
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.io.open-no-encoding","rule_id":"py.io.open-no-encoding","severity":"info","count":1,"title":"open() missing encoding — with urllib.request.urlopen(request, timeout=20) as reply:","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/jev-latest-canary.py","line":58,"code":"with urllib.request.urlopen(request, timeout=20) as reply:","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/jev-latest-canary.py#L58"}]}
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.io.rmtree-ignore-errors","rule_id":"py.io.rmtree-ignore-errors","severity":"info","count":1,"title":"rmtree(ignore_errors=True) hides failures — shutil.rmtree(self.tmp, ignore_errors=True)","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary_run.py","line":99,"code":"shutil.rmtree(self.tmp, ignore_errors=True)","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary_run.py#L99"}]}
+{"type":"finding","project":"/Users/josh/Developer/jev","language":"python","rule":"py.subprocess-no-check","rule_id":"py.subprocess-no-check","severity":"info","count":2,"title":"py.subprocess-no-check: subprocess.run without check=... may silently ignore failures; consider check=True","description":"","samples":[{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary_run.py","line":62,"code":"proc = subprocess.run(","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary_run.py#L62"},{"file":"/Users/josh/Developer/jev/scripts/test_jev_latest_canary_run.py","line":217,"code":"proc = subprocess.run(","permalink":"https://github.com/JYeswak/jev_playground/blob/10e8ee0cd981da74df3cc9f9af71f7842cb85019/scripts/test_jev_latest_canary_run.py#L217"}]}
+{"type":"scanner","project":"/Users/josh/Developer/jev","language":"python","status":"ok","files":3,"critical":0,"warning":0,"info":58,"timestamp":"2026-10-15T19:42:15Z"}
+{"type":"totals","project":"/Users/josh/Developer/jev","status":"ok","failed_modules":[],"files":3,"critical":0,"warning":0,"info":58,"timestamp":"2026-10-15 13:42:15"}
+
+UBS STDERR
+ℹ Preparing shadow workspace for 3 file(s) and 0 directory target(s)
+ℹ Scanning shadow workspace at /var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/tmp.qCzTPNOpg2/files_scan
+UBS Meta-Runner v5.4.17  2026-10-15 13:42:12
+Project: /Users/josh/Developer/jev
+Format:  jsonl
+Detected: python
+Scanning python...
+Finished python (1s)
