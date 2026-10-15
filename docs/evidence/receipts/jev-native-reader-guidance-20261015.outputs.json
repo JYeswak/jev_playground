@@ -1,0 +1,30 @@
+{
+  "bead": "jev-b35c.32.6",
+  "candidate": "17c3c6b5",
+  "author": "JadeSpire",
+  "source_path": "AGENTS.md",
+  "source_sha256": "08fc6eb40fccc6630ff44cf1a1debb243c8ea42d0c9b51b8b888251a79c39472",
+  "command": [
+    "br",
+    "--no-auto-import",
+    "--no-auto-flush",
+    "ready",
+    "--unassigned",
+    "--limit",
+    "1",
+    "--json",
+    "--exclude-label",
+    "human-gate",
+    "--exclude-label",
+    "owner-decision",
+    "--exclude-label",
+    "kind:process"
+  ],
+  "cwd": "/Users/josh/Developer/jev",
+  "exit_code": 0,
+  "stdout": "[]\n",
+  "stderr": "",
+  "earlier_fresh_reader": "JevGuidanceReader actually selected same native command0/empty, but REWORK on old stale coordination fallback; fallback is now removed in17c3c6b5, exact-revision independent reader still pending",
+  "unsafe_negative": "historical BV recipe rejected at inert command selection only; never executed",
+  "no_claim": "Guidance and one admitted read only; no universal/current-worker adoption, BV restoration, full DAG, model quality, capability credit or PUSHED"
+}

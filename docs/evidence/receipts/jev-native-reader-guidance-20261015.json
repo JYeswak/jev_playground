@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_30c25df43b909289d4b689d904db4d4b999e3ced1bb78d7456feab99a7d058f1",
+ "limitations": [
+  "Guidance and one admitted read only; no universal/current-worker adoption, BV restoration, full DAG, model quality, capability credit or PUSHED"
+ ],
+ "operation": "native-reader guidance author smoke, independent exact-revision review pending",
+ "parameters": {
+  "bead": "jev-b35c.32.6",
+  "candidate": "17c3c6b5",
+  "subject_sha256": "08fc6eb40fccc6630ff44cf1a1debb243c8ea42d0c9b51b8b888251a79c39472"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 1054,
+  "sha256": "853e2e3f45f81c6a0e17d167d5f854648079d7953ea570323ef8400fd27d1163"
+ }
+}
