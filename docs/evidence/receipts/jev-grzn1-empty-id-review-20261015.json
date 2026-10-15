@@ -1,0 +1,68 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_14e5781dabc05131baf0ebadc43f7baf28929bcddb99dc3d8bcbbc59f808b656",
+ "limitations": [
+  "Offline artifact audit only; no live L3 or model-quality claim.",
+  "Existing18tests pass but new malformed empty-identity CLI counterexample is wrongly accepted; review REWORK.",
+  "Author ownership preserved; no source edits or publication/closure claim."
+ ],
+ "operation": "jev.grzn1.non-author.empty-identity",
+ "parameters": {
+  "bead": "jev-grzn.1",
+  "candidate": "e7c366fb921f38be3bdcb53f04d980233f3000b5"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_empty_identity": "PASS",
+  "candidate": "e7c366fb921f38be3bdcb53f04d980233f3000b5",
+  "cli_controls": [
+   {
+    "case": "healthy",
+    "exit_code": 0,
+    "live_l3_proven": false,
+    "rows": [
+     {
+      "case": "positive",
+      "status": "PASS",
+      "surface": "gate-observe"
+     },
+     {
+      "case": "negative",
+      "status": "PASS",
+      "surface": "gate-observe"
+     }
+    ],
+    "status": "PASS",
+    "stderr_bytes": 0,
+    "stdout_sha256": "da94df2e7b59036bbcfe7a609a4aef4600b8d6b467167be1c101be9abf6d3025"
+   },
+   {
+    "case": "empty-id",
+    "exit_code": 0,
+    "live_l3_proven": false,
+    "rows": [
+     {
+      "case": "positive",
+      "status": "PASS",
+      "surface": ""
+     },
+     {
+      "case": "negative",
+      "status": "PASS",
+      "surface": ""
+     }
+    ],
+    "status": "PASS",
+    "stderr_bytes": 0,
+    "stdout_sha256": "575835d212d0aabee4548118089e4634fe21a7f426c6c4e162b7b6275c31e011"
+   }
+  ],
+  "expected_empty_identity": "REFUSED_OR_FAIL",
+  "model_calls": 0,
+  "review_status": "REWORK",
+  "source_sha256": "fb0052910592af4868fb87ae595196ad029160fa3e08a5f9aa6ea731c22e2a7c",
+  "unit_suite_exit": 0,
+  "unit_tests_passed": 18
+ }
+}
