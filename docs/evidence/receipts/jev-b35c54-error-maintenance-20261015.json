@@ -1,0 +1,22 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_835e71458d7ac1dcb5e0e9ed0d1155cb8e93307dd71b9c173ed6a7f7469030d6",
+ "limitations": [
+  "Author-only working-tree tests; not exact candidate export or publication.",
+  "HEAD already has error import; peer prototype integration restored, no novel backend capability.",
+  "Full-kit baseline unverified; raw UBS warning8/info33 retained; formatter wording assertions removed, exit6 retained."
+ ],
+ "operation": "cli.error-maintenance",
+ "parameters": {
+  "bead": "jev-b35c.54",
+  "output_path": "docs/evidence/receipts/jev-b35c54-error-maintenance-20261015.outputs.txt",
+  "subject_path": "kit/test/errors.test.mjs",
+  "subject_sha256": "33e84f954de07773dd337725d15073dd567810d4f0ee0accfbb680770b2e3f72"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 15354,
+  "sha256": "1a27cf9259032a0d99f5fe0c6c55f69b2ec10250e306124f306fdcb782cd5c9e"
+ }
+}

@@ -86,3 +86,7 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
   machine-local `source_repo_path`, as documented by br; portable
   `source_repo` and all other pre-existing issue facts are preserved.
   No bead closure or classifier verdict implied.
+- CLI error regression coverage (`jev-b35c.54`): retain the online-required
+  exit-code check without pinning incidental formatter copy. Human and robot
+  usage smokes return exit 64; 14 keyless error cases pass. This is maintenance,
+  not a new backend capability or a full-kit pass.

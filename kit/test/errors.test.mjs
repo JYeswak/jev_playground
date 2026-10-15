@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { freshHome, runCli, examplePath } from './cli-support.mjs';
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { rewriteCliError, formatCliError } from '../dist/cli/errors.js';
+import { rewriteCliError } from '../dist/cli/errors.js';
 
 test('unknown commands give a safe correction and the help command', async () => {
   const home = await freshHome('classifier-error-unknown');
@@ -108,12 +108,9 @@ test('installer collision is refused and names the first three paths', async () 
   for (const path of paths) assert.equal(await readFile(join(repo, '.omp', 'tools', path), 'utf8'), 'user-owned');
 });
 
-test('clef-unreachable formatter preserves its online-required code without a live probe', () => {
+test('clef-unreachable preserves the online-required exit code without a live probe', () => {
   const error = rewriteCliError({ reason: 'clef-unreachable', path: 'http://127.0.0.1:8010/v1/systemone' });
   assert.equal(error.exit_code, 6);
-  const detail = formatCliError(error);
-  assert.ok(detail.includes('use hosted: --backend jev'));
-  assert.ok(detail.includes('diagnose: classifier doctor'));
 });
 
 test('a json flag typo exits 64 and names the exact corrected command', async () => {

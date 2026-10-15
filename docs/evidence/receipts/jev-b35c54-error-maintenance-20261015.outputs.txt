@@ -1,0 +1,247 @@
+CLI ERROR MAINTENANCE — jev-b35c.54
+
+Scope: working-tree prototype lost an import that HEAD already contains. No new shipped backend capability. Preserve surrounding peer transport/preflight WIP; do not stage kit/bin/jev.mjs wholesale.
+
+COMMAND: /opt/homebrew/bin/node kit/bin/jev.mjs clasify
+EXIT: 64
+STDOUT:
+
+STDERR:
+error: unknown command 'clasify'
+did you mean: classifier classify
+see: classifier --help
+
+COMMAND: /opt/homebrew/bin/node kit/bin/jev.mjs clasify --robot
+EXIT: 64
+STDOUT:
+{"ok":false,"schema":"classifier.cli.v1","status":"USAGE","data":null,"meta":{"version":"0.0.0","backend":"jev","backend_requested":"jev","fallback_reason":null,"model":null,"latency_ms":0,"usage":null},"warnings":[],"commands":["classifier --help"],"errors":[{"code":"USAGE","exit_code":64,"message":"error: unknown command 'clasify'\ndid you mean: classifier classify --robot","remediation":[],"see":"classifier --help"}]}
+
+STDERR:
+error: unknown command 'clasify'
+did you mean: classifier classify --robot
+see: classifier --help
+
+
+COMMAND: /opt/homebrew/bin/node --test kit/test/errors.test.mjs
+EXIT: 0
+STDOUT:
+TAP version 13
+# Subtest: unknown commands give a safe correction and the help command
+ok 1 - unknown commands give a safe correction and the help command
+  ---
+  duration_ms: 81.434083
+  type: 'test'
+  ...
+# Subtest: a one-character flag typo is interpreted and reported without changing the JSON result
+ok 2 - a one-character flag typo is interpreted and reported without changing the JSON result
+  ---
+  duration_ms: 547.823583
+  type: 'test'
+  ...
+# Subtest: missing input files report the option, example, remediation, and no_input exit
+ok 3 - missing input files report the option, example, remediation, and no_input exit
+  ---
+  duration_ms: 80.277458
+  type: 'test'
+  ...
+# Subtest: an existing label path is read normally and never gets the missing-input status
+ok 4 - an existing label path is read normally and never gets the missing-input status
+  ---
+  duration_ms: 85.679291
+  type: 'test'
+  ...
+# Subtest: an unknown flag is ignored with a warning but a near miss runs its documented correction
+ok 5 - an unknown flag is ignored with a warning but a near miss runs its documented correction
+  ---
+  duration_ms: 581.348917
+  type: 'test'
+  ...
+# Subtest: a singular label flag points to the required plural flag and real example
+ok 6 - a singular label flag points to the required plural flag and real example
+  ---
+  duration_ms: 73.011834
+  type: 'test'
+  ...
+# Subtest: a missing API key is explicit NOT_RUN and points to offline operation
+ok 7 - a missing API key is explicit NOT_RUN and points to offline operation
+  ---
+  duration_ms: 73.0635
+  type: 'test'
+  ...
+# Subtest: an unoffered fake label is refused without returning a decision
+ok 8 - an unoffered fake label is refused without returning a decision
+  ---
+  duration_ms: 78.059083
+  type: 'test'
+  ...
+# Subtest: more than twenty rank candidates refuses chunking with a safe reduction
+ok 9 - more than twenty rank candidates refuses chunking with a safe reduction
+  ---
+  duration_ms: 77.0835
+  type: 'test'
+  ...
+# Subtest: fake gate mismatch points to the captured command
+ok 10 - fake gate mismatch points to the captured command
+  ---
+  duration_ms: 75.760833
+  type: 'test'
+  ...
+# Subtest: installer collision is refused and names the first three paths
+ok 11 - installer collision is refused and names the first three paths
+  ---
+  duration_ms: 81.165166
+  type: 'test'
+  ...
+# Subtest: clef-unreachable preserves the online-required exit code without a live probe
+ok 12 - clef-unreachable preserves the online-required exit code without a live probe
+  ---
+  duration_ms: 0.274125
+  type: 'test'
+  ...
+# Subtest: a json flag typo exits 64 and names the exact corrected command
+ok 13 - a json flag typo exits 64 and names the exact corrected command
+  ---
+  duration_ms: 75.052417
+  type: 'test'
+  ...
+# Subtest: failure status is identical across human and robot output modes
+ok 14 - failure status is identical across human and robot output modes
+  ---
+  duration_ms: 217.237917
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2209.5065
+
+STDERR:
+
+COMMAND: nice -n 10 ubs kit/test/errors.test.mjs
+EXIT: 0
+STDOUT:
+ℹ Scanning one file directly (no workspace): /Users/josh/Developer/jev/kit/test/errors.test.mjs
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ██╗   ██╗██╗  ████████╗██╗███╗   ███╗ █████╗ ████████╗███████╗              ║
+║  ██║   ██║██║  ╚══██╔══╝██║████╗ ████║██╔══██╗╚══██╔══╝██╔════╝              ║
+║  ██║   ██║██║     ██║   ██║██╔████╔██║███████║   ██║   █████╗                ║
+║  ██║   ██║██║     ██║   ██║██║╚██╔╝██║██╔══██║   ██║   ██╔══╝                ║
+║  ╚██████╔╝███████╗██║   ██║██║ ╚═╝ ██║██║  ██║   ██║   ███████╗              ║
+║   ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝              ║
+║                                                                              ║
+║  ██████╗ ██╗   ██╗ ██████╗         __       __                               ║
+║  ██╔══██╗██║   ██║██╔════╝         \ `-'"-'` /                               ║
+║  ██████╔╝██║   ██║██║  ███╗        / \_   _/ \                               ║
+║  ██╔══██╗██║   ██║██║   ██║        |  d\_/b  |                               ║
+║  ██████╔╝╚██████╔╝╚██████╔╝       .'\   V   /'.                              ║
+║  ╚═════╝  ╚═════╝  ╚═════╝        /   '-...-'   \                            ║
+║                                  | /         \ |                             ║
+║                                  \/\         /\/                             ║
+║                                  ==(||)---(||)==                             ║
+║                                                                              ║
+║  ███████╗  ██████╗   █████╗ ███╗   ██╗███╗   ██╗███████╗██████╗              ║
+║  ██╔════╝  ██╔═══╝  ██╔══██╗████╗  ██║████╗  ██║██╔════╝██╔══██╗             ║
+║  ███████╗  ██║      ███████║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝             ║
+║  ╚════██║  ██║      ██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗             ║
+║  ███████║  ██████╗  ██║  ██║██║ ╚████║██║ ╚████║███████╗██║  ██║             ║
+║  ╚══════╝  ╚═════╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝                  ║
+║                                                                              ║
+║   JS / TS • PYTHON • C / C++ • RUST • GO • JAVA • RUBY                       ║
+║   SWIFT • C# • ELIXIR                                                        ║
+║                    UBS: ULTIMATE BUG SCANNER • SARIF FUSION ☄️               ║
+║                                                                              ║
+║                                                                              ║
+║                     Night Owl QA                                             ║
+║                     “We see bugs before you do.”                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+UBS Meta-Runner v5.4.17  2026-10-15 04:53:35
+Project: /Users/josh/Developer/jev
+Format:  text
+Detected: js
+
+──────── js ────────
+UBS module: js (contract v2) — kit/test/errors.test.mjs
+Files scanned: 1
+[warning] JSON.parse without try/catch (8 found) — js.json-parse-without-try
+    Wrap JSON.parse in try/catch or validate input
+    kit/test/errors.test.mjs:21  JSON.parse without try/catch; malformed input will throw (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L21)
+    kit/test/errors.test.mjs:30  JSON.parse without try/catch; malformed input will throw (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L30)
+    kit/test/errors.test.mjs:34  JSON.parse without try/catch; malformed input will throw (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L34)
+    kit/test/errors.test.mjs:39  JSON.parse without try/catch; malformed input will throw (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L39)
+    kit/test/errors.test.mjs:47  JSON.parse without try/catch; malformed input will throw (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L47)
+
+ASYNC/AWAIT & PROMISE PITFALLS
+[info] await outside try/catch (19 found) — js.async.await-no-try
+    Wrap awaited calls in try/catch to surface rejections
+    kit/test/errors.test.mjs:9  await without try/catch; wrap to handle rejections (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L9)
+    kit/test/errors.test.mjs:17  await without try/catch; wrap to handle rejections (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L17)
+    kit/test/errors.test.mjs:25  await without try/catch; wrap to handle rejections (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L25)
+    kit/test/errors.test.mjs:33  await without try/catch; wrap to handle rejections (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L33)
+    kit/test/errors.test.mjs:34  await without try/catch; wrap to handle rejections (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L34)
+
+FUNCTION & SCOPE ISSUES
+[info] js.function-scope.arrow-implicit-return (13 found) — js.function-scope.arrow-implicit-return
+    kit/test/errors.test.mjs:8  Arrow functions with { } - verify return intent — test('unknown commands give a safe correction and the help command', async () => { (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L8)
+    kit/test/errors.test.mjs:16  Arrow functions with { } - verify return intent — test('a one-character flag typo is interpreted and reported without changing the JSON result', async () => { (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L16)
+    kit/test/errors.test.mjs:24  Arrow functions with { } - verify return intent — test('missing input files report the option, example, remediation, and no_input exit', async () => { (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L24)
+    kit/test/errors.test.mjs:32  Arrow functions with { } - verify return intent — test('an existing label path is read normally and never gets the missing-input status', async () => { (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L32)
+    kit/test/errors.test.mjs:42  Arrow functions with { } - verify return intent — test('an unknown flag is ignored with a warning but a near miss runs its documented correction', async () => { (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L42)
+[info] security.http-url (1 found) — security.http-url
+    kit/test/errors.test.mjs:112  Plain HTTP URL detected; ensure HTTPS is used for production (https://github.com/JYeswak/jev_playground/blob/db976845ecd24fe63a354cef286949ac8a2d645a/kit/test/errors.test.mjs#L112)
+good: Deep property chains are guarded
+good: Error handling looks solid
+good: Resource lifecycle appears balanced
+Critical issues: 0
+Warning issues: 8
+Info items: 33
+Report generated: 2026-10-15T10:53:38Z
+NULL SAFETY & DEFENSIVE PROGRAMMING
+MATH & ARITHMETIC PITFALLS
+ARRAY & COLLECTION SAFETY
+TYPE COERCION & COMPARISON TRAPS
+ERROR HANDLING ANTI-PATTERNS
+SECURITY VULNERABILITIES
+PARSING & TYPE CONVERSION BUGS
+CONTROL FLOW GOTCHAS
+DEBUGGING & PRODUCTION CODE
+MEMORY LEAKS & PERFORMANCE
+VARIABLE & SCOPE ISSUES
+CODE QUALITY MARKERS
+REGEX & STRING SAFETY
+DOM MANIPULATION SAFETY
+TYPESCRIPT STRICTNESS
+NODE.JS I/O & MODULES
+RESOURCE LIFECYCLE CORRELATION
+
+Summary Statistics:
+Files scanned: 1
+Critical issues: 0
+Warning issues: 8
+Info items: 33
+
+──────── Combined Summary ────────
+Files: 1
+Critical: 0
+Warning: 8
+Info: 33
+
+STDERR:
+ℹ ast-grep (path): /opt/homebrew/bin/ast-grep
+Scanning js...
+Finished js (1s)
+
+UBS TRIAGE (raw labels preserved):
+warning js.json-parse-without-try x8 -> human_severity=none, triage_verdict=false_positive: test must fail if child CLI emits malformed JSON, not catch and mask it.
+info await-no-try x19 -> human_severity=none, triage_verdict=false_positive: node:test captures async rejection as test failure.
+info arrow-implicit-return x13 -> human_severity=none, triage_verdict=false_positive: procedural test callbacks need no result.
+info security.http-url x1 -> human_severity=none, triage_verdict=false_positive: loopback string in pure formatter-policy test, no network request.
+Raw total: critical0 warning8 info33, not scanner-clean. No suppressions or gate changes.
+
+LIMITS: full-kit baseline not rerun or claimed green; no model calls; author-only working-tree proof, not exact-candidate archive replay or production publication; two formatter-copy assertions deleted, original semantic exit6 retained.
