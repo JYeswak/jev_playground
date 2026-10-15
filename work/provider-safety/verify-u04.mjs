@@ -208,6 +208,30 @@ const readApproved = () => configText(APPROVED);
   );
 }
 
+// --- Planted control: denied approval + working user session -> user key,
+// approval path never consulted (RubyMeadow review 3274 scope gap). ---
+{
+  const calls = [];
+  const tCalls = [];
+  const order = [];
+  const provider = makeInfisicalKeyProvider(
+    fakeRunner({ calls, order }),
+    Date.now,
+    "/synthetic/bin/infisical",
+    "/synthetic/home",
+    readApproved,
+    { origin: DENIED, transport: fakeTransport(tCalls) },
+  );
+  const value = await provider();
+  check("denied approval with working user session still returns user key", value === SYN.key);
+  check("denied approval makes zero transport calls on user leg", tCalls.length === 0, `transport=${tCalls.length}`);
+  check(
+    "denied approval never reaches machine child on user leg",
+    calls.length === 1,
+    `runner calls=${calls.length}`,
+  );
+}
+
 // --- Source hashes + global guards ---
 const SRC = "work/jev-client/src/infisical-key.ts";
 const srcBytes = readFileSync(new URL("../jev-client/src/infisical-key.ts", import.meta.url));
