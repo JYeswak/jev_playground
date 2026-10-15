@@ -385,10 +385,16 @@ def _bind_cohort_to_frozen_source(cohort: dict, cohort_path: Path) -> None:
             f"reach.json rows_file missing or unreadable: {source.get('rows_file')!r}"
         )
     try:
-        with open(rows_path, "rb") as handle:
-            row_count = sum(1 for line in handle if line.strip())
+        rows_bytes = rows_path.read_bytes()
     except OSError as exc:
         raise ValueError(f"reach.json rows_file unreadable: {exc}") from exc
+    row_count = sum(1 for line in rows_bytes.splitlines() if line.strip())
+    actual_rows_digest = hashlib.sha256(rows_bytes).hexdigest()
+    want_rows_digest = cohort.get("rows_sha256")
+    if want_rows_digest is None:
+        raise ValueError("reach.json must carry rows_sha256 (full-file digest)")
+    if actual_rows_digest != want_rows_digest:
+        raise ValueError("reach.json rows_sha256 disagrees with rows file bytes")
     receipt_path = _resolve_cohort_source(source.get("receipt"), cohort_path)
     if receipt_path is None:
         raise ValueError(f"reach.json receipt missing or unreadable: {source.get('receipt')!r}")

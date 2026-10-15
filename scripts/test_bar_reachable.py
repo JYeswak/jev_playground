@@ -183,6 +183,7 @@ class BarReachabilityTests(unittest.TestCase):
             "covered_rows": covered,
             "harm_rows": harm,
             "missing_outcomes": rows - covered,
+            "rows_sha256": digest,
             "source": {
                 "rows_file": "rows.jsonl",
                 "window_rows_sha256": digest,
@@ -240,6 +241,18 @@ class BarReachabilityTests(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(receipt["status"], "ERROR")
             self.assertIn("disagrees with frozen source", receipt["error"])
+
+    def test_cohort_same_count_byte_tamper_refuses(self):
+        with TemporaryDirectory() as tmp:
+            root = self._cohort_tree(Path(tmp), rows=100, covered=45, harm=0)
+            rows_path = root / "rows.jsonl"
+            raw = rows_path.read_bytes().replace(b'"id": 7}', b'"id": 8}', 1)
+            rows_path.write_bytes(raw)
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+            self.assertIn("rows_sha256 disagrees", receipt["error"])
+
 
     def test_cohort_missing_counts_refuses(self):
         with TemporaryDirectory() as tmp:
