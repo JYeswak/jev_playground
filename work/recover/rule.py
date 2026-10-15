@@ -78,9 +78,17 @@ def same_command(first: dict, second: dict) -> bool:
 
 
 def next_action_kind(failed_call: dict, next_call: dict | None) -> str | None:
-    """'retry' when the next call repeats the failed call, else 'change'."""
+    """Classify the observed next action: 'retry' for a repeated call,
+    're-read' for an edit failure followed by a read of the same file,
+    otherwise 'change'."""
     if next_call is None:
         return None
+    if (failed_call.get("name") == "edit" and next_call.get("name") == "read"
+            and isinstance(failed_call.get("arguments"), dict)
+            and isinstance(next_call.get("arguments"), dict)
+            and failed_call["arguments"].get("path") is not None
+            and failed_call["arguments"].get("path") == next_call["arguments"].get("path")):
+        return "re-read"
     if next_call.get("name") != failed_call.get("name"):
         return "change"
     if same_command(failed_call.get("arguments", {}), next_call.get("arguments", {})):

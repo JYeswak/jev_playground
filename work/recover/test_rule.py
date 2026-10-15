@@ -128,6 +128,19 @@ class ImputationRefusalTest(unittest.TestCase):
         self.assertIn("NOT_IDENTIFIABLE", str(ctx.exception))
 
 
+def edit_fail_rows(path, next_path):
+    return [
+        {"type": "message", "message": {"role": "assistant", "content": [
+            {"type": "toolCall", "id": "e1", "name": "edit", "arguments": {"path": path}}]}},
+        {"type": "message", "message": {"role": "toolResult", "toolCallId": "e1", "toolName": "edit",
+                                        "isError": True, "content": [{"type": "text", "text": "edit failed: stale_tag mismatch"}]}},
+        {"type": "message", "message": {"role": "assistant", "content": [
+            {"type": "toolCall", "id": "r1", "name": "read", "arguments": {"path": next_path}}]}},
+        {"type": "message", "message": {"role": "toolResult", "toolCallId": "r1", "toolName": "read",
+                                        "isError": False, "content": []}},
+    ]
+
+
 class CohortJoinTest(unittest.TestCase):
     def test_timeout_retry_then_success_joins_agree(self):
         rows = episode_rows("curl slow", "timed out", "curl slow")
@@ -148,6 +161,17 @@ class CohortJoinTest(unittest.TestCase):
         self.assertEqual(next_action_kind(bash_call("a"), bash_call("b")), "change")
         self.assertIsNone(next_action_kind(bash_call("a"), None))
 
+
+    def test_stale_tag_same_file_reread_agrees(self):
+        ep = score_rows(edit_fail_rows("a.ts", "a.ts"))["episodes"][0]
+        self.assertEqual((ep["tool"], ep["class"], ep["action"]), ("edit", "stale-tag", "re-read"))
+        self.assertTrue(ep["agree"])
+        self.assertFalse(flag_violation("edit", "stale-tag", "re-read"))
+
+    def test_stale_tag_unrelated_read_is_change(self):
+        ep = score_rows(edit_fail_rows("a.ts", "b.ts"))["episodes"][0]
+        self.assertEqual(ep["action"], "change")
+        self.assertFalse(ep["agree"])
 
 class SummarizeTest(unittest.TestCase):
     def test_small_n_reports_not_powered(self):
