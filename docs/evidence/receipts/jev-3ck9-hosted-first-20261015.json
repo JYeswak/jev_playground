@@ -1,0 +1,68 @@
+{
+ "authority": "live",
+ "confidence": "observed",
+ "evidence_id": "ev_5e7afe8f53282fdd0a9b85e4acc85ade01e76971d13f86dcb3f300f02cf346eb",
+ "limitations": [
+  "Availability only; not parity, non-inferiority, per-use value or full parent acceptance",
+  "Hosted costs are catalog estimates; actual billing balance was not queried; hosted quota is not unlimited",
+  "Fresh native sessions disabled extension, skill and rule discovery; native find and unexpected-stop remained active",
+  "Native footer has counts/cost but no provider label; local502 to hosted success proven in same-session model_usage rows",
+  "Globals are mutable installed state; hashes bind this observed snapshot, not immutable publication"
+ ],
+ "operation": "jev-3ck9-hosted-first-availability",
+ "parameters": {
+  "authority_am": "54511,54569",
+  "subject_sha256": "d8acda90d69f0a74b9184952598551fa9308552f6413785f9abe94413ac439ac"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "badtoken_stdout_sha256": "4953c3a1209d0b7ce07620073c3d5ebb852591de349487b73a9c2cece09c95bb",
+  "configured_profiles": [
+   "default",
+   "claude",
+   "codex",
+   "grok",
+   "muse"
+  ],
+  "date_utc": "2026-10-15",
+  "fallback": [
+   "cloudflare-workers-ai/@cf/cloudflare/clef-flash"
+  ],
+  "find_catalog_usd": "0.000239286",
+  "find_errors": 0,
+  "find_fresh_exit": 0,
+  "find_hits": [
+   "kit/src/doctor/detectors/drift.mjs"
+  ],
+  "find_input_tokens": 6297,
+  "find_requests": 3,
+  "find_stdout_sha256": "9ab3fc40dbe866148d3d7edaafed577dea2f12757410e4c1b2d8e0947f6d8d74",
+  "find_wall_ms": "6968.903",
+  "global_config_hashes": {
+   "claude/config.yml": "6526f8b259ef3a93e0caf7c60c7cade9db6c564a940f027e69fea1d4de8f1d0a",
+   "claude/models.yml": "46c965da93e4108768d5f05d1e9511c1db7efbb9ff9a30d0d8de53a199183d7d",
+   "codex/config.yml": "9ebb9d3d8639c433c5743499ce3b31bce89b073b76cf60143789e330be28839d",
+   "codex/models.yml": "4e95e8f7f70c1fe1f3feb38d60cdbaaa9f189ffeb63f3a328b112cab20a26c6e",
+   "default/config.yml": "2bef73f984e17cd97dd7473f39388dfc4f5dc8818c77d40ccf3e8f76bd97ce64",
+   "default/models.yml": "4087838cad77e4cdb12abc017be51d493a286a0716e5347d8e4075884c859739",
+   "grok/config.yml": "dc886d7b8d5e2c65e8899befdef5f603018377906f5214fca35739bf68804b13",
+   "grok/models.yml": "8fde6f1ab72efa54fd8309ff16dc4c8eee4ce8b1418b171ba926e74f66a61fa2",
+   "muse/config.yml": "edf639fe2a083d32b74fb6769a5423ac2f21bc8145ce78138805422b1981e4b6",
+   "muse/models.yml": "9ebe0bfb6d0efc1462a104d447a171d39e49372d21a69eef197fb302aaf26997"
+  },
+  "model": "cloudflare-workers-ai/@cf/cloudflare/clef-flash",
+  "negative_errors": 3,
+  "negative_exit": 1,
+  "negative_requests": 3,
+  "negative_status": 401,
+  "postnegative_errors": 0,
+  "postnegative_exit": 0,
+  "postnegative_input_tokens": 3560,
+  "postnegative_profile": "claude",
+  "primary": "clef/clef-flash",
+  "runtime": "omp18.11.0",
+  "session_journal_sha256": "435404dd69164cba450ae4fcd8d93c1f317e4dd3ec59ad38b5954087193da295",
+  "total_catalog_usd": "0.000706838",
+  "total_hosted_input_tokens": 18601
+ }
+}
