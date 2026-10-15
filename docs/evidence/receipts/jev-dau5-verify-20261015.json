@@ -1,0 +1,21 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_5c7f26cebd6f4abe9287193473c62a9aaf7c91dd518942ac217f26e7e6095ce7",
+ "limitations": [
+  "Recorded temporal population only; secondary original bar fails; no live activation or new model-quality/cost claim"
+ ],
+ "operation": "dau5-independent-recorded-replay",
+ "parameters": {
+  "bead": "jev-dau5.1",
+  "new_model_calls": "0",
+  "original_bar_pass": "false",
+  "source_commit": "100422b9306114898c802478452427eeea85415a",
+  "tests": "6-pass-0-fail-exit0"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 1567,
+  "sha256": "39a55156c3f6d66524dfc8d0fefccc7d046256c8802a32196352f3cd8921d029"
+ }
+}
