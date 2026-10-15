@@ -422,16 +422,13 @@ by the session's tool count.
 
 ---
 
-## Fleet Coordination — omp Agents in One NTM Session
+## Fleet Coordination — canonical omp-kit plane
 
-The `jev` tmux session runs one human pane (0, Joshua), a conductor (pane 1), and worker panes (2+),
-all omp. The project's `session-stop` hook gives each worker one continuation: finish its own bead,
-then claim from `br ready`, else report `IDLE pane N` to pane 1.
-
-- **Send:** `ntm send jev --pane=<N> "<message>"` (a long packet: `--file <path>`). Never relay a
-  conductor message to other panes.
-- **Callback format:** `ntm send jev --pane=1 "DONE <bead> <commit> <one-line evidence>"` or
-  `"BLOCKED <bead> <exact blocker + what you tried>"`.
+Read `skill://omp-kit-orchestration` for the live seat map, worker objective and
+delivery rules. Jev's moved Tern seats use its interim identity/oracle route, not the
+historical tmux pane numbers. Workers pull through the native queue below; the director
+handles DAG, sizing, custody and review exceptions, not per-bead implementation dispatch.
+Use the canonical pull/review/wait loop rather than an abbreviated queue or IDLE fallback.
 - **Agent Mail** is for reservations and durable messages: reserve exact paths before editing, bead
   id as the reason and thread id.
 - **Never disturb another agent's work.** Working-tree changes you did not make are normal here
@@ -439,34 +436,36 @@ then claim from `br ready`, else report `IDLE pane N` to pane 1.
   ask about them.
 - **One agent owns a tree at a time;** say which clone you are in before running its suite.
 - **Never run a live Jev call on another agent's behalf without saying so.**
-- **Packets carry:** the mission line, the bead id, the acceptance (positive observable, planted
-  negative, NO-CLAIM), the verifier, and the callback. Never dispatch "make the tests pass".
+- **Acceptance contracts carry:** the mission, bead, positive observable, planted negative,
+  NO-CLAIM boundary and non-author verifier. Never substitute "make the tests pass".
 
 ## Beads (br) — Dependency-Aware Issue Tracking
 
-`br` never runs git: after `br sync --flush-only`, stage `.beads/issues.jsonl` yourself. Every bead
-carries **WHAT** (the observable change), **WHY** (the measurement or failure behind it), and
-**ACCEPTANCE** (the command a fresh agent runs, with a planted negative and a NO-CLAIM). Close with
-evidence (command and output, commit, receipt), never on a word. **Never close your own bead:**
-comment the evidence, leave it `in_progress`, and the named verifier re-runs and closes. A parked
-bead is `deferred` with a one-line reason; a blocked one names its trigger, owner and first command
-after the trigger.
+Use native `br` during the G13 reader hold, with `--no-auto-import --no-auto-flush` on
+every invocation. The canonical pull/review procedure is `skill://omp-kit-orchestration`;
+its current worker objective supplies the exact loop. Every bead carries **WHAT**, **WHY**,
+testable **ACCEPTANCE**, a planted negative and a **NO-CLAIM** boundary.
+
+Workers read product queues with all three process-label exclusions:
 
 ```bash
-br ready --json                       # unblocked work
-br show <id> --json                   # full detail with dependencies
-br update <id> --status in_progress   # claim
-br comments add <id> "evidence ..."
-br close <id> --reason "command + output + commit"
-br sync --flush-only                  # export JSONL (no git)
+br --no-auto-import --no-auto-flush ready --unassigned --limit 1 --json --exclude-label human-gate --exclude-label owner-decision --exclude-label kind:process
+br --no-auto-import --no-auto-flush list --status in_review --json --exclude-label human-gate --exclude-label owner-decision --exclude-label kind:process
 ```
 
-## bv — Graph-Aware Triage Engine
+Read the selected bead with `br --no-auto-import --no-auto-flush show <id> --json`;
+`show` does not accept the exclusion flags. Claim atomically with `update <id> --claim`,
+and pass `--actor <your actual agent name>` on every write. A refused claim means refresh
+the eligible queue, not overwrite its owner. Raw-ready counts include assigned or process
+work and are not unassigned product supply.
 
-`bv` ranks the bead graph (PageRank, betweenness, critical path, cycles). **Use only `--robot-*`
-flags: bare `bv` launches a TUI that blocks the session.** Start with `bv --robot-triage`; only
-`quick_ref.top_picks` and non-empty `claim_command` fields are claimable. Run it from this repo. The
-full flag reference is the managed block at the end of this file.
+## Native graph reads during G13
+
+Live BV and stock-SQLite tracker readers remain held. Use the native queue above and
+native `br` dependency commands. `br --no-auto-import --no-auto-flush dep cycles` proves
+only the cycle result; missing hidden-parent or event coverage stays UNKNOWN, not `dag-ok`.
+The temporary hold retires only after canonical reader certification and an explicit G13
+lift through omp-kit; neither an old robot-command recipe nor a clean cycle check lifts it.
 
 ## UBS — Ultimate Bug Scanner
 
@@ -517,91 +516,37 @@ If Joshua asks you to use your built-in TODO functionality, do it without arguin
 
 ---
 
-## Beads Workflow Integration
+## Native Beads Workflow Integration
 
-This project uses [beads_rust](https://github.com/Dicklesworthstone/beads_rust) (`br`) for issue tracking and [beads_viewer](https://github.com/Dicklesworthstone/beads_viewer) (`bv`) for graph-aware triage. Issues are stored in `.beads/` and tracked in git. Current `br` workspaces normally export `.beads/issues.jsonl`; older `bd`/legacy workspaces may use `.beads/beads.jsonl`. `bv` auto-discovers the supported JSONL files, so agents should use `br`/`bv` commands instead of hard-coding a single filename.
+The instructions in this block use the canonical omp-kit G13 route, not the historical
+BV-first recipe. Operating protocol and its future reader certification belong to omp-kit;
+this file supplies project guidance, not a second local orchestrator.
 
-### Using bv as an AI sidecar
+### Pull and report
 
-bv is a graph-aware triage engine for Beads projects. Instead of parsing .beads/issues.jsonl / .beads/beads.jsonl directly or hallucinating graph traversal, use robot flags for deterministic, dependency-aware outputs with precomputed metrics (PageRank, betweenness, critical path, cycles, HITS, eigenvector, k-core).
+1. Read Agent Mail replies with `include_bodies=true, mark_read=false`; act before acknowledging.
+2. Finish the held bead; otherwise use the native product queue under **Beads (br)** above.
+3. Read the actual bead before work and claim atomically with the actual actor.
+4. Implement and exercise its acceptance. Record exact source, complete output, exit code,
+   and NO-CLAIM limits on the bead. Author completion goes to `in_review`; it is not a close.
+5. Between beads, a non-author verifies a waiting product review before taking new work.
+   A failing acceptance is REWORK, not a narrowed close. Preserve the original parent outcome.
+6. Questions and protected actions go on the bead with `needs-director` plus an ack-required
+   mail line. Keep config, service, secret, raw-push, other-owner-state and fleet-pane routes.
+7. With no eligible work or review, wait one actual `sleep 600`; do not repeat unchanged checks.
 
-**Scope boundary:** bv handles *what to work on* (triage, priority, planning). `br` handles creating, modifying, and closing beads.
+### Native graph and save boundaries
 
-**CRITICAL: Use ONLY --robot-* flags. Bare bv launches an interactive TUI that blocks your session.**
-
-#### The Workflow: Start With Triage
-
-**`bv --robot-triage` is your single entry point.** It returns everything you need in one call:
-- `quick_ref`: at-a-glance counts + top 3 picks
-- `recommendations`: ranked actionable items with scores, reasons, unblock info
-- `quick_wins`: low-effort high-impact items
-- `blockers_to_clear`: items that unblock the most downstream work
-- `project_health`: status/type/priority distributions, graph metrics
-- `commands`: copy-paste shell commands for next steps
-
-```bash
-bv --robot-triage        # THE MEGA-COMMAND: start here
-bv --robot-next          # Minimal: just the single top pick + claim command
-
-# Token-optimized output (TOON) for lower LLM context usage:
-bv --robot-triage --format toon
-```
-
-Before claiming, verify current state with `br show <id> --json` or `br ready --json`. `recommendations` can include graph-important blocked or assigned work; only `quick_ref.top_picks` and non-empty `claim_command` fields represent claimable work.
-
-#### Other bv Commands
-
-| Command | Returns |
-|---------|---------|
-| `--robot-plan` | Parallel execution tracks with unblocks lists |
-| `--robot-priority` | Priority misalignment detection with confidence |
-| `--robot-insights` | Full metrics: PageRank, betweenness, HITS, eigenvector, critical path, cycles, k-core |
-| `--robot-alerts` | Stale issues, blocking cascades, priority mismatches |
-| `--robot-suggest` | Hygiene: duplicates, missing deps, label suggestions, cycle breaks |
-| `--robot-diff --diff-since <ref>` | Changes since ref: new/closed/modified issues |
-| `--robot-graph [--graph-format=json\|dot\|mermaid]` | Dependency graph export |
-
-#### Scoping & Filtering
-
-```bash
-bv --robot-plan --label backend              # Scope to label's subgraph
-bv --robot-insights --as-of HEAD~30          # Historical point-in-time
-bv --recipe actionable --robot-plan          # Pre-filter: ready to work (no blockers)
-bv --recipe high-impact --robot-triage       # Pre-filter: top PageRank scores
-```
-
-### br Commands for Issue Management
-
-```bash
-br ready --json                       # Show issues ready to work (no blockers)
-br list --status=open --json          # All open issues
-br show <id> --json                   # Full issue details with dependencies
-br create --title="..." --type=task --priority=2 --json
-br update <id> --status=in_progress --json
-br close <id> --reason="Completed" --json
-br close <id1> <id2> --reason="Completed" --json
-br sync --flush-only                  # Export DB to JSONL after Beads mutations
-```
-
-### Workflow Pattern
-
-1. **Triage**: Run `bv --robot-triage` to find the highest-impact actionable work
-2. **Claim**: Use `br update <id> --status=in_progress --json`
-3. **Work**: Implement the task
-4. **Complete**: Use `br close <id> --reason="Completed" --json`
-5. **Sync**: Run `br sync --flush-only` after Beads mutations so the JSONL export is current
-
-### Key Concepts
-
-- **Dependencies**: Issues can block other issues. `br ready --json` shows only unblocked work.
-- **Priority**: P0=critical, P1=high, P2=medium, P3=low, P4=backlog (use numbers 0-4, not words)
-- **Types**: task, bug, feature, epic, chore, docs, question
-- **Blocking**: `br dep add <issue> <depends-on>` to add dependencies
-
-### Git Policy
-
-`br` never commits or pushes. Follow this repository's own git instructions before staging, committing, or pushing. If the repository says "commit only when asked," that rule overrides any generic workflow advice.
+- A true `blocks` edge names an input the successor needs. A `parent-child` edge is decomposition,
+  not a fix. Keep new children out from under an epic's open blocker.
+- Process-labelled work belongs to the director/background lane, not product workers.
+- `br` does not commit or push. Reads do not import/export JSONL during G13; publication keeps
+  its guarded route. A local candidate is not PUSHED.
+- Publication pending is not permission for raw push, broad staging, shared-index rewriting,
+  or unchanged save loops. Declare the candidate and take eligible work or the required wait.
+- Preserve UNKNOWN reader coverage. Resume graph-aware robot readers only after the canonical
+  G13 lift; historical recipes are not authorization to open the live tracker.
 
 <!-- end-bv-agent-instructions -->
 
-**This project overrides the generated block above on closing (fleet rule, `~/.agents/AGENTS.md` "the Guide loop").** Workers never run `br close`, and `--reason="Completed"` is never a close reason. When a bead's acceptance is met, report `DONE <bead> <sha> <evidence>` to the director; the director re-runs the acceptance and closes with the evidence in the reason (`br close <id> --reason "<command> -> <result>; commit <sha>"`). The kit enforces this at the act (`kit-close-needs-evidence`, `kit-flywheel-guard SELF_CLOSE_REFUSED`). On finishing or being blocked, take the next bead from your own frontier without waiting.
+**Closing:** the implementer never closes their own bead. A different verifier re-runs the full acceptance and closes with exact exit-0 evidence, source and receipt, or returns REWORK. Workers may perform that non-author product review; directors/background agents handle process work. A callback token, `--reason="Completed"`, a local commit or an author's test result is not a verified close. Follow the canonical omp-kit procedure when older coordination text disagrees.
