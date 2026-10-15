@@ -1,0 +1,49 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_083cb11dd717a92bc62630408a55fcd234402e08589fc60270963295b4a223e2",
+ "limitations": [
+  "Exact local candidate only; existing dispatcher binding was already in HEAD. Maintenance/regression coverage, not new capability or full-kit baseline green. No raw push or production save performed."
+ ],
+ "operation": "non-author-cli-error-maintenance-review",
+ "parameters": {
+  "bead": "jev-b35c.54",
+  "candidate": "33d2b9b3f97e745e740fc538af6dafa27ff08e64",
+  "subject_sha256": "49659ca772d6e1830b48c7ab32ee0bdb10d93b65a55ce152328e1fd1a42390d6"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "candidate": "33d2b9b3f97e745e740fc538af6dafa27ff08e64",
+  "full_kit_suite_ran": false,
+  "human": {
+   "exit": 64,
+   "stderr": "error: unknown command 'clasify'\ndid you mean: classifier classify\nsee: classifier --help\n",
+   "stdout": ""
+  },
+  "implementer": "JadeSpire",
+  "lane": "offline",
+  "model_calls": 0,
+  "new_capability": false,
+  "no_api_keys": true,
+  "prepare_exit": 0,
+  "reviewer": "LavenderDune",
+  "robot": {
+   "exit": 64,
+   "stderr": "error: unknown command 'clasify'\ndid you mean: classifier classify --robot\nsee: classifier --help\n",
+   "stdout": "{\"ok\":false,\"schema\":\"classifier.cli.v1\",\"status\":\"USAGE\",\"data\":null,\"meta\":{\"version\":\"0.0.0\",\"backend\":\"jev\",\"model\":null,\"latency_ms\":0,\"usage\":null},\"warnings\":[],\"commands\":[\"classifier --help\"],\"errors\":[{\"code\":\"USAGE\",\"exit_code\":64,\"message\":\"error: unknown command 'clasify'\\ndid you mean: classifier classify --robot\",\"remediation\":[],\"see\":\"classifier --help\"}]}\n"
+  },
+  "source_bytes_unchanged": true,
+  "source_sha256": {
+   "CHANGELOG.md": "b2cff11eff0629c104a85f435ebfe153cf63c837db740bd2697ff3869e758301",
+   "kit/bin/jev.mjs": "fae7d9eb02a064546a95b90d298714b4f771df1a12cd89033756fb421ad0e8b2",
+   "kit/src/cli/errors.ts": "bbf8ff569b82f57f38d70030cdb31f6ea3c5dd36d1612456fad7719f63290ab5",
+   "kit/test/errors.test.mjs": "33e84f954de07773dd337725d15073dd567810d4f0ee0accfbb680770b2e3f72"
+  },
+  "spend_usd": "0",
+  "test_command": "node --test kit/test/errors.test.mjs",
+  "test_exit": 0,
+  "tests_failed": 0,
+  "tests_passed": 14,
+  "tests_stdout_sha256": "9daff67d4a8d3586fdc5f5d9033bc7be8b8ef1108edf5b9b38fd95fbc89be7ec"
+ }
+}
