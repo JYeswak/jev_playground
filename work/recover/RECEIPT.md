@@ -64,3 +64,9 @@ and not a substitute for fleet-session measurement with real labels.
 - Fixture re-run rc=0: split dev{a,b}/held{c} unchanged; cohorts_dev {}
   + cohorts_held {} (still zero R-class rows); unclassified 2, unmarked 0.
 - Unit suite: 29/29.
+
+## Run v4 (re-read agreement)
+
+- `next_action_kind` recognizes edit -> same-file read as `re-read`
+  (unrelated read stays `change`); end-to-end stale-tag tests both ways.
+- Unit suite: 31/31. Fixture re-run rc=0 unchanged.
