@@ -70,3 +70,15 @@ The gate is that `work/x4-vendored-probe/x4b-PREREG.md` (committed here) exists 
 ## Boundary
 
 Not run: X4b, any live Jev or Clef call, any second repository, organic traffic, per-window production latency. This bead does not establish deployment value.
+
+## 2026-10-15 offline acceptance replay
+
+The exact named `nice -n 10 uv run --no-project --offline --with scikit-learn python work/x4-vendored-probe/run.py` command exited 0 on the unchanged frozen inputs. Its held AUC, paired DeLong values, 53-source-group bootstrap intervals and independently dev-fitted Platt/ECE results reproduce the tables above within their displayed rounding. The symmetric-calibration ECE condition still fails; the constructed-sample AUC result is not a deployment or value verdict.
+
+The named unit suite exited 0, 4/4. The dev-only positive control now checks the original non-inferiority relation against recorded Jev held scores rather than merely checking the length of four returned predictions. Both planted refusals remain: held-data refitting and window-level bootstrap units. The numerical implementation, frozen sample, split, seed, 2,000 bootstrap draws and calibration procedure are unchanged.
+
+This replay used Python 3.14.2, NumPy 2.5.4, SciPy 1.18.1 and scikit-learn 1.9.1. Process wall time was 36.64 seconds with one BLAS/OMP thread and low scheduling priority; the earlier 6.67-second figure is historical, not this replay's latency or a performance claim. The control suite took 3.07 seconds wall time.
+
+X4b remains NOT_RUN. Current native tracker readback finds `jev-mvvh` blocked on its existing value-data prerequisite, and its canonical `work/jev-mvvh/ledger-history.jsonl` source is absent: there is no checked vendor-shadow KEEP receipt to satisfy the gate. This is not a KILL decision, zero-value assumption, positive embedding qualification or proof that a future KEEP branch has run. No Qwen embedding load or GPU-guard invocation was performed for X4b; the gate was not open. The committed X4b preregistration and the separate gated execution obligation are preserved, not replaced by the old scratch result.
+
+No live Jev/Clef request, new corpus, label, remote call, runtime hook, service activation or shared configuration change occurred. All results remain restricted to the original constructed sample.

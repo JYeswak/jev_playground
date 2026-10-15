@@ -13,6 +13,8 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("x4_run", HERE / "run.py")
+if spec is None or spec.loader is None:
+    raise RuntimeError("probe module loader is unavailable")
 run = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(run)
 SAMPLE = json.loads(run.SAMPLE.read_text())
@@ -27,7 +29,14 @@ class DevOnlyFit(unittest.TestCase):
     def test_dev_only_fit_is_accepted(self):
         held_ids = {r["sample_id"] for r in SAMPLE["held"]}
         score, _, _ = run.fit_probe(SAMPLE["dev"], held_ids)
-        self.assertEqual(len(score(SAMPLE["held"][:4])), 4)
+        held = SAMPLE["held"]
+        labels = np.asarray([int(row["label"] == "pos") for row in held])
+        recorded_jev = run.load_jsonl(run.JEV_ROWS)
+        incumbent = np.asarray([recorded_jev[row["sample_id"]]["noul"] for row in held])
+        self.assertGreaterEqual(
+            run.roc_auc_score(labels, score(held)),
+            run.roc_auc_score(labels, incumbent) - 0.02,
+        )
 
 
 class ClusterBootstrapUnit(unittest.TestCase):

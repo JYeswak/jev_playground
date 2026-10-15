@@ -1,0 +1,78 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_a30c0b6fdc1d8fc25508b74ed5a4e81c903a910b6f2d88226a15b469f2d4a5d7",
+ "limitations": [
+  "Reproduces original constructed sample only; no new population, deployment, runtime or value claim",
+  "Symmetric-calibration ECE gate still fails despite the primary constructed-sample AUC bar",
+  "X4b remains NOT_RUN without checked economic KEEP; no embedding run, GPU guard invocation or positive KEEP-branch qualification",
+  "Existing numerical implementation/inputs are unchanged; positive test now checks the frozen NI relation instead of output length",
+  "fit_seconds varies; numeric comparisons use recorded metric rounding, not exact full-output equality"
+ ],
+ "operation": "x4-frozen-probe-grouped-acceptance-replay",
+ "parameters": {
+  "bead": "jev-x4-vendored-probe-closeout-82p7.1",
+  "subject_sha256": "47851694eb53aa5c3f7569cbea872bab475aebb8d3fc8984954621e1afbab0c1"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "bootstrap_b_used": 1968,
+  "clef_auc": "0.83885",
+  "date_utc": "2026-10-15",
+  "dev_n": 120,
+  "ece_platt": {
+   "clef": "0.08320128440195268",
+   "jev": "0.07244510932681601",
+   "probe": "0.1652879885006247"
+  },
+  "external_model_calls": 0,
+  "held_n": 200,
+  "held_source_groups": 53,
+  "input_sha256": {
+   "work/local-decision-arms/vendor-rows-clefflash-dev.jsonl": "d7cd03394145a288ec9c808867a8613e2591520c7bd080f9ccf65d145a54c0ab",
+   "work/local-decision-arms/vendor-rows-clefflash.jsonl": "6dab05529656568df232de6fe42f9a808c28cbff221f6f158f189d885c12c11a",
+   "work/vendor-paste/sample.json": "2a167ed69ebfa5aa41399b278c14c1dae5a40ec630f4de97cfbb7faaa39644ab",
+   "work/vendor-paste/vendor-rows.jsonl": "00c3346b5ebc4364fba29675c1d77a2409a4b7ed9c82207c5091c42434c2cb38"
+  },
+  "jev_auc": "0.82745",
+  "new_external_spend_usd": "0",
+  "numerical_command_exit": 0,
+  "numerical_wall_seconds": "36.64",
+  "paired_cluster_ci95": {
+   "probe_minus_clef": [
+    "-0.027825187878196354",
+    "0.1262914372955961"
+   ],
+   "probe_minus_jev": [
+    "0.0013764880952381487",
+    "0.17371338327370295"
+   ]
+  },
+  "probe_auc": "0.9175",
+  "quality_delta_exit": 0,
+  "quality_delta_gating": 0,
+  "result_canonical_sha256": "4978946e18443dce217a93476ef2948c84d54d8b13d07226249dee6e1b0190d3",
+  "source_sha256": {
+   "work/x4-vendored-probe/RECEIPT.md": "59f5583e40f0d617697c4751449327b3240e005b033694c8128bdb50a0defa52",
+   "work/x4-vendored-probe/run.py": "5ddb4795214442c893585ed3d7b2124cf88103ada25b45a4a609af25e96dde7d",
+   "work/x4-vendored-probe/test_run.py": "e739cce1a08affef276a51209a70958d5f50aba3cf6c199b17d28bfd9f0acdff",
+   "work/x4-vendored-probe/x4b-PREREG.md": "27d5cd02002a4001974983efdc4a0387c859a7afed84c8de4a3f86d54c194686"
+  },
+  "symmetric_ece_gate_passed": false,
+  "ubs_critical": 0,
+  "ubs_exit": 0,
+  "ubs_warning": 1,
+  "unit_test_exit": 0,
+  "unit_test_wall_seconds": "3.07",
+  "unit_tests_failed": 0,
+  "unit_tests_passed": 4,
+  "versions": {
+   "numpy": "2.5.4",
+   "python": "3.14.2",
+   "scipy": "1.18.1",
+   "sklearn": "1.9.1"
+  },
+  "x4b": "NOT_RUN",
+  "x4b_keep_evidence": "no checked KEEP receipt; canonical economic history input absent"
+ }
+}
