@@ -1,0 +1,82 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_59ccb2b8713d5cc7a99ab9d9b5badc310a14bf9f37673dcd98866b7f20bd234f",
+ "limitations": [
+  "Inventory enumeration/source-constraint proof only,not parent liveL3."
+ ],
+ "operation": "jev.grzn4.inventory-enumeration",
+ "parameters": {
+  "bead": "jev-grzn.4",
+  "subject_sha256": "090cfee1f691615b5c0ecfa27042766a5476e9bb2ad6058c8ba1284671db3606"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "acceptance": {
+   "ast_guard": "current run source clean; generated fixed-list nonce rejected; invalid trailing syntax refused",
+   "bead_literal_matches": 0,
+   "command": "uv run python work/l3-receipts/test_run.py",
+   "dynamic_on_and_none": "real planner CLI pass; exact new native profile/case coverage and no infra-only scheduling",
+   "exit_code": 0,
+   "failed": 0,
+   "fixed_plan_negative": "valid old-inventory plan fails nonce consumer assertion",
+   "initial_red": "runtime fixture literal guard failed before refactor; three embedded inventory identifiers detected",
+   "nonauthor_confirmation": "PENDING independent review",
+   "passed": 24,
+   "prereg_guard": "canonical clean; nonce outside forms rejected; exact runtime-generated table and marked example accepted"
+  },
+  "bead": "jev-grzn.4",
+  "limits": [
+   "No live surface, fresh RPC receipt, model-quality, parent L3 or current-mission promotion.",
+   "AST checks direct string literals only; native Python exec grammar, complete parse, no recovery or source execution.",
+   "The small Markdown gate recognizes exact generated tables and explicit example sections/fences, not arbitrary Markdown semantics.",
+   "Private tooling/cache provisioning changed no repository dependency manifests or shared installs; no scan category skipped or partial override enabled."
+  ],
+  "new_model_calls": 0,
+  "new_spend_usd": "0.00",
+  "quality": {
+   "lsp": "OK",
+   "ubs": {
+    "bandit": "completed;2low findings for fixed absolute argv/no shell/15s bounded child,triaged",
+    "complete": true,
+    "critical": 0,
+    "dependency_audit": "completed;no known vulnerabilities",
+    "exit_code": 0,
+    "ruff": "clean",
+    "triage": "Six json-load warnings intentionally fail tests on malformed committed fixtures; no suppression or severity rewrite.",
+    "warnings": 6
+   }
+  },
+  "regex": {
+   "engine": "CPython3.14.2 re",
+   "input_byte_cap": 131072,
+   "pattern": "[\\w-]+",
+   "positive_risk_control_detected": true,
+   "regexploit_exit": 0,
+   "regexploit_no_risk_reported": true,
+   "reject_and_boundary": true,
+   "required_match": true
+  },
+  "scope": "test supplement only; parent planner, source inventory and prereg unchanged",
+  "smoke": {
+   "exact_native_cases": 10,
+   "exit_code": 0,
+   "live_l3_proven": false,
+   "model_calls": 0,
+   "none_identity_sha256": "1363b8187f7f5e0d6f550175fa48c705620f9c4fa8b3a6932f151d9a412f7384",
+   "none_scheduled": false,
+   "on_identity_sha256": "0cc95c6e66a745b5da2620cba7c480b317208a6bb06b427b9e97d783a8ada186",
+   "profiles": 5,
+   "regex_long_near_miss_bytes": 131071,
+   "regex_long_near_miss_ns": 308042,
+   "regex_reject_boundary": true,
+   "regex_required_match": true,
+   "runtime": "3.14.2",
+   "stdout_sha256": "c4700d6246306689491be7435ca62526b3f62be22b35e22756d644a312195618"
+  },
+  "source": {
+   "path": "work/l3-receipts/test_run.py",
+   "sha256": "090cfee1f691615b5c0ecfa27042766a5476e9bb2ad6058c8ba1284671db3606"
+  }
+ }
+}

@@ -1,13 +1,18 @@
 """Offline parser/planner controls; recorded answer fixtures are not live L3 proof."""
 from __future__ import annotations
 
+import ast
 import copy
 import hashlib
 import importlib.util
 import json
 import os
+import re
+import subprocess
+import sys
 import tempfile
 import unittest
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -32,14 +37,18 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         self.session = self.root / "fixture-session.jsonl"
         self.session.write_text(json.dumps({"type": "session", "fixture": True}) + "\n")
         canonical = json.loads((ROOT / "work/jev-inventory/expected.json").read_text())
-        surface = next(row for row in canonical["surfaces"] if row["id"] == "gate-observe")
+        surface = next(row for row in canonical["surfaces"]
+                       if row["group"] == "hook" and row["expect"] == "on"
+                       and isinstance(row["decision"], str)
+                       and not row["decision"].lower().startswith("none"))
+        self.surface_id = surface["id"]
         self.inventory = {"schema": canonical["schema"], "profiles": ["default"], "surfaces": [surface]}
         self.policy = {"K_s": 1, "B_s": 2, "model": positive["backend"], "model_field": "backend",
                        "positive": {"field": "decision", "equals": True},
                        "negative": {"field": "decision", "equals": False}}
         self.budget = {"schema": "jev-l3-budget.v1", "total_budget": 2, "spend_estimate_usd": 0,
                        "surfaces": {surface["id"]: self.policy}}
-        self.agents = "| Surface | Status |\n|---|---|\n| gate-observe | ON |\n"
+        self.agents = f"| Surface | Status |\n|---|---|\n| {self.surface_id} | ON |\n"
         self.records = []
         for line, case in enumerate(["positive", "negative"], 1):
             raw = self.log.read_text().splitlines()[line - 1]
@@ -59,7 +68,8 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         result = self.audit()
         self.assertEqual(
             [(row["surface"], row["profile"], row["case"], row["status"]) for row in result["rows"]],
-            [("gate-observe", "default", "positive", "PASS"), ("gate-observe", "default", "negative", "PASS")],
+            [(self.surface_id, "default", "positive", "PASS"),
+             (self.surface_id, "default", "negative", "PASS")],
         )
         self.assertEqual((result["status"], result["exit_code"], result["live_l3_proven"]), ("PASS", 0, False))
 
@@ -78,7 +88,7 @@ class ReceiptPrimitiveTests(unittest.TestCase):
     def test_malformed_surface_cannot_disappear_from_coverage(self) -> None:
         for mutation in [{"expect": "mystery"}, {"decision": None}]:
             inventory = copy.deepcopy(self.inventory)
-            extra = dict(inventory["surfaces"][0], id="additional-observed-surface", **mutation)
+            extra = dict(inventory["surfaces"][0], id=uuid.uuid4().hex, **mutation)
             inventory["surfaces"].append(extra)
             with self.assertRaises(ValueError):
                 RUN.make_plan(inventory, self.budget)
@@ -87,7 +97,7 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         for missing in ["K_s", "total_budget"]:
             budget = copy.deepcopy(self.budget)
             if missing == "K_s":
-                del budget["surfaces"]["gate-observe"][missing]
+                del budget["surfaces"][self.surface_id][missing]
             else:
                 del budget[missing]
             with self.assertRaises(ValueError):
@@ -97,7 +107,7 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         for change in ["per_surface", "total"]:
             budget = copy.deepcopy(self.budget)
             if change == "per_surface":
-                budget["surfaces"]["gate-observe"]["B_s"] = 3
+                budget["surfaces"][self.surface_id]["B_s"] = 3
             else:
                 budget["total_budget"] = 3
             with self.assertRaisesRegex(ValueError, "budget"):
@@ -126,7 +136,7 @@ class ReceiptPrimitiveTests(unittest.TestCase):
                 f'| {inventory["surfaces"][0]["name"]} | ON |', inventory["surfaces"][0]))
 
     def test_receipt_surface_or_profile_mismatch_fails(self) -> None:
-        for field, value in [("surface", "webscreen"), ("profile", "unregistered")]:
+        for field, value in [("surface", uuid.uuid4().hex), ("profile", "unregistered")]:
             records = copy.deepcopy(self.records)
             records[0][field] = value
             self.assertEqual(self.audit(records)["status"], "FAIL")
@@ -155,7 +165,7 @@ class ReceiptPrimitiveTests(unittest.TestCase):
     def test_native_plan_covers_each_profile_in_both_directions(self) -> None:
         self.inventory["profiles"] = ["default", "codex"]
         self.inventory["surfaces"][0] = dict(self.inventory["surfaces"][0], group="native")
-        self.budget["surfaces"]["gate-observe"]["B_s"] = 4
+        self.budget["surfaces"][self.surface_id]["B_s"] = 4
         self.budget["total_budget"] = 4
         plan = RUN.make_plan(self.inventory, self.budget)
         self.assertEqual({(row["profile"], row["case"]) for row in plan["sessions"]},
@@ -163,7 +173,9 @@ class ReceiptPrimitiveTests(unittest.TestCase):
 
     def test_fleet_observations_never_schedule_profile_rpc_or_load_checks(self) -> None:
         canonical = json.loads((ROOT / "work/jev-inventory/expected.json").read_text())
-        fleet = next(row for row in canonical["surfaces"] if row["id"] == "needs-human")
+        fleet = next(row for row in canonical["surfaces"]
+                     if row["group"] == "fleet" and row["expect"] == "on"
+                     and not row["decision"].lower().startswith("none"))
         self.inventory.update(profiles=["default", "codex"], surfaces=[fleet])
         self.budget["surfaces"] = {fleet["id"]: self.policy}
         plan = RUN.make_plan(self.inventory, self.budget)
@@ -188,6 +200,151 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         path = self.root / "receipts.jsonl"
         path.write_text("")
         self.assertEqual(self.audit(RUN.read_receipts(path))["status"], "FAIL")
+
+
+class InventoryEnumerationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.inventory = json.loads((ROOT / "work/jev-inventory/expected.json").read_text())
+        self.identifiers = {row["id"] for row in self.inventory["surfaces"]}
+        observations = [json.loads(line) for line in
+                        (ROOT / "kit/fixtures/gate/answers-jev.jsonl").read_text().splitlines()]
+        self.model = next(row["backend"] for row in observations if row["decision"] is True)
+
+    @staticmethod
+    def literal_ids(source: str, identifiers: set[str]) -> set[str]:
+        """Inspect complete native Python ASTs, never execute the supplied source."""
+        if len(source.encode()) > 131072:
+            raise ValueError("source exceeds this finite architecture check")
+        tree = ast.parse(source, mode="exec")
+        return {node.value for node in ast.walk(tree)
+                if isinstance(node, ast.Constant) and isinstance(node.value, str)
+                and node.value in identifiers}
+
+    @staticmethod
+    def generated_table(inventory: dict[str, Any]) -> str:
+        digest = hashlib.sha256(json.dumps(inventory, sort_keys=True).encode()).hexdigest()
+        rows = ["| Surface | Expect |", "|---|---|"]
+        rows += [f'| {row["id"]} | {row["expect"]} |' for row in inventory["surfaces"]]
+        return f"<!-- generated inventory {digest} -->\n" + "\n".join(rows) + "\n<!-- end generated inventory -->"
+
+    @classmethod
+    def prereg_ids(cls, text: str, inventory: dict[str, Any]) -> set[str]:
+        if len(text.encode()) > 131072:
+            raise ValueError("document exceeds this finite architecture check")
+        identifiers = {row["id"] for row in inventory["surfaces"]}
+        text = text.replace(cls.generated_table(inventory), "")
+        found: set[str] = set()
+        example_level = None
+        fence = None
+        example_fence = False
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(("```", "~~~")):
+                marker = stripped[:3]
+                if fence == marker:
+                    fence, example_fence = None, False
+                elif fence is None:
+                    fence = marker
+                    example_fence = stripped[3:].strip().lower() == "example"
+                continue
+            if fence is None and stripped.startswith("#"):
+                level = len(stripped) - len(stripped.lstrip("#"))
+                heading = stripped[level:].strip().lower()
+                if example_level is not None and level <= example_level:
+                    example_level = None
+                if heading == "example" or heading.startswith(("example ", "example:")):
+                    example_level = level
+            if example_level is None and not example_fence:
+                found.update(set(re.findall(r"[\w-]+", line)) & identifiers)
+        return found
+
+    def budget_for(self, inventory: dict[str, Any]) -> dict[str, Any]:
+        surfaces = {}
+        for identifier, surface in RUN.required_surfaces(inventory).items():
+            if surface["group"] == "native":
+                sessions = 2 * len(inventory["profiles"])
+            elif surface["group"] == "fleet":
+                sessions = 2
+            else:
+                sessions = 1 + len(inventory["profiles"])
+            surfaces[identifier] = {
+                "K_s": 1, "B_s": sessions,
+                "model": self.model, "model_field": "backend",
+                "positive": {"field": "decision", "equals": True},
+                "negative": {"field": "decision", "equals": False},
+                "load": {"field": "decision", "equals": True},
+            }
+        return {"schema": "jev-l3-budget.v1", "surfaces": surfaces,
+                "total_budget": sum(row["B_s"] for row in surfaces.values()),
+                "spend_estimate_usd": 0}
+
+    def extended_inventory(self) -> tuple[dict[str, Any], str, str]:
+        inventory = copy.deepcopy(self.inventory)
+        on_id, none_id = uuid.uuid4().hex, uuid.uuid4().hex
+        self.assertTrue({on_id, none_id}.isdisjoint(self.identifiers))
+        template = next(row for row in inventory["surfaces"]
+                        if row["expect"] == "on" and row["group"] == "native"
+                        and not row["decision"].lower().startswith("none"))
+        inventory["surfaces"] += [
+            dict(template, id=on_id),
+            dict(template, id=none_id, decision="none (enumeration control)"),
+        ]
+        return inventory, on_id, none_id
+
+    def assert_nonce_plan(self, plan: dict[str, Any], on_id: str, none_id: str) -> None:
+        expected = {(on_id, profile, case) for profile in self.inventory["profiles"]
+                    for case in ("positive", "negative")}
+        rows = [row for row in plan["sessions"] if row["surface"] == on_id]
+        self.assertEqual({(row["surface"], row["profile"], row["case"]) for row in rows}, expected)
+        self.assertEqual(len(rows), len(expected))
+        self.assertFalse(any(row["surface"] == none_id for row in plan["sessions"]))
+
+    def test_fixture_ids_are_loaded_from_the_runtime_inventory(self) -> None:
+        self.assertFalse(self.literal_ids(Path(__file__).read_text(), self.identifiers),
+                         "fixture pins an inventory identifier")
+
+    def test_cli_enumerates_appended_on_identity_and_excludes_none_identity(self) -> None:
+        inventory, on_id, none_id = self.extended_inventory()
+        with tempfile.TemporaryDirectory(dir=os.environ["TMPDIR"]) as directory:
+            root = Path(directory)
+            source = root / "expected.json"
+            budget = root / "budget.json"
+            source.write_text(json.dumps(inventory))
+            budget.write_text(json.dumps(self.budget_for(inventory)))
+            result = subprocess.run(
+                [sys.executable, str(Path(__file__).with_name("run.py")),
+                 "--inventory", str(source), "--budget", str(budget), "--plan", "--json"],
+                capture_output=True, text=True, timeout=15, check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assert_nonce_plan(json.loads(result.stdout), on_id, none_id)
+
+    def test_fixed_inventory_plan_cannot_pass_the_nonce_consumer_check(self) -> None:
+        _, on_id, none_id = self.extended_inventory()
+        fixed_plan = RUN.make_plan(self.inventory, self.budget_for(self.inventory))
+        with self.assertRaises(AssertionError):
+            self.assert_nonce_plan(fixed_plan, on_id, none_id)
+
+    def test_ast_guard_rejects_fixed_nonce_literal_and_invalid_suffix(self) -> None:
+        inventory, nonce, _ = self.extended_inventory()
+        identifiers = {row["id"] for row in inventory["surfaces"]}
+        source = Path(__file__).with_name("run.py").read_text()
+        self.assertEqual(self.literal_ids(source, identifiers), set())
+        variant = source + f"\nFIXED_SURFACES = {[nonce]!r}\n"
+        self.assertEqual(self.literal_ids(variant, identifiers), {nonce})
+        with self.assertRaises(SyntaxError):
+            self.literal_ids(variant + "\n)", identifiers)
+
+    def test_prereg_ids_require_generated_table_or_marked_example(self) -> None:
+        inventory, nonce, _ = self.extended_inventory()
+        document = Path(__file__).with_name("PREREG.md").read_text()
+        self.assertEqual(self.prereg_ids(document, inventory), set())
+        self.assertEqual(self.prereg_ids(document + f"\n{nonce}\n", inventory), {nonce})
+        self.assertEqual(self.prereg_ids(document + "\n" + self.generated_table(inventory), inventory), set())
+        example = f"\n## Example\n```json\n{json.dumps({'surface': nonce})}\n```\n"
+        self.assertEqual(self.prereg_ids(document + example, inventory), set())
+        self.assertEqual(self.prereg_ids(document + example + f"\n## Live\n{nonce}", inventory), {nonce})
+
 
 
 if __name__ == "__main__":
