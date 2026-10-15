@@ -1,0 +1,68 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_907e09f91479b3b93c777324e1aba76086835e0b9990fb6e326d6ab5bf5098c7",
+ "limitations": [
+  "REWORK: literal acceptance exits2; no source-bound terminal verdict is implemented."
+ ],
+ "operation": "jev.p4.non-author.review",
+ "parameters": {
+  "bead": "jev-p4-gate-bar-gtok"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bead": "jev-p4-gate-bar-gtok",
+  "candidate": "4acdd84b",
+  "limitations": [
+   "Honest written zero-harm NOT_REACHABLE disclosure is not the required executable producer.",
+   "Missing-class refusal is proven but generic ERROR is not a source-bound terminal verdict.",
+   "No full cohort/value validation or prereg timing approval claimed after the first unmet tool contract.",
+   "No source, prereg, acceptance, configuration or author-ownership changes."
+  ],
+  "literal_acceptance": {
+   "command": "python3 scripts/bar-reachable.py --prereg work/gate-family/prereg/PREREG.md --json",
+   "error": "unrecognized arguments: --json",
+   "exit_code": 2,
+   "terminal_source_bound_verdict": false
+  },
+  "new_model_calls": 0,
+  "new_spend_usd": "0.00",
+  "review_status": "REWORK_LITERAL_TOOL_PATH_MISSING",
+  "source_contract": {
+   "organic_labels_not_synthetically_filled": true,
+   "prereg_flag": "metadata only and requires --items; does not drive mode/counts",
+   "source_bound_not_reachable_path": "MISSING"
+  },
+  "sources": [
+   {
+    "path": "scripts/bar-reachable.py",
+    "sha256": "5867ed9e2c3817e51780742141a72fe2208c73f11b12c24b6d81a7849c43b211"
+   },
+   {
+    "path": "work/gate-family/prereg/PREREG.md",
+    "sha256": "42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec"
+   },
+   {
+    "path": "work/gate-family/prereg/reach.json",
+    "sha256": "a5abcf7989704a98909466eb13c93da2f45d3041834718f024ea5585a387c25e"
+   }
+  ],
+  "witness_controls": [
+   {
+    "error": "AUROC class counts must both be positive",
+    "exit_code": 2,
+    "negative": 45,
+    "positive": 0,
+    "status": "ERROR"
+   },
+   {
+    "error": "AUROC class counts must both be positive",
+    "exit_code": 2,
+    "negative": 0,
+    "positive": 1,
+    "status": "ERROR",
+    "synthetic_math_control_only": true
+   }
+  ]
+ }
+}
