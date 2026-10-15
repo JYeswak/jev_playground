@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_a3744d20364bfdfffad4b7514d6de9d19a422034b0e2471434c4994a8d77eb97",
+ "limitations": [
+  "REWORK: same-count row-file byte tamper accepted despite frozen digest mismatch. Literal terminal path and13/13 tests pass but do not establish full input integrity. Both supplied candidate objects unavailable; working-tree checks only. No model/quality/publication/closure claim."
+ ],
+ "operation": "review_p4_source_binding",
+ "parameters": {
+  "bead": "jev-p4-gate-bar-gtok",
+  "working_source_sha256": "5b235f9da8eda7667f565ffd4f6451acbde1e6519176678d33c88de8924a7029"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 23313,
+  "sha256": "5b235f9da8eda7667f565ffd4f6451acbde1e6519176678d33c88de8924a7029"
+ }
+}
