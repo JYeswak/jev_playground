@@ -1,9 +1,9 @@
 {
  "authority": "test",
  "confidence": "observed",
- "evidence_id": "ev_59ccb2b8713d5cc7a99ab9d9b5badc310a14bf9f37673dcd98866b7f20bd234f",
+ "evidence_id": "ev_dbeee729e3dd67389bd543d7df6057f22944f0e61ee490f8f20960463b705210",
  "limitations": [
-  "Inventory enumeration/source-constraint proof only,not parent liveL3."
+  "Enumeration/source constraint only; no parent liveL3 or publication claim."
  ],
  "operation": "jev.grzn4.inventory-enumeration",
  "parameters": {
@@ -34,6 +34,14 @@
   ],
   "new_model_calls": 0,
   "new_spend_usd": "0.00",
+  "publication": {
+   "land_result": "LAND_APPLY_REQUIRED; no apply or publication command executed",
+   "local_source_candidate": "12a353152f6d19487515e76abed0f3ca9f483680",
+   "parent_planner_present_on_published_base": false,
+   "published_base": "100422b9306114898c802478452427eeea85415a",
+   "reason": "Do not publish tests alone without the parent planner; owner must land parent or an owner-bound bundle.",
+   "status": "NOT_PUBLISHED"
+  },
   "quality": {
    "lsp": "OK",
    "ubs": {
@@ -42,6 +50,24 @@
     "critical": 0,
     "dependency_audit": "completed;no known vulnerabilities",
     "exit_code": 0,
+    "finding_triage": [
+     {
+      "count": 6,
+      "finding": "py.parsing.json-loads-no-try",
+      "human_severity": "none",
+      "tool_severity": "warning",
+      "triage_reason": "Committed fixture corruption must fail the test; catching it would hide invalid evidence.",
+      "triage_verdict": "false_positive"
+     },
+     {
+      "count": 2,
+      "finding": "Bandit B404/B603",
+      "human_severity": "none",
+      "tool_severity": "Low",
+      "triage_reason": "Canonical absolute interpreter/script and owned JSON path argv only; no shell;15s deadline.",
+      "triage_verdict": "false_positive"
+     }
+    ],
     "ruff": "clean",
     "triage": "Six json-load warnings intentionally fail tests on malformed committed fixtures; no suppression or severity rewrite.",
     "warnings": 6
