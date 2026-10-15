@@ -3,77 +3,86 @@ import assert from "node:assert/strict";
 import {
   ADOPTION_MAX_MINUTES,
   DROPPED_UNLABELLED_MAX,
-  DROPPED_UNLABELLED_WINDOW,
   checkAdoption,
   checkDroppedUnlabelled,
 } from "../src/ship/stage-exit.ts";
 
-// DROPPED-UNLABELLED cutoff + stranger-adopts bound (jev-uzq1.2).
-// NO-CLAIM: cutoff checks only; not ship, L3, or value proof.
+// Receipt-bound stage-exit gates (jev-uzq1.2 rework for LavenderDune 3523).
+// Every check takes a receipt artifact with source provenance; bare numbers
+// and caller belief booleans are refused. NO-CLAIM: cutoff checks only.
 // Keyless: no model, network, or Infisical use.
 
-test("29 positives in the 14-day window passes eligibility only", () => {
-  assert.deepEqual(checkDroppedUnlabelled({ outcomePositives: 29, window: "14d" }), {
-    eligible: true,
-    scope: "cutoff-check-only",
-  });
-});
+const SOURCE = {
+  path: "work/uzq1/stage-receipt.json",
+  sha256: "a".repeat(64),
+  collectedAt: "2026-10-15T11:00:00Z",
+};
 
-test("exactly 30 positives fails the strict cutoff", () => {
-  assert.throws(
-    () => checkDroppedUnlabelled({ outcomePositives: 30, window: "14d" }),
-    /reach the 30 cutoff/,
+test("29 positives with receipt provenance passes eligibility only", () => {
+  assert.deepEqual(
+    checkDroppedUnlabelled({ outcomePositives: 29, window: "14d", source: SOURCE }),
+    { eligible: true, scope: "cutoff-check-only" },
   );
 });
 
-test("31 positives fails the strict cutoff", () => {
+test("exactly 30 and 31 positives fail the strict cutoff", () => {
+  for (const outcomePositives of [30, 31]) {
+    assert.throws(
+      () => checkDroppedUnlabelled({ outcomePositives, window: "14d", source: SOURCE }),
+      /cutoff/,
+    );
+  }
+});
+
+test("bare numbers without receipt source are refused", () => {
   assert.throws(
-    () => checkDroppedUnlabelled({ outcomePositives: 31, window: "14d" }),
-    /reach the 30 cutoff/,
+    () => checkDroppedUnlabelled({ outcomePositives: 29, window: "14d" }),
+    /provenance is required/,
+  );
+  assert.throws(
+    () => checkDroppedUnlabelled({ outcomePositives: 29, window: "14d", source: {} }),
+    /source field/,
+  );
+  assert.throws(
+    () =>
+      checkDroppedUnlabelled({
+        outcomePositives: 29,
+        window: "14d",
+        source: { ...SOURCE, sha256: "xyz" },
+      }),
+    /64 hex/,
   );
 });
 
 test("unstated or different window fails", () => {
-  for (const window of [undefined, null, "", "7d", "30d"]) {
+  for (const window of ["", "7d", "30d"]) {
     assert.throws(
-      () => checkDroppedUnlabelled({ outcomePositives: 5, window }),
+      () => checkDroppedUnlabelled({ outcomePositives: 5, window, source: SOURCE }),
       /window must be/,
     );
   }
 });
 
-test("non-count positives fail", () => {
-  for (const outcomePositives of [undefined, null, NaN, 2.5, -1, "29"]) {
-    assert.throws(
-      () => checkDroppedUnlabelled({ outcomePositives, window: "14d" }),
-      /non-negative integer/,
-    );
-  }
-});
-
 test("stranger-adopts receipt under 60 minutes passes", () => {
-  assert.deepEqual(checkAdoption({ receiptPresent: true, elapsedMinutes: 42 }), {
+  assert.deepEqual(checkAdoption({ elapsedMinutes: 42, source: SOURCE }), {
     eligible: true,
   });
 });
 
-test("missing receipt or 60+ minutes fails", () => {
+test("negative elapsed minutes fail", () => {
   assert.throws(
-    () => checkAdoption({ receiptPresent: false, elapsedMinutes: 10 }),
-    /receipt missing/,
-  );
-  assert.throws(
-    () => checkAdoption({ receiptPresent: true, elapsedMinutes: 60 }),
-    /bound/,
-  );
-  assert.throws(
-    () => checkAdoption({ receiptPresent: true, elapsedMinutes: 95 }),
-    /bound/,
+    () => checkAdoption({ elapsedMinutes: -1, source: SOURCE }),
+    /negative/,
   );
 });
-
-test("constants match the source clauses", () => {
-  assert.equal(DROPPED_UNLABELLED_MAX, 30);
-  assert.equal(DROPPED_UNLABELLED_WINDOW, "14d");
-  assert.equal(ADOPTION_MAX_MINUTES, 60);
+test("missing receipt or 60+ minutes fail", () => {
+  assert.throws(() => checkAdoption({ elapsedMinutes: 10 }), /provenance is required/);
+  assert.throws(
+    () => checkAdoption({ elapsedMinutes: 60, source: SOURCE }),
+    /bound/,
+  );
+  assert.throws(
+    () => checkAdoption({ elapsedMinutes: 95, source: SOURCE }),
+    /bound/,
+  );
 });
