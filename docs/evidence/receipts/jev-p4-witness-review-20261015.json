@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_0d0a28c83530067972ffe2d7a7c223d35d6fc5085c157612ce72ef616a5772f0",
+ "limitations": [
+  "Controlled synthetic witness rows; organic cohort remains NOT_REACHABLE and no experiment/model-quality/publication claim"
+ ],
+ "operation": "jev-p4 original individual-witness non-author acceptance",
+ "parameters": {
+  "bead": "jev-p4-gate-bar-gtok",
+  "subject_sha256": "1757c7225a81505ab32b823a3b323012ab578bf171be90171da1a0f9fd546661"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 4397,
+  "sha256": "51092d5f59b843588bb2aad2e17daedc6f0e092cb03e4287e27d73864725bfb0"
+ }
+}

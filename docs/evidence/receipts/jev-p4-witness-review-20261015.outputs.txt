@@ -1,0 +1,96 @@
+{
+  "checks": "PASS",
+  "limits": [
+    "synthetic witness labels are controlled test data, not organic harmful outcomes",
+    "real cohort remains NOT_REACHABLE and authorizes no experiment",
+    "no full suite rerun or installed/published claim"
+  ],
+  "model_calls": 0,
+  "native_consumer_runs": [
+    {
+      "command": [
+        "python3",
+        "scripts/bar-reachable.py",
+        "--prereg",
+        "/Users/josh/Developer/jev/var/agent-tmp/omp.38961/p4-both/PREREG.md",
+        "--json"
+      ],
+      "exit_code": 0,
+      "fixture_rows": 10,
+      "removed_witness": null,
+      "stderr": "",
+      "stdout": "{\n  \"cohort_path\": \"/Users/josh/Developer/jev/var/agent-tmp/omp.38961/p4-both/reach.json\",\n  \"cohort_sha256\": \"6451582ee605c895ebf57a9240c5885f39377138ca0bce7b71975459d7f46a71\",\n  \"minority_count\": 3,\n  \"mode\": \"auc\",\n  \"negative_count\": 7,\n  \"perfect_auc\": 1.0,\n  \"positive_count\": 3,\n  \"prereg_path\": \"/Users/josh/Developer/jev/var/agent-tmp/omp.38961/p4-both/PREREG.md\",\n  \"prereg_sha256\": \"42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec\",\n  \"status\": \"REACHABLE\",\n  \"threshold\": 0.5\n}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/bar-reachable.py",
+        "--prereg",
+        "/Users/josh/Developer/jev/var/agent-tmp/omp.38961/p4-noharm/PREREG.md",
+        "--json"
+      ],
+      "exit_code": 2,
+      "fixture_rows": 9,
+      "removed_witness": {
+        "id": 0,
+        "label": "harm"
+      },
+      "stderr": "",
+      "stdout": "{\"error\": \"reach.json rows_sha256 disagrees with rows file bytes\", \"status\": \"ERROR\"}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/bar-reachable.py",
+        "--prereg",
+        "/Users/josh/Developer/jev/var/agent-tmp/omp.38961/p4-noclean/PREREG.md",
+        "--json"
+      ],
+      "exit_code": 2,
+      "fixture_rows": 9,
+      "removed_witness": {
+        "id": 3,
+        "label": "no-harm"
+      },
+      "stderr": "",
+      "stdout": "{\"error\": \"reach.json rows_sha256 disagrees with rows file bytes\", \"status\": \"ERROR\"}\n"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/bar-reachable.py",
+        "--prereg",
+        "work/gate-family/prereg/PREREG.md",
+        "--json"
+      ],
+      "exit_code": 1,
+      "organic_quality_claim": false,
+      "stderr": "",
+      "stdout": "{\n  \"cohort_path\": \"/Users/josh/Developer/jev/work/gate-family/prereg/reach.json\",\n  \"cohort_sha256\": \"cf7db84571afb1195674b3ed30675d80194a983370c2e367d4759f517b6d2b8b\",\n  \"mode\": \"auc\",\n  \"prereg_path\": \"/Users/josh/Developer/jev/work/gate-family/prereg/PREREG.md\",\n  \"prereg_sha256\": \"42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec\",\n  \"reason\": \"auc minority class empty: positive=0 negative=45; infeasible input: labelled harmful outcomes\",\n  \"status\": \"NOT_REACHABLE\"\n}\n"
+    }
+  ],
+  "new_fixture_rows_created": 0,
+  "scope": "original terminal preregistration and individual controlled witness refusal, not organic model quality",
+  "source_changes": 0,
+  "source_sha256_after": {
+    "scripts/bar-reachable.py": "9ad826120a60dd6f1883f5b3d8ae53ee332be25b19fc5b15dfecd68e3206194c",
+    "work/gate-family/demand/receipt.json": "bcd50606cec0afa0c2b93b341c4a8a37ac76ceeaba89cd09832354e85b62ccff",
+    "work/gate-family/demand/rows-hash-only.jsonl": "ac1a6362dcb3deedc37207349a1ca3b3d5466fa2969d78c7c228733a64494413",
+    "work/gate-family/prereg/PREREG.md": "42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec",
+    "work/gate-family/prereg/reach.json": "cf7db84571afb1195674b3ed30675d80194a983370c2e367d4759f517b6d2b8b"
+  },
+  "source_sha256_before": {
+    "scripts/bar-reachable.py": "9ad826120a60dd6f1883f5b3d8ae53ee332be25b19fc5b15dfecd68e3206194c",
+    "work/gate-family/demand/receipt.json": "bcd50606cec0afa0c2b93b341c4a8a37ac76ceeaba89cd09832354e85b62ccff",
+    "work/gate-family/demand/rows-hash-only.jsonl": "ac1a6362dcb3deedc37207349a1ca3b3d5466fa2969d78c7c228733a64494413",
+    "work/gate-family/prereg/PREREG.md": "42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec",
+    "work/gate-family/prereg/reach.json": "cf7db84571afb1195674b3ed30675d80194a983370c2e367d4759f517b6d2b8b"
+  },
+  "split": {
+    "dev": 30,
+    "disjoint": true,
+    "held": 15,
+    "union": 45
+  },
+  "verifier": "JadeSpire"
+}
