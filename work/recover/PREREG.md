@@ -78,3 +78,12 @@ Cohorts are reported separately for dev and held; the min_n gate applies
 within each half. Expected on current data: NOT_POWERED everywhere (zero
 R-class episodes in fixture); the split machinery itself is the deliverable
 under test, with honest underpowered output.
+
+## Amendment v3 (2026-10-15, committed before any v3 scoring)
+
+Receipt self-verification: `rule.py --json` first recomputes the RECEIPT
+machine block from the answers file and compares field-by-field; on any
+mismatch it prints the reason to stderr and exits 2 with no score output
+(fail closed on drifted receipt). A missing machine block skips
+verification with `receipt_unverified` noted (bootstrapping must remain
+possible). V1 design/MIN_N/margin/model-arm rules all stand.
