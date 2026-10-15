@@ -1,0 +1,19 @@
+{
+ "authority": "live",
+ "confidence": "observed",
+ "evidence_id": "ev_f47313bd5fed932c4edab8356e0bbb737a269325f55e7954ad0a93b1ee0dbfbf",
+ "limitations": [
+  "Native disabled enum plus still-unloaded exact label only; plist preserved; no current judge semantic/feature quality/full jh6f acceptance/PUSHED or independent readback claim"
+ ],
+ "operation": "approved disable-only retirement of installed obsolete alias-monitor consumer",
+ "parameters": {
+  "approval": "AM56638",
+  "bead": "jev-jh6f",
+  "subject_sha256": "833f53045225eb1f2618a6ffa2ae4151a3cfbbb7d2f14c50af64d33afb4bc4fa"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 1367,
+  "sha256": "572f4569c169a4b9a55c7f668f72942e8961938a3a58d757b858e93799f60e8e"
+ }
+}

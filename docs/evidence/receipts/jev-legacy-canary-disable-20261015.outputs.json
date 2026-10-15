@@ -1,0 +1,30 @@
+{
+  "authority": "QuietBadger AM56638 under J04/56022",
+  "controller": "JadeSpire",
+  "seat": "tern:17",
+  "uid": 501,
+  "label": "ai.zeststream.jev-latest-canary",
+  "pre_disabled_exit": 0,
+  "pre_disabled_exact_rows": [],
+  "pre_runtime_exit": 113,
+  "pre_runtime_notfound": true,
+  "effect_command": [
+    "launchctl",
+    "disable",
+    "gui/501/ai.zeststream.jev-latest-canary"
+  ],
+  "effect_tool_result": "success, no stdout/stderr",
+  "post_disabled_exit": 0,
+  "post_disabled_exact_rows": [
+    "\"ai.zeststream.jev-latest-canary\" => disabled"
+  ],
+  "post_runtime_exit": 113,
+  "post_runtime_notfound": true,
+  "plist_preserved_identity": true,
+  "rollback": "launchctl enable gui/501/ai.zeststream.jev-latest-canary restores enabled behavior via false override, not byte-identical absence",
+  "no_claim": "Installed obsolete consumer retirement only; no bootstrap/feature-quality/full jh6f acceptance/PUSHED/current judge semantic pass",
+  "post_disabled_semantic": true,
+  "native_disabled_representation": "disabled enum, not literal true",
+  "controller_assertion_correction": "Initial controller predicate incorrectly required => true; actual Darwin25 native output is exact-label => disabled. Corrected interpretation of the already captured output; no repeated effect/read or weakened enabled-state postcondition.",
+  "postconditions_pass": true
+}
