@@ -118,3 +118,49 @@ Not ranked: T16 bandits (no reward labels), the ultrametric hierarchy, and game-
 - **Conformal (T7):** LAC score 1 − p_true on DEV, q̂ = ⌈(n+1)(1−α)⌉-th order statistic.
 - **Memory log:** statuses and latencies from `~/.local/state/jev/memory-filter.jsonl` (32,017 rows; turn = (instance, promptHash); window ts ≥ 2026-10-03). Max-of-4: 20,000 bootstrap draws from 4,950 scored latencies. Budget change commit `0ea5e91f` (2026-10-02 01:00 −0600).
 - **Wilson/PPV:** z = 1.959964; PPV = s·π/(s·π + f·(1−π)); interval from a Beta(65,37) × Beta(13,89) posterior over s and f.
+
+## D. Authorized D2 full-vector reference reconciliation (2026-10-15)
+
+Joshua selected Option A in `J-2026-10-15-07` / AM56011, recorded in
+`jev-9odh` comment 3695: re-derive the bar under the frozen procedure, with
+provenance. This is **post-observation reference reconciliation**, not a
+prospectively frozen experiment or a new quality win.
+
+The `.0276` statements in the original audit and A1 above describe the scalar
+chosen-probability computation in `advanced-literature.md:221-237`. They remain
+historical evidence. That computation omits flooring the other 76 probabilities
+and the subsequent renormalization, so it is not the full-vector D2 oracle.
+The historical full-vector result against `.0276 ± .002` remains **FAIL**.
+
+The independent Python standard-library derivation is
+`work/local-decision-arms/derive-calibration-reference.py`. Its committed
+`calibration-reference.json` binds all five input byte hashes, the implementation
+hash, sorted DEV/held ID hashes, fitted coefficients, bin counts and confidence
+sums. Under the unchanged method it derives:
+
+| Recorded arm | Platt a | Platt b | Held ECE |
+|---|---:|---:|---:|
+| Jev | 2.1198209187396593 | 0.12564660573730493 | 0.03175198653414941 |
+| Clef-labelled rows | 1.3526520145076346 | 0.0002885751250081534 | 0.024566611204658775 |
+
+The Jev reference center is now the independently derived full-vector value;
+the existing absolute tolerance remains **.002**. No floor, renormalization,
+logit clipping, optimizer, step count/rate, DEV-only fit, held IDs, ECE bins,
+bootstrap RNG/interval/tolerance, or D7 alarm rule changes. The raw vectors are
+not pre-normalized, and `row.confidence` is not used. Clef rows expose only
+`p_choice`, so their existing scalar-floor treatment is retained.
+
+This is a fixed Banking77 record population: seed 7 selects the 600 held IDs,
+seed 8 selects the disjoint 200 DEV IDs. The recorded schemas contain no event
+timestamps; filesystem mtimes are **not** generation windows. No rolling traffic
+window is inferred. Jev records name `jev-1.13.0`; the Clef arm label does not
+establish a resolved serving model or version.
+
+Replay with `uv run --no-project --no-config python3
+work/local-decision-arms/derive-calibration-reference.py --check
+work/local-decision-arms/calibration-reference.json`, then
+`node --test kit/test/measurement-calibration.test.mjs`. The consumer requires
+the source/method/derivation provenance and rejects a bare matching point or an
+edited center even within the numeric tolerance. No model calls are part of
+either mathematical replay; non-author verification remains required.
+

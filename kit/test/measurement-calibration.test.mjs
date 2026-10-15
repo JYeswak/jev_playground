@@ -1,13 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // measurement-calibration.test.mjs — D2 symmetric calibration + D7 rerun spread (jev-b35c.23).
 //
-// Frozen parameters live in the bead acceptance, fixed before implementation; this file
-// reproduces them from committed rows only. No live call, no network, no post-hoc bars.
+// The method, inputs, splits and tolerances remain frozen. J-2026-10-15-07 authorizes
+// a post-observation reference reconciliation; its derivation and prior FAIL are retained.
+// No live call, network, prospective experiment win or scalar-method substitution.
 //
 // Method (equal treatment both arms):
 // - Id sets: DEV 200 / held 600 are the id sets of the committed Clef files, verified
@@ -46,6 +48,83 @@ const BOOT_SEED = 0;
 
 function readJsonl(p) {
   return fs.readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l));
+}
+
+function referenceHash(bytes) {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+function validateD2Reference(document) {
+  const requireProvenance = (condition, detail) => {
+    if (!condition) {
+      throw Object.assign(new Error(`D2 reference provenance: ${detail}`), {
+        code: 'D2_REFERENCE_PROVENANCE',
+      });
+    }
+  };
+  requireProvenance(document?.schema_version === 'd2-reference.v1', 'schema');
+  requireProvenance(
+    document.authorization?.decision === 'J-2026-10-15-07'
+      && document.authorization?.kind === 'post_observation_reference_reconciliation',
+    'authorized reconciliation, not a prospective bar',
+  );
+  const prescribedMethod = {
+    floor: String(FLOOR), renormalize: true,
+    platt_iterations: PLATT_ITERS, platt_learning_rate: String(PLATT_LR),
+    initial_a: '1', initial_b: '0', logit_clip: '0.0001',
+    ece_bins: 10, dev_count: 200, held_count: 600, held_seed: 7, dev_seed: 8,
+  };
+  for (const [key, value] of Object.entries(prescribedMethod)) {
+    requireProvenance(document.method?.[key] === value, `changed method: ${key}`);
+  }
+  const expectedInputs = [
+    'work/choice-banking77/full.jsonl',
+    'work/choice-banking77/rows-full-jev.jsonl',
+    'work/local-decision-arms/rows-clefflash-dev.jsonl',
+    'work/local-decision-arms/rows-clefflash.jsonl',
+    'work/local-decision-arms/run.py',
+  ];
+  requireProvenance(Array.isArray(document.inputs), 'input provenance');
+  const inputs = new Map(document.inputs.map((input) => [input.path, input.sha256]));
+  requireProvenance(
+    document.inputs.length === expectedInputs.length && inputs.size === expectedInputs.length,
+    'exact input identities',
+  );
+  for (const input of expectedInputs) {
+    requireProvenance(
+      inputs.get(input) === referenceHash(fs.readFileSync(path.join(ROOT, input))),
+      `input bytes: ${input}`,
+    );
+  }
+  const derivation = document.derivation;
+  const implementation = 'work/local-decision-arms/derive-calibration-reference.py';
+  requireProvenance(
+    derivation?.implementation_path === implementation
+      && derivation.implementation_sha256 === referenceHash(fs.readFileSync(path.join(ROOT, implementation))),
+    'independent implementation bytes',
+  );
+  for (const [name, ids] of [['dev', DEVIDS], ['held', SAMP]]) {
+    const digest = referenceHash(JSON.stringify([...ids].sort((a, b) => a - b)));
+    requireProvenance(derivation[`${name}_ids_sha256`] === digest, `${name} ids`);
+  }
+  const center = document.reference?.jev_held_ece;
+  requireProvenance(
+    typeof center === 'string' && Number.isFinite(Number(center))
+      && Number(center) >= 0 && Number(center) <= 1
+      && center === derivation.jev?.held_ece,
+    'reference must be the independently derived result',
+  );
+  requireProvenance(document.reference.absolute_tolerance === '0.002', 'unchanged tolerance');
+  requireProvenance(
+    document.historical?.scalar_reference === '0.0276'
+      && document.historical.prior_full_vector_result === 'FAIL',
+    'historical failure retained',
+  );
+  return { center: Number(center), tolerance: 0.002 };
+}
+
+function readD2Reference() {
+  return JSON.parse(fs.readFileSync(path.join(ARMS, 'calibration-reference.json'), 'utf8'));
 }
 
 function mulberry32(seed) {
@@ -271,14 +350,15 @@ test('id sets reproduce the frozen DEV 200 / held 600 split', () => {
   }
 });
 
-test('D2 held ECE after Platt reproduces Jev .0276 within .002', () => {
+test('D2 held Jev ECE reproduces the authorized full-vector reference within unchanged .002', () => {
+  const reference = validateD2Reference(readD2Reference());
   const cal = calibrate(() => loadJevArm(''), true);
   assert.equal(cal.status, 'OK');
   assert.equal(cal.devN, 200);
   assert.equal(cal.heldN, 600);
   assert.ok(cal.flooredCount > 0, `vector floor must bind on real rows, got ${cal.flooredCount}`);
   const e = ece([...cal.held.values()]);
-  assert.ok(Math.abs(e - 0.0276) <= 0.002, `Jev ECE ${e}`);
+  assert.ok(Math.abs(e - reference.center) <= reference.tolerance, `Jev ECE ${e}`);
 });
 
 test('D2 held ECE after Platt reproduces Clef .0246 within .002', () => {
@@ -395,4 +475,29 @@ test('coin-flip judge ECE exceeds its Bernoulli noise floor and fails the gate',
   const clef = calibrate(() => [...clefDev, ...clefHeld], false);
   assert.ok(ece([...jev.held.values()]) < noiseFloor, 'Jev Platt ECE passes the gate');
   assert.ok(ece([...clef.held.values()]) < noiseFloor, 'Clef Platt ECE passes the gate');
+});
+
+test('D2 reference requires derivation provenance even for a matching point', () => {
+  const cal = calibrate(() => loadJevArm(''), true);
+  assert.equal(cal.status, 'OK');
+  const matchingPointWithoutProvenance = {
+    reference: {
+      jev_held_ece: String(ece([...cal.held.values()])),
+      absolute_tolerance: '0.002',
+    },
+  };
+  assert.throws(
+    () => validateD2Reference(matchingPointWithoutProvenance),
+    { code: 'D2_REFERENCE_PROVENANCE' },
+  );
+});
+
+test('D2 reference refuses an edited center even inside the numeric tolerance', () => {
+  const reference = readD2Reference();
+  const edited = structuredClone(reference);
+  edited.reference.jev_held_ece = String(Number(reference.reference.jev_held_ece) + 0.001);
+  assert.throws(
+    () => validateD2Reference(edited),
+    { code: 'D2_REFERENCE_PROVENANCE' },
+  );
 });

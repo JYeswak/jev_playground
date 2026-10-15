@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c6057301a8f71c3e7f34db26e4500c22de238f7177116c76864cd6a433724ab1",
+ "limitations": [
+  "Authorized post-observation reference reconciliation only. Targeted13/13 and producer check/negatives pass; mandatory UBS and heavy-suite admission NOT_CLEARED. HistoricalFAIL remains; no prospective quality win,full clearance,publication or self-close.48 failed auxiliary native-judge requests disclosed; actualbillingUNKNOWN."
+ ],
+ "operation": "d2_full_vector_reference_reconciliation",
+ "parameters": {
+  "authorization": "J-2026-10-15-07",
+  "bead": "jev-9odh"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 5362,
+  "sha256": "eba57941b1678e86ecb6cdbc6650e89419b075916e9007b1d3ad6dff3db37be5"
+ }
+}

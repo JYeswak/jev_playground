@@ -1,0 +1,186 @@
+{
+  "authorization": {
+    "decision": "J-2026-10-15-07",
+    "kind": "post_observation_reference_reconciliation",
+    "source": "AM56011 / jev-9odh comment3695"
+  },
+  "data_scope": {
+    "clef_recorded_arms": [
+      "clefflash"
+    ],
+    "clef_resolved_backend_model": "not recorded; arm name does not resolve serving identity",
+    "event_window": null,
+    "event_window_status": "event timestamps absent from these recorded schemas",
+    "jev_recorded_models": [
+      "jev-1.13.0"
+    ],
+    "population": "committed Banking77 record ids; not rolling fleet traffic",
+    "probability_source": "raw probability entries, not row.confidence; no pre-normalization",
+    "time_filter": "none; frozen source hashes and DEV/held ids define the population"
+  },
+  "derivation": {
+    "clef": {
+      "bin_confidence_sums": [
+        "0.0",
+        "0.0",
+        "0.7632111315846907",
+        "1.7811464607125103",
+        "1.3740964062767185",
+        "5.451233906007994",
+        "7.135205884369532",
+        "9.80517647250975",
+        "20.568716370777192",
+        "518.7890911552598"
+      ],
+      "bin_correct_counts": [
+        0,
+        0,
+        2,
+        4,
+        2,
+        7,
+        6,
+        10,
+        20,
+        526
+      ],
+      "bin_counts": [
+        0,
+        0,
+        3,
+        5,
+        3,
+        10,
+        11,
+        13,
+        24,
+        531
+      ],
+      "dev_correct_count": 190,
+      "dev_count": 200,
+      "floored_entries": 0,
+      "floored_rows": 0,
+      "held_correct_count": 577,
+      "held_count": 600,
+      "held_ece": "0.024566611204658775",
+      "platt_a": "1.3526520145076346",
+      "platt_b": "0.0002885751250081534"
+    },
+    "dev_ids_sha256": "8cd07882eb81c64241a698b10709abdd7a9bb37a09743084ccc3260a11ba5233",
+    "held_ids_sha256": "387d6d38300cb5964250c17795d4d7ebfd976e03b75ac57b06108977ee32c904",
+    "implementation_path": "work/local-decision-arms/derive-calibration-reference.py",
+    "implementation_sha256": "29e412de451d738ff3e611606e2eee4e6e8d182b30ea4d341b4af4c09ab22f86",
+    "intent_count": 77,
+    "jev": {
+      "bin_confidence_sums": [
+        "0.1316548383409878",
+        "1.5969313657231252",
+        "5.418913617046185",
+        "9.106626875348528",
+        "11.279326166555025",
+        "13.417265556066257",
+        "15.785083491866692",
+        "34.91596907628828",
+        "373.286188405274",
+        "0.0"
+      ],
+      "bin_correct_counts": [
+        1,
+        1,
+        9,
+        11,
+        9,
+        13,
+        14,
+        34,
+        380,
+        0
+      ],
+      "bin_counts": [
+        2,
+        10,
+        21,
+        26,
+        25,
+        24,
+        24,
+        46,
+        422,
+        0
+      ],
+      "dev_correct_count": 155,
+      "dev_count": 200,
+      "floored_entries": 59552,
+      "floored_rows": 800,
+      "held_correct_count": 472,
+      "held_count": 600,
+      "held_ece": "0.03175198653414941",
+      "platt_a": "2.1198209187396593",
+      "platt_b": "0.12564660573730493"
+    },
+    "jev_source_count": 3080,
+    "runtime": {
+      "cross_runtime_bit_identity": "not claimed; frozen .002 consumer tolerance unchanged",
+      "implementation": "cpython",
+      "platform": "darwin",
+      "python": "3.14.2"
+    },
+    "seed_splits_verified": true,
+    "source_count": 3080
+  },
+  "historical": {
+    "absolute_tolerance": "0.002",
+    "interpretation": "Historical FAIL remains; authorized post-observation reference reconciliation, not a prospective quality win.",
+    "prior_full_vector_held_ece_recorded": "0.0317",
+    "prior_full_vector_result": "FAIL",
+    "scalar_reference": "0.0276"
+  },
+  "inputs": [
+    {
+      "path": "work/choice-banking77/full.jsonl",
+      "sha256": "60c42d092665d74e78db7b524c9c214a75215df699734388164136d34d60956e"
+    },
+    {
+      "path": "work/choice-banking77/rows-full-jev.jsonl",
+      "sha256": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3"
+    },
+    {
+      "path": "work/local-decision-arms/rows-clefflash-dev.jsonl",
+      "sha256": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099"
+    },
+    {
+      "path": "work/local-decision-arms/rows-clefflash.jsonl",
+      "sha256": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb"
+    },
+    {
+      "path": "work/local-decision-arms/run.py",
+      "sha256": "3ba2998c280ca25f58413f8b8f5e516f9439663d00cc262598ce059c5db01f78"
+    }
+  ],
+  "method": {
+    "arithmetic": "Python binary64; math.log and math.exp; decimal strings use repr",
+    "clef_confidence": "max(p_choice, 0.005); no vector available",
+    "correctness": "normalized Jev row.choice == row.intent; Clef row.choice == row.intent",
+    "dev_count": 200,
+    "dev_seed": 8,
+    "ece_bins": 10,
+    "fit_split": "DEV only",
+    "floor": "0.005",
+    "held_count": 600,
+    "held_seed": 7,
+    "id_hash_encoding": "UTF-8 compact JSON sorted integer id list; no newline",
+    "initial_a": "1",
+    "initial_b": "0",
+    "jev_confidence": "max(floor_each_vector_entry) / sum(floor_each_vector_entry)",
+    "logit_clip": "0.0001",
+    "platt_iterations": 2000,
+    "platt_learning_rate": "0.1",
+    "renormalize": true,
+    "sum_order": "input file order; ECE bins ascending"
+  },
+  "reference": {
+    "absolute_tolerance": "0.002",
+    "jev_held_ece": "0.03175198653414941"
+  },
+  "schema_version": "d2-reference.v1"
+}
