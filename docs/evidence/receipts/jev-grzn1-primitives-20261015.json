@@ -1,0 +1,90 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_d66c7c80202fb6ff0e41ec7e8679613662ccf925fe1005d8649120db1fc56392",
+ "limitations": [
+  "Offline artifact audit and planning only; fixture session is synthetic and no live L3 claim is made",
+  "Canonical ledger has zero observations and cannot pass; source-derived live budget is not declared by this unit and default CLI refuses it",
+  "Original parent execution, call-budget source proof, isolation, memory harness and non-author live acceptance remain incomplete",
+  "Fleet plan emits hub observations rather than RPC; no session, service, shared config or secret operation executed",
+  "UBS ignores owned scratch environment; seven JSON-load warnings fail closed and strict-type warning deliberately excludes bool/int equivalence"
+ ],
+ "operation": "grzn1-receipt-parser-planner-primitives",
+ "parameters": {
+  "bead": "jev-grzn.1",
+  "subject_sha256": "e4bbd7442ed936f8623aa7733bfc8ef284afe2bccf5aa0509d35562baa293c37"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "canonical_ledger_observations": 0,
+  "cli": {
+   "canonical-no-live-budget": {
+    "exit": 1,
+    "status": "REFUSED",
+    "stderr_bytes": 0,
+    "stdout_sha256": "bede88e57c4d515db5918766a8949990df8d1e676103586efc6fdf7c2eba619f"
+   },
+   "declaration-mismatch": {
+    "exit": 1,
+    "status": "FAIL",
+    "stderr_bytes": 0,
+    "stdout_sha256": "95c091637c4a1041aea65f0d88bf988bfe0262aa5ff30200be21a98cf7f40215"
+   },
+   "healthy-artifact-audit": {
+    "exit": 0,
+    "status": "PASS",
+    "stderr_bytes": 0,
+    "stdout_sha256": "da94df2e7b59036bbcfe7a609a4aef4600b8d6b467167be1c101be9abf6d3025"
+   },
+   "healthy-plan": {
+    "exit": 0,
+    "status": "PLAN",
+    "stderr_bytes": 0,
+    "stdout_sha256": "89a7d6f67681bcaf1c924552c2fffb98ec3ebc267dad0c7031556bc019f7208f"
+   },
+   "missing-per-surface-k": {
+    "exit": 1,
+    "status": "REFUSED",
+    "stderr_bytes": 0,
+    "stdout_sha256": "bede88e57c4d515db5918766a8949990df8d1e676103586efc6fdf7c2eba619f"
+   },
+   "missing-receipts": {
+    "exit": 1,
+    "status": "FAIL",
+    "stderr_bytes": 0,
+    "stdout_sha256": "49183576e45e7ebf78945d89ddd4eca9bb0f08e22db5e122005181f97c1e984f"
+   },
+   "missing-total-budget": {
+    "exit": 1,
+    "status": "REFUSED",
+    "stderr_bytes": 0,
+    "stdout_sha256": "bede88e57c4d515db5918766a8949990df8d1e676103586efc6fdf7c2eba619f"
+   },
+   "positive-no-log": {
+    "exit": 1,
+    "status": "FAIL",
+    "stderr_bytes": 0,
+    "stdout_sha256": "c7967c07f8252284dfad57ecea93fc7ec5d6b33e7fe6a99c79c988fd0945e09d"
+   }
+  },
+  "date_utc": "2026-10-15",
+  "live_l3_proven": false,
+  "model_calls": 0,
+  "observed_fixture_sha256": "183fb6ede05aaede58b81651e7381d99b13e380fcb66d4a038d5e9e54bcbf748",
+  "observed_fixture_source": "kit/fixtures/gate/answers-jev.jsonl",
+  "quality_delta_exit": 0,
+  "quality_delta_gating": 0,
+  "source_sha256": {
+   "work/l3-receipts/PREREG.md": "ef5dee7d0e7ae50b121e98eebbc9216e3adda2884ca0f881b012efe85e0a4553",
+   "work/l3-receipts/receipts.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "work/l3-receipts/run.py": "fb0052910592af4868fb87ae595196ad029160fa3e08a5f9aa6ea731c22e2a7c",
+   "work/l3-receipts/test_run.py": "373e8288db49063ae4d5383ea1dabf1607411714968009f3b2a82fbc870a81c2"
+  },
+  "ubs_critical": 0,
+  "ubs_exit": 0,
+  "ubs_warning": 8,
+  "unit_test_exit": 0,
+  "unit_tests_failed": 0,
+  "unit_tests_passed": 18
+ }
+}
