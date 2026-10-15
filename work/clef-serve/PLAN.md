@@ -65,3 +65,24 @@ unavailable, this leg is reported NOT_RUN, not green.
 - Entry: leaf bead claimed; leases valid; retained source readable.
 - Exit: acceptances 1-2 green with N/model/date/latency/spend/hash reported;
   DONE to director with exact cmd/output/exit; no self-close.
+
+## Bead items (planning-convert fenced; decomposition before implementation)
+
+```text
+### clef-serve-bootstrap — Promote retained Clef-Flash server to tracked work/clef-serve with byte fingerprint and owned lifecycle
+type: task priority: 1
+labels: plan:oy76-bootstrap, mission:jev, pillar:local-first
+depends-on: (none)
+existing: (new)
+discovered-from: jev-oy76 acceptance items 1-2; retained source var/agent-tmp/clef-serve.dadu.20261010/serve.py
+WHAT: (a) work/clef-serve/serve.py is the promoted loopback server with GET / returning joint_head/index byte fingerprint. (b) work/clef-serve/fingerprint.py exposes the pure byte-hash function with unittest proof including a planted filename-instead-of-bytes failure. (c) scripts/clef-serve.sh start|stop|status owns the test-process lifecycle via PID file and reports foreign :8010 listeners as not jev-owned.
+WHY: oy76 items 1-2 (tracked server + lifecycle) are implementable without the blocked gateway attribution in item 3; this leaf is the implementation prerequisite oy76 consumes.
+ACCEPTANCE:
+- [a] `python3 -m unittest work/clef-serve/test_fingerprint.py` exits 0 on known bytes.
+- [a] Planted negative: fingerprint over file names instead of bytes FAILS.
+- [b] `bash scripts/clef-serve.sh start` (Clef-Flash weights loaded) then `status` shows :8010 + live fingerprint; `stop` leaves PID gone and port closed.
+- [b] Planted negative: a `--no-model` fingerprint-only run is reported NOT_RUN for the lifecycle leg, never green.
+- [c] `status` with a foreign :8010 listener and no owned PID file reports not jev-owned; `stop` refuses to kill a PID it does not own.
+- [c] Planted negative: `stop` presented with a live foreign PID exits nonzero and kills nothing.
+NO-CLAIM: This leaf does not prove gateway attribution, routing, or any oy76 item 3 claim.
+```
