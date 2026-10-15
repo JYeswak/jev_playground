@@ -1,0 +1,81 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_689647cad274dc36fbcdcf1cc31449f8501c92665408516cdf9034c57d4b9662",
+ "limitations": [
+  "Terminal NOT_REACHABLE for frozen zero-harm organic cohort. Synthetic positive/class-removal controls prove tool mechanics only, not organic harms, a reachable experiment, model quality, provider authorization or publication."
+ ],
+ "operation": "independent-p4-terminal-feasibility-replay",
+ "parameters": {
+  "bead": "jev-p4-gate-bar-gtok",
+  "candidate": "ad7a5ae0b3425fae3e590f6c2b26d5c885f9c180",
+  "subject_sha256": "7fdcf025c99033c07233b62fbfb3ff491c0d1705522903bae99713889ee4e97e"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "candidate": "ad7a5ae0b3425fae3e590f6c2b26d5c885f9c180",
+  "controls_are_synthetic_not_organic_harms": true,
+  "implementer": "WildDog",
+  "mathematical_controls": {
+   "healthy": {
+    "exit": 0,
+    "reason": null,
+    "status": "REACHABLE"
+   },
+   "remove-clean-class": {
+    "exit": 1,
+    "reason": "auc minority class empty: positive=40 negative=0; infeasible input: labelled clean outcomes",
+    "status": "NOT_REACHABLE"
+   },
+   "remove-harmful-class": {
+    "exit": 1,
+    "reason": "auc minority class empty: positive=0 negative=70; infeasible input: labelled harmful outcomes",
+    "status": "NOT_REACHABLE"
+   },
+   "restored": {
+    "exit": 0,
+    "reason": null,
+    "status": "REACHABLE"
+   }
+  },
+  "model_calls": 0,
+  "new_organic_experiment_authorized": false,
+  "public_command": "python3 scripts/bar-reachable.py --prereg work/gate-family/prereg/PREREG.md --json",
+  "public_exit": 1,
+  "public_output": {
+   "cohort_path": "/Users/josh/Developer/jev/var/agent-tmp/p4-review.46486/tree/work/gate-family/prereg/reach.json",
+   "cohort_sha256": "cf7db84571afb1195674b3ed30675d80194a983370c2e367d4759f517b6d2b8b",
+   "mode": "auc",
+   "prereg_path": "/Users/josh/Developer/jev/var/agent-tmp/p4-review.46486/tree/work/gate-family/prereg/PREREG.md",
+   "prereg_sha256": "42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec",
+   "reason": "auc minority class empty: positive=0 negative=45; infeasible input: labelled harmful outcomes",
+   "status": "NOT_REACHABLE"
+  },
+  "publication_done": false,
+  "reviewer": "LavenderDune",
+  "source_bytes_unchanged": true,
+  "source_sha256": {
+   "scripts/bar-reachable.py": "9ad826120a60dd6f1883f5b3d8ae53ee332be25b19fc5b15dfecd68e3206194c",
+   "scripts/test_bar_reachable.py": "0f1c924392e6cdbd82f4595a33bea3a59325c9bb898a540b17fc94cefcc86a6a",
+   "work/gate-family/demand/receipt.json": "bcd50606cec0afa0c2b93b341c4a8a37ac76ceeaba89cd09832354e85b62ccff",
+   "work/gate-family/demand/rows-hash-only.jsonl": "ac1a6362dcb3deedc37207349a1ca3b3d5466fa2969d78c7c228733a64494413",
+   "work/gate-family/prereg/PREREG.md": "42dd86b5dfb42179ab27c3ffcbdf7528b4277d7942b714f3e5c267a7236847ec",
+   "work/gate-family/prereg/reach.json": "cf7db84571afb1195674b3ed30675d80194a983370c2e367d4759f517b6d2b8b"
+  },
+  "split": {
+   "cohort_ids_exactly_labelled_zero_based_positions": true,
+   "dev_distinct_sessions": 6,
+   "dev_missing_session": 0,
+   "held_distinct_sessions": 6,
+   "held_missing_session": 0,
+   "labelled_rows": 45,
+   "raw_sessions_or_commands_emitted": false,
+   "shared_session_count": 0,
+   "window_rows": 15481
+  },
+  "tests_command": "python3 -m unittest scripts/test_bar_reachable.py -v",
+  "tests_exit": 0,
+  "tests_passed": 14,
+  "tests_stderr_sha256": "4eb5d3c134126fecc004ef12dd998fcd9b22e7e89ee71f2574901de6dcc46de5"
+ }
+}
