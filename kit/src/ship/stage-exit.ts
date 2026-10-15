@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
 /**
@@ -107,4 +108,46 @@ export async function loadStageReceipt(
   } catch {
     fail(`stage receipt artifact is not valid JSON: ${String(url)}`);
   }
+}
+
+/**
+ * Full eligibility path: load the artifact, verify the payload (artifact
+ * minus its source block) against the declared source hash, then run both
+ * exit checks on its fields. Any step refuses; caller-supplied objects
+ * never reach the checks directly. Producers hash the payload before
+ * attaching the source block.
+ */
+export async function checkStageEligibility(
+  url: string | URL,
+  read: typeof readFile = readFile,
+): Promise<{ eligible: true }> {
+  let text: string;
+  try {
+    text = await read(url, "utf8");
+  } catch {
+    fail(`stage receipt artifact missing or unreadable: ${String(url)}`);
+  }
+  const artifact: unknown = JSON.parse(text!);
+  if (artifact === null || typeof artifact !== "object") {
+    fail("stage receipt artifact must be a JSON object");
+  }
+  const record = artifact as Record<string, unknown>;
+  const { source: _detached, ...payload } = record;
+  const source = _detached;
+  assertSource(source);
+  const actual = createHash("sha256").update(JSON.stringify(payload), "utf8").digest("hex");
+  const declared = (source as ReceiptSource).sha256;
+  if (actual !== declared) {
+    fail("stage receipt bytes disagree with declared source hash");
+  }
+  checkDroppedUnlabelled({
+    outcomePositives: record["outcomePositives"] as number,
+    window: record["window"] as string,
+    source: source as ReceiptSource,
+  });
+  checkAdoption({
+    elapsedMinutes: record["elapsedMinutes"] as number,
+    source: source as ReceiptSource,
+  });
+  return { eligible: true };
 }

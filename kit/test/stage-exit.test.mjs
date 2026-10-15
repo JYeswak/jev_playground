@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync } from "node:fs";
@@ -8,6 +9,7 @@ import {
   DROPPED_UNLABELLED_MAX,
   checkAdoption,
   checkDroppedUnlabelled,
+  checkStageEligibility,
   loadStageReceipt,
 } from "../src/ship/stage-exit.ts";
 
@@ -110,4 +112,46 @@ test("malformed receipt artifact fails", async () => {
   const file = join(dir, "stage-receipt.json");
   writeFileSync(file, "{not json", "utf8");
   await assert.rejects(loadStageReceipt(new URL(`file://${file}`)), /not valid JSON/);
+});
+
+test("eligibility through loader passes on a hash-bound artifact", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "stage-exit-"));
+  const file = join(dir, "stage-receipt.json");
+  const payload = { outcomePositives: 12, window: "14d", elapsedMinutes: 30 };
+  const body = {
+    ...payload,
+    source: {
+      path: file,
+      sha256: createHash("sha256").update(JSON.stringify(payload), "utf8").digest("hex"),
+      collectedAt: "2026-10-15T00:00:00Z",
+    },
+  };
+  writeFileSync(file, JSON.stringify(body), "utf8");
+  assert.deepEqual(await checkStageEligibility(new URL(`file://${file}`)), {
+    eligible: true,
+  });
+});
+
+test("tampered artifact bytes refuse through the same entry", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "stage-exit-"));
+  const file = join(dir, "stage-receipt.json");
+  const body = {
+    outcomePositives: 12,
+    window: "14d",
+    elapsedMinutes: 30,
+    source: { path: file, sha256: "0".repeat(64), collectedAt: "2026-10-15T00:00:00Z" },
+  };
+  const payload = { outcomePositives: 12, window: "14d", elapsedMinutes: 30 };
+  body.source.sha256 = createHash("sha256")
+    .update(JSON.stringify(payload), "utf8")
+    .digest("hex");
+  writeFileSync(file, JSON.stringify({ ...body, elapsedMinutes: 99 }), "utf8");
+  await assert.rejects(checkStageEligibility(new URL(`file://${file}`)), /disagree/);
+});
+
+test("unrelated real file refuses through the same entry", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "stage-exit-"));
+  const file = join(dir, "banking77.json");
+  writeFileSync(file, JSON.stringify({ intents: 77 }), "utf8");
+  await assert.rejects(checkStageEligibility(new URL(`file://${file}`)), /refused/);
 });
