@@ -196,6 +196,24 @@ def authorize_arm(design_id: str, prereg_text: str) -> str:
         return design_id
     raise Refused(f"NOT_PREREGISTERED: model arm '{design_id}' has no preregistered design")
 
+def verify_receipt_block(block: dict, answers_rows: list, dev_ids: set, held_ids: set, answers_sha: str) -> dict:
+    """Recompute the RECEIPT machine block from answers rows; raise Refused
+    naming the first mismatching field. The tool itself calls this before
+    printing any score, so a drifted receipt fails closed."""
+    dev_rows = [r for r in answers_rows if r.get("session") in dev_ids]
+    held_rows = [r for r in answers_rows if r.get("session") in held_ids]
+    expected = {
+        "answers_rows": len(answers_rows),
+        "answers_sha256": answers_sha,
+        "cohorts_dev": summarize(dev_rows),
+        "cohorts_held": summarize(held_rows),
+        "unclassified_errors": sum(1 for r in answers_rows if not r.get("class")),
+    }
+    mismatches = [k for k in expected if expected[k] != block.get(k)]
+    if mismatches:
+        raise Refused(f"RECEIPT_MISMATCH: fields differ: {', '.join(mismatches)}")
+    return {"ok": True, "checked": sorted(expected)}
+
 class Refused(Exception):
     pass
 
@@ -316,6 +334,25 @@ def main(argv: list[str]) -> int:
     unmarked = [e for e in scored["episodes"] if e["session"] is None]
     dev_eps = [e for e in scored["episodes"] if (e["session"] or "") in dev_ids]
     held_eps = [e for e in scored["episodes"] if (e["session"] or "") in held_ids]
+    root = Path(__file__).resolve().parent.parent.parent
+    answers_path = root / "kit" / "fixtures" / "recover" / "answers-observed.jsonl"
+    receipt_path = root / "work" / "recover" / "RECEIPT.md"
+    try:
+        answers_bytes = answers_path.read_bytes()
+        answers_rows = [json.loads(line) for line in answers_bytes.decode("utf-8").splitlines() if line.strip()]
+        receipt_text = receipt_path.read_text(encoding="utf-8")
+        start = receipt_text.index("```json", receipt_text.index("## Machine block"))
+        block = json.loads(receipt_text[start + len("```json"):receipt_text.index("```", start + 7)])
+    except (OSError, ValueError) as exc:
+        report = {"tool": "rule.py", "receipt_check": {"status": "UNVERIFIED", "reason": str(exc)}}
+        print(json.dumps(report, indent=2))
+        return 0
+    try:
+        check = verify_receipt_block(block, answers_rows, dev_ids, held_ids,
+                                     hashlib.sha256(answers_bytes).hexdigest())
+    except Refused as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     report = {"tool": "rule.py", "bead": "jev-n4-recover-error-rule-1grh",
               "estimand": "OBSERVATIONAL",
               "task": identity,
@@ -324,7 +361,8 @@ def main(argv: list[str]) -> int:
               "cohorts_dev": summarize(dev_eps),
               "cohorts_held": summarize(held_eps),
               "unclassified_errors": sum(1 for e in scored["episodes"] if not e["class"]),
-              "unmarked_session_errors": len(unmarked)}
+              "unmarked_session_errors": len(unmarked),
+              "receipt_check": {"status": "VERIFIED", **check}}
     print(json.dumps(report, indent=2))
     return 0
 

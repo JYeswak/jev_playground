@@ -97,3 +97,11 @@ and not a substitute for fleet-session measurement with real labels.
   fixture task split, verifies answers sha256 against file bytes, and fails
   a mutated block; synthetic nonempty cohort proves the SCORED branch.
 - Unit suite: 38/38. Fixture re-run rc=0 unchanged.
+
+## Run v7 (receipt self-verification)
+
+- `rule.py --json` verifies the committed machine block before printing:
+  VERIFIED all 5 fields, rc=0. Mismatch prints reason to stderr, rc=2,
+  no score output.
+- Unit suite: 38/38 (verifier match + mutated-refusal via executable
+  verify_receipt_block; R142 hard refusal even when listed).

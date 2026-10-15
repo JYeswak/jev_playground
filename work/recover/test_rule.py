@@ -23,6 +23,7 @@ from work.recover.rule import (
     score_rows,
     split_sessions,
     summarize,
+    verify_receipt_block,
     wilson_interval,
 )
 
@@ -270,12 +271,19 @@ class RecordedAnswersTest(unittest.TestCase):
         self.assertEqual(block["cohorts_dev"], summarize(dev_rows))
         self.assertEqual(block["cohorts_held"], summarize(held_rows))
 
-    def test_mutated_block_fails_recompute(self):
+    def test_mutated_block_refused_by_verifier(self):
+        import hashlib
         rows = [json.loads(line) for line in self.ANSWERS.read_text(encoding="utf-8").splitlines() if line.strip()]
+        _, fixture_rows, _ = load_task(self.TASK)
+        dev_ids, held_ids = split_sessions(fixture_rows)
+        file_sha = hashlib.sha256(self.ANSWERS.read_bytes()).hexdigest()
         block = self.load_block()
+        self.assertEqual(
+            verify_receipt_block(block, rows, dev_ids, held_ids, file_sha)["ok"], True)
         mutated = dict(block, unclassified_errors=block["unclassified_errors"] + 999)
-        self.assertNotEqual(mutated["unclassified_errors"],
-                            sum(1 for r in rows if not r.get("class")))
+        with self.assertRaises(Refused) as ctx:
+            verify_receipt_block(mutated, rows, dev_ids, held_ids, file_sha)
+        self.assertIn("RECEIPT_MISMATCH", str(ctx.exception))
 
     def test_scored_branch_on_synthetic_nonempty_cohort(self):
         synthetic = ([{"class": "timeout", "agree": True, "next_ok": True}] * 6 +
