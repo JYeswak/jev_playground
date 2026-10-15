@@ -21,6 +21,8 @@
 # one stdout record line `NOTIFY <OUTCOME>: <detail>`; the log line keeps
 # today's shape `<UTC timestamp> rc=<runner rc> <last output line>`. A failing
 # notifier never changes the runner outcome.
+# The message travels as argv to a static `on run argv` handler, never
+# interpolated into AppleScript source: model-controlled output stays data.
 # The runner never embeds a repository path: the default canary resolves
 # relative to this script's directory, and all locations come from flags/env.
 set -u
@@ -59,7 +61,7 @@ done
 
 if [ ! -f "$CANARY" ]; then
   echo "NOTIFY ERROR: canary not found"
-  "$NOTIFY_BIN" -e "display notification \"ERROR: canary not found\" with title \"Jev canary\"" >/dev/null 2>&1 || :
+  "$NOTIFY_BIN" -e 'on run argv' -e 'display notification (item 1 of argv) with title "Jev canary"' -e 'end run' "ERROR: canary not found" >/dev/null 2>&1 || :
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) rc=3 canary not found" >> "$LOG_FILE"
   exit 3
 fi
@@ -84,7 +86,7 @@ esac
 mkdir -p "$(dirname "$LOG_FILE")"
 if [ "$notify" -eq 1 ]; then
   echo "NOTIFY $outcome: $lastline"
-  "$NOTIFY_BIN" -e "display notification \"$outcome: $lastline\" with title \"Jev canary\"" >/dev/null 2>&1 || :
+  "$NOTIFY_BIN" -e 'on run argv' -e 'display notification (item 1 of argv) with title "Jev canary"' -e 'end run' "$outcome: $lastline" >/dev/null 2>&1 || :
 fi
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) rc=$exitcode $lastline" >> "$LOG_FILE"
 exit "$exitcode"

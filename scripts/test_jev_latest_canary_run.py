@@ -34,9 +34,10 @@ while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do shift; done
 exec "$@"
 """ % (AUTH_TEXT, AUTH_TEXT)
 
-# Stub notifier: records each invocation's arguments, exits $NOTIFY_RC.
+# Stub notifier: records each invocation's argv joined by \x1f (so hostile
+# payloads cannot blend across argument boundaries), exits $NOTIFY_RC.
 NOTIFY_STUB = """#!/usr/bin/env bash
-echo "$@" >> "$NOTIFY_LOG"
+IFS=$'\\x1f'; echo "$*" >> "$NOTIFY_LOG"
 exit "${NOTIFY_RC:-0}"
 """
 
@@ -152,6 +153,19 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertIn("AUTH", calls[0])
         (line,) = self.log_lines()
         self.assertIn("rc=4", line)
+
+    def test_hostile_output_stays_argv_data(self):
+        evil = 'MOVED: x" & quoted & "y\\z'
+        proc = self.invoke(1, evil)
+        self.assertEqual(proc.returncode, 1)
+        (call,) = self.notify_calls()
+        parts = call.split("\x1f")
+        # Static AppleScript fragments, then the message verbatim as argv.
+        self.assertEqual(len(parts), 7)
+        self.assertEqual(parts[0], "-e")
+        self.assertEqual(parts[-1], f"MOVED: {evil}")
+        for code in parts[1:-1:2]:
+            self.assertNotIn(evil, code)
 
     def test_auth_text_overrides_canary_exit_1(self):
         # The planted Infisical failure exits 1 like a MOVED canary; only the
