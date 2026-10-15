@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import subprocess  # nosec B404 - fixed local test script only
 import sys
 from tempfile import TemporaryDirectory
@@ -267,6 +268,42 @@ class BarReachabilityTests(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "PREREG.md").write_text("reach-mode: auc\n", encoding="utf-8")
+            code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
+            self.assertEqual(code, 2)
+            self.assertEqual(receipt["status"], "ERROR")
+
+    def test_witness_row_removal_refuses(self):
+        # Individual semantic witness: covered row 4788
+        # (cmdSha 823686c7…, session 01a12200…, 2026-10-10T00:52:24Z).
+        # Removing exactly that row must refuse before any verdict.
+        real_rows = ROOT / "work/gate-family/demand/rows-hash-only.jsonl"
+        lines = [
+            line for line in real_rows.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        witness = json.loads(lines[4788])
+        self.assertEqual(
+            witness["cmdSha"],
+            "823686c780eed0df85dcf21476eb2dce6be0c20908d89ae3e7b7c2057e186b31",
+        )
+        self.assertEqual(witness["session"], "01a12200-037f-777a-aba6-b3dd092ab589")
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            kept = lines[:4788] + lines[4789:]
+            self.assertEqual(len(kept), len(lines) - 1)
+            (root / "rows.jsonl").write_text("\n".join(kept) + "\n", encoding="utf-8")
+            shutil.copy(ROOT / "work/gate-family/prereg/PREREG.md", root / "PREREG.md")
+            shutil.copy(ROOT / "work/gate-family/prereg/reach.json", root / "reach.json")
+            shutil.copy(
+                ROOT / "work/gate-family/demand/receipt.json", root / "demand.json"
+            )
+            cohort = json.loads((root / "reach.json").read_text(encoding="utf-8"))
+            cohort["source"] = {
+                "rows_file": "rows.jsonl",
+                "window_rows_sha256": cohort["source"]["window_rows_sha256"],
+                "receipt": "demand.json",
+            }
+            (root / "reach.json").write_text(json.dumps(cohort), encoding="utf-8")
             code, receipt = run_checker("--prereg", str(root / "PREREG.md"))
             self.assertEqual(code, 2)
             self.assertEqual(receipt["status"], "ERROR")
