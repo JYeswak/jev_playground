@@ -1,0 +1,20 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_ccf226d3025a681e42faa25a22c28ee3917b673725112523af18371b824dae48",
+ "limitations": [
+  "Native capture fixture and frozen-frame recovery only; no Clef quality or non-inferiority result.",
+  "51 direct episode joins/full request authority remain incomplete; scoring prohibited.",
+  "UBS timed out; static scan and whole CI unverified. No publication or non-author acceptance claimed."
+ ],
+ "operation": "jev.find.capture-recovery",
+ "parameters": {
+  "bead": "jev-3ck9",
+  "subject_sha256": "82f018ae0b9c601346ce40699d2a4c868230310e3b40ab6dbe7de585ccb38dc2"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 5985,
+  "sha256": "02ed0e7a86f9799ece4a5244f209a97aa844e58bc48e051fc2420e2d8612b10d"
+ }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "jev.find-capture-recovery.v1",
+  "bead": "jev-3ck9",
+  "recorded_at": "2026-10-15T06:47:46.048Z",
+  "status": "INCOMPLETE_HISTORICAL_PARITY",
+  "sources": [
+    {
+      "path": "work/jev-3ck9/recover.mjs",
+      "sha256": "f1f2162c58d913e6a15278485406ea8ee467ea950b4d59ab97062711c392600c"
+    },
+    {
+      "path": "work/jev-3ck9/recover.test.mjs",
+      "sha256": "221d01c485060c94f3d380f2f310a720afecd2b847e4eb88a6a30a7feadb4254"
+    },
+    {
+      "path": "work/jev-3ck9/capture.mjs",
+      "sha256": "6ac46a4177144e8af67627445c9b05a1d45d8c1e0dadbdd2b995136ab2ceb58a"
+    },
+    {
+      "path": "work/jev-3ck9/capture.test.mjs",
+      "sha256": "c70d9c371ea3a399635637ce6b232680f1f130ab4cc00579e1c7c2c7cce99d42"
+    }
+  ],
+  "verification": {
+    "runtime": {
+      "node": "22.23.3",
+      "omp": "18.11.0",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "focused_tests": {
+      "command": "node --test work/jev-3ck9/recover.test.mjs work/jev-3ck9/capture.test.mjs",
+      "exit_code": 0,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "stdout_sha256": "3c7f9900383ce636d078ba95d69daea46973718ea29de3aeadb0e3a650cabbe0",
+      "stderr_bytes": 0
+    },
+    "native_capture": {
+      "exit_code": 0,
+      "mode": "CAPTURE_ONLY",
+      "purpose": "native capture plumbing only",
+      "historicalEpisodes": 0,
+      "parityClaim": false,
+      "adaptiveCascade": true,
+      "sourceExecutableEquivalence": "UNVERIFIED: inspected package source 18.10.3; executable version checked separately",
+      "executableVersion": "18.11.0",
+      "executableSha256": "85fe6ab9aec55a794d96086021136495f7613d6b1c8f2b08c05840d68233716a",
+      "boundary": {
+        "healthyLoopbackConnections": 1,
+        "sandboxLoopbackConnections": 0,
+        "networkDenied": true,
+        "outsideWritesDenied": true
+      },
+      "requestCount": 4,
+      "requests": [
+        {
+          "sha256": "a3a4a9b139fe8e1dd0ba3645a49eae427c9b19db5e32e843db4918b1f10e9698",
+          "bytes": 1771,
+          "questions": 2
+        },
+        {
+          "sha256": "7c6ab9167984ad83c39667e57f026bd87b58884c0f46856951bb82c53420c246",
+          "bytes": 1122,
+          "questions": 2
+        },
+        {
+          "sha256": "109e2c3d914d9d75c83fbf3ced023e443f8d5089591c948557f57de18659e285",
+          "bytes": 897,
+          "questions": 1
+        },
+        {
+          "sha256": "986cd52604d29304aae39054cf52de9834ebcc4600f830e24d2af5a628632812",
+          "bytes": 872,
+          "questions": 1
+        }
+      ],
+      "returnedHitCount": 2,
+      "resultSha256": "d7e578ef9a164aee4db516636085ab69fdddcf77bbb36dc2bcc71b6fedd463d8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "artifact_directory_sha256": "797ab7dafb30b8145c06f7fe030d0bea1a5d02a02f98b9a52c2f57358b7e6a23",
+      "filesystem_exception": "/dev/null is allowed for process I/O; ordinary outside writes are refused"
+    },
+    "recovery": {
+      "exit_code": 2,
+      "report_sha256": "53782fd5cc1101a98500cc21ac7e86113d363a3425bd56324e7a69d42237fbcb",
+      "invocation_sha256": "2366289246019abeede21f51e515983d1ac873d3225d2843e9270c5b7563c279",
+      "authenticated_window": {
+        "from": "2026-09-29T04:55:45.560638Z",
+        "through": "2026-10-06T04:55:45.560638Z"
+      },
+      "N_frame": 999,
+      "distinct_sessions": 57,
+      "observer_follow_through": 559,
+      "frame_sha256": "eaa9904b124ab19a618dadb4713763d2b9dc3a4c9d454211dcf16778021ac5a0",
+      "baseline_sha256": "fa821c712122adb144df2d12d851a5ce0795e5507ff8251bbb4d93eeb0005e29",
+      "observer_sha256": "c0dcac82ea0267d6596cac88e61d0399db6e9ba5bb427235bfc9163d44ac3989",
+      "counts": {
+        "joined": 948,
+        "missingSource": 0,
+        "duplicateSource": 0,
+        "unsearched": 0,
+        "missingResult": 51,
+        "ambiguous": 0,
+        "prunedResultEpisodes": 0
+      },
+      "full_request_authority": "UNKNOWN",
+      "source_fidelity": "UNKNOWN",
+      "N_capture": 0,
+      "N_labeled": 0,
+      "N_paired": 0,
+      "scoring_allowed": false
+    },
+    "real_frame_negatives": {
+      "exit_code": 0,
+      "originalN": 999,
+      "controls": [
+        {
+          "expected": "FRAME_COUNT_MISMATCH",
+          "observed": "FRAME_COUNT_MISMATCH",
+          "rejected": true
+        },
+        {
+          "expected": "DUPLICATE_OBSERVER_EPISODE",
+          "observed": "DUPLICATE_OBSERVER_EPISODE",
+          "rejected": true
+        }
+      ],
+      "modelRequests": 0
+    },
+    "ubs": {
+      "status": "UNVERIFIED_TIMEOUT",
+      "deadline_seconds": 120,
+      "complete": false,
+      "findings": null,
+      "owned_TMPDIR_ignored": true
+    }
+  },
+  "measurement": {
+    "typesafe_calls": 0,
+    "external_model_calls": 0,
+    "typesafe_spend_usd": "0.00",
+    "clef_quality_scored": false,
+    "non_inferiority": "UNKNOWN",
+    "profile_switch_authorized": false
+  },
+  "limitations": [
+    "The native positive is a fixed-answer capture-only metadata fixture, not historical capture or model-quality evidence.",
+    "The frozen999 frame is authenticated, but51 nested-eval episodes lack complete direct original call/request authority. No smaller cohort or imputed Jev pick is accepted.",
+    "Native find is adaptive; offline scoring of a fixed-answer capture trace cannot establish Clef-controlled cascade rank1.",
+    "Native caches lack session/tool-call identity and original full-file hashes; no cache-to-episode request authority is claimed.",
+    "Inspected source18.10.3 and actual executable18.11.0 are not asserted equivalent beyond exercised capture behavior.",
+    "Full NI/value/local rollout acceptance remains open. Shared configuration, local serving and TESTS.md peer hunks were not changed.",
+    "UBS timed out and staged outside the explicit TMPDIR. No scanner pass or whole-suite/CI claim is made.",
+    "This result is locally generated evidence, not proof of publication or non-author acceptance."
+  ]
+}
