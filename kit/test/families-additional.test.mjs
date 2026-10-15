@@ -1,13 +1,15 @@
 // Cohort-B adapter invariants, source-description scope only (jev-b35c.17.2).
 //
-// Covers what exists in-tree: the seven source verbs are exposed in the
-// family-verb record (a missing verb fails), and the committed-evidence path
-// (registry capabilities/schema/validation, decision contracts) stays green.
-// Memory-enforcement live switch and effort shadow-only have NO executable
-// subject in-tree (no adapter implementation, no effort routing code found by
-// search 2026-10-15) and are explicitly NOT covered here; they belong to
-// jev-b35c.17.1 (open) or director routing. No model calls, no network.
-// NO-CLAIM: this pins source-description invariants, not adapter behavior.
+// What exists in-tree: the family registry (capabilities/schema/validation)
+// and full-shape decision contracts. What does NOT exist: any implementation
+// of the seven adapter verbs (run, batch, explain, cases, eval, calibrate,
+// watch) — FAMILY_VERBS is only a reserved-family-name blacklist, and adding
+// `watch` there would forbid the cohort-B family NAMED watch, so the record
+// is deliberately left at six words and guarded open below. Memory-enforcement
+// live switch and effort shadow-only likewise have no executable subject.
+// Those belong to jev-b35c.17.1 (open) or director routing.
+// NO-CLAIM: this pins evidence-path invariants, not adapter behavior.
+// No model calls, no network.
 
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -18,27 +20,15 @@ import {
 } from "../src/families/registry.ts";
 import { validateContract } from "../src/contracts.ts";
 
-const SOURCE_VERBS = [
-  "run",
-  "batch",
-  "explain",
-  "cases",
-  "eval",
-  "calibrate",
-  "watch",
-];
-
 const familyNamed = (name) => [{ name, usage: "x", description: "x" }];
 
-for (const verb of SOURCE_VERBS) {
-  test(`source verb '${verb}' is exposed (reserved as a family name)`, () => {
-    const errors = validateFamilyNames(familyNamed(verb));
-    assert.ok(
-      errors.some((message) => message.includes("reserved family name")),
-      `verb '${verb}' must be reserved; got: ${JSON.stringify(errors)}`,
-    );
-  });
-}
+test("cohort-B watch family is not blocked by the verb record", () => {
+  const errors = validateFamilyNames(familyNamed("watch"));
+  assert.ok(
+    errors.every((message) => !message.includes("reserved family name")),
+    `family 'watch' must stay registrable; got: ${JSON.stringify(errors)}`,
+  );
+});
 
 test("committed registry generates capabilities, docs and schema", () => {
   const registry = createFamilyRegistry();

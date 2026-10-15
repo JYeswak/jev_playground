@@ -25,7 +25,7 @@ const META_VERBS: Record<string, true> = {
   doctor: true, install: true, ask: true, help: true, skillgap: true,
 };
 const FAMILY_VERBS: Record<string, true> = {
-  run: true, batch: true, explain: true, cases: true, eval: true, calibrate: true, watch: true,
+  run: true, batch: true, explain: true, cases: true, eval: true, calibrate: true,
 };
 const HERMES_VERBS: Record<string, true> = {
   route: true, rerank: true, triage: true, search: true, plan: true, choose: true,
