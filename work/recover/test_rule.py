@@ -82,11 +82,11 @@ class ClassifyBashTest(unittest.TestCase):
 
 
 class ClassifyEditTest(unittest.TestCase):
-    def test_stale_tag(self):
-        self.assertEqual(classify_edit_error({"tag": "stale_tag", "path": "a.ts"}), "stale-tag")
+    def test_stale_tag_in_result_text(self):
+        self.assertEqual(classify_edit_error('edit failed: stale_tag mismatch, re-read first'), "stale-tag")
 
-    def test_ordinary_edit_unclassified(self):
-        self.assertIsNone(classify_edit_error({"path": "a.ts", "edits": []}))
+    def test_ordinary_edit_error_unclassified(self):
+        self.assertIsNone(classify_edit_error("edit failed: disk full"))
 
 
 class PrescriptionTest(unittest.TestCase):
@@ -185,6 +185,34 @@ class SplitTest(unittest.TestCase):
         dev, held = split_sessions(rows)
         self.assertEqual(dev, {"a", "b"})
         self.assertEqual(held, {"c"})
+
+class SessionIsolationTest(unittest.TestCase):
+    def session_rows(self, sid, calls):
+        rows = [{"type": "session", "id": sid, "timestamp": "2026-10-04T00:40:00Z"}]
+        for cid, err in calls:
+            rows.append({"type": "message", "message": {"role": "assistant", "content": [
+                {"type": "toolCall", "id": cid, "name": "bash", "arguments": {"command": "x"}}]}})
+            rows.append({"type": "message", "message": {"role": "toolResult", "toolCallId": cid,
+                                                        "toolName": "bash", "isError": err is not None,
+                                                        "content": [{"type": "text", "text": err or "ok"}]}})
+        return rows
+
+    def test_trailing_failure_has_no_next_action(self):
+        rows = self.session_rows("s1", [("c1", "timeout")]) + self.session_rows("s2", [("c2", None)])
+        eps = score_rows(rows)["episodes"]
+        self.assertEqual(len(eps), 1)
+        self.assertIsNone(eps[0]["action"])
+        self.assertIsNone(eps[0]["next_ok"])
+        self.assertFalse(eps[0]["agree"] is True)
+
+    def test_duplicate_call_ids_across_sessions_stay_independent(self):
+        rows = (self.session_rows("s1", [("c1", "timeout")]) +
+                self.session_rows("s2", [("c1", "syntax error near x")]))
+        eps = score_rows(rows)["episodes"]
+        self.assertEqual(len(eps), 2)
+        by_session = {e["session"]: e for e in eps}
+        self.assertEqual(by_session["s1"]["class"], "timeout")
+        self.assertEqual(by_session["s2"]["class"], "syntax")
 
 if __name__ == "__main__":
     unittest.main()

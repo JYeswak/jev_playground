@@ -53,9 +53,11 @@ def classify_bash_error(text: str) -> str | None:
     return None
 
 
-def classify_edit_error(arguments: dict) -> str | None:
-    blob = json.dumps(arguments or {}).lower()
-    if "stale_tag" in blob or "stale tag" in blob:
+def classify_edit_error(text: str) -> str | None:
+    """Classify from the error result text (where real stale-tag failures
+    surface), never from call arguments."""
+    lowered = (text or "").lower()
+    if "stale_tag" in lowered or "stale tag" in lowered:
         return "stale-tag"
     return None
 
@@ -95,16 +97,28 @@ def flag_violation(tool: str, error_class: str | None, action: str | None) -> bo
 
 
 def iter_calls(rows: list):
-    """Yield (call, result, next_call, next_result, session) tuples."""
-    pending: dict[str, dict] = {}
-    order: list[str] = []
-    current_session: str | None = None
+    """Yield (call, result, next_call, next_result, session) tuples.
+
+    Joins never cross session markers: each session (plus the leading
+    unmarked rows) is an independent partition, so a trailing failure
+    cannot borrow the next session's first action, and duplicate call IDs
+    in different sessions cannot overwrite each other.
+    """
+    partitions: list[tuple[str | None, dict, list]] = []
+
+    def new_partition(session: str | None):
+        partitions.append((session, {}, []))
+
+    new_partition(None)
+    current = 0
     for row in rows:
         if row.get("type") == "session" and isinstance(row.get("id"), str):
-            current_session = row["id"]
+            new_partition(row["id"])
+            current = len(partitions) - 1
             continue
         if row.get("type") != "message":
             continue
+        _, pending, order = partitions[current]
         message = row.get("message", {})
         if message.get("role") == "toolResult":
             cid = message.get("toolCallId")
@@ -123,16 +137,16 @@ def iter_calls(rows: list):
                 pending[cid] = {
                     "call": {"name": part.get("name"), "arguments": part.get("arguments", {})},
                     "result": None,
-                    "session": current_session,
                 }
                 order.append(cid)
-    calls = [pending[cid] for cid in order]
-    for i, entry in enumerate(calls):
-        nxt = calls[i + 1] if i + 1 < len(calls) else None
-        yield (entry["call"], entry["result"],
-               nxt["call"] if nxt else None,
-               nxt["result"] if nxt else None,
-               entry["session"])
+    for session, pending, order in partitions:
+        calls = [pending[cid] for cid in order]
+        for i, entry in enumerate(calls):
+            nxt = calls[i + 1] if i + 1 < len(calls) else None
+            yield (entry["call"], entry["result"],
+                   nxt["call"] if nxt else None,
+                   nxt["result"] if nxt else None,
+                   session)
 
 
 def error_text(result: dict | None) -> str:
@@ -176,7 +190,7 @@ def score_rows(rows: list) -> dict:
         if tool == "bash":
             klass = classify_bash_error(error_text(result))
         elif tool == "edit":
-            klass = classify_edit_error(call.get("arguments", {}))
+            klass = classify_edit_error(error_text(result))
         else:
             klass = None
         action = next_action_kind(call, nxt)

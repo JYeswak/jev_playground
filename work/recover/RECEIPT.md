@@ -54,3 +54,13 @@ and not a substitute for fleet-session measurement with real labels.
   absence. No comparison computed or claimed.
 - Unit suite: 27/27 (24 v1 + task-missing refusal, task resolution,
   deterministic split).
+
+## Run v3 (session isolation + edit-text classification)
+
+- Session-partitioned joins: trailing failures take no next action;
+  duplicate call IDs across sessions stay independent (both tested).
+- Edit errors classify from result text (stale_tag surfaces there), not
+  call arguments.
+- Fixture re-run rc=0: split dev{a,b}/held{c} unchanged; cohorts_dev {}
+  + cohorts_held {} (still zero R-class rows); unclassified 2, unmarked 0.
+- Unit suite: 29/29.
