@@ -1,0 +1,72 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_d0e649cdfa7aff9781b985e1fc6643cefc5ce7f0c6c9930a9d7749e3cd197f51",
+ "limitations": [
+  "Offline injected acceptance only; zero live model calls."
+ ],
+ "operation": "jev.lco8.non-author.acceptance",
+ "parameters": {
+  "bead": "jev-lco8",
+  "published_commit": "100422b9306114898c802478452427eeea85415a"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bead": "jev-lco8",
+  "lane": "offline injected production hook in immutable published export",
+  "limitations": [
+   "No live TypeSafe call, profile activation, whole CI, or installed global-copy claim.",
+   "Reviewer setup failures were corrected without changing published source; successful smoke uses documented content array and Ask result/status schema.",
+   "Smoke stderr contains a Node module-type informational warning."
+  ],
+  "model_calls": 0,
+  "published_commit": "100422b9306114898c802478452427eeea85415a",
+  "smoke": {
+   "exit_code": 0,
+   "result": {
+    "http402": {
+     "askerInvocations": 1,
+     "contentPreserved": true,
+     "rows": 5,
+     "statuses": [
+      "fail_open",
+      "paused",
+      "paused",
+      "paused",
+      "paused"
+     ]
+    },
+    "http429": {
+     "askerInvocations": 2,
+     "statuses": [
+      "fail_open",
+      "ok"
+     ]
+    },
+    "rawBodyAbsentFromRows": true,
+    "scope": "offline injected production hook factory at published100422b9"
+   },
+   "stdout_sha256": "f84be65e422dfa3642c71b8250849b870cd0a12bee0e3da8dcfa5b8954f41550",
+   "transport_attempts": 0
+  },
+  "source": [
+   {
+    "path": ".omp/hooks/post/jev-webscreen.ts",
+    "sha256": "7f1905a6436bedff4716325e3ab00eebf1c246bde80842212775e52bfd1df5d1"
+   },
+   {
+    "path": ".omp/hooks/post/jev-webscreen.test.mjs",
+    "sha256": "9db8da950f4937d3c009402711a6b567ca1701af5922f1296b6fc17f24929233"
+   }
+  ],
+  "spend_usd": "0.00",
+  "suite": {
+   "exit_code": 0,
+   "failed": 0,
+   "passed": 16,
+   "skipped": 0,
+   "stdout_sha256": "2b45e0f9cf75f3f3eddbdbba9e350cb1eb323c57d4ba0dbe0c353d1da6595fff",
+   "transport_attempts": 0
+  }
+ }
+}
