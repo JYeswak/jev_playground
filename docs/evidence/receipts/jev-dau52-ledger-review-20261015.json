@@ -1,9 +1,9 @@
 {
  "authority": "test",
  "confidence": "observed",
- "evidence_id": "ev_ba7c66c01331e98ac812f1147ddee7b2d4e0138dd3438cc8a75a6ea73c201f57",
+ "evidence_id": "ev_b8a7a4d1ab525284f9d3c8db1b00a85a02bbb2c368700c181c4ee964ed31f02c",
  "limitations": [
-  "Offline non-author ledger documentation only. Reuses earlier independent arithmetic without repeating forbidden old numeric runs. Parent labels/horizon remain UNQUALIFIED; no model calls, quality win, service or publication claim."
+  "REWORK: original AC2 preregistered-scorer binding absent, confirmed3563/3596. Only document fields, source hashes and six refusal probes pass. No full-child PASS/close, parent qualification, new numeric rerun/model call or publication."
  ],
  "operation": "review_dau5_ledger",
  "parameters": {
