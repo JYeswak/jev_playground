@@ -148,13 +148,6 @@ test('global hook audit catches copied hooks and accepts only hardlinks to the c
   assert.deepEqual(await audit.run(healthy.ctx), []);
 });
 
-test('outside-repo audit remains explicitly unavailable', async () => {
-  const item = detector(driftDetectors, 'fm-surfaces-outside-repo-audit');
-  assert.equal(item.availability, 'unavailable');
-  assert.ok(item.skipped_reason);
-  assert.deepEqual(await item.run(base(null)), []);
-});
-
 test('fleet watcher is healthy with a fresh liveness row and RED after two intervals', async () => {
   const stateDir = await fixture('doctor-watch-fresh');
   const detectorRun = detector(driftDetectors, 'fm-fleet-watch-stale').run;

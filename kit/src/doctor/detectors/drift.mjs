@@ -137,6 +137,129 @@ async function globalHookFindings(ctx) {
   return findings;
 }
 
+// This is a current-state audit, not proof that a loaded hook behaved correctly.
+// Unsupported declarations stay UNKNOWN rather than inheriting a presence-only pass.
+async function outsideRepoFindings(ctx) {
+  const findings = [];
+  const report = (surface, reason, details = {}, unknown = false) => {
+    findings.push(finding('P1', 'A', unknown ? 'Outside-repo audit coverage is UNKNOWN' : 'Outside-repo declared state differs from observed state', {
+      surface: surface?.id ?? null, reason, ...details,
+    }, 'Reconcile the canonical inventory with the named installed evidence; do not change live switches during an audit.'));
+  };
+  if (!ctx.repo || !ctx.home || !ctx.stateDir || ctx.inventory?.schema !== 'jev-inventory.expected.v1' ||
+    !Array.isArray(ctx.inventory.surfaces) || !ctx.inventory.surfaces.length ||
+    !Array.isArray(ctx.inventory.profiles) || !ctx.inventory.profiles.length ||
+    ctx.inventory.profiles.some((name) => !safeInventoryPath(name) || name.includes('/'))) {
+    report(null, 'required_inventory_or_scope_unavailable', {}, true);
+    return findings;
+  }
+  let repo;
+  let home;
+  try { [repo, home] = await Promise.all([realpath(ctx.repo), realpath(ctx.home)]); }
+  catch (error) {
+    report(null, 'scope_unreadable', { code: error?.code ?? 'UNKNOWN' }, true);
+    return findings;
+  }
+  const profiles = ctx.inventory.profiles.map((name) => ({
+    name, path: name === 'default' ? join(home, '.omp', 'agent') : join(home, '.omp', 'profiles', name, 'agent'),
+  }));
+  const ids = new Set();
+  for (const surface of ctx.inventory.surfaces) {
+    if (!surface || typeof surface.id !== 'string' || ids.has(surface.id) ||
+      !['on', 'off', 'inert'].includes(surface.expect)) {
+      report(surface, 'unsupported_surface_declaration', {}, true);
+      continue;
+    }
+    ids.add(surface.id);
+    if (surface.expect === 'off' && surface.log) {
+      // Only rerank's canonical inventory semantics define 3h silence as OFF.
+      // Extension logs alone cannot establish that their configured switch is OFF.
+      if (surface.id !== 'websearch-rerank') report(surface, 'off_switch_coverage_unavailable', {}, true);
+      if (!safeInventoryPath(surface.log) || surface.log.includes('/')) {
+        report(surface, 'unsupported_log_path', {}, true);
+        continue;
+      }
+      try {
+        const text = await readFile(join(ctx.stateDir, surface.log), 'utf8');
+        let recent = 0;
+        let invalid = false;
+        for (const line of text.split('\n')) {
+          if (!line.trim()) continue;
+          try {
+            const row = JSON.parse(line);
+            const ts = typeof row.ts === 'number' ? row.ts : Date.parse(row.ts);
+            if (!Number.isFinite(ts)) invalid = true;
+            else if (ts >= ctx.now - 3 * 60 * 60 * 1000) recent += 1;
+          } catch { invalid = true; }
+        }
+        if (recent) report(surface, 'declared_off_writer_active', { recent_rows: recent, window_ms: 3 * 60 * 60 * 1000 });
+        if (invalid) report(surface, 'writer_log_unparseable', {}, true);
+      } catch (error) {
+        // A missing log is not evidence that an OFF writer has stopped.
+        report(surface, 'writer_log_unavailable', { code: error?.code ?? 'UNKNOWN' }, true);
+      }
+      continue;
+    }
+    if (surface.group !== 'global' || surface.expect !== 'on') {
+      report(surface, 'unsupported_surface_scope', { group: surface.group ?? null }, true);
+      continue;
+    }
+    if (!safeInventoryPath(surface.repo) || typeof surface.hookfile !== 'string' ||
+      !safeInventoryPath(surface.hookfile) || surface.hookfile.includes('/')) {
+      report(surface, 'unsupported_install_declaration', {}, true);
+      continue;
+    }
+    const source = join(repo, surface.repo);
+    let sourceBytes;
+    let sourceStat;
+    try {
+      const sourceReal = await realpath(source);
+      sourceStat = await lstat(source);
+      if (!isWithin(repo, sourceReal) || sourceStat.isSymbolicLink() || !sourceStat.isFile()) throw new Error('unsafe source');
+      sourceBytes = await readFile(source);
+    } catch (error) {
+      report(surface, 'required_source_unavailable', { source: surface.repo, code: error?.code ?? 'UNSAFE' }, true);
+      continue;
+    }
+    let committed;
+    try {
+      committed = await ctx.exec('git', ['-C', repo, 'show', `HEAD:${surface.repo}`], {
+        timeout: 1000, maxBuffer: 4 * 1024 * 1024,
+      });
+    } catch { /* Report absent authority without printing command output or secrets. */ }
+    if (committed?.code !== 0 || typeof committed.stdout !== 'string') {
+      report(surface, 'committed_source_unavailable', { source: surface.repo }, true);
+      continue;
+    }
+    if (!sourceBytes.equals(Buffer.from(committed.stdout, 'utf8'))) {
+      report(surface, 'source_differs_from_committed', { source: surface.repo });
+    }
+    for (const profile of profiles) {
+      const target = join(profile.path, 'hooks', 'post', surface.hookfile);
+      const details = { profile: profile.name, target: relative(home, target), source: surface.repo };
+      try {
+        if (!await safeDirectoryParents(home, dirname(target))) {
+          report(surface, 'installed_path_escape', details);
+          continue;
+        }
+        const installed = await lstat(target);
+        if (!installed.isFile() || installed.isSymbolicLink()) {
+          report(surface, 'installed_not_regular_file', details);
+          continue;
+        }
+        const bytes = await readFile(target);
+        if (!bytes.equals(sourceBytes)) report(surface, 'installed_bytes_differ', details);
+        else if (installed.dev !== sourceStat.dev || installed.ino !== sourceStat.ino) {
+          report(surface, 'installed_not_source_hardlink', details);
+        }
+      } catch (error) {
+        report(surface, 'required_install_unavailable', { ...details, code: error?.code ?? 'UNKNOWN' }, true);
+      }
+    }
+  }
+  return findings;
+}
+
 export const detectors = [
   {
     id: 'fm-hooks-global-link-broken', subsystem: 'hooks', tier: 'D', repo_required: true,
@@ -145,10 +268,8 @@ export const detectors = [
   },
   {
     id: 'fm-surfaces-outside-repo-audit', subsystem: 'drift', tier: 'D', repo_required: false,
-    availability: 'unavailable',
-    skipped_reason: 'outside-repo audit implementation is not present',
-    data_sources: ['outside-repo audit script (unavailable)'],
-    async run() { return []; },
+    data_sources: ['ctx.inventory declared profiles and surfaces', 'committed source via git show HEAD:<repo>', 'installed global hook bytes and identity', 'declared-OFF writer logs (3h)'],
+    async run(ctx) { return outsideRepoFindings(ctx); },
   },
   {
     id: 'fm-fleet-watch-stale', subsystem: 'drift', tier: 'D', repo_required: false,
