@@ -112,6 +112,19 @@ class ReceiptPrimitiveTests(unittest.TestCase):
         self.inventory["surfaces"][0].pop("name", None)
         self.assertEqual(self.audit(agents="| | ON |")["status"], "FAIL")
 
+    def test_empty_or_whitespace_identity_cannot_match_blank_on_declaration(self) -> None:
+        original_id = self.inventory["surfaces"][0]["id"]
+        for invalid_id in ("", " \t "):
+            inventory = copy.deepcopy(self.inventory)
+            inventory["surfaces"][0]["id"] = invalid_id
+            budget = copy.deepcopy(self.budget)
+            budget["surfaces"] = {invalid_id: budget["surfaces"][original_id]}
+            with self.assertRaisesRegex(ValueError, "non-empty unique IDs"):
+                RUN.make_plan(inventory, budget)
+            self.assertFalse(RUN.declaration_on("| | ON |", inventory["surfaces"][0]))
+            self.assertFalse(RUN.declaration_on(
+                f'| {inventory["surfaces"][0]["name"]} | ON |', inventory["surfaces"][0]))
+
     def test_receipt_surface_or_profile_mismatch_fails(self) -> None:
         for field, value in [("surface", "webscreen"), ("profile", "unregistered")]:
             records = copy.deepcopy(self.records)

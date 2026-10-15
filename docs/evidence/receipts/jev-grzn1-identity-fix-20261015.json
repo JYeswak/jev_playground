@@ -1,0 +1,65 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_9ea8306290e569fd76f005c7bccee30260c7ce4a4249ffabecf58bed2287fa7e",
+ "limitations": [
+  "Reviewer actual pre-fix failure accepted as ground truth; no pre-fix failing rerun performed",
+  "After-fix healthy and empty-ID commands use reviewer retained observation-derived artifacts; whitespace is the same controlled identity mutation",
+  "Artifact-audit correctness only; no model/session/service/secret/config operations or live L3 claim",
+  "Budgets, evidence predicates, positive outcomes, empty-ledger behavior and parent live obligations unchanged"
+ ],
+ "operation": "grzn1-nonempty-identity-and-alias-refusal",
+ "parameters": {
+  "bead": "jev-grzn.1",
+  "subject_sha256": "e082c8e40510e325da8e519647d87a0652eb3d576e92365296b8f370041d29a3"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "cli": {
+   "empty-id": {
+    "exit": 1,
+    "status": "REFUSED",
+    "stderr_bytes": 0,
+    "stdout_sha256": "bede88e57c4d515db5918766a8949990df8d1e676103586efc6fdf7c2eba619f"
+   },
+   "healthy": {
+    "exit": 0,
+    "status": "PASS",
+    "stderr_bytes": 0,
+    "stdout_sha256": "da94df2e7b59036bbcfe7a609a4aef4600b8d6b467167be1c101be9abf6d3025"
+   },
+   "restored-healthy": {
+    "exit": 0,
+    "status": "PASS",
+    "stderr_bytes": 0,
+    "stdout_sha256": "da94df2e7b59036bbcfe7a609a4aef4600b8d6b467167be1c101be9abf6d3025"
+   },
+   "whitespace-id": {
+    "exit": 1,
+    "status": "REFUSED",
+    "stderr_bytes": 0,
+    "stdout_sha256": "bede88e57c4d515db5918766a8949990df8d1e676103586efc6fdf7c2eba619f"
+   }
+  },
+  "date_utc": "2026-10-15",
+  "healthy_payload_unchanged_from_review": true,
+  "live_l3_proven": false,
+  "lsp_diagnostics_errors": 0,
+  "model_calls": 0,
+  "quality_delta_exit": 0,
+  "quality_delta_gating": 0,
+  "reviewed_pre_fix_commit": "e7c366fb921f38be3bdcb53f04d980233f3000b5",
+  "reviewer_evidence": "ev_14e5781dabc05131baf0ebadc43f7baf28929bcddb99dc3d8bcbbc59f808b656",
+  "source_sha256": {
+   "work/l3-receipts/PREREG.md": "34b520eced055ce5efd8b97bd029ce0d02ac1e18377229ab12375e51229aa0e8",
+   "work/l3-receipts/run.py": "ea188d52eb27f439c8676afe34dac63f669a5cb05c73884af0fea88f70240b4c",
+   "work/l3-receipts/test_run.py": "a20f5a983f2ab9484a6ff9443bf80d7149d215da901bca023ef09560d15c1c87"
+  },
+  "ubs_critical": 0,
+  "ubs_exit": 0,
+  "ubs_warning": 8,
+  "unit_test_exit": 0,
+  "unit_tests_failed": 0,
+  "unit_tests_passed": 19
+ }
+}

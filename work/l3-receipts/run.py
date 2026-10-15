@@ -18,8 +18,13 @@ def required_surfaces(inventory: dict[str, Any]) -> dict[str, dict[str, Any]]:
     result = {}
     seen = set()
     for row in inventory["surfaces"]:
-        if not isinstance(row, dict) or not isinstance(row.get("id"), str) or row["id"] in seen:
-            raise ValueError("inventory surfaces need unique IDs")
+        if (
+            not isinstance(row, dict)
+            or not isinstance(row.get("id"), str)
+            or not row["id"].strip()
+            or row["id"] in seen
+        ):
+            raise ValueError("inventory surfaces need non-empty unique IDs")
         seen.add(row["id"])
         if row.get("expect") not in {"on", "off", "inert"}:
             raise ValueError("inventory expected state is unknown")
@@ -154,9 +159,13 @@ def check_evidence(record: dict[str, Any], policy: dict[str, Any], root: Path) -
 
 
 def declaration_on(agents: str, surface: dict[str, Any]) -> bool:
-    names = {surface["id"].lower()}
-    if isinstance(surface.get("name"), str) and surface["name"]:
-        names.add(surface["name"].lower())
+    identity = surface.get("id")
+    if not isinstance(identity, str) or not identity.strip():
+        return False
+    names = {identity.lower()}
+    display_name = surface.get("name")
+    if isinstance(display_name, str) and display_name.strip():
+        names.add(display_name.strip().lower())
     matches = []
     for line in agents.splitlines():
         if not line.strip().startswith("|"):

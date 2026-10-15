@@ -14,7 +14,7 @@ A caller supplies either a JSON file or exactly one fenced `json` block in a pre
 
 | Field | Meaning / refusal boundary |
 |---|---|
-| `surfaces` | Object keyed by exactly the inventory's ON decision surface IDs. No hard-coded list, missing surface or extra surface. Infra decisions beginning with `none` are excluded. |
+| `surfaces` | Object keyed by exactly the inventory's ON decision surface IDs. IDs must be strings with non-whitespace content and must be unique; missing/empty/whitespace-only identity refuses before planning. A blank declaration is never an identity alias. No hard-coded list, missing surface or extra surface. Infra decisions beginning with `none` are excluded. |
 | Each `K_s` | Explicit nonnegative integer per scripted session; absence, booleans or a guessed default refuse. The actual code-path upper-bound derivation belongs to the original budget/execution acceptance, not this parser. |
 | Each `B_s` | Must equal planned session count multiplied by `K_s`; never silently repaired. |
 | Each `model` / `model_field` | Explicit answering-model pin and its field in the referenced log row. Session-model fallback cannot impersonate a pinned model. This does not authorize changing the parent's model policy or a shared role. |
