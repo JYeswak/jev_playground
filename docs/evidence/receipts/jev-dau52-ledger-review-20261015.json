@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_ba7c66c01331e98ac812f1147ddee7b2d4e0138dd3438cc8a75a6ea73c201f57",
+ "limitations": [
+  "Offline non-author ledger documentation only. Reuses earlier independent arithmetic without repeating forbidden old numeric runs. Parent labels/horizon remain UNQUALIFIED; no model calls, quality win, service or publication claim."
+ ],
+ "operation": "review_dau5_ledger",
+ "parameters": {
+  "bead": "jev-dau5.2",
+  "candidate": "686675f10217e27ffe90462ac4acae4f36ecece0"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 484721,
+  "sha256": "a2c897ba0d1bfbf28e205216fe8ea83e32b7ffc2533a2a1208ba604ba0c064c5"
+ }
+}
