@@ -1,0 +1,58 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_3a9f419620daff034aac27fb30774989602fe2af504597b92c287eab5c5a521b",
+ "limitations": [
+  "Direct Node import follows same-process validated package load; cold native consumption independently exercised on actual OMP18.11.2. Existing full suite/refusal evidence reused only after exact entire kit tree identity. Fixture has default runtime export; export-star preservation inspected in actual emitted artifact. No parent19, full-main-CI or model-quality claim."
+ ],
+ "operation": "jev-b35c.72.resolution-review",
+ "parameters": {
+  "subject_sha256": "eb9b20b2849aa59c8e26987a90b888dd153751c6770ee708f68f1463b7e14288"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "actual_native_controls": [
+   {
+    "NODE_PATH_unset": true,
+    "advisory_listed": true,
+    "exit": 0,
+    "fresh_marker_rows": 1,
+    "label": "enabled",
+    "model_prompts": 0,
+    "stderr": "",
+    "stdout_sha256": "88b46895f054ea72a4054c054152aa64b22769efec7606d4d1ec9e77dd2455e7"
+   },
+   {
+    "NODE_PATH_unset": true,
+    "advisory_listed": false,
+    "exit": 0,
+    "fresh_marker_rows": 0,
+    "label": "disabled",
+    "model_prompts": 0,
+    "stderr": "",
+    "stdout_sha256": "59b79eb234b08f8653f046c80494a87b4b7fcc392f285367045ad71e22c6b41a"
+   }
+  ],
+  "actual_relative_shim": "// classifier-shim-v2 family=gate profile=default pin=c2d7871afbc14c190b564eebdbaf3de190c35f17\n// off-switch: ~/.local/state/jev/gate-fixture-off (presence-OFF)\n// safe-side: refuse (test installer.gate.unreachable.refuses)\nexport * from \"../../../../../../../native74-f1c-review.59421/advisory-valid-dD8WMz/consumer/node_modules/jev-fixture-native/src/gate-hook.ts\";\nexport { default } from \"../../../../../../../native74-f1c-review.59421/advisory-valid-dD8WMz/consumer/node_modules/jev-fixture-native/src/gate-hook.ts\";\n",
+  "both_kit_tree_ids": "34287bb8f26ceda7c6e95dfa0634a9d81dd3075e",
+  "current_native_executable": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.2",
+  "current_native_version": "18.11.2",
+  "direct_generated_shim_import": {
+   "exit": 0,
+   "stderr": "(node:99796) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:99796) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/direct-resolution-proof/good-home/.omp/agent/hooks/pre/jev-gate.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /Users/josh/Developer/package.json.\n",
+   "stdout": "{\"install\":{\"exit\":0,\"writes\":[\"/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/direct-resolution-proof/good-home/.omp/agent/hooks/pre/jev-gate.ts\",\"/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/direct-resolution-proof/good-home/.omp/agent/config.yml\",\"/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/direct-resolution-proof/good-home/.omp/agent/jev-shims.json\"],\"families\":[{\"family\":\"gate\",\"profile\":\"default\",\"status\":\"installed\"},{\"family\":\"hint\",\"profile\":\"default\",\"status\":\"installed\"}]},\"shim\":\"/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/direct-resolution-proof/good-home/.omp/agent/hooks/pre/jev-gate.ts\",\"default_is_function\":true,\"default_identity\":true,\"exports\":[\"default\"],\"packaged_exports\":[\"default\"]}\n"
+  },
+  "full_kit_evidence": "ev_6a1cbb68c992a237df98b5a79c01132fac4a72222063ae169c331742208c37a1",
+  "installer_and_refusal_evidence": "ev_51fa095a3fae29d756eb620df4dc2056c2b5f694afae3ae10bfe9a619b484ca9",
+  "no_source_changes_by_reviewer": true,
+  "package_realpath_equals_path": true,
+  "physical_package": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/consumer/node_modules/jev-fixture-native",
+  "prior_full_kit_exit": 0,
+  "prior_full_kit_tests": 365,
+  "prior_original_installer_matrix_tests": 65,
+  "prior_supported_floor_profile_tests": 28,
+  "reviewed_handoff_head": "ee8a9ce1f800e8a8a79bf1fc20bbb87abfab7e2b",
+  "verified_source": "20da0ca1c62e450709eb230a66b5c8a3f2600e5e",
+  "whole_kit_trees_identical": true
+ }
+}
