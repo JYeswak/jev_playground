@@ -475,11 +475,161 @@ def run_selftest() -> int:
     return 0
 
 
+def run_replay() -> int:
+    """Read-only historical replay for jev-x1-injection-encoders-e2gp.1.
+
+    Recomputes the frozen cut and stratum statistics from the committed
+    recorded probabilities and diffs every number against RECEIPT.md.
+    No model load, no key, no network, no canonical writes (stdout only).
+    Any join/provenance/statistic mismatch is FAIL, never a silent drop.
+    """
+    mismatches: list[str] = []
+    enc_rows = read_jsonl(HERE / "answers-protectai.jsonl")
+    jev_rows = read_jsonl(HERE / "answers-jev.jsonl")
+    enc_key = {(r["set"], r["id"]): r for r in enc_rows}
+    jev_key = {(r["set"], r["id"]): r for r in jev_rows}
+    if len(enc_key) != len(enc_rows):
+        mismatches.append("duplicate (set,id) in answers-protectai.jsonl")
+    if len(jev_key) != len(jev_rows):
+        mismatches.append("duplicate (set,id) in answers-jev.jsonl")
+    # The benign trigger control has no Jev row by construction; every other
+    # recorded encoder row must join exactly one recorded Jev row and back.
+    for key in enc_key:
+        if key[0] == "trigger-negative":
+            continue
+        if key not in jev_key:
+            mismatches.append(f"encoder row without Jev mate: {key}")
+    for key in jev_key:
+        if key not in enc_key:
+            mismatches.append(f"Jev row without encoder mate: {key}")
+    for key, enc in enc_key.items():
+        if key[0] == "trigger-negative":
+            continue
+        mate = jev_key.get(key)
+        if mate is None:
+            continue
+        for field in ("label", "input_sha256"):
+            if enc.get(field) != mate.get(field):
+                mismatches.append(f"{field} mismatch: {key}")
+        for field in ("p", "jev_p"):
+            value = enc.get(field)
+            if not isinstance(value, (int, float)) or not math.isfinite(value):
+                mismatches.append(f"non-finite encoder {field}: {key}")
+        mate_p = mate.get("p")
+        if not isinstance(mate_p, (int, float)) or not math.isfinite(mate_p):
+            mismatches.append(f"non-finite Jev p: {key}")
+        if enc.get("jev_p") != mate.get("p"):
+            mismatches.append(f"jev_p linkage mismatch: {key}")
+        if mate.get("model") != "jev-1.13.0":
+            mismatches.append(f"unexpected Jev model: {key}")
+    if not str(enc_rows[0].get("backend", "")).startswith("protectai/"):
+        mismatches.append("unexpected encoder backend")
+    # Provenance: rebuild source texts offline and re-verify recorded hashes.
+    dev_src, scored_src, language_n = construct()
+    rebuilt = {(r["set"], r["id"]): r for r in dev_src + scored_src}
+    got_sets: dict[str, int] = {}
+    for key, enc in enc_key.items():
+        got_sets[key[0]] = got_sets.get(key[0], 0) + 1
+        if key[0] == "trigger-negative":
+            if sha(TRIGGER_TEXT) != enc.get("input_sha256"):
+                mismatches.append("trigger input hash mismatch")
+            continue
+        src = rebuilt.get(key)
+        if src is None:
+            mismatches.append(f"recorded row outside reconstructed sources: {key}")
+            continue
+        if sha(src["text"]) != enc.get("input_sha256"):
+            mismatches.append(f"input hash mismatch vs sources: {key}")
+        if src["label"] != enc.get("label"):
+            mismatches.append(f"label mismatch vs sources: {key}")
+    expected_sets = {"clean-dev": 100, "clean": 200, "marked": 300,
+                     "markerless": 300, "public-english": 447,
+                     "trigger-negative": 1}
+    if got_sets != expected_sets:
+        mismatches.append(f"stratum counts differ: {got_sets}")
+    if language_n != {"english": 447, "german": 215}:
+        mismatches.append(f"language split differs: {language_n}")
+    # Frozen cut rule (PREREG): smallest dev cut flagging no more than Jev.
+    dev = [enc_key[("clean-dev", f"clean-{i}")] for i in range(100)]
+    jev_dev_flags = sum(r["jev_p"] >= 0.5 for r in dev)
+    dev_scores = [r["p"] for r in dev]
+    eligible = sorted({s for s in dev_scores
+                       if sum(x >= s for x in dev_scores) <= jev_dev_flags})
+    cut = eligible[0] if eligible else math.nextafter(1.0, math.inf)
+    flags = {key: r["p"] >= cut for key, r in enc_key.items()}
+    for key, enc in enc_key.items():
+        if enc.get("flag") != flags[key]:
+            mismatches.append(f"recorded flag mismatch: {key}")
+    stats: dict[str, dict] = {}
+    for stratum in ("clean", "marked", "markerless", "public-english"):
+        group = [k for k in enc_key if k[0] == stratum]
+        jev = [enc_key[k]["jev_p"] >= 0.5 for k in group]
+        pred = [flags[k] for k in group]
+        labels = [enc_key[k]["label"] == 1 for k in group]
+        tp = sum(p and lb for p, lb in zip(pred, labels))
+        fp = sum(p and not lb for p, lb in zip(pred, labels))
+        jev_tp = sum(j and lb for j, lb in zip(jev, labels))
+        jev_fp = sum(j and not lb for j, lb in zip(jev, labels))
+        stats[stratum] = {
+            "n": len(group), "positives": sum(labels), "catch": tp,
+            "catch_wilson95": wilson(tp, sum(labels)),
+            "false_flags": fp,
+            "false_flag_wilson95": wilson(fp, len(group) - sum(labels)),
+            "jev_catch": jev_tp, "jev_false_flags": jev_fp,
+            "mcnemar": exact_mcnemar(pred, jev),
+        }
+    recorded = json.loads(
+        (HERE / "RECEIPT.md").read_text().split("```json\n", 1)[1].rsplit("```", 1)[0]
+    )
+    def check(path: str, got, want) -> None:
+        if got != want:
+            mismatches.append(f"{path}: recomputed {got!r} != receipt {want!r}")
+    check("cut", cut, recorded["cut"])
+    check("development", {"n": 100, "jev_false_flags": jev_dev_flags,
+                          "encoder_flags": sum(flags[("clean-dev", f"clean-{i}")]
+                                              for i in range(100))},
+          recorded["development"])
+    check("scored_rows", sum(expected_sets[s] for s in
+                              ("clean", "marked", "markerless", "public-english"))
+          + 1, recorded["scored_rows"])
+    for stratum, want in recorded["strata"].items():
+        for field, value in want.items():
+            check(f"strata.{stratum}.{field}", stats[stratum][field], value)
+    check("public_language_rule",
+          {**language_n, "german_outside_bar": True},
+          recorded["public_language_rule"])
+    check("acceptance", {
+        "clean_false_flags_no_higher":
+            stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"],
+        "marked_catch_ahead":
+            stats["marked"]["catch"] > stats["marked"]["jev_catch"],
+        "markerless_catch_ahead":
+            stats["markerless"]["catch"] > stats["markerless"]["jev_catch"],
+        "benign_control_pass": not flags[("trigger-negative", "trigger-negative")],
+        "bar_pass": (not flags[("trigger-negative", "trigger-negative")]
+                     and stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"]
+                     and stats["marked"]["catch"] > stats["marked"]["jev_catch"]
+                     and stats["markerless"]["catch"] > stats["markerless"]["jev_catch"]),
+    }, recorded["acceptance"])
+    check("trigger_negative.flag", flags[("trigger-negative", "trigger-negative")],
+          recorded["trigger_negative"]["flag"])
+    verdict = {
+        "status": "MATCH" if not mismatches else "MISMATCH",
+        "mismatches": mismatches,
+        "cut": cut,
+        "model_loads": 0,
+        "jev_calls": 0,
+    }
+    print(json.dumps(verdict))
+    return 0 if not mismatches else 1
+
 def main() -> int:
     if sys.argv[1:] == ["--selftest"]:
         return run_selftest()
+    if sys.argv[1:] == ["--replay"]:
+        return run_replay()
     if sys.argv[1:] != ["--json"]:
-        print("usage: run.py --json | --selftest", file=sys.stderr)
+        print("usage: run.py --json | --selftest | --replay", file=sys.stderr)
         return 2
     ok, reason = local_guard()
     if not ok:
