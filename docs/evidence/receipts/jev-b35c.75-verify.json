@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c17417e06123a237b7723e6da4a71463f4548991265245d2dba1c76c27686174",
+ "limitations": [
+  "Network available during verifier run (author ran network-denied). UBS run is author's. No live Jev/model calls."
+ ],
+ "operation": "jev-b35c.75-non-author-hermetic-verify",
+ "parameters": {
+  "candidate": "fef7a719"
+ },
+ "producer": "RubyMeadow",
+ "result_ref": {
+  "bytes": 479,
+  "sha256": "36ba9f1d32394f39abe7c67309de7917c93a6ccbc7b335a4253e132cdaf08e7d"
+ }
+}
