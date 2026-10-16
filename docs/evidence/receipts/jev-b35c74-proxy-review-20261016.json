@@ -1,0 +1,41 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_5d4e89a893b1da853c0ce1112a59d87b94c97329712d96210b292905d25d92d3",
+ "limitations": [
+  "Counterexample only; advisory fix observed, no full acceptance or parent close."
+ ],
+ "operation": "jev-b35c.74.proxy-native-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_native_hook_loader": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "{\"loaded\":0,\"errors\":[{\"path\":\"/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/missing-api.mjs\",\"error\":\"Failed to load hook: pi.review_missing_api_72819 is not a function. (In 'pi.review_missing_api_72819()', 'pi.review_missing_api_72819' is undefined)\"}]}\n"
+  },
+  "bead": "jev-b35c.74",
+  "boundary": "checkLoadedModule302-328 recording Proxy manufactures callable methods for every property",
+  "candidate": "a870272af2360bffdbd891c181a5cd3774518dd9",
+  "fixture": "export default function fixture(pi){pi.review_missing_api_72819();pi.on(\"tool_call\",()=>undefined)}",
+  "fragment": {
+   "exit": 0,
+   "stderr": "(node:59349) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+   "stdout": "{\"admission\":\"accepted\",\"actualApiFailure\":\"pi.review_missing_api_72819 is not a function\"}\n"
+  },
+  "fragment_program": "import {stripTypeScriptTypes} from \"node:module\";const f=new Function(\"isRecord\",stripTypeScriptTypes(\"async function checkLoadedModule(loaded: unknown, familyId: string, expectedEvent: string | undefined): Promise<void> {\\n  if (!isRecord(loaded) || !(\\\"default\\\" in loaded) || typeof loaded.default !== \\\"function\\\") {\\n    throw new Error(\\\"native entry has no default function export: \\\" + familyId);\\n  }\\n  // Every entry factory runs against a recording stub, hooks and extensions\\n  // alike: a factory that throws is incompatible, whatever it declares.\\n  // The stub records host calls instead of implementing them; only flat\\n  // recorder calls are supported, deep host APIs fail closed.\\n  const calls: Array<{ method: string; args: unknown[] }> = [];\\n  const stubPi = new Proxy({}, {\\n    get(_target, property) {\\n      if (property === \\\"then\\\") return undefined;\\n      return (...args: unknown[]) => { calls.push({ method: String(property), args }); };\\n    },\\n  });\\n  // The typeof check above proves callability; name the factory shape once\\n  // for the invocation below.\\n  const factory: (pi: unknown) => unknown = loaded.default as (pi: unknown) => unknown;\\n  try {\\n    await factory(stubPi);\\n  } catch (error) {\\n    throw new Error(\\\"native entry factory throws: \\\" + familyId + \\\": \\\" + (error instanceof Error ? error.message : String(error)));\\n  }\\n  if (expectedEvent === undefined) return;\\n  // Hook contract: the declared event must be registered with a callable\\n  // handler. pi.on(name, null) does not count.\\n  const registered = calls.some((call) => call.method === \\\"on\\\" && call.args.length >= 2 && call.args[0] === expectedEvent && typeof call.args[1] === \\\"function\\\");\\n  if (!registered) {\\n    throw new Error(\\\"native entry does not register \\\" + expectedEvent + \\\": \\\" + familyId);\\n  }\\n}\\n\",{mode:\"transform\"})+\";return checkLoadedModule;\")((v)=>v!==null&&typeof v===\"object\"&&!Array.isArray(v));const factory=(pi)=>{pi.review_missing_api_72819();pi.on(\"tool_call\",()=>undefined)};await f({default:factory},\"gate\",\"tool_call\");let error;try{factory({on(){}})}catch(e){error=e.message}console.log(JSON.stringify({admission:\"accepted\",actualApiFailure:error}));",
+  "limits": [
+   "Real source-fragment versus actual native loader mismatch; not full installed profile session or full suite.",
+   "Local build admission refused1/free12.52448pct; exact-candidate remoteCI38907757376 in_progress when inspected.",
+   "No product edits, real profiles, services or provider calls; native loader process network/write-contained.",
+   "Evidence reservation request timed out; canonical same-server native reservation read confirmed active exact path before sign."
+  ],
+  "prior_advisory_fix": {
+   "exit": 0,
+   "stdout": "{\"exit\":4,\"writes\":[],\"families\":[{\"family\":\"hint\",\"profile\":\"muse\",\"status\":\"refused\",\"reason\":\"native entry does not load: hint: native entry factory throws: hint: native-factory-failure\"}]}\n"
+  },
+  "reviewer": "DarkBear",
+  "source_sha256": "af2fb6b7756e4ecef34f4de56cd8435db91e3f74ef5998040b3b06b2f7587579",
+  "verdict": "REWORK"
+ }
+}
