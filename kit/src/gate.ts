@@ -10,7 +10,7 @@ const riskModule = await (async (): Promise<RiskModule> => {
   }
 })();
 const { RISK, STATE_CONTEXT, CUT } = riskModule;
-import { askJevBundle, DEFAULT_MODEL, type JevBundleResult, type JevUsage } from "./client.ts";
+import { askJevBundle, configuredBackend, DEFAULT_MODEL, previewJevRequest, type BackendDryRunResult, type BackendMode, type JevBundleResult, type JevUsage } from "./client.ts";
 import { sizePreflight } from "./preflight.ts";
 import { validateNoulAnswer } from "./validate.ts";
 
@@ -27,6 +27,10 @@ export type GateResult =
       model: string;
       latencyMs: number;
       usage?: JevUsage;
+      backend?: "jev" | "clef";
+      backendRequested?: BackendMode;
+      routeReason?: string;
+      fallbackReason?: string;
     }
   | {
       ok: false;
@@ -34,17 +38,25 @@ export type GateResult =
       error: string;
       model: string;
       latencyMs: number;
-    };
+      backend?: "jev" | "clef";
+      backendRequested?: BackendMode;
+      routeReason?: string;
+      fallbackReason?: string;
+    }
+  | BackendDryRunResult;
 
 export type GateAsk = (options: {
   state: Record<string, unknown>;
   questions: typeof RISK;
   model: string;
+  backend?: BackendMode;
 }) => Promise<JevBundleResult>;
 
 export type GateOptions = {
   command: string;
   model?: string;
+  backend?: BackendMode;
+  dryRun?: boolean;
   ask?: GateAsk;
 };
 
@@ -59,11 +71,17 @@ export async function gateCommand(options: GateOptions): Promise<GateResult> {
   const model = options.model ?? DEFAULT_MODEL;
   const state = { command: options.command, context: STATE_CONTEXT };
   sizePreflight(state, RISK);
+  if (options.dryRun) {
+    const requested = configuredBackend(options.backend);
+    if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", model, latencyMs: 0 };
+    if (requested === "clef") return { ok: false, reason: "uncalibrated", error: "Clef does not support bundled questions", model, latencyMs: 0, backend: "clef", backendRequested: requested };
+    return previewJevRequest(state, RISK, model, requested, "bundle");
+  }
   const ask = options.ask ?? ((request) => askJevBundle(request));
-  const result = await ask({state, questions: RISK, model});
+  const result = await ask({state, questions: RISK, model, ...(options.backend === undefined ? {} : { backend: options.backend })});
   if (!result.ok) return result;
   const scores: GateScores = {};
   for (const [key, answer] of Object.entries(result.answers)) scores[key] = validateNoulAnswer(answer);
   const maxScore = Math.max(...Object.values(scores));
-  return { ok: true, flag: maxScore > CUT, maxScore, scores, model: result.resolvedModel, latencyMs: result.latencyMs, usage: result.usage };
+  return { ok: true, flag: maxScore > CUT, maxScore, scores, model: result.resolvedModel, latencyMs: result.latencyMs, usage: result.usage, ...(result.backend ? { backend: result.backend } : {}), ...(result.backendRequested ? { backendRequested: result.backendRequested } : {}), ...(result.routeReason ? { routeReason: result.routeReason } : {}), ...(result.fallbackReason ? { fallbackReason: result.fallbackReason } : {}) };
 }

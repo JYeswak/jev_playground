@@ -1,4 +1,4 @@
-import { askJevChoice, type AskChoiceOptions, type JevChoiceResult, type JevUsage } from "./client.ts";
+import { askJevChoice, configuredBackend, previewJevRequest, type AskChoiceOptions, type BackendDryRunResult, type BackendMode, type JevChoiceResult, type JevUsage } from "./client.ts";
 import { optionsPreflight, sizePreflight } from "./preflight.ts";
 
 export const BANKING77_INSTRUCTIONS = "The primary intent of this customer banking message";
@@ -6,6 +6,8 @@ export const BANKING77_INSTRUCTIONS = "The primary intent of this customer banki
 export type ClassifyOptions = {
   text: string;
   labels: readonly string[];
+  backend?: BackendMode;
+  dryRun?: boolean;
   ask?: (options: AskChoiceOptions) => Promise<JevChoiceResult>;
   apiKey?: string;
   fetchImpl?: typeof fetch;
@@ -20,7 +22,11 @@ export type ClassifyResult = {
   latencyMs: number;
   model: string;
   usage?: JevUsage;
-};
+  backend?: "jev" | "clef";
+  backendRequested?: BackendMode;
+  routeReason?: string;
+  fallbackReason?: string;
+} | BackendDryRunResult;
 
 function validateLabels(labels: readonly string[]): string[] {
   if (!Array.isArray(labels) || labels.length < 2) {
@@ -43,6 +49,12 @@ export async function classifyText(options: ClassifyOptions): Promise<ClassifyRe
   const question = { type: "choice", instructions: BANKING77_INSTRUCTIONS, criteria: classes };
   optionsPreflight(question);
   sizePreflight(state, question);
+  if (options.dryRun) {
+    const requested = configuredBackend(options.backend);
+    if (!requested) throw new Error("classify failed (usage): backend must be jev, clef, or auto");
+    if (requested === "clef") throw new Error("classify failed (uncalibrated): no committed Clef calibration was supplied");
+    return previewJevRequest(state, { choice: question }, options.model, requested, "choice");
+  }
 
   const ask = options.ask ?? askJevChoice;
   const result = await ask({
@@ -52,6 +64,7 @@ export async function classifyText(options: ClassifyOptions): Promise<ClassifyRe
     apiKey: options.apiKey,
     fetchImpl: options.fetchImpl,
     model: options.model,
+    ...(options.backend === undefined ? {} : { backend: options.backend }),
   });
   if (!result.ok) throw new Error(`classify failed (${result.reason}): ${result.error}`);
   if (!labels.includes(result.choice)) throw new Error(`classify returned an unoffered label: ${result.choice}`);
@@ -63,5 +76,9 @@ export async function classifyText(options: ClassifyOptions): Promise<ClassifyRe
     latencyMs: result.latencyMs,
     model: result.model,
     ...(result.usage ? { usage: result.usage } : {}),
+    ...(result.backend ? { backend: result.backend } : {}),
+    ...(result.backendRequested ? { backendRequested: result.backendRequested } : {}),
+    ...(result.routeReason ? { routeReason: result.routeReason } : {}),
+    ...(result.fallbackReason ? { fallbackReason: result.fallbackReason } : {}),
   };
 }

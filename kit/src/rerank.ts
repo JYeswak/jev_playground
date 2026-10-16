@@ -1,4 +1,4 @@
-import { askJevChoice, type AskChoiceOptions, type JevChoiceResult, type JevUsage } from "./client.ts";
+import { askJevChoice, configuredBackend, previewJevRequest, type AskChoiceOptions, type BackendDryRunResult, type BackendMode, type JevChoiceResult, type JevUsage } from "./client.ts";
 import { sizePreflight } from "./preflight.ts";
 
 export type RerankCandidate = {
@@ -11,6 +11,8 @@ export type RerankCandidate = {
 export type RerankOptions = {
   query: string;
   candidates: RerankCandidate[];
+  backend?: BackendMode;
+  dryRun?: boolean;
   ask?: (options: AskChoiceOptions) => Promise<JevChoiceResult>;
   apiKey?: string;
   fetchImpl?: typeof fetch;
@@ -24,7 +26,11 @@ export type RerankResult = {
   latencyMs: number;
   model: string;
   usage?: JevUsage;
-};
+  backend?: "jev" | "clef";
+  backendRequested?: BackendMode;
+  routeReason?: string;
+  fallbackReason?: string;
+} | BackendDryRunResult;
 
 const MAX_CANDIDATES = 20;
 const INSTRUCTIONS =
@@ -49,6 +55,12 @@ export async function rerankTop1(options: RerankOptions): Promise<RerankResult> 
     criteria: Object.fromEntries(candidates.map((candidate) => [candidate.id, `Candidate passage ${candidate.id}`])),
   };
   sizePreflight(state, question);
+  if (options.dryRun) {
+    const requested = configuredBackend(options.backend);
+    if (!requested) throw new Error("rerank failed (usage): backend must be jev, clef, or auto");
+    if (requested === "clef") throw new Error("rerank failed (uncalibrated): no committed Clef calibration was supplied");
+    return previewJevRequest(state, { choice: question }, options.model, requested, "choice");
+  }
   const ask = options.ask ?? askJevChoice;
   const result = await ask({
     state,
@@ -57,6 +69,7 @@ export async function rerankTop1(options: RerankOptions): Promise<RerankResult> 
     apiKey: options.apiKey,
     fetchImpl: options.fetchImpl,
     model: options.model,
+    ...(options.backend === undefined ? {} : { backend: options.backend }),
   });
   if (!result.ok) throw new Error(`rerank failed (${result.reason}): ${result.error}`);
   if (!ids.includes(result.choice)) throw new Error(`rerank returned an unoffered candidate: ${result.choice}`);
@@ -69,6 +82,10 @@ export async function rerankTop1(options: RerankOptions): Promise<RerankResult> 
     latencyMs: result.latencyMs,
     model: result.model,
     ...(result.usage ? { usage: result.usage } : {}),
+    ...(result.backend ? { backend: result.backend } : {}),
+    ...(result.backendRequested ? { backendRequested: result.backendRequested } : {}),
+    ...(result.routeReason ? { routeReason: result.routeReason } : {}),
+    ...(result.fallbackReason ? { fallbackReason: result.fallbackReason } : {}),
   };
 }
 

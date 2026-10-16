@@ -1,4 +1,4 @@
-import { askJev, type AskOptions, type JevResult, type JevUsage } from "./client.ts";
+import { askJev, configuredBackend, previewJevRequest, type AskOptions, type BackendDryRunResult, type BackendMode, type JevResult, type JevUsage } from "./client.ts";
 import { sizePreflight } from "./preflight.ts";
 
 export const SCIFACT_INSTRUCTIONS = "Does the evidence support the claim?";
@@ -11,6 +11,8 @@ export const SUPPORT_THRESHOLD = 0.5;
 export type VerifyOptions = {
   claim: string;
   evidence: string;
+  backend?: BackendMode;
+  dryRun?: boolean;
   ask?: (options: AskOptions) => Promise<JevResult>;
   apiKey?: string;
   fetchImpl?: typeof fetch;
@@ -25,7 +27,11 @@ export type VerifyResult = {
   latencyMs: number;
   model: string;
   usage?: JevUsage;
-};
+  backend?: "jev" | "clef";
+  backendRequested?: BackendMode;
+  routeReason?: string;
+  fallbackReason?: string;
+} | BackendDryRunResult;
 
 export async function verifyClaim(options: VerifyOptions): Promise<VerifyResult> {
   if (typeof options.claim !== "string" || options.claim.trim().length === 0) {
@@ -43,6 +49,12 @@ export async function verifyClaim(options: VerifyOptions): Promise<VerifyResult>
   };
   sizePreflight(state, { value: question });
 
+  if (options.dryRun) {
+    const requested = configuredBackend(options.backend);
+    if (!requested) throw new Error("verify failed (usage): backend must be jev, clef, or auto");
+    if (requested === "clef") throw new Error("verify failed (uncalibrated): no committed Clef calibration was supplied");
+    return previewJevRequest(state, { value: question }, options.model, requested, "noul");
+  }
   const ask = options.ask ?? askJev;
   const result = await ask({
     state,
@@ -50,6 +62,7 @@ export async function verifyClaim(options: VerifyOptions): Promise<VerifyResult>
     apiKey: options.apiKey,
     fetchImpl: options.fetchImpl,
     model: options.model,
+    ...(options.backend === undefined ? {} : { backend: options.backend }),
   });
   if (!result.ok) throw new Error(`verify failed (${result.reason}): ${result.error}`);
   const value = result.scores.value;
@@ -64,6 +77,10 @@ export async function verifyClaim(options: VerifyOptions): Promise<VerifyResult>
     latencyMs: result.latencyMs,
     model: result.model,
     ...(result.usage ? { usage: result.usage } : {}),
+    ...(result.backend ? { backend: result.backend } : {}),
+    ...(result.backendRequested ? { backendRequested: result.backendRequested } : {}),
+    ...(result.routeReason ? { routeReason: result.routeReason } : {}),
+    ...(result.fallbackReason ? { fallbackReason: result.fallbackReason } : {}),
   };
 }
 

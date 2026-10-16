@@ -13,15 +13,15 @@ export const EXIT_CODES = Object.freeze({
 });
 
 export function statusForFailure(failure = {}) {
-  if (failure.reason === 'unconfigured') return 'NOT_RUN';
-  if (failure.reason === 'sdk-missing' || failure.reason === 'billing-hold') return 'ONLINE_REQUIRED';
+  if (failure.reason === 'unconfigured' || failure.reason === 'uncalibrated') return 'NOT_RUN';
+  if (failure.reason === 'sdk-missing' || failure.reason === 'billing-hold' || failure.reason === 'backend-hold' || failure.reason === 'online-required') return 'ONLINE_REQUIRED';
   if (failure.reason === 'usage') return 'USAGE';
   if (failure.reason === 'no-input' || failure.code === 'ENOENT') return 'NO_INPUT';
   if (failure.reason === 'cannot-create') return 'CANT_CREATE';
   if (failure.reason === 'io' || ['EACCES', 'EIO', 'EISDIR'].includes(failure.code)) return 'IO';
   if (failure.reason === 'refused-unsafe') return 'REFUSED_UNSAFE';
   if (failure.reason === 'transport' || failure.reason === 'http') return 'RETRYABLE';
-  if (failure.reason === 'non-json' || failure.reason === 'no-answers' || failure.reason === 'invalid-answer') return 'REFUSED';
+  if (failure.reason === 'non-json' || failure.reason === 'no-answers' || failure.reason === 'invalid-answer' || failure.reason === 'truncated') return 'REFUSED';
   if (failure.status === 'NOT_RUN') return 'NOT_RUN';
   return 'FINDINGS';
 }

@@ -4,12 +4,12 @@ const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
   doctor: new Set(['--only', '--skip']),
   repair: new Set(['--only']),
-  ask: new Set(['--state', '--question']),
-  rerank: new Set(['--query', '--candidates']),
-  classify: new Set(['--text', '--labels']),
-  verify: new Set(['--claim', '--evidence']),
-  score: new Set(['--text', '--levels']),
-  gate: new Set(['--command']),
+  ask: new Set(['--state', '--question', '--backend']),
+  rerank: new Set(['--query', '--candidates', '--backend']),
+  classify: new Set(['--text', '--labels', '--backend']),
+  verify: new Set(['--claim', '--evidence', '--backend']),
+  score: new Set(['--text', '--levels', '--backend']),
+  gate: new Set(['--command', '--backend']),
   omp: new Set(['--dir']),
   install: new Set(['--dir']),
   uninstall: new Set(['--dir']),
@@ -17,12 +17,12 @@ const VALUE_OPTIONS = {
 const BOOLEAN_OPTIONS = {
   doctor: new Set(['--quick', '--deep', '--online']),
   repair: new Set(['--apply']),
-  ask: new Set(['--fake']),
-  rerank: new Set(['--fake']),
-  classify: new Set(['--fake']),
-  verify: new Set(['--fake']),
-  score: new Set(['--fake']),
-  gate: new Set(['--fake']),
+  ask: new Set(['--fake', '--dry-run']),
+  rerank: new Set(['--fake', '--dry-run']),
+  classify: new Set(['--fake', '--dry-run']),
+  verify: new Set(['--fake', '--dry-run']),
+  score: new Set(['--fake', '--dry-run']),
+  gate: new Set(['--fake', '--dry-run']),
   omp: new Set(['--dry-run', '--apply']),
   install: new Set(['--dry-run', '--apply']),
   uninstall: new Set(['--dry-run', '--apply']),
@@ -147,6 +147,10 @@ export function parseArgv(args) {
         const value = commandArgs[i + 1];
         if (!value || value.startsWith('-')) {
           error = { message: `Missing value for ${token}` };
+          break;
+        }
+        if (token === '--backend' && !['jev', 'clef', 'auto'].includes(value)) {
+          error = { message: `Invalid value for --backend: ${value}` };
           break;
         }
         options[token.slice(2)] = value;
