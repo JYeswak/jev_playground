@@ -1,5 +1,9 @@
 import type * as SdkModule from "@typesafe-ai/sdk";
 import { validateBundleAnswers, validateChoiceAnswer, validateNoulAnswer, validateScoreAnswer } from "./validate.ts";
+import { sizePreflight } from "./preflight.ts";
+import { askClef, type ClefFailureReason } from "./clef.ts";
+import { loadCalibrations, questionSha, type ClefCalibration, type ModelFingerprint } from "./calibration.ts";
+import { readSystemOneUsage, type SystemOneUsage } from "./usage.ts";
 declare const process: { env: Record<string, string | undefined> };
 type Sdk = typeof SdkModule;
 const SDK_PATH = "../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
@@ -64,6 +68,79 @@ export function clientCacheSize(): number {
 /** The endpoint the SDK targets by default. No fetch() is constructed beside it. */
 export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 export const DEFAULT_MODEL = "jev-1.13.0";
+export type SystemOneBody = { state: string | Record<string, unknown>; questions: Record<string, unknown>; model: string };
+export type SystemOneRequestPreview = { endpoint: string; method: "POST"; body: SystemOneBody };
+export function buildSystemOneBody(state: string | Record<string, unknown>, questions: Record<string, unknown>, model: string): SystemOneBody {
+  return { state, questions, model };
+}
+export function previewSystemOneRequest(state: string | Record<string, unknown>, questions: Record<string, unknown>, model = DEFAULT_MODEL): SystemOneRequestPreview {
+  sizePreflight(state, questions);
+  return { endpoint: SYSTEMONE_ENDPOINT, method: "POST", body: buildSystemOneBody(state, questions, model) };
+}
+export type BackendMode = "jev" | "clef" | "auto";
+type BackendMetadata = { backend?: "jev" | "clef"; backendRequested?: BackendMode; routeReason?: string; fallbackReason?: string };
+export type BackendRouteInput = {
+  requested: BackendMode;
+  primitive: "choice" | "noul" | "score" | "bundle";
+  questionCount: number;
+  calibration?: ClefCalibration;
+  questionKey?: string;
+  questionHash?: string;
+  fingerprint?: ModelFingerprint;
+  familyReceiptRegistered: boolean;
+  backendHoldActive: boolean;
+};
+export type BackendRoute = { backend: "jev" | "clef"; backendRequested: BackendMode; routeReason?: string };
+export type BackendOptions = {
+  backend?: BackendMode;
+  clefFetchImpl?: typeof fetch;
+  clefUrl?: string;
+  clefCalibration?: ClefCalibration;
+  clefFingerprint?: ModelFingerprint;
+};
+export type BackendDryRunResult = {
+  ok: true;
+  dryRun: true;
+  request: SystemOneRequestPreview;
+  latencyMs: 0;
+  model: string;
+  backend: "jev";
+  backendRequested: BackendMode;
+  routeReason?: string;
+  fallbackReason?: string;
+};
+export function configuredBackend(backend?: BackendMode): BackendMode | undefined {
+  const value = backend ?? process.env.JEV_BACKEND ?? "jev";
+  return value === "jev" || value === "clef" || value === "auto" ? value : undefined;
+}
+export function previewJevRequest(
+  state: string | Record<string, unknown>,
+  questions: Record<string, unknown>,
+  model: string | undefined,
+  requested: BackendMode,
+  primitive: BackendRouteInput["primitive"],
+): BackendDryRunResult {
+  if (requested === "clef") throw new Error("uncalibrated: a Clef request preview requires a committed calibration");
+  const route = requested === "auto" ? resolveBackendRoute({
+    requested,
+    primitive,
+    questionCount: Object.keys(questions).length,
+    familyReceiptRegistered: false,
+    backendHoldActive: clefBackendHoldActive(Date.now()),
+  }) : undefined;
+  const routeReason = route?.routeReason;
+  const resolvedModel = model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  return {
+    ok: true,
+    dryRun: true,
+    request: previewSystemOneRequest(state, questions, resolvedModel),
+    latencyMs: 0,
+    model: resolvedModel,
+    backend: "jev",
+    backendRequested: requested,
+    ...(routeReason ? { routeReason, fallbackReason: routeReason } : {}),
+  };
+}
 
 /**
  * Usage exactly as the server reported it; never invented, never zero-filled.
@@ -76,15 +153,10 @@ export const DEFAULT_MODEL = "jev-1.13.0";
  * absent, and reported as absent. `extra` holds every other finite numeric usage field verbatim
  * (for example `reasoning_tokens`), `{}` when there are none.
  */
-export type JevUsage = {
-  input_tokens: number;
-  output_tokens: number;
-  billing_units: number | null;
-  extra: Record<string, number>;
-};
+export type JevUsage = SystemOneUsage;
 export type JevResult =
-  | { ok: true; scores: Record<string, number>; latencyMs: number; model: string; usage?: JevUsage }
-  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+  | ({ ok: true; scores: Record<string, number>; latencyMs: number; model: string; usage?: JevUsage } & BackendMetadata)
+  | ({ ok: false; reason: JevFailure; error: string; latencyMs: number; model: string } & BackendMetadata);
 
 /**
  * A MULTICLASS answer: exactly one label out of a fixed set, with the full distribution.
@@ -94,16 +166,17 @@ export type JevResult =
  *                         "probabilities":{"transient":0.0,"argument":0.98,"bug":0.02}}}}
  */
 export type JevChoiceResult =
-  | {
+  | ({
       ok: true;
       choice: string;
       confidence: number;
       probabilities: Record<string, number>;
+      probabilitiesRaw?: true;
       latencyMs: number;
       model: string;
       usage?: JevUsage;
-    }
-  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+    } & BackendMetadata)
+  | ({ ok: false; reason: JevFailure; error: string; latencyMs: number; model: string } & BackendMetadata);
 
 /**
  * Named failure classes, so a caller can branch without string-matching a message.
@@ -111,7 +184,7 @@ export type JevChoiceResult =
  * clone before `npm ci --prefix work/sdk`). Distinct so a demo never reports a missing SDK as a
  * missing key.
  */
-export type JevFailure = "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport" | "billing-hold";
+export type JevFailure = "usage" | "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport" | "billing-hold" | "uncalibrated" | "truncated" | "backend-hold" | "online-required" | "refused-unsafe";
 /**
  * Wrap the transport and report when a request reaches it. Callers use this
  * to distinguish a failure before dispatch (no key, billing hold, missing
@@ -126,7 +199,7 @@ export function observedFetch(onRequest: () => void, fetchImpl: typeof fetch = g
 
 
 
-export type AskOptions = {
+export type AskOptions = BackendOptions & {
   /** The object the questions are asked about. Serialised as-is into `state`. */
   state: Record<string, unknown>;
   /** key -> instructions, or a noul body with optional criteria. Keys come back as the score keys. */
@@ -140,7 +213,7 @@ export type AskOptions = {
   nowMs?: () => number;
 };
 
-export type AskChoiceOptions = {
+export type AskChoiceOptions = BackendOptions & {
   /** The object the question is asked about. Serialised as-is into `state`. */
   state: Record<string, unknown>;
   /** The question itself, as text. */
@@ -163,6 +236,146 @@ const SCORE_KEY = "score";
 type Posted =
   | { ok: true; answers: object; latencyMs: number; resolvedModel: string; usage?: JevUsage }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number };
+
+const AUTO_FALLBACK_REASONS: Record<string, true> = { http: true, transport: true, truncated: true, uncalibrated: true };
+let consecutiveClefFailures = 0;
+let clefHoldUntil = 0;
+
+export function resetClefBackendHold(): void {
+  consecutiveClefFailures = 0;
+  clefHoldUntil = 0;
+}
+
+export function recordClefFailure(reason: ClefFailureReason | "timeout", nowMs = Date.now()): void {
+  if (clefHoldUntil !== 0 && nowMs >= clefHoldUntil) {
+    consecutiveClefFailures = 0;
+    clefHoldUntil = 0;
+  }
+  if (reason === "transport" || reason === "timeout") {
+    consecutiveClefFailures += 1;
+    if (consecutiveClefFailures >= 2) clefHoldUntil = nowMs + 60_000;
+  } else {
+    consecutiveClefFailures = 0;
+  }
+}
+
+export function recordClefSuccess(): void {
+  consecutiveClefFailures = 0;
+}
+
+export function clefBackendHoldActive(nowMs = Date.now()): boolean {
+  return nowMs < clefHoldUntil;
+}
+
+export function resolveBackendRoute(input: BackendRouteInput): BackendRoute {
+  if (input.requested === "jev") return { backend: "jev", backendRequested: input.requested };
+  if (input.requested === "clef") return { backend: "clef", backendRequested: input.requested };
+  if (!input.familyReceiptRegistered) return { backend: "jev", backendRequested: "auto", routeReason: "not-a-family-receipt" };
+  if (!input.calibration || input.calibration.receipt.verdict !== "PASS" || !input.calibration.receipt.result_commit) {
+    return { backend: "jev", backendRequested: "auto", routeReason: "no-calibration" };
+  }
+  if (input.questionKey !== input.calibration.question_key || input.questionHash !== input.calibration.question_sha256) {
+    return { backend: "jev", backendRequested: "auto", routeReason: "question-mismatch" };
+  }
+  if (input.questionCount !== 1) return { backend: "jev", backendRequested: "auto", routeReason: "multi-question" };
+  if (!input.fingerprint) return { backend: "jev", backendRequested: "auto", routeReason: "fingerprint-unavailable" };
+  if (input.fingerprint.joint_head_sha256 !== input.calibration.model.joint_head_sha256 ||
+      input.fingerprint.index_sha256 !== input.calibration.model.index_sha256) {
+    return { backend: "jev", backendRequested: "auto", routeReason: "fingerprint-mismatch" };
+  }
+  if (input.backendHoldActive) return { backend: "jev", backendRequested: "auto", routeReason: "backend-hold" };
+  return { backend: "clef", backendRequested: "auto" };
+}
+
+export async function withAutoFallback<T extends { ok: boolean; reason?: string }>(
+  requested: BackendMode,
+  fallbackAllowed: boolean,
+  clefAttempt: () => Promise<T>,
+  jevAttempt: () => Promise<T>,
+): Promise<T> {
+  const clef = await clefAttempt();
+  if (requested !== "auto" || clef.ok || !fallbackAllowed || !AUTO_FALLBACK_REASONS[clef.reason ?? ""]) return clef;
+  return jevAttempt();
+}
+function selectedBackend(options: BackendOptions): BackendMode | undefined {
+  const value = options.backend ?? process.env.JEV_BACKEND ?? "jev";
+  return value === "jev" || value === "clef" || value === "auto" ? value : undefined;
+}
+
+function withBackendMetadata<T extends { ok: boolean }>(
+  result: T,
+  backend: "jev" | "clef",
+  backendRequested: BackendMode,
+  routeReason?: string,
+): T & BackendMetadata {
+  return {
+    ...result,
+    backend,
+    backendRequested,
+    ...(routeReason ? { routeReason, fallbackReason: routeReason } : {}),
+  };
+}
+
+async function selectCalibration(
+  options: BackendOptions,
+  primitive: "choice" | "noul",
+  question: Record<string, unknown>,
+  state: Record<string, unknown>,
+): Promise<ClefCalibration | undefined> {
+  let candidates: ClefCalibration[];
+  try {
+    candidates = options.clefCalibration ? [options.clefCalibration] : await loadCalibrations();
+  } catch {
+    return undefined;
+  }
+  try {
+    const hash = questionSha(question, Object.keys(state));
+    const matches = candidates.filter((item) => item.primitive === primitive && item.question_sha256 === hash);
+    return matches.length === 1 ? matches[0] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function askClefNoul(options: AskOptions, requested: BackendMode, callerKey: string, question: Record<string, unknown>): Promise<JevResult> {
+  const calibration = await selectCalibration(options, "noul", question, options.state);
+  const result = await askClef({
+    primitive: "noul",
+    state: options.state,
+    question,
+    callerKey,
+    calibration,
+    fingerprint: options.clefFingerprint,
+    fetchImpl: options.clefFetchImpl,
+    url: options.clefUrl,
+    timeoutMs: options.timeoutMs,
+  });
+  if (result.ok) recordClefSuccess();
+  else recordClefFailure(result.reason, options.nowMs?.() ?? Date.now());
+  if (result.ok && "scores" in result) return withBackendMetadata(result, "clef", requested);
+  if (!result.ok) return withBackendMetadata(result, "clef", requested);
+  return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
+}
+
+async function askClefChoice(options: AskChoiceOptions, requested: BackendMode, question: Record<string, unknown>): Promise<JevChoiceResult> {
+  const calibration = await selectCalibration(options, "choice", question, options.state);
+  const result = await askClef({
+    primitive: "choice",
+    state: options.state,
+    question,
+    callerKey: CHOICE_KEY,
+    calibration,
+    fingerprint: options.clefFingerprint,
+    fetchImpl: options.clefFetchImpl,
+    url: options.clefUrl,
+    timeoutMs: options.timeoutMs,
+  });
+  if (result.ok) recordClefSuccess();
+  else recordClefFailure(result.reason, options.nowMs?.() ?? Date.now());
+  if (result.ok && "choice" in result) return withBackendMetadata(result, "clef", requested);
+  if (!result.ok) return withBackendMetadata(result, "clef", requested);
+  return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
+}
 
 /**
  * When guardedFetch aborts a request that has not yet delivered headers:
@@ -320,7 +533,7 @@ async function postSystemOne(
       timeoutMs,
       retry?.maxRetries ?? 0,
     );
-    result = await client.systemOne({ state: state as never, questions: questions as never, model });
+    result = await client.systemOne(buildSystemOneBody(state, questions, model) as never);
   } catch (err) {
     const latencyMs = Date.now() - started;
     if (err instanceof APIError) {
@@ -347,34 +560,12 @@ async function postSystemOne(
   }
   const resolvedModel =
     "model" in result && typeof result.model === "string" ? result.model : model;
-  const usage = readUsage("usage" in result ? result.usage : undefined);
+  const usage = readSystemOneUsage("usage" in result ? result.usage : undefined);
   return { ok: true, answers, latencyMs, resolvedModel, ...(usage ? { usage } : {}) };
 }
 
-/**
- * Read `usage` field by field; never invent one. The whole object is absent (undefined) when the
- * response carries no usage object or no finite `input_tokens`/`output_tokens` pair — the scores
- * stand without it. `billing_units` is reported as `null` when absent or non-finite, never as 0.
- */
-function readUsage(raw: unknown): JevUsage | undefined {
-  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return undefined;
-  const finite = (key: string): number | null => {
-    const value: unknown = Reflect.get(raw, key);
-    return typeof value === "number" && Number.isFinite(value) ? value : null;
-  };
-  const input_tokens = finite("input_tokens");
-  const output_tokens = finite("output_tokens");
-  if (input_tokens === null || output_tokens === null) return undefined;
-  const extra: Record<string, number> = {};
-  for (const key of Object.keys(raw)) {
-    if (key === "input_tokens" || key === "output_tokens" || key === "billing_units") continue;
-    const value = finite(key);
-    if (value !== null) extra[key] = value;
-  }
-  return { input_tokens, output_tokens, billing_units: finite("billing_units"), extra };
-}
 
-export async function askJev(options: AskOptions): Promise<JevResult> {
+async function askJevUsingJev(options: AskOptions): Promise<JevResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   const apiKey = await resolveApiKey(options.apiKey);
 
@@ -441,6 +632,48 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
   return { ok: true, scores, latencyMs, model, ...(posted.usage ? { usage: posted.usage } : {}) };
 }
 
+export async function askJev(options: AskOptions): Promise<JevResult> {
+  const requested = selectedBackend(options);
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
+  if (requested === "jev") return withBackendMetadata(await askJevUsingJev(options), "jev", requested);
+
+  const keys = Object.keys(options.questions ?? {});
+  let routeReason: string | undefined;
+  if (requested === "auto") {
+    const route = resolveBackendRoute({
+      requested,
+      primitive: keys.length === 1 ? "noul" : "bundle",
+      questionCount: keys.length,
+      familyReceiptRegistered: false,
+      backendHoldActive: clefBackendHoldActive(options.nowMs?.() ?? Date.now()),
+    });
+    routeReason = route.routeReason;
+    if (route.backend === "jev") return withBackendMetadata(await askJevUsingJev(options), "jev", requested, routeReason);
+  }
+  if (keys.length !== 1) {
+    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef requires exactly one calibrated question", latencyMs: 0, model }, "clef", requested);
+  }
+  const callerKey = keys[0];
+  const rawQuestion = options.questions[callerKey];
+  const question = typeof rawQuestion === "string"
+    ? { type: "noul", instructions: rawQuestion }
+    : { type: "noul", instructions: rawQuestion.instructions, ...(rawQuestion.criteria ? { criteria: rawQuestion.criteria } : {}) };
+  const clefAttempt = () => askClefNoul(options, requested, callerKey, question);
+  if (requested === "auto") {
+    let clefFailureReason: string | undefined;
+    const jevHeld = billingHoldActive(options.nowMs?.() ?? Date.now()) !== null;
+    const result = await withAutoFallback("auto", !jevHeld, async () => {
+      const clef = await clefAttempt();
+      if (!clef.ok) clefFailureReason = clef.reason;
+      return clef;
+    }, () => askJevUsingJev(options));
+    const backend = result.backend === "clef" ? "clef" : "jev";
+    return withBackendMetadata(result, backend, requested, backend === "jev" ? (clefFailureReason ?? routeReason) : undefined);
+  }
+  return clefAttempt();
+}
+
 /**
  * Ask ONE multiclass question: mutually-exclusive labels, exactly one answer.
  *
@@ -455,7 +688,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
  * `criteria` is a MAP; the SDK itself rejects a list
  * (@typesafe-ai/sdk dist/index.mjs:339 "Choice criteria must be a map of labels to descriptions").
  */
-export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoiceResult> {
+async function askJevChoiceUsingJev(options: AskChoiceOptions): Promise<JevChoiceResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   const apiKey = await resolveApiKey(options.apiKey);
 
@@ -497,8 +730,48 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
   }
 }
 
-export type AskScoreOptions = {
-  /** The object the question is asked about. Serialised as-is into `state`. */
+export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoiceResult> {
+  const requested = selectedBackend(options);
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
+  if (requested === "jev") return withBackendMetadata(await askJevChoiceUsingJev(options), "jev", requested);
+
+  const question = { type: "choice", instructions: options.instructions, criteria: options.classes };
+  if (requested === "auto") {
+    // R4 keeps public benchmark rows out of automatic family routing.
+    const route = resolveBackendRoute({
+      requested,
+      primitive: "choice",
+      questionCount: 1,
+      calibration: options.clefCalibration,
+      questionKey: options.clefCalibration?.question_key,
+      questionHash: options.clefCalibration?.question_sha256,
+      fingerprint: options.clefFingerprint,
+      familyReceiptRegistered: false,
+      backendHoldActive: clefBackendHoldActive(options.nowMs?.() ?? Date.now()),
+    });
+    if (route.backend === "jev") return withBackendMetadata(await askJevChoiceUsingJev(options), "jev", requested, route.routeReason);
+  }
+  if (Array.isArray(options.classes) || Object.keys(options.classes ?? {}).length < 2) {
+    return withBackendMetadata({ ok: false, reason: "no-answers", error: "Clef choice requires at least two labels", latencyMs: 0, model }, "clef", requested);
+  }
+  const clefAttempt = () => askClefChoice(options, requested, question);
+  if (requested === "auto") {
+    let clefFailureReason: string | undefined;
+    const jevHeld = billingHoldActive(options.nowMs?.() ?? Date.now()) !== null;
+    const result = await withAutoFallback("auto", !jevHeld, async () => {
+      const clef = await clefAttempt();
+      if (!clef.ok) clefFailureReason = clef.reason;
+      return clef;
+    }, () => askJevChoiceUsingJev(options));
+    const backend = "backend" in result && result.backend === "clef" ? "clef" : "jev";
+    return withBackendMetadata(result, backend, requested, backend === "jev" ? clefFailureReason : undefined);
+  }
+  return clefAttempt();
+}
+
+export type AskScoreOptions = BackendOptions & {
+  /** The object the question is asked about. Serialised as-is into state. */
   state: Record<string, unknown>;
   /** The question itself, as text. */
   instructions: string;
@@ -511,9 +784,8 @@ export type AskScoreOptions = {
   fetchImpl?: typeof fetch;
   nowMs?: () => number;
 };
-
 export type JevScoreResult =
-  | {
+  | ({
       ok: true;
       score: number;
       confidence: number;
@@ -522,15 +794,15 @@ export type JevScoreResult =
       latencyMs: number;
       model: string;
       usage?: JevUsage;
-    }
-  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+    } & BackendMetadata)
+  | ({ ok: false; reason: JevFailure; error: string; latencyMs: number; model: string } & BackendMetadata);
 
 /**
  * Ask ONE score question: an ordered rubric, exactly one level comes back.
  * The SDK refuses a criteria list shorter than two; we refuse before spending
  * a call, with the same no-answers verdict a malformed answer earns.
  */
-export async function askJevScore(options: AskScoreOptions): Promise<JevScoreResult> {
+async function askJevScoreUsingJev(options: AskScoreOptions): Promise<JevScoreResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   const apiKey = await resolveApiKey(options.apiKey);
 
@@ -565,10 +837,30 @@ export async function askJevScore(options: AskScoreOptions): Promise<JevScoreRes
   }
 }
 
-export type AskBundleOptions = {
-  /** What the questions are asked about: text (sent as a string) or an object. Serialised as-is into `state`. */
+export async function askJevScore(options: AskScoreOptions): Promise<JevScoreResult> {
+  const requested = selectedBackend(options);
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
+  if (requested === "clef") {
+    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef has no score calibration", latencyMs: 0, model }, "clef", requested);
+  }
+  if (requested === "auto") {
+    const route = resolveBackendRoute({
+      requested,
+      primitive: "score",
+      questionCount: 1,
+      familyReceiptRegistered: false,
+      backendHoldActive: clefBackendHoldActive(options.nowMs?.() ?? Date.now()),
+    });
+    return withBackendMetadata(await askJevScoreUsingJev(options), "jev", requested, route.routeReason);
+  }
+  return withBackendMetadata(await askJevScoreUsingJev(options), "jev", requested);
+}
+
+export type AskBundleOptions = BackendOptions & {
+  /** What the questions are asked about: text (sent as a string) or an object. Serialised as-is into state. */
   state: string | Record<string, unknown>;
-  /** Already-typed question objects (`type: noul|choice|score`). */
+  /** Already-typed question objects (type: noul|choice|score). */
   questions: Record<string, unknown>;
   timeoutMs?: number;
   model?: string;
@@ -579,22 +871,23 @@ export type AskBundleOptions = {
   /** Retry owned by the SDK. Absent means maxRetries 0: one attempt per call. */
   retry?: { maxRetries?: number };
 };
+
 export type JevBundleResult =
-  | {
+  | ({
       ok: true;
       answers: Record<string, unknown>;
       latencyMs: number;
       model: string;
       resolvedModel: string;
       usage?: JevUsage;
-    }
-  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+    } & BackendMetadata)
+  | ({ ok: false; reason: JevFailure; error: string; latencyMs: number; model: string } & BackendMetadata);
 
 /**
  * Mixed questions against one state. Choice + Noul in one request run in parallel.
  * The only sanctioned way to ask both without forking fetch.
  */
-export async function askJevBundle(options: AskBundleOptions): Promise<JevBundleResult> {
+async function askJevBundleUsingJev(options: AskBundleOptions): Promise<JevBundleResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   const apiKey = await resolveApiKey(options.apiKey);
   if (!apiKey) {
@@ -625,6 +918,26 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
     resolvedModel: posted.resolvedModel,
     ...(posted.usage ? { usage: posted.usage } : {}),
   };
+}
+
+export async function askJevBundle(options: AskBundleOptions): Promise<JevBundleResult> {
+  const requested = selectedBackend(options);
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
+  if (requested === "clef") {
+    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef does not support bundled questions", latencyMs: 0, model }, "clef", requested);
+  }
+  if (requested === "auto") {
+    const route = resolveBackendRoute({
+      requested,
+      primitive: "bundle",
+      questionCount: Object.keys(options.questions ?? {}).length,
+      familyReceiptRegistered: false,
+      backendHoldActive: clefBackendHoldActive(options.nowMs?.() ?? Date.now()),
+    });
+    return withBackendMetadata(await askJevBundleUsingJev(options), "jev", requested, route.routeReason);
+  }
+  return withBackendMetadata(await askJevBundleUsingJev(options), "jev", requested);
 }
 
 /**
