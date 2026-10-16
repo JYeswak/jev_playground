@@ -1,0 +1,56 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c1a267b1b21dadaccf4123636083c1f682f54f474ddd28ba96c36fca2cc408c1",
+ "limitations": [
+  "Installed Jev chain only; no commit performed by the probe, no global release or one-day metric claim."
+ ],
+ "operation": "verify_actual_installed_COMMIT1",
+ "parameters": {
+  "bead": "jev-b35c.66",
+  "subject_sha256": "eae7bdfd2e8b7f71cda355ea3621b5893b90d7d4df94a205a8a2350cb941fc0f"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 2135,
+  "details": {
+   "guard_sha256": "eae7bdfd2e8b7f71cda355ea3621b5893b90d7d4df94a205a8a2350cb941fc0f",
+   "negative_mutation": "Replace only both actual existing Refs ids with nonexistent jev-zz9nonexist and jev-zz9nonexist2; first two paragraphs unchanged.",
+   "original_message": "docs(evidence): qualify signed UBS 5.5.0 consumers [test]\n\nMinisign-authenticated manifest and complete official runtime: 13 modules and 366 helpers, no installation or patch. Same original memory-filter and installer paths each complete under the unchanged 120-second ceiling; clean and critical-sink controls retain both directions. Calibration consumer completes with raw 2 critical and 6 warnings, not green. Current-source hashes recorded without claiming historical input identity or causal speedup; global adoption, independent triage and storage admission remain separate.\n\nRefs jev-9odh jev-mandatory-ubs-clearance-rtjv.\n",
+   "original_message_sha256": "b93c6dfcc03052094294cdfcd9c1d72ed5dbd47217030ad29079b2fdbcda2e39",
+   "runs": [
+    {
+     "argv": [
+      "/Users/josh/Developer/jev/.git/hooks/commit-msg",
+      "/Users/josh/Developer/jev/var/agent-tmp/commit1-verification.86553/original.txt"
+     ],
+     "case": "original",
+     "exit": 0,
+     "stderr": "",
+     "stdout": "verification-level PASS level=test\n"
+    },
+    {
+     "argv": [
+      "/Users/josh/Developer/jev/.git/hooks/commit-msg",
+      "/Users/josh/Developer/jev/var/agent-tmp/commit1-verification.86553/nonexistent.txt"
+     ],
+     "case": "nonexistent",
+     "exit": 4,
+     "stderr": "commit-msg-bead: refusing commit: none of the named tokens exists in /Users/josh/Developer/jev/.beads/beads.db\n",
+     "stdout": "verification-level PASS level=test\n"
+    }
+   ],
+   "tracker_after": {
+    ".beads/beads.db": "27fde0d7ff43b579b62f49b0a828b6015b5bf20d2277144619c1cb8bc3935706",
+    ".beads/beads.db-wal": "f348c24474bbefc51afbb32f72c788e8199a39511f65623be5220f880ff6d5d1",
+    ".beads/issues.jsonl": "2b4271c52555ba0b949b33e7be7c00ab616d6bb04bb3b3f0eb821aee7f8c21d8"
+   },
+   "tracker_before": {
+    ".beads/beads.db": "27fde0d7ff43b579b62f49b0a828b6015b5bf20d2277144619c1cb8bc3935706",
+    ".beads/beads.db-wal": "f348c24474bbefc51afbb32f72c788e8199a39511f65623be5220f880ff6d5d1",
+    ".beads/issues.jsonl": "2b4271c52555ba0b949b33e7be7c00ab616d6bb04bb3b3f0eb821aee7f8c21d8"
+   }
+  },
+  "sha256": "a0bc2fc9fe1f4f1529c36d87ef829be741243df2994f73d4677a811894ce7441"
+ }
+}
