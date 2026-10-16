@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_611b8b18870fb64ae507a461cebd9a769b5dff2157675d5b9984093c5ea57060",
+ "limitations": [
+  "No live provider calls; worktree-external fixture work/rerank-scifact from same commit."
+ ],
+ "operation": "verify_published_omp_tool_contracts",
+ "parameters": {
+  "bead": "jev-b35c.70",
+  "commit": "3ce593288a14d9188474b984c496481ffedc181c"
+ },
+ "producer": "RubyMeadow",
+ "result_ref": {
+  "bytes": 579,
+  "sha256": "8982bf5915b8466da80d5f282f7a18961f2b454acae384702c26e598c9cdc363"
+ }
+}

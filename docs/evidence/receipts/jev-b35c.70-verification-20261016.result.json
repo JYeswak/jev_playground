@@ -1,0 +1,17 @@
+{
+ "subject_commit": "3ce593288a14d9188474b984c496481ffedc181c",
+ "scope": [
+  "kit/test/omp-tools.test.mjs"
+ ],
+ "commands": [
+  "npm run prepare (in-scratch export, node_modules symlinked) -> rc=0",
+  "node --test test/omp-tools.test.mjs -> rc=0 6/6"
+ ],
+ "logs": {
+  "prepare_sha256": "3d98808689b1813c938a96d85ff81e236be5c13931ca973d0c2cb08da9c50f0f",
+  "prepare_bytes": 84,
+  "tests_sha256": "9b91e26d3e647ffe6f8b3efc4163a00eecd45371ab288eacdb9054fccfcf7d5f",
+  "tests_bytes": 1850
+ },
+ "verdict": "6 installed-tool contracts pass on exact published source; no live calls"
+}
