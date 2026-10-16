@@ -1,0 +1,21 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_63bad4e9357bcb2735b306f5f086440883d1eef4c3c6518d5c322403976092ab",
+ "limitations": [
+  "Actual audit exit1/28 findings is non-green, not full Current health.",
+  "No switches, services, shared configuration or direct model calls changed.",
+  "Initial partial archive lacked2declared fixtures; completed from same exactcommit without source/test/hash edits."
+ ],
+ "operation": "verify_published_outside_repo_audit",
+ "parameters": {
+  "bead": "jev-b35c.50",
+  "commit": "fe59449cc6c060ff51df16179c5b9f4c92357f64"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 34555,
+  "path": "docs/evidence/receipts/jev-b35c.50-published-20261016.result.json",
+  "sha256": "b1763192afee4d21c643ed1fe2592902282f86e84fa077259f3bcad44ce00290"
+ }
+}
