@@ -151,7 +151,7 @@ def check_source_hashes(suite: str) -> None:
         raise X2Error(f"{suite} source manifest is missing")
     source_paths = {
         "injection": {
-            "x1_runner": ROOT / "work/x1-injection-encoders/run.py",
+            "x1_runner": ROOT / "work/x1-injection-encoders/capture.py",
             "x1_preregistration": ROOT / "work/x1-injection-encoders/PREREG.md",
             "jev_answers": ROOT / "kit/fixtures/screen/answers-jev.jsonl",
             "clean_tool_results": ROOT / "work/jev-injection-flag/tool-results-sample.json",
@@ -285,7 +285,7 @@ def split_rows(
 def load_injection_rows() -> list[dict[str, Any]]:
     check_source_hashes("injection")
     spec = importlib.util.spec_from_file_location(
-        "x1_injection_runner", ROOT / "work/x1-injection-encoders/run.py"
+        "x1_injection_runner", ROOT / "work/x1-injection-encoders/capture.py"
     )
     if spec is None or spec.loader is None:
         raise X2Error("X1 source builder is unavailable")

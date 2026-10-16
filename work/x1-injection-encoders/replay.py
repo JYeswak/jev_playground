@@ -6,9 +6,10 @@ recorded probabilities and diffs every number against RECEIPT.md.
 No model load, no key, no network, no canonical writes (stdout only).
 Any join/provenance/statistic mismatch is FAIL, never a silent drop.
 
-Isolated from run.py on purpose: X2 split.json pins run.py bytes
-(x1_runner b0705f6d...), so replay machinery lives here and imports
-run.py read-only. Usage: replay.py --replay
+Isolated from run.py on purpose: X2 split.json pins the frozen producer
+(x1_runner b0705f6d...) now carried by capture.py, so this module imports
+capture.py read-only. Canonical entrypoint is run.py --json; this module
+has no CLI of its own.
 """
 
 from __future__ import annotations
@@ -16,20 +17,19 @@ from __future__ import annotations
 import importlib.util
 import json
 import math
-import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 
 
 def _load_runner():
-    spec = importlib.util.spec_from_file_location("x1run", HERE / "run.py")
+    # Frozen producer (X2-pinned b0705f6d); never run.py, avoiding any
+    # circular import now that run.py --json delegates here.
+    spec = importlib.util.spec_from_file_location("x1capture", HERE / "capture.py")
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
-
-
 _runner = _load_runner()
 read_jsonl = _runner.read_jsonl
 sha = _runner.sha
@@ -237,13 +237,3 @@ def run_replay() -> int:
     print(json.dumps(verdict))
     return 0 if not mismatches else 1
 
-
-def main() -> int:
-    if sys.argv[1:] != ["--replay"]:
-        print("usage: replay.py --replay", file=sys.stderr)
-        return 2
-    return run_replay()
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
