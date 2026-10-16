@@ -1,0 +1,277 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_f8bf0597f4853d13b75475c93cf6f4771db8e9ac026c9a291c18eba9ba57e5cb",
+ "limitations": [
+  "Original resolver leaf only; no original19 rollup, model-quality, handler-firing or whole-main claim."
+ ],
+ "operation": "jev-b35c.72.resolver-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_native": [
+   {
+    "advisoryListed": true,
+    "args": [
+     "--profile",
+     "muse",
+     "--model",
+     "openai/gpt-4o",
+     "--mode=rpc",
+     "--session-dir",
+     "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/normal/sessions",
+     "--max-time=8"
+    ],
+    "errors": [],
+    "exit": 0,
+    "freshMarkers": [
+     {
+      "family": "gate",
+      "nonce": "strict20-normal-b9f7d8dc37db7821",
+      "ts": 1792166646353
+     }
+    ],
+    "label": "normal",
+    "nonce": "strict20-normal-b9f7d8dc37db7821",
+    "state_success": true,
+    "stderr": "",
+    "stdout_bytes": 82254,
+    "stdout_sha256": "4781d824a3906c623e22b22d6dcca6817cfd6eb63421ae2c97b6c96b15168f89"
+   },
+   {
+    "advisoryListed": false,
+    "args": [
+     "--profile",
+     "muse",
+     "--model",
+     "openai/gpt-4o",
+     "--mode=rpc",
+     "--session-dir",
+     "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/disabled/sessions",
+     "--max-time=8",
+     "--no-extensions"
+    ],
+    "errors": [],
+    "exit": 0,
+    "freshMarkers": [],
+    "label": "disabled",
+    "nonce": "strict20-disabled-258abcfaa81bcdfe",
+    "state_success": true,
+    "stderr": "",
+    "stdout_bytes": 81768,
+    "stdout_sha256": "29d98ce2fea74c7d2ea4e8864a5cea445016941246764aec710d248d24de4800"
+   }
+  ],
+  "author": "WildDog",
+  "bead": "jev-b35c.72",
+  "build": {
+   "compiled_sha256": "194e676fa4959b4ef01a7cc017103e0d702d4122234bcf1ed8f8c2618c7813cf",
+   "exact_immutable_archive": true,
+   "own_source_native_receipt": "ev_e8342be4a8a800fd1f75997c2e9e9f33d22e9ae8c2d7b76fb7cbdd94088f06d1",
+   "prepare_exit": 0
+  },
+  "candidate": "20da0ca1c62e450709eb230a66b5c8a3f2600e5e",
+  "cold_shim_consumer": {
+   "cwd": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home/.omp/profiles/muse/agent/hooks/pre",
+   "exit": 0,
+   "installed_package_physical": true,
+   "network_denied": true,
+   "node_path_unset": true,
+   "program": "import {readFile,realpath} from 'node:fs/promises';import{dirname,isAbsolute,resolve}from'node:path';import{pathToFileURL}from'node:url';import ts from \"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/source/kit/node_modules/typescript/lib/typescript.js\";const shim=\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts\",entry=\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer/node_modules/jev-fixture-native/src/gate-hook.ts\";const actual=await import(pathToFileURL(shim).href);const expected=await import(pathToFileURL(entry).href);const text=await readFile(shim,'utf8');const ast=ts.createSourceFile(shim,text,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);const specs=ast.statements.filter(x=>ts.isExportDeclaration(x)&&x.moduleSpecifier).map(x=>x.moduleSpecifier.text);const resolved=await Promise.all(specs.map(async x=>({specifier:x,relative:x.startsWith('.')&&!isAbsolute(x),real:await realpath(resolve(dirname(shim),x))})));const original=await realpath(entry);const defaultsSame=actual.default===expected.default&&typeof actual.default==='function';const forwards=Object.keys(expected).every(k=>actual[k]===expected[k]);if(!defaultsSame||!forwards||!resolved.length||resolved.some(x=>!x.relative||x.real!==original))throw Error('resolver/export mismatch');console.log(JSON.stringify({cold_shim_import_first:true,default_identity:defaultsSame,forwarded_runtime_exports:Object.keys(expected),exports_preserved:forwards,resolved,validated_entry:original,node_path:process.env.NODE_PATH??null}));",
+   "stderr": "",
+   "stdout": {
+    "cold_shim_import_first": true,
+    "default_identity": true,
+    "exports_preserved": true,
+    "forwarded_runtime_exports": [
+     "default"
+    ],
+    "node_path": null,
+    "resolved": [
+     {
+      "real": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer/node_modules/jev-fixture-native/src/gate-hook.ts",
+      "relative": true,
+      "specifier": "../../../../../../../consumer/node_modules/jev-fixture-native/src/gate-hook.ts"
+     },
+     {
+      "real": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer/node_modules/jev-fixture-native/src/gate-hook.ts",
+      "relative": true,
+      "specifier": "../../../../../../../consumer/node_modules/jev-fixture-native/src/gate-hook.ts"
+     }
+    ],
+    "validated_entry": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer/node_modules/jev-fixture-native/src/gate-hook.ts"
+   }
+  },
+  "limits": [
+   "Only original installed package-resolution leaf; original .19 full rollup remains independent and open.",
+   "Reused still-current exact candidate own source/build/65x2/native/refusal evidence; no duplicate unchanged test runs or borrowed WIP proof.",
+   "Cold fixture has only default runtime export; identity and all existing runtime exports proven, no invented additional named binding.",
+   "Native module/factory loading/registration only, not handler firing, model efficacy, real profile/service/global configuration changes or whole-main CI.",
+   "No reviewer production/source/test mutation or author reassignment."
+  ],
+  "mixed_registration_refusal": {
+   "exit": 4,
+   "families": [
+    {
+     "family": "hint",
+     "profile": "muse",
+     "reason": "native entry registers a malformed tool: hint",
+     "status": "refused"
+    }
+   ],
+   "writes": []
+  },
+  "original_five_suite_matrix": {
+   "admission": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 161541857280,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 161541857280,
+    "free_excludes_purgeable": true,
+    "free_pct": 16.24087000220662,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 161541857280,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 4033977728,
+        "method": "foundation"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 161524871168,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 161524871168,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   },
+   "command": "node --test kit/test/install-cli.test.mjs kit/test/omp-paths.test.mjs kit/test/omp-config-merge.test.mjs kit/test/install-omp-profile.test.mjs kit/test/install-skills.test.mjs && fnm exec --using 22.18.0 node --test kit/test/install-cli.test.mjs kit/test/omp-paths.test.mjs kit/test/omp-config-merge.test.mjs kit/test/install-omp-profile.test.mjs kit/test/install-skills.test.mjs",
+   "exit": 0,
+   "fail_each": 0,
+   "full_stdout_sha256": "ddbf3401b499a64d30f06c43d330a46fa4d3a788f224e604d319ffd5f020e054",
+   "pass_each": 65,
+   "runtimes": [
+    "Node22.23.3",
+    "Node22.18.0"
+   ],
+   "skipped_each": 0
+  },
+  "peer_full_kit_qualification": {
+   "exact_same_candidate": "20da0ca1c62e450709eb230a66b5c8a3f2600e5e",
+   "full_tests": 365,
+   "pass": 365,
+   "receipt": "ev_6a1cbb68c992a237df98b5a79c01132fac4a72222063ae169c331742208c37a1",
+   "reviewer": "LavenderDune",
+   "verification": "published receipt verify0; not claimed as my own full-kit invocation"
+  },
+  "physical_install_and_boundaries": {
+   "bad": {
+    "exit": 4,
+    "families": [
+     {
+      "family": "gate",
+      "profile": "muse",
+      "reason": "native entry has no default function export: gate",
+      "status": "refused"
+     }
+    ],
+    "writes": []
+   },
+   "consumer": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer",
+   "first": {
+    "exit": 0,
+    "families": [
+     {
+      "family": "gate",
+      "profile": "muse",
+      "status": "installed"
+     },
+     {
+      "family": "hint",
+      "profile": "muse",
+      "status": "installed"
+     }
+    ],
+    "writes": [
+     "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts",
+     "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home/.omp/profiles/muse/agent/config.yml",
+     "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home/.omp/profiles/muse/agent/jev-shims.json"
+    ]
+   },
+   "home": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/home",
+   "physical": true,
+   "pkg": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/strict20da/native-valid/consumer/node_modules/jev-fixture-native",
+   "refusalUnchanged": true,
+   "repeat": {
+    "exit": 0,
+    "families": [
+     {
+      "family": "gate",
+      "profile": "muse",
+      "status": "already"
+     },
+     {
+      "family": "hint",
+      "profile": "muse",
+      "status": "already"
+     }
+    ],
+    "writes": []
+   },
+   "repeatUnchanged": true
+  },
+  "reviewer": "DarkBear",
+  "source": [
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/omp-profile-target.ts",
+    "sha256": "eb9b20b2849aa59c8e26987a90b888dd153751c6770ee708f68f1463b7e14288"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/omp-config-merge.ts",
+    "sha256": "2b42c4269438f89511ab784528a84c150876476163335ec3d19e5b788efbe91b"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/omp-paths.ts",
+    "sha256": "717d054940e726ffca76362d9082931c0f0aaa35e1651e318d3d736a6d4dd8e1"
+   }
+  ],
+  "verdict": "PASS_ORIGINAL_RESOLVER_LEAF_ACCEPTANCE"
+ }
+}
