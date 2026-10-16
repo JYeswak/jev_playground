@@ -1,0 +1,38 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4e84c257e411d9e227845ff67711e56799791e6dd043223049a5b72b39f135d6",
+ "limitations": [
+  "Advisory factory false admission; exact source fragment and current-dist installer, not full native-session acceptance."
+ ],
+ "operation": "jev-b35c.74.advisory-admission-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_installer_probe": {
+   "exit": 0,
+   "program": "import {mkdir,writeFile,readFile} from \"node:fs/promises\";import {installProfileTargets} from \"./kit/dist/install/omp-profile-target.js\";const root=\"/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/advisory-real\";const pkg=root+\"/node_modules/jev-fixture-native\";await mkdir(pkg+\"/src\",{recursive:true});const pin=\"c2d7871afbc14c190b564eebdbaf3de190c35f17\",resolved=\"git+https://github.com/JYeswak/jev_playground.git#\"+pin;const pm=JSON.parse(await readFile(\"kit/test/fixtures/installer/native-pkg/package.json\",\"utf8\"));await writeFile(pkg+\"/package.json\",JSON.stringify(pm));await writeFile(pkg+\"/src/hint.mjs\",\"export default function hintExtensionFixture(){throw new Error(\\\"native-factory-failure\\\")}\");const deps={[pm.name]:resolved};await writeFile(root+\"/package.json\",JSON.stringify({name:\"owned-review\",dependencies:deps}));await writeFile(root+\"/package-lock.json\",JSON.stringify({lockfileVersion:3,packages:{\"\":{dependencies:deps},[\"node_modules/\"+pm.name]:{version:pm.version,resolved}}}));const contract=JSON.parse(await readFile(\"kit/test/fixtures/installer/contracts/hint.json\",\"utf8\"));const family={id:\"hint\",surfaceType:\"advisory\",kind:\"extension\",declared:\"ON\",contract,manifest:{latencyBudgetMs:800,safeSideTestId:contract.safe_side_test_id,offSwitchPath:\"fixture-hint-off\"},packageSpecifier:pm.name+\"/src/hint.mjs\",packageRoot:pkg,packageLockPath:root+\"/package-lock.json\",pin};const r=await installProfileTargets({ompHome:root+\"/omp\",profiles:[\"muse\"],families:[family],switchRegistry:{surfaces:[{id:\"hint\",off_switch:{path:\"fixture-hint-off\",polarity:\"exists-disables\"}}]},maxHandlerLatencyMs:1500});console.log(JSON.stringify(r));",
+   "stderr": "",
+   "stdout": "{\"exit\":0,\"writes\":[\"/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/advisory-real/omp/profiles/muse/agent/config.yml\",\"/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/advisory-real/omp/profiles/muse/agent/jev-shims.json\"],\"families\":[{\"family\":\"hint\",\"profile\":\"muse\",\"status\":\"installed\"}]}\n"
+  },
+  "bead": "jev-b35c.74",
+  "candidate": "80181db1",
+  "fixture_provenance": "Recorded native-pkg package manifest and hint contract; native hint factory return replaced with throwing body in owned throwaway mjs package; no canonical edits.",
+  "fragment_probe": {
+   "exit": 0,
+   "stderr": "(node:91799) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+   "stdout": "{\"admission\":\"accepted\",\"factoryCallsDuringAdmission\":0,\"actualFactoryFailure\":\"observed-native-factory-failure\"}\n"
+  },
+  "limits": [
+   "Runtime dist exercised as present; no compiled-source equivalence assertion. Candidate source fragment exact match reported separately.",
+   "Network denied, writes limited to owned scratch; no real profile/service/provider actions.",
+   "No full suite or parent closure claim."
+  ],
+  "reviewer": "DarkBear",
+  "runtime_dist_sha256": "edf41e8e771ceab08939c4c1f90397bfcd16c57c4e063c4fca88d345e2928503",
+  "source_boundary": "checkLoadedModule:315-319 returns without invoking any advisory default factory; hook only invocation326",
+  "source_matches_candidate": true,
+  "source_sha256": "7a016b3c60bd52cd1e688175c86ef33d7abea1d21b11e7cd72ea31dffa1f82ba",
+  "verdict": "REWORK"
+ }
+}
