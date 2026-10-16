@@ -1,0 +1,111 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_3989736472bcb52768c29666c61863d69772f5debcf4548e2e575a840de291bd",
+ "limitations": [
+  "Observed committed-source replay, not published full acceptance; symmetric ECE fails and X4b remains NOT_RUN."
+ ],
+ "operation": "x4.parent-acceptance-replay",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 881,
+  "details": {
+   "bead": "jev-x4-vendored-probe-closeout-82p7",
+   "boundary": "Constructed frozen sample only; no organic/deployment value, no Clef superiority, symmetric ECE FAIL; X4b not KILL and not executed. This receipt records observed source-bound validation, not publication or author self-close.",
+   "command": "nice -n 10 uv run --no-project --offline --with scikit-learn python work/x4-vendored-probe/run.py",
+   "controls": {
+    "command": "nice -n 10 uv run --no-project --offline --with scikit-learn python -m unittest work/x4-vendored-probe/test_run.py -v",
+    "exit": 0,
+    "held_refit_refused": true,
+    "tests_passed": 4,
+    "window_bootstrap_refused": true
+   },
+   "environment": {
+    "cache": "owned resolver metadata plus read-only existing wheel archive pointers; no repository source copies",
+    "model_calls": 0,
+    "network": "sandbox denied",
+    "numpy": "2.5.4",
+    "python": "3.14.2",
+    "scikit_learn": "1.9.1",
+    "scipy": "1.18.1",
+    "spend_usd": "0.00",
+    "threads": 1
+   },
+   "executed_source_commit": "3cf87d6334842dafcbb0574074681a64b1a285a2",
+   "exit": 0,
+   "observed_metrics": {
+    "auc_bar": "0.80745",
+    "auc_clef": "0.83885",
+    "auc_jev": "0.82745",
+    "auc_probe": "0.9175",
+    "bootstrap_draws_with_both_classes": 1968,
+    "bootstrap_units": 53,
+    "dev_groups": 46,
+    "dev_n": 120,
+    "ece_clef": "0.08320128440195268",
+    "ece_clef_ci95": [
+     "0.057490334285784435",
+     "0.2537221984413552"
+    ],
+    "ece_jev": "0.07244510932681601",
+    "ece_jev_ci95": [
+     "0.0701781446186731",
+     "0.26769822718541986"
+    ],
+    "ece_probe": "0.1652879885006247",
+    "ece_probe_ci95": [
+     "0.10111460863879762",
+     "0.29469231424274195"
+    ],
+    "headline": "meets the non-inferiority bar on a constructed sample",
+    "held_groups": 53,
+    "held_n": 200,
+    "overlap": 0,
+    "probe_minus_clef_ci95": [
+     "-0.027825187878196354",
+     "0.1262914372955961"
+    ],
+    "probe_minus_jev_ci95": [
+     "0.0013764880952381487",
+     "0.17371338327370295"
+    ],
+    "probe_vs_clef_delong_p": "0.006549516169267279",
+    "probe_vs_clef_holm_p": "0.006549516169267279",
+    "probe_vs_jev_delong_p": "0.0004117071118636533",
+    "probe_vs_jev_holm_p": "0.0008234142237273066",
+    "raw_jev_reference": "0.1846",
+    "symmetric_ece_pass": false
+   },
+   "publication": {
+    "matching_source_files": 6,
+    "missing_executed_updates": [
+     "work/x4-vendored-probe/test_run.py",
+     "work/x4-vendored-probe/RECEIPT.md"
+    ],
+    "published_full_acceptance": false,
+    "remote_main": "100422b9306114898c802478452427eeea85415a",
+    "total_source_files": 8
+   },
+   "same_bytes_on_shared_main": "a5d64c75f292f2810a42f7e44c7c2cea31a105b9",
+   "source_sha256": {
+    "work/local-decision-arms/vendor-rows-clefflash-dev.jsonl": "d7cd03394145a288ec9c808867a8613e2591520c7bd080f9ccf65d145a54c0ab",
+    "work/local-decision-arms/vendor-rows-clefflash.jsonl": "6dab05529656568df232de6fe42f9a808c28cbff221f6f158f189d885c12c11a",
+    "work/vendor-paste/sample.json": "2a167ed69ebfa5aa41399b278c14c1dae5a40ec630f4de97cfbb7faaa39644ab",
+    "work/vendor-paste/vendor-rows.jsonl": "00c3346b5ebc4364fba29675c1d77a2409a4b7ed9c82207c5091c42434c2cb38",
+    "work/x4-vendored-probe/RECEIPT.md": "59f5583e40f0d617697c4751449327b3240e005b033694c8128bdb50a0defa52",
+    "work/x4-vendored-probe/run.py": "5ddb4795214442c893585ed3d7b2124cf88103ada25b45a4a609af25e96dde7d",
+    "work/x4-vendored-probe/test_run.py": "e739cce1a08affef276a51209a70958d5f50aba3cf6c199b17d28bfd9f0acdff",
+    "work/x4-vendored-probe/x4b-PREREG.md": "27d5cd02002a4001974983efdc4a0387c859a7afed84c8de4a3f86d54c194686"
+   },
+   "x4b": {
+    "embedding_loads": 0,
+    "gpu_guard_called": false,
+    "prereg_committed": true,
+    "reason": "No checked vendor-shadow KEEP; current mvvh blocked and canonical ledger-history.jsonl absent",
+    "status": "NOT_RUN"
+   }
+  },
+  "sha256": "049696e6f4075166566b492e0f61018e65bacf68772760dbfdb2e3662a19c34f"
+ }
+}
