@@ -1,9 +1,12 @@
-"""Planted negatives for run.py --replay (jev-x1-injection-encoders-e2gp.1).
+"""Planted negatives for the X1 recorded replay (jev-x1-injection-encoders-e2gp.1).
 
-Every case copies the committed canonical bundle into a throwaway directory
-and points the replay at the copies: canonical answers/RECEIPT files are
-never mutated. Full-size copies keep the frozen stratum counts intact so each
-case isolates exactly one refusal.
+ReplayNegatives copies the committed canonical bundle into a throwaway
+directory and points the replay module at the copies: canonical
+answers/RECEIPT files are never mutated. Full-size copies keep the frozen
+stratum counts intact so each case isolates exactly one refusal.
+TestJsonEntrypoint drives the canonical run.py --json command itself and
+asserts it never writes canonical files, on both the MATCH and the
+guard-refusal paths.
 """
 
 import contextlib
@@ -12,6 +15,9 @@ import io
 import json
 import os
 import shutil
+import subprocess
+import sys
+import time
 import unittest
 from pathlib import Path
 
@@ -188,6 +194,65 @@ class ReplayNegatives(unittest.TestCase):
         self.assertTrue(any("without Jev mate" in m
                             for m in verdict["mismatches"]))
 
+
+WATCHED = (
+    HERE / "answers-protectai.jsonl",
+    HERE / "answers-jev.jsonl",
+    HERE / "RECEIPT.md",
+    HERE / "PREREG.md",
+    HERE / "../../kit/fixtures/screen/answers-protectai.jsonl",
+    HERE / "../../kit/fixtures/screen/answers-jev.jsonl",
+)
+
+
+class TestJsonEntrypoint(unittest.TestCase):
+    """The canonical run.py --json command never writes canonical files."""
+
+    @classmethod
+    def setUpClass(cls):
+        root = HERE.parents[1] / "var" / "agent-tmp"
+        cls.scratch = root / f"x1json.{os.getpid()}"
+        cls.scratch.mkdir(parents=True, exist_ok=True)
+        (cls.scratch / ".owner").write_text(
+            f"pid: {os.getpid()}\nlabel: x1json\nrepo: {root.parent}\n"
+        )
+        stub = cls.scratch / "localbench-stub.sh"
+        stub.write_text('#!/bin/sh\necho \'{"parked": []}\'\n')
+        stub.chmod(0o755)
+        cls.stub = stub
+
+    def snapshot(self):
+        return {str(p): p.read_bytes() for p in WATCHED}
+
+    def run_json(self, extra_env):
+        env = dict(os.environ)
+        env["LOCALBENCH_BIN"] = str(type(self).stub)
+        env.update(extra_env)
+        before = self.snapshot()
+        proc = subprocess.run(
+            [sys.executable, str(HERE / "run.py"), "--json"],
+            capture_output=True, text=True, timeout=300, env=env,
+            cwd=str(HERE.parents[1]),
+        )
+        after = self.snapshot()
+        self.assertEqual(before, after)
+        return proc
+
+    def test_json_match_writes_nothing(self):
+        proc = self.run_json({})
+        self.assertEqual(proc.returncode, 0)
+        verdict = json.loads(proc.stdout)
+        self.assertEqual(verdict["status"], "MATCH")
+        self.assertEqual(verdict["mismatches"], [])
+
+    def test_json_guard_refusal_writes_nothing(self):
+        hold = type(self).scratch / "gpu-hold"
+        hold.write_text(str(int(time.time()) + 3600))
+        proc = self.run_json({"JEV_GPU_HOLD_FILE": str(hold)})
+        self.assertEqual(proc.returncode, 0)
+        verdict = json.loads(proc.stdout)
+        self.assertEqual(verdict["status"], "NOT_RUN")
+        self.assertEqual(verdict["jev_calls"], 0)
 
 if __name__ == "__main__":
     unittest.main()
