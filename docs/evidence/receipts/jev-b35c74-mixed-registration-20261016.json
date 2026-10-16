@@ -1,0 +1,72 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_dd4c679826ca2a62219f4b19388c5331e51a409342ec475e8b64b5f0678ceb85",
+ "limitations": [
+  "Bounded installer/native loading counterexample; no full-suite, model-quality, or parent completion claim."
+ ],
+ "operation": "jev-b35c.74.mixed-registration-review",
+ "parameters": {
+  "subject_sha256": "522b9656cde81ad19b2f53662f6a15e238f70ad7f7d468346591d6aef16a564d"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "api_results": [
+   {
+    "bad": false,
+    "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/consumer",
+    "entry": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/consumer/node_modules/jev-fixture-native/src/hint-extension.ts",
+    "exit": 0,
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/home",
+    "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/home/.omp",
+    "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz",
+    "status": "installed",
+    "writes": [
+     "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/home/.omp/agent/config.yml",
+     "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/home/.omp/agent/jev-shims.json"
+    ]
+   },
+   {
+    "bad": true,
+    "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/consumer",
+    "entry": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/consumer/node_modules/jev-fixture-native/src/hint-extension.ts",
+    "exit": 0,
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/home",
+    "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/home/.omp",
+    "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4",
+    "status": "installed",
+    "writes": [
+     "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/home/.omp/agent/config.yml",
+     "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/home/.omp/agent/jev-shims.json"
+    ]
+   }
+  ],
+  "bead": "jev-b35c.74",
+  "captures": {
+   "mixed-registration-api.stderr": {
+    "bytes": 183,
+    "sha256": "2d5e13f22fba880df1dfbe2e53c76f1ef92fd70cc12302d9cbeaf15df3a160b8"
+   },
+   "mixed-registration-api.stdout": {
+    "bytes": 1740,
+    "sha256": "6531b9957ba01b3ec0b91e64792077f5a7dbd352e9f561767e94513cf5351806"
+   },
+   "mixed-registration-native.stderr": {
+    "bytes": 185,
+    "sha256": "f74043829ec35d76c6a9cfe2619ef955e3e774e510d182e9e7f6b4d2ffc067ad"
+   },
+   "mixed-registration-native.stdout": {
+    "bytes": 82185,
+    "sha256": "c555bf82a7d3391da4b8190d8387ec3dcf5ba36ce5d0c5f5600c6fb9e0d3df79"
+   }
+  },
+  "closed_source_commit": "40275767",
+  "compiled_matches_exercised_working_artifact": true,
+  "compiled_sha256": "6477128669d168871a7e4e013d6c42465b609673cfd6758701f50c572ddb2aaf",
+  "model_prompts": 0,
+  "native_stderr": "Failed to load extension /Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null…: Failed to load extension: null is not an object (evaluating 'u.sourcePath')\n",
+  "negative_entry": "// Fixture native extension entry for installer profile-target tests.\n// Mirrors the real extension shape (see .omp/extensions/jev-claim-check.ts):\n// a default factory receiving pi and registering a tool. Pure and\n// deterministic, no I/O, never loaded outside owned test homes.\nexport type FixtureHost = {\n  registerTool: (tool: unknown) => void;\n};\n\nexport default function hintExtensionFixture(pi: FixtureHost): void {\n  pi.registerTool(null);\n  pi.registerTool({\n    name: \"hint-fixture-tool\",\n    label: \"Hint fixture\",\n    description: \"Fixture advisory tool for installer tests.\",\n    parameters: {},\n    execute: async () => ({ allowed: true }),\n  });\n}\n",
+  "source_sha256": "522b9656cde81ad19b2f53662f6a15e238f70ad7f7d468346591d6aef16a564d",
+  "verdict": "REWORK: invalid earlier registration masked by later valid registration"
+ }
+}
