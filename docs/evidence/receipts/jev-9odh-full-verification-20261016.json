@@ -1,0 +1,200 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c8943729e6367505d77167325252c5f695520f9c2c6d3a739576c4a31f2e4847",
+ "limitations": [
+  "Authorized post-observation reference reconciliation; no prospective quality win. Author proof awaits independent closure."
+ ],
+ "operation": "jev-9odh.full-original-verification",
+ "parameters": {
+  "subject_sha256": "5880d69d010ea464a19f5a640c37361c1fcfc976967857e2dd3bf465cfa0e24f"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "admission": {
+   "canonical_heavy": "omp-kit heavy --label 9odh-original-full-kit",
+   "load": "9.07/8.92/9.11 on32cores",
+   "nice": 10,
+   "sbh": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 177769828352,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 177769828352,
+    "free_excludes_purgeable": true,
+    "free_pct": 17.87237513046016,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/source",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 177769828352,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 3076881792,
+        "method": "foundation"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 176829472768,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 176829472768,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   }
+  },
+  "aggregate": {
+   "commands": [
+    "npm ci --ignore-scripts --no-audit --no-fund --cache OWNED --prefix kit",
+    "npm run prepare --prefix kit",
+    "npm test --prefix kit"
+   ],
+   "complete_output_bytes": 74965,
+   "complete_output_sha256": "3009c7f6b362518f8bea91d1f428a66d7128a618aa152cae09fe758df70c86c4",
+   "cwd": "exact git archive 402757671b774b1149bc8d0526768a791b1902bf",
+   "decisive_output": [
+    "# Subtest: D2 held Jev ECE reproduces the authorized full-vector reference within unchanged .002",
+    "# Subtest: D2 held ECE after Platt reproduces Clef .0246 within .002",
+    "# Subtest: D2 reference requires derivation provenance even for a matching point",
+    "# Subtest: D2 reference refuses an edited center even inside the numeric tolerance",
+    "1..364",
+    "# tests 364",
+    "# pass 364",
+    "# fail 0",
+    "# skipped 0"
+   ],
+   "exit": 0,
+   "fail": 0,
+   "pass": 364,
+   "retained_output": "artifact://1358",
+   "skipped": 0,
+   "tests": 364
+  },
+  "author": "DarkBear",
+  "authorization": "J-2026-10-15-07 Option A; post-observation full-vector reference reconciliation, not prospective quality win",
+  "bead": "jev-9odh",
+  "frozen_method": {
+   "all_19_common_function_declarations_byte_identical": true,
+   "constants_block_byte_identical": true,
+   "original": "2ce1c6b6",
+   "prior_scalar_fail_retained": true,
+   "tolerance": "0.002"
+  },
+  "inputs": [
+   {
+    "actual": "60c42d092665d74e78db7b524c9c214a75215df699734388164136d34d60956e",
+    "expected": "60c42d092665d74e78db7b524c9c214a75215df699734388164136d34d60956e",
+    "path": "work/choice-banking77/full.jsonl"
+   },
+   {
+    "actual": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3",
+    "expected": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3",
+    "path": "work/choice-banking77/rows-full-jev.jsonl"
+   },
+   {
+    "actual": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099",
+    "expected": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099",
+    "path": "work/local-decision-arms/rows-clefflash-dev.jsonl"
+   },
+   {
+    "actual": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb",
+    "expected": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb",
+    "path": "work/local-decision-arms/rows-clefflash.jsonl"
+   },
+   {
+    "actual": "3ba2998c280ca25f58413f8b8f5e516f9439663d00cc262598ce059c5db01f78",
+    "expected": "3ba2998c280ca25f58413f8b8f5e516f9439663d00cc262598ce059c5db01f78",
+    "path": "work/local-decision-arms/run.py"
+   }
+  ],
+  "lane": "offline/local",
+  "limits": [
+   "No model-quality win, scalar-method substitution, bar/tolerance/input mutation, whole-main-CI or global service-health claim.",
+   "No new source edits; existing scientific source and docs already published. Exact snapshot source fingerprints match current canonical files.",
+   "Full-kit test aggregate and producer checks are author verification; non-author must verify and close.",
+   "No live provider requests intentionally made; keyless fixture suite with provider key environment unset; not independent network-traffic attestation."
+  ],
+  "producer_checks": [
+   {
+    "exit": 0,
+    "id": "exact",
+    "stderr": "",
+    "stdout": "{\"checked\": \"work/local-decision-arms/calibration-reference.json\", \"jev_held_ece\": \"0.03175198653414941\", \"status\": \"OK\"}\n"
+   },
+   {
+    "exit": 1,
+    "id": "invalid-json",
+    "stderr": "REFUSE: Expecting value: line 1 column 1 (char 0)\n",
+    "stdout": ""
+   },
+   {
+    "exit": 1,
+    "id": "bare-reference",
+    "stderr": "REFUSE: reference/provenance disagreement with independent re-derivation\n",
+    "stdout": ""
+   }
+  ],
+  "reference": {
+   "absolute_tolerance": "0.002",
+   "jev_held_ece": "0.03175198653414941"
+  },
+  "source": [
+   {
+    "canonical_matches_exercised": true,
+    "path": "kit/test/measurement-calibration.test.mjs",
+    "sha256": "5aa743b8a63120776df72898803138b0061584aec2f271b5ce23f99ec5343265"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/local-decision-arms/derive-calibration-reference.py",
+    "sha256": "29e412de451d738ff3e611606e2eee4e6e8d182b30ea4d341b4af4c09ab22f86"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/local-decision-arms/calibration-reference.json",
+    "sha256": "eba57941b1678e86ecb6cdbc6650e89419b075916e9007b1d3ad6dff3db37be5"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/plan-20261004/specs/advanced-mathops.md",
+    "sha256": "e53b4bed8924e76d31571b0aefcf693d09aa78d0fcbd3149918f39216c094e51"
+   }
+  ],
+  "source_commit": "402757671b774b1149bc8d0526768a791b1902bf",
+  "status": "AUTHOR_VERIFICATION_COMPLETE_PENDING_NONAUTHOR",
+  "ubs": {
+   "independent_warning_triage": "JadeSpire comment4039 false_positive; raw tool severity warning preserved; actual invalid-JSON CLI refusal now freshly exercised",
+   "previous_raw_producer_scan": "complete, exit0,0critical,1warning"
+  }
+ }
+}
