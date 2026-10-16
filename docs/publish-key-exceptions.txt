@@ -1,0 +1,15 @@
+# publish-export key-shape exceptions (jev-x5cy). Read by scripts/publish-export.sh.
+# EXEMPT rows: one per key-shaped LINE of the export that was read in context and proven synthetic by its own content:
+#   EXEMPT <export-relative path> | <sha256 of the whole exported line, no trailing newline> | <key-pattern hits on that line> | <reason>
+# A row binds the path, the full line content and the hit count together. It cannot cover another file, an edited
+# line, or a second key added to the same line; any change makes the line unexplained again (the scan then FAILs).
+# There are no path-wide, directory-wide or pattern-wide rows. A malformed row stops the scan (exit 4).
+# The AWS documentation example key and the redactor's own source are explained in the script, not here.
+# Each row's evidence is recorded in docs/evidence/jev-x5cy-key-hit-rulings-20261011.md; the matched text is never printed.
+EXEMPT docs/demos/upstream-repro/issue-1-state-preview-plaintext-credentials.md | 682c74bca496dd8150a19869b8e700c2b646031650da4481373491f74678775b | 1 | upstream bug-report excerpt (bdd1c9a6): the whole PEM is header + the literal word FAKE + footer, no key body; sibling rows in the same block are labelled fake values (sk-live-FAKE-EXAMPLE-NOT-A-REAL-KEY)
+EXEMPT work/jevcache-probe/repro-4-state-preview-credentials.sh | b50782ff1c5957564878691d1989119d9e5aa7950e0074b881cb31f2e7505101 | 1 | probe script (bdd1c9a6): the same FAKE-bodied PEM stub; sibling probes are labelled fake or documentation values
+EXEMPT .omp/hooks/post/jev-gate-observe.test.mjs | c4e0c5d8e4dad817af87914c8792fa41c4b49913baaf85fd3108e7dc23a9d2c7 | 1 | unit-test list of synthetic secret shapes (1e16af45): the element is the PEM header marker alone, no key material; its neighbours are generated with repeat(), e.g. a.repeat(24)
+EXEMPT work/gate-question-gap/extract-5-extension.jsonl | b07c898a6eb84c48a663bec9724d51328c53e058ffb3d72834dc1dd41d26a2a7 | 1 | recorded session command (f3f544fb): the hit is a PEM-marker search term inside the -E alternation of a git grep pattern argument, no key material
+# REDACT: an uncertain key-shaped line is NOT exempted. The export copy has every key-shaped match on it replaced by
+# KEY_SHAPE_REDACTED (source untouched); the row binds path + whole-line sha256 + hit count like an EXEMPT row, and a stale row stops the build.
+REDACT work/jev-hqha/hqha.errsample.json | f5904f4b320cdee03df4500634cbab245ae266742a4a2a6af7478728dfbdb9fb | 2 | captured error sample (0d2d2beb) holding one 20-char AWS-shaped identifier twice; looks like a hand-edited placeholder but is not independently proven synthetic (reviewer 779d84f6), so it is redacted rather than excused

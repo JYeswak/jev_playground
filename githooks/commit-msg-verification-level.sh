@@ -122,6 +122,9 @@ selftest() {
   check_file "$tmp/prose" >/dev/null 2>&1 && { echo "selftest: FAIL — 'live' as prose accepted as a level claim"; fails=$((fails+1)); }
 
   # RECEIPT LEVEL + SUGGESTION (2026-09-20): hermetic temp-repo arms, never the real index.
+  # jev-n3lx/jev-90id: this fixture builds its own repo; a caller's exported GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE
+  # must not steer its init/config at the caller's repo. Selftest branch only: the hook path keeps git's GIT_INDEX_FILE.
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
   t2=$(mktemp -d) || exit 2
   ( cd "$t2" && git init -q . && git config user.email t@t && git config user.name t \
     && printf 'x\n' > r.md && git add r.md && printf 'docs: record the verdict [receipt]\n' >"$tmp/goodR" )

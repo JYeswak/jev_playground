@@ -2,15 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { chmod, lstat, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { chmod, lstat, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { acquireDoctorLock } from '../dist/doctor/lock.js';
 import { mutate } from '../dist/doctor/mutate.js';
 import { planMissingTool } from '../dist/doctor/fixers/missing-omp-tool.js';
 import { INSTALL_FILES } from '../dist/install.js';
-import { exitCodeForFailure } from '../src/cli/exit.mjs';
 import { doctorFixture, repoRoot, snapshot } from './doctor-support.mjs';
-import { runCli } from './cli-support.mjs';
+import { freshHome, runCli } from './cli-support.mjs';
 
 const REPAIR_IDS = 'fm-logs-mode-too-open,fm-hooks-global-link-broken,fm-plugins-omp-tool-missing';
 const FIXTURE_ROOT = join(repoRoot, 'kit/test/doctor_fixtures');
@@ -119,6 +118,48 @@ function lifecycleEnv(fixture) {
     JEV_STATE_DIR: fixture.stateDir,
     JEV_DOCTOR_DIR: fixture.doctorDir,
   };
+}
+
+async function readRunDirs(doctorDir) {
+  const entries = await readdir(join(doctorDir, 'runs'), { withFileTypes: true });
+  return entries.filter((entry) => entry.isDirectory() && !entry.isSymbolicLink()).map((entry) => entry.name).sort();
+}
+
+async function readActionRows(doctorDir, runId) {
+  const text = await readFile(join(doctorDir, 'runs', runId, 'actions.jsonl'), 'utf8');
+  return text.trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
+}
+
+// Behavioral quarantine proof: every original is gone from the repo, present
+// byte-identical under the run quarantine dir, and covered by an uninstall
+// action row. Throws when any of that is missing, so a direct-unlink removal
+// (no quarantine copy, no action row) fails this same proof.
+async function assertQuarantined({ repo, doctorDir, originals }) {
+  let runs;
+  try {
+    runs = await readRunDirs(doctorDir);
+  } catch (error) {
+    throw new Error(`not quarantined (no run state): ${error?.code ?? error}`);
+  }
+  assert.equal(runs.length, 1, `expected exactly one run, saw ${runs.length}`);
+  const runId = runs[0];
+  const rows = await readActionRows(doctorDir, runId).catch((error) => {
+    throw new Error(`not quarantined (no action record): ${error?.code ?? error}`);
+  });
+  for (const [rel, bytes] of originals) {
+    await assert.rejects(lstat(join(repo, rel)), { code: 'ENOENT' });
+    let copy;
+    try {
+      copy = await readFile(join(doctorDir, 'runs', runId, 'quarantine', ...rel.split('/')));
+    } catch {
+      throw new Error(`not quarantined (no recoverable copy): ${rel}`);
+    }
+    assert.ok(copy.equals(bytes), `quarantined bytes differ: ${rel}`);
+    assert.ok(
+      rows.some((row) => row.kind === 'uninstall' && row.operation === 'quarantine' && row.target === rel),
+      `not quarantined (no uninstall action row): ${rel}`,
+    );
+  }
 }
 
 test('repair defaults to a zero-write plan and names apply plus rollback commands', async () => {
@@ -232,7 +273,33 @@ test('apply repairs, doctor verifies clean, and undo restores the byte-identical
   assert.equal(JSON.parse(undoneAgain.stdout).data.actions_taken, 0);
 });
 
-test('a models.yml write refuses with exit 4 and no backup or action row', async () => {
+test('repair refuses a diverged hook copy through the CLI with exit 4 and writes nothing', async () => {
+  const fixture = await makeRepairFixture('classifier-repair-diverged-hook');
+  const diverged = Buffer.concat([await readFile(fixture.target), Buffer.from('\n// operator edit\n')]);
+  await writeFile(fixture.target, diverged);
+  const before = await fileState(fixture.target);
+
+  const planned = runCli(['repair', '--only', 'fm-hooks-global-link-broken', '--robot'], {
+    home: fixture.home,
+    cwd: fixture.repo,
+    env: lifecycleEnv(fixture),
+  });
+  assert.equal(planned.status, 4, `${planned.stderr}${planned.stdout}`);
+  assert.ok(JSON.parse(planned.stdout).status.includes('REFUSED'), planned.stdout);
+  assert.deepEqual(await fileState(fixture.target), before);
+
+  const applied = runCli(['repair', '--apply', '--only', 'fm-hooks-global-link-broken', '--robot'], {
+    home: fixture.home,
+    cwd: fixture.repo,
+    env: lifecycleEnv(fixture),
+  });
+  assert.equal(applied.status, 4, `${applied.stderr}${applied.stdout}`);
+  assert.ok(JSON.parse(applied.stdout).status.includes('REFUSED'), applied.stdout);
+  assert.deepEqual(await fileState(fixture.target), before);
+  await assert.rejects(lstat(join(fixture.doctorDir, 'runs')), { code: 'ENOENT' });
+});
+
+test('a models.yml write refuses with no backup or action row', async () => {
   const fixture = await doctorFixture('classifier-repair-protected-models');
   const target = join(fixture.home, '.omp/agent/models.yml');
   await mkdir(dirname(target), { recursive: true });
@@ -253,7 +320,6 @@ test('a models.yml write refuses with exit 4 and no backup or action row', async
     expectedBeforeMode: 0o600,
   }), (error) => error.code === 'REFUSED');
   assert.deepEqual(await fileState(target), before);
-  assert.equal(exitCodeForFailure({ reason: 'refused-unsafe' }), 4);
   await assert.rejects(lstat(join(doctorDir, 'runs')), { code: 'ENOENT' });
   assert.deepEqual(await readdir(doctorDir), ['lock.free']);
 });
@@ -300,7 +366,6 @@ test('a concurrent apply refuses with exit 5 and the live lock owner pid', async
       env: lifecycleEnv({ ...fixture, doctorDir }),
     });
     assert.equal(result.status, 5, `${result.stderr}${result.stdout}`);
-    assert.equal(exitCodeForFailure({ reason: 'transport' }), 5);
     assert.ok(result.stdout.includes(`pid ${process.pid}`), result.stdout);
     assert.equal((await fileState(logPath)).mode, 0o644);
     await assert.rejects(lstat(join(doctorDir, 'runs')), { code: 'ENOENT' });
@@ -309,27 +374,61 @@ test('a concurrent apply refuses with exit 5 and the live lock owner pid', async
   }
 });
 
-test('installer uninstall removes managed files only through quarantine', async () => {
-  const source = await readFile(join(repoRoot, 'kit/src/install.ts'), 'utf8');
-  assert.ok(source.includes('operation: "quarantine"'), 'uninstall must quarantine managed files');
-  assert.equal(source.includes('unlink('), false, 'uninstall must not unlink managed paths directly');
-});
+test('uninstall quarantines every managed file and undo restores it byte-identical', async () => {
+  const home = await freshHome('classifier-uninstall-quarantine');
+  const repo = join(home, 'repo');
+  const doctorDir = join(home, 'doctor-state');
+  await mkdir(join(repo, '.git'), { recursive: true });
+  await writeFile(join(repo, 'keep.txt'), 'operator-owned');
+  const cliEnv = { CI: '1', NO_COLOR: '1', JEV_DOCTOR_DIR: doctorDir };
 
-test('doctor mutation calls stay behind mutate.ts', async () => {
-  const root = join(repoRoot, 'kit/src/doctor');
-  const paths = [];
-  async function collect(directory) {
+  const installed = runCli(['install', 'omp-project', '--dir', repo, '--apply', '--robot'], { home, cwd: repo, env: cliEnv });
+  assert.equal(installed.status, 0, installed.stderr);
+  assert.equal(JSON.parse(installed.stdout).data.status, 'READY');
+
+  const originals = new Map();
+  async function collect(directory, rel) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const path = join(directory, entry.name);
-      if (entry.isDirectory()) await collect(path);
-      else if (entry.name.endsWith('.ts') || entry.name.endsWith('.mjs')) paths.push(path);
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) await collect(path, relPath);
+      else if (entry.isFile()) originals.set(relPath, await readFile(path));
     }
   }
-  await collect(root);
-  const forbidden = ['writeFile(', 'unlink(', 'rm('];
-  for (const path of paths) {
-    if (path === join(root, 'mutate.ts')) continue;
-    const source = await readFile(path, 'utf8');
-    for (const call of forbidden) assert.equal(source.includes(call), false, `${path} contains ${call}`);
+  await collect(join(repo, '.omp'), '.omp');
+  assert.ok(originals.size > 0, 'install must place managed files');
+
+  const removed = runCli(['uninstall', 'omp-project', '--dir', repo, '--apply', '--robot'], { home, cwd: repo, env: cliEnv });
+  assert.equal(removed.status, 0, removed.stderr);
+  assert.equal(JSON.parse(removed.stdout).data.status, 'REMOVED');
+  assert.equal(await readFile(join(repo, 'keep.txt'), 'utf8'), 'operator-owned');
+
+  await assertQuarantined({ repo, doctorDir, originals });
+
+  const undone = runCli(['repair', 'undo', 'latest', '--robot'], { home, cwd: repo, env: cliEnv });
+  assert.equal(undone.status, 0, `${undone.stderr}${undone.stdout}`);
+  assert.equal(JSON.parse(undone.stdout).data.actions_taken, originals.size);
+  for (const [rel, bytes] of originals) {
+    assert.ok((await readFile(join(repo, ...rel.split('/')))).equals(bytes), `restored bytes differ: ${rel}`);
   }
+});
+
+test('a managed file removed without recorded quarantine fails the quarantine proof', async () => {
+  const home = await freshHome('classifier-uninstall-direct-unlink');
+  const repo = join(home, 'repo');
+  const doctorDir = join(home, 'doctor-state');
+  await mkdir(join(repo, '.git'), { recursive: true });
+  await writeFile(join(repo, 'keep.txt'), 'operator-owned');
+  const cliEnv = { CI: '1', NO_COLOR: '1', JEV_DOCTOR_DIR: doctorDir };
+
+  const installed = runCli(['install', 'omp-project', '--dir', repo, '--apply', '--robot'], { home, cwd: repo, env: cliEnv });
+  assert.equal(installed.status, 0, installed.stderr);
+
+  const rel = '.omp/tools/jev-gate.ts';
+  const bytes = await readFile(join(repo, ...rel.split('/')));
+  const displaced = join(home, 'managed-file-preserved-outside-quarantine');
+  await rename(join(repo, ...rel.split('/')), displaced);
+  assert.ok((await readFile(displaced)).equals(bytes));
+
+  await assert.rejects(assertQuarantined({ repo, doctorDir, originals: new Map([[rel, bytes]]) }), /not quarantined/);
 });

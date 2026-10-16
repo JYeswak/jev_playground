@@ -1,0 +1,19 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_1b16fcddf30dd1aab8763e7da5b84f479da7b79f2c990a184a69b61c415c69e7",
+ "limitations": [
+  "Director owns non-destructive test edit; another non-author reviewer must close"
+ ],
+ "operation": "jev-b35c.14-runtime-acceptance",
+ "parameters": {
+  "decisive_output": "repair9/9-exit0;kit207/207-exit0;LSP-OK;UBS-critical0-warning13;revision-bound-quality-exit=0",
+  "negative": "managed-file-displaced-with-bytes-preserved;missing-quarantine-proof-refused",
+  "source_parent": "451249cf6f6520ec3aa5b4c8dad44bf3e1ea7d7a"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 19304,
+  "sha256": "f35d0f1b895fc1ae2ffeab1d5de9cc9752dfa77dc5c4f9d54c0210fc121f812a"
+ }
+}

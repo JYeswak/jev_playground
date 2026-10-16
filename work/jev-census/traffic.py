@@ -216,8 +216,31 @@ def facg_window():
     )
 
 
-def counting_status(positives):
-    return "NOT_COUNTED" if positives is None else "COUNTED"
+def counting_status(positives, source="labels"):
+    # Status is source-based, never value-based: a row from an unmeasured
+    # source stays NOT_COUNTED even if a surrogate positive count arrives,
+    # so an unlabeled read row can never be promoted by a proxy number.
+    # Labeled rows (source="labels") keep the value rule: None is unstated,
+    # any stated count (0 included) is COUNTED.
+    if positives is None or source == "unmeasured":
+        return "NOT_COUNTED"
+    return "COUNTED"
+
+
+def finalize_row(c):
+    # Production emitter: status, rate and traffic block for one candidate
+    # row. main() builds every row through here, so the status rule is the
+    # shipped policy, not a parallel reimplementation.
+    p = c["positives"]
+    c["status"] = counting_status(p, c["positives_source"])
+    c["tp_per_week"] = (p / c["days"] * 7) if isinstance(p, int) else None
+    c["traffic"] = {
+        "days": c["days"],
+        "opportunities": c["opportunities"],
+        "positives": c["positives"],
+        "status": c["status"],
+    }
+    return c
 
 
 def wb7j_sample():
@@ -309,15 +332,7 @@ def main():
         },
     }
     for name, c in cands.items():
-        p = c["positives"]
-        c["status"] = counting_status(p)
-        c["tp_per_week"] = (p / c["days"] * 7) if isinstance(p, int) else None
-        c["traffic"] = {
-            "days": c["days"],
-            "opportunities": c["opportunities"],
-            "positives": c["positives"],
-            "status": c["status"],
-        }
+        finalize_row(c)
     for name, c in cands.items():
         print(
             "%-22s days=%-6g opp=%-7d pos=%-6s tp/wk=%-8s src=%s"
@@ -331,6 +346,10 @@ def main():
             ),
             flush=True,
         )
+    out = os.path.join(HERE, "candidates.json")
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump({"window_days": float(DAYS), "candidates": cands}, fh, indent=1)
+        fh.write("\n")
     print("wrote " + out, flush=True)
 
 

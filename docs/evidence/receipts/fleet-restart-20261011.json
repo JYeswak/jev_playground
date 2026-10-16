@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_e563da900151e513ec032d1aa4fffdbf820a28ede8df66aa816358cfca1f7c4b",
+ "limitations": [
+  "Shared-checkout offline checks, not fresh-clone scrubbed-HOME registry acceptance or live backend proof"
+ ],
+ "operation": "fleet-restart-independent-integration",
+ "parameters": {
+  "decisive_output": "doctor0;ntm0-seven-healthy;targeted28/28;kit-suite0;mission-check0;mission-tests9/9;ledger-tests37/37;stage70-pass240;ledger-gate1-UNMEASURED;capabilities0",
+  "repo": "/Users/josh/Developer/jev"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 1617,
+  "sha256": "70f1e41ad7fe392305bae20e84a9caca1f4d302da50422c85df89e197e71b32f"
+ }
+}

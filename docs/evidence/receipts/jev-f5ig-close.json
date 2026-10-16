@@ -1,0 +1,25 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_5946d437e52e7af95a0b42a6d1acf2e0401e49411dfe51cef84f52676ce65abc",
+ "limitations": [
+  "This is one title-Jaccard design, not an area refutation; 425-pair census was not re-run; no new Jev spend. The untracked temp script was not used."
+ ],
+ "operation": "f5ig-tracked-score-replay",
+ "parameters": {
+  "accuracy": "108/292=0.3699",
+  "bar": "0.758",
+  "bead": "jev-f5ig",
+  "command": "uv run --no-project python work/jev-eruw/eruw.score.py using only tracked work/jev-eruw inputs",
+  "commit": "57b71583e2e586e1a9b188a850ed04bb581b55e3",
+  "investigation": "work/jev-eruw/eruw.score.py",
+  "live_calls": "0",
+  "recorded_spend": "0.01903",
+  "rows": "292"
+ },
+ "producer": "BeigeDog",
+ "result_ref": {
+  "bytes": 311,
+  "sha256": "1163b7398e98806d3fc62c36112951d0ebc318c015a55a2ceff5503f90637daa"
+ }
+}

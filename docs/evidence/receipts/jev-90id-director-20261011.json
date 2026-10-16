@@ -1,0 +1,20 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_b7b0e9186892f304116a2eec2d63b34dc373abf1d8be0e685c5db24e1631499a",
+ "limitations": [
+  "Miniwob full invocation stopped on missing gymnasium before episodes; Git builder exercised via verbatim replay, not full game proof",
+  "Publisher cannot reach init because scan refuses; post-scan block replay only; x7 preexisting missing replay.py remains failed; installed hook untouched under n3lx"
+ ],
+ "operation": "jev-90id-independent-source-isolation",
+ "parameters": {
+  "committed_worker_doc_sha256": "6ee03d8da8ba2287bfc7ef08454303d920e5c69ca4333e7df7c63ba7cbc0d842",
+  "decisive_output": "sentinel15/15-exit0;actual-miniwob-script-fake-rc1-missing-gymnasium;five-caller-fingerprints-unchanged",
+  "source_commit": "14f31880"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 1270,
+  "sha256": "6941c371390287591274440c593b0e96b7a41eef4e3f14b9c4c2a99b25e2ca06"
+ }
+}

@@ -3,6 +3,10 @@
 # foundation/gates.d/80 via the scripts/selftest-*.sh glob. Every arm plants
 # a real condition and requires the stated outcome.
 set -uo pipefail
+# jev-n3lx: this selftest builds its own fixture repo. A caller that exported GIT_DIR / GIT_WORK_TREE /
+# GIT_INDEX_FILE (to point a gate at a candidate tree) must not steer the fixture's `git config` and
+# `git commit` at the caller's repository: under an inherited GIT_DIR they rewrite its .git/config.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 cd "$root" || exit 2
 S="$root/scripts/git-commit-serialized.sh"
@@ -17,9 +21,15 @@ printf 'pid=%s\nlabel=selftest-serialized-add\nrepo=%s\ncreated=%s\n' "$$" "$roo
 cleanup() { python3 "$root/scripts/git-commitd.py" stop --repo "$tmp" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null
+# jev-n3lx.1: write fixture git config through an explicit per-command binding
+# to the fixture repo's own config file, so a hostile inherited GIT_CONFIG
+# cannot steer the write elsewhere. Callers use this, never bare `git config`.
+fixture_git_config() {
+  GIT_CONFIG="$1/.git/config" git -C "$1" config "$2" "$3"
+}
 git -C "$tmp" init -q
-git -C "$tmp" config user.email selftest@example.invalid
-git -C "$tmp" config user.name serialized-add-selftest
+fixture_git_config "$tmp" user.email selftest@example.invalid
+fixture_git_config "$tmp" user.name serialized-add-selftest
 printf 'base\n' > "$tmp/base.txt"
 git -C "$tmp" add base.txt && git -C "$tmp" commit -qm "baseline [test]"
 printf 'one\n' > "$tmp/a.txt"
@@ -46,6 +56,21 @@ if (cd "$tmp" && "$S" --only -m "selftest commit [test]" -- c.txt >/dev/null 2>&
 committed=$(cd "$tmp" && git diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ' ')
 staged=$(cd "$tmp" && git diff --cached --name-only | sort | tr '\n' ' ')
 if [ "$committed" = "c.txt " ] && [ "$staged" = "a.txt b.txt " ]; then ok "commit isolated to requested path"; else no "commit paths=[$committed] staged=[$staged]"; fi
+
+# Arm 4 (jev-n3lx.1): the real fixture setup route resists hostile config.
+# A hostile inherited GIT_CONFIG must not steer writes away from the fixture
+# repo; the production helper binds every write explicitly. Reverting the
+# helper to bare `git -C` config must fail both assertions below.
+sentinel="$tmp/sentinel-config"
+printf '[user]\n\tname = sentinel\n' > "$sentinel"
+sentinel_before=$(shasum -a 256 "$sentinel" | cut -d' ' -f1)
+export GIT_CONFIG="$sentinel"
+fixture_git_config "$tmp" user.email probe@example.invalid
+fixture_git_config "$tmp" user.name probe-selftest
+unset GIT_CONFIG
+if [ "$(shasum -a 256 "$sentinel" | cut -d' ' -f1)" = "$sentinel_before" ]; then ok "hostile GIT_CONFIG leaves sentinel untouched"; else no "sentinel config mutated"; fi
+fixture_email=$(cd "$tmp" && git config user.email)
+if [ "$fixture_email" = "probe@example.invalid" ]; then ok "fixture repo took its own config"; else no "fixture config misdirected"; fi
 
 printf 'selftest-serialized-add: pass=%d fail=%d\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

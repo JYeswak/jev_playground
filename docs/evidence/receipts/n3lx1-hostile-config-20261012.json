@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_865d9a81ffb2c300f23adc386075c75d54572acab396090def2c01b150eae299",
+ "limitations": [
+  "non-author review pending; root histories untouched; live config observed byte-identical not modified"
+ ],
+ "operation": "jev-n3lx.1 hostile-GIT_CONFIG arm verification",
+ "parameters": {
+  "commit": "b82533bfb28b4acee035a6c3222814cde1e833cc",
+  "script_blob": "dc26e79e1d1317d6f6382743352e302f15713186"
+ },
+ "producer": "RainyKite",
+ "result_ref": {
+  "bytes": 293,
+  "sha256": "dba7d754ed6cd33ca61827153126f8362b186f7646f1b49ea50cde31b74c7643"
+ }
+}

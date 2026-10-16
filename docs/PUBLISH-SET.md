@@ -24,6 +24,10 @@ branch. The script scans the EXPORT, never the working tree.
 1. `/Users/josh` → `~` (operator home must read portably).
 2. `encrypted_content` → `ENCRYPTED_BLOB` (keeps the redteam/hardening prose
    readable while guaranteeing no line can be mistaken for a real blob).
+3. A `thinkingSignature` value of 100 or more base64-ish characters →
+   `THINKING_SIGNATURE_BLOB` (jev-x5cy). The key and the prose around it stay; only the
+   opaque value goes. The source files are untouched (the original evidence is preserved in the
+   private repo); only the export copy is redacted.
 
 ## Scan contract (over the export's full history)
 
@@ -38,5 +42,24 @@ branch. The script scans the EXPORT, never the working tree.
     tests. Designed for this purpose; not a credential.
   - `/AKIA[0-9A-Z]{16}/`, `/sk-live-[A-Za-z0-9]+/` in
     `demos/preaction-abstention/src/redact.mjs` — the redactor's own patterns;
-    the scanner matching the scanner is expected.
+    the scanner matching the scanner is expected. Matched by that exact path only.
+  - The AWS example excuses only itself: a line that also carries any other key shape is unexplained.
+  - Exact exception rows in `docs/publish-key-exceptions.txt` (jev-x5cy): one row per key-shaped
+    LINE read in context and proven synthetic, binding the export-relative path, the sha256 of the
+    whole line and its hit count. A row cannot cover another file, an edited line or a second key on
+    the same line. No path-wide, directory-wide or pattern-wide rows. The evidence for each row is in
+    `docs/evidence/jev-x5cy-key-hit-rulings-20261011.md`.
+  - `REDACT` rows in the same file are not exemptions: for an uncertain key-shaped line (not proven
+    synthetic) the export copy gets every key-shaped match replaced by `KEY_SHAPE_REDACTED`; same
+    binding as an exact row, source untouched, and a stale row stops the build (exit 4).
   - Any NEW hit is a fail-closed ERROR, never a silent pass.
+- `0` blob-shaped `thinkingSignature` values (`"thinkingSignature": "` followed by 100+ of
+  `A-Za-z0-9+/=_-`). Transform 3 removes them; the scan still refuses any that remain.
+
+## Diagnostics and exit codes
+
+The scan prints counts and `path:line` only. A hit's matched text is never printed, in any mode:
+a hit may be a real credential. `scripts/publish-export.sh --scan DIR` scans any tree read-only.
+Exit `0` clean, `1` findings, `2` bad usage or a missing tool, `4` scanner error. Exit `4` means a
+`grep` or `git` call failed for a reason other than "no match" (grep exits 1 for no match, which is
+a clean result), or an exceptions row is malformed: the scan did not complete, which is never a pass.

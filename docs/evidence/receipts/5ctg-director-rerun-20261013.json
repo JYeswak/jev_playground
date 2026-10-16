@@ -1,0 +1,27 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_1699478c345d81410bdcd6acd0bba4a7c7c5419807cd8bedc883e7a85ded7423",
+ "limitations": [
+  "Director rerun 2026-10-13 08:1xZ; result bound is the --json output; cap_scopes drifts with time (629 at the run); scratch outputs not committed"
+ ],
+ "operation": "director-independent-rerun",
+ "parameters": {
+  "bead": "jev-5ctg",
+  "command_json": "python3 work/jev-5ctg/after_measure.py --json",
+  "command_selftest": "python3 work/jev-5ctg/after_measure.py --selftest",
+  "commit": "187586c16371647df35010e2a537a33ae09919ae",
+  "json_exit": "0",
+  "newc_eligible": "17087",
+  "newc_wilson_high": "0.00022476709704141121",
+  "receipt_blob": "5dceb484f1de27c6a3c4e6dd68255df092ee4b3c",
+  "script_blob": "e1ca181fcafe13213d1178f69de8c139d2ca1c1b",
+  "selftest_exit": "0",
+  "selftest_sha256": "552bf76a3fa895a6d8a1105e627adfbcdbd0c0ad8e33fb7a2472ecdcd89091fa"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 8782,
+  "sha256": "59ac44d7caa9118e0daf735e15db7046b6e58beda1c4fb71cf1a82203b90d2ea"
+ }
+}

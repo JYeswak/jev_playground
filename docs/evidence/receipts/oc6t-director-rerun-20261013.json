@@ -1,0 +1,22 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_bf9c666f4f6eb1ddd882a00a7ff3a364ab9981596f636cef7ce5e31dc95fc655",
+ "limitations": [
+  "Director rerun in the canonical checkout, 2026-10-13; the raw output file is scratch and not committed, only its sha256 is bound; not an independent-reviewer receipt (BeigeDog gate #123 is that)"
+ ],
+ "operation": "director-independent-rerun",
+ "parameters": {
+  "bead": "jev-ci-fixture-isolation-control-oc6t",
+  "command": "bash scripts/selftest-fixture-isolation.sh",
+  "commit": "d8dbd924da9ca490f089773ff8823930e03bb569",
+  "exit": "0",
+  "git_config_sha256": "738f79c458f48511bc6145b7f9e75963aa5f01a9187ed2c24bc6e7e0991d7482",
+  "result_line": "selftest-fixture-isolation: pass=15 fail=0"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 1277,
+  "sha256": "44ad8077ef8fb0ca78a40a105c84072f97455a883f5824acfd8c0850d2786a39"
+ }
+}

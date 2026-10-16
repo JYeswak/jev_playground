@@ -1,0 +1,20 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c5952e8602e5ca94e07f3120bdddabc35c63799323efdb70256b13b6a8f08496",
+ "limitations": [
+  "skills-target UBS scan UNSOLVED per author/reviewer, no retry or green scan claim; no complete verification or close",
+  "Full255 suite is non-author CobaltCoyote report, own fresh run targeted48 only; APIs not wired into CLI"
+ ],
+ "operation": "jev-b35c.19-independent-target-api-review",
+ "parameters": {
+  "decisive_output": "own-five-target-suites48/48-exit0;reviewer-AM50571-fullkit255/255-exit0",
+  "scope": "T5-T8-T12-module-APIs-per-ordered-spec;no-CLI-wiring-claim",
+  "source_commit": "e389ee87a432814ec39f4bb3a7d5353c91d61ee9"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 51,
+  "sha256": "27b7d91f825e1b8c21d58c7fc61080eba68da8d04c24235f2aa425eff4ec7896"
+ }
+}

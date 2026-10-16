@@ -1,0 +1,25 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_80513ac7e0d280aa7a9c2891ee1c74a103482bbd7a62583db189d86d39dbaf7e",
+ "limitations": [
+  "fresh-clone item 6 not run here",
+  "prior evidence 2522/2529 cited as lineage"
+ ],
+ "operation": "jev-c7q7-item5-provenance",
+ "parameters": {
+  "audit": "83-39-44-12dag",
+  "checker_blob": "5571663029c2cd5dad39d65fefaa925d1a334cb58079a20d13ef4214035a46e2",
+  "commit": "aa19bcd451927e053c9ed3019f3dcca074489d91",
+  "prior_source": "50281d3ac7d0a2db7779dcacfca6f30dbc9993e9",
+  "reviewer": "BlueHorizon(non-author)",
+  "suite": "5/5-exit0",
+  "test_blob": "bc3470e7f2f7fdf2f0959adbba2a4a0e5fe53317f31e4afa62b9c0c1685c6c68",
+  "testsmd_blob": "b75af290258cb98578eb12147b5274f226594d2d96575b6613d6c37114daf964"
+ },
+ "producer": "BlueHorizon",
+ "result_ref": {
+  "bytes": 54993,
+  "sha256": "21858a02c9cec916b8c62cb698d7831335835a1c7aba9bf712051509f6f6057a"
+ }
+}

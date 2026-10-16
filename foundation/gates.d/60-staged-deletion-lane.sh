@@ -31,6 +31,12 @@
 
 set -uo pipefail
 
+# jev-n3lx: the fixtures below build their own repos. A caller that exported GIT_DIR / GIT_WORK_TREE /
+# GIT_INDEX_FILE (to point a gate at a candidate tree) must not steer the fixture's `git init`,
+# `git config` and `git commit` at the caller's repository: under an inherited GIT_DIR they rewrite its
+# .git/config (core.hooksPath, user.*) and add commits to its HEAD.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
+
 LANE_DIR="$(cd -- "$(dirname -- "$0")/../../githooks" && pwd)"
 WRAPPER="$LANE_DIR/pre-commit"
 IMPL="$LANE_DIR/pre-commit-staged-deletion-survives.sh"

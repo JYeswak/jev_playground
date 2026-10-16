@@ -59,6 +59,38 @@ function completion(res, model, message, finishReason, stream) {
   }));
 }
 
+// Assigned by run(): the outer catch below must tear down the same child/server the
+// session started, or a timed-out route lingers (2026-10-11 CI stall).
+let activeTeardown = () => {};
+// --no-ui exists only on newer omp (present 18.10.0, absent 18.3.0 which rejects it
+// as "unknown flag" before reading stdin, so the route times out with requests=0).
+// The probe already passes --no-extensions, so omitting --no-ui where unsupported
+// changes nothing observable. Detection is a line-prefix match (weakest engine, no
+// regex); any detection failure keeps the full argv and lets genuine failures surface.
+let noUiSupport;
+function ompSupportsNoUi() {
+  if (noUiSupport !== undefined) return Promise.resolve(noUiSupport);
+  return new Promise((resolve) => {
+    const done = (v) => { noUiSupport = v; resolve(v); };
+    let timer;
+    try {
+      const p = spawn("omp", ["--help"], { stdio: ["ignore", "pipe", "ignore"] });
+      let text = "";
+      timer = setTimeout(() => { try { p.kill("SIGKILL"); } catch {} done(true); }, 15000);
+      if (timer.unref) timer.unref();
+      p.stdout.on("data", (c) => {
+        text += c;
+        if (text.length > 200000) { try { p.kill("SIGKILL"); } catch {} clearTimeout(timer); done(true); }
+      });
+      p.on("error", () => { clearTimeout(timer); done(true); });
+      p.on("close", () => {
+        clearTimeout(timer);
+        done(text.split("\n").some((l) => l.trimStart().startsWith("--no-ui")));
+      });
+    } catch { clearTimeout(timer); done(true); }
+  });
+}
+
 async function run(masking, inspectResult) {
   const marker = fakeSecret();
   let scratch;
@@ -103,6 +135,7 @@ async function run(masking, inspectResult) {
   });
   let resolvePromptResult;
   const promptResult = new Promise((resolve) => { resolvePromptResult = resolve; });
+  let promptSettled = false;
   let resolveComplete;
   let rejectComplete;
   const completed = new Promise((resolve, reject) => {
@@ -116,6 +149,23 @@ async function run(masking, inspectResult) {
   let lines;
   let timeoutId;
   let server;
+  const sockets = new Set();
+  // Hard teardown: the 2026-10-11 CI stall was node lingering after the 45 s timer
+  // fired (child + open keep-alive sockets hold the loop; exitCode alone never exits).
+  // Every exit path below goes through here; a wedged loop still exits via watchdog.
+  function teardown() {
+    try {
+      clearTimeout(timeoutId);
+      try { child?.stdin?.end(); } catch { /* already gone */ }
+      try { child?.kill("SIGTERM"); } catch { /* never spawned */ }
+      setTimeout(() => { try { child?.kill("SIGKILL"); } catch { /* gone */ } }, 2000).unref();
+      for (const s of sockets) { try { s.destroy(); } catch { /* gone */ } }
+      try { server?.closeAllConnections?.(); } catch { /* old node */ }
+      try { server?.close(); } catch { /* never listened */ }
+      if (scratch) rm(scratch, { recursive: true, force: true }).catch(() => {});
+    } catch { /* teardown never throws */ }
+  }
+  activeTeardown = teardown;
 
   server = createServer(async (req, res) => {
     try {
@@ -176,6 +226,7 @@ async function run(masking, inspectResult) {
       rejectComplete(error);
     }
   });
+  server.on("connection", (s) => { sockets.add(s); s.on("close", () => sockets.delete(s)); });
 
   server.listen(0, "127.0.0.1");
   server.once("listening", () => {
@@ -196,6 +247,7 @@ async function run(masking, inspectResult) {
         "--approval-mode=yolo",
         "--max-time=40",
       ];
+      if (!(await ompSupportsNoUi())) args.splice(args.indexOf("--no-ui"), 1);
       const bypassPath = join(scratch, "bypass.yml");
       if (!masking) await writeFile(bypassPath, "secrets:\n  enabled: false\n", { mode: 0o600 });
       const bypassArgs = masking ? [] : ["--config", bypassPath];
@@ -235,7 +287,11 @@ async function run(masking, inspectResult) {
               rawHostToolResultB64: inspectResult ? Buffer.from(line).toString("base64") : undefined,
             });
           }
-          if (frame.type === "prompt_result" && frame.id === "p1") resolvePromptResult(frame.status);
+          if (frame.type === "prompt_result" && frame.id === "p1") { promptSettled = true; resolvePromptResult(frame.status); }
+          // 18.3.0 ends the session with agent_end instead of prompt_result: the turn
+          // above ran to completion (tool executed, done said), so the prompt completed.
+          // First frame wins; the 18.10 prompt_result path above is untouched.
+          else if (frame.type === "agent_end" && !promptSettled) { promptSettled = true; resolvePromptResult("completed"); }
         } catch (error) { rejectComplete(error); }
       });
       child.once("error", rejectComplete);
@@ -260,11 +316,8 @@ async function run(masking, inspectResult) {
       });
       await rm(scratch, { recursive: true, force: true });
     } catch (error) {
-      clearTimeout(timeoutId);
-      child?.kill("SIGTERM");
-      lines?.close();
-      server.close();
-      await rm(scratch, { recursive: true, force: true });
+      try { lines?.close(); } catch { /* gone */ }
+      teardown();
       rejectCapture(error);
       rejectComplete(error);
     }
@@ -296,6 +349,8 @@ if (masking === bypass) {
     process.stdout.write(JSON.stringify(output) + "\n");
   } catch (error) {
     process.stderr.write(`NOT_RUN: ${error?.message ?? error}\n`);
+    activeTeardown();
     process.exitCode = 2;
+    setTimeout(() => process.exit(2), 8000).unref();
   }
 }

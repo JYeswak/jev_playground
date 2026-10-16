@@ -10,8 +10,18 @@ import pathlib
 import runpy
 import shutil
 import subprocess
+import sys
 import unittest
 from types import SimpleNamespace
+
+# Route prerequisite: the ProviderRoute tests drive a real local omp session. An
+# objectively absent omp binary is a named SKIP (runner exit 8); any present-but-
+# failing route stays FAIL, including timeouts. No version or responsiveness guess:
+# a local pass on one omp version never proves an earlier version lacks the route
+# (that needs upstream contract evidence, not a version floor).
+if shutil.which("omp") is None:
+    print("SKIP (missing prerequisite: omp binary for the local provider route)")
+    sys.exit(8)
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "omp-secret-probe.py"
 probe = SimpleNamespace(**runpy.run_path(SCRIPT, run_name="omp_secret_probe"))

@@ -1,0 +1,19 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_8b6e4a6116c1797c0fafad35c33041226ca3c6971d61fdea45380666a679e1e8",
+ "limitations": [
+  "stage 30 no-secrets RED on main independent (x7 test_replay.py:136); hqha value provenance unknown offline, redacted not proven; BSD grep/sed only; real jev_playground-export not built"
+ ],
+ "operation": "jev-x5cy-rework-redact-uncertain-capture",
+ "parameters": {
+  "decisive_output": "hqha-line-REDACT-not-EXEMPT;selftest-publish-export-scan-48of48;9-mutants-killed;full-script-real-tree-rc0-3-env-caller-unchanged;mutant-unset-caller-changed;source-blob-unchanged",
+  "source_commit": "779d84f6",
+  "subject_doc": "docs/evidence/jev-x5cy-key-hit-rulings-20261011.md"
+ },
+ "producer": "CyanLake",
+ "result_ref": {
+  "bytes": 14056,
+  "sha256": "9f9535ea7d98bbb1f2a19c3a35de422a54af8a4399505978e9281a921d4431d6"
+ }
+}

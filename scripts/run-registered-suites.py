@@ -412,6 +412,10 @@ def emit(rows):
 
 
 def selftest():
+    # jev-90id: the fixture builds its own repo; a caller's exported GIT_* must not steer init/config/commit.
+    for _name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+                  "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_CONFIG"):
+        os.environ.pop(_name, None)
     tmp = Path(tempfile.mkdtemp(prefix="suites-", dir="/tmp"))
     subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
     subprocess.run(

@@ -1,0 +1,21 @@
+{
+ "authority": "live",
+ "confidence": "observed",
+ "evidence_id": "ev_1609af239d235780852b3061d4cc04b4af6e92a2802c919b7297fbdeaf8ecd8e",
+ "limitations": [
+  "Only verified PID6231 stopped; no inference/model-quality check or all-fleet OUTSIDE audit"
+ ],
+ "operation": "service-stop",
+ "parameters": {
+  "bead": "jev-outside-kev-stop-yf49",
+  "pid": "6231",
+  "port": "8009",
+  "signal": "SIGTERM",
+  "subject_sha256": "12430405ccc753ac24eb2a69bda498aa86911f792f4cc5bbbbb9c0a4566a25c9"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 873,
+  "sha256": "e9c41d4e195ba9f416dbbeff458bce50642ec6635319a20a992135a0eb8e16a3"
+ }
+}

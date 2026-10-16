@@ -1,0 +1,18 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_dcf3c7895c611221681bd5b573aabdefceb52ce9ab7e08e838f38fc0629934df",
+ "limitations": [
+  "Green suite is incomplete behavioral acceptance; no close authorized"
+ ],
+ "operation": "jev-b35c.14-independent-reject",
+ "parameters": {
+  "decisive_output": "repair8/8-exit0;acceptance-REJECT-source-text-tests-lines312-335;disconnected-exit4-map",
+  "source_commit": "73632b88136638583c649f2acf47bbb5d2fc26f7"
+ },
+ "producer": "BrownGoose",
+ "result_ref": {
+  "bytes": 14457,
+  "sha256": "05cbc25681ed916a22e0146b381d6821d09e07f6f0bc88f0027518bc948b9a8e"
+ }
+}
