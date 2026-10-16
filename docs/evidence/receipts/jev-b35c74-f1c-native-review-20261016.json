@@ -1,0 +1,150 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4e689fab2648553427d9b5925becd8c681e3f35ed573aebfcb76647333c1d0b0",
+ "limitations": [
+  "63 tests and genuine native gate factory startup pass; these do not override actual installed advisory false admission. No model generation, real-user activation, universal SDK or whole-CI claim."
+ ],
+ "operation": "jev-b35c.74-f1c-native-contract-review",
+ "parameters": {
+  "subject_sha256": "deabd5d459d9b109f6e64f8acddcf43a35cc306d7fec0393eb77cdfe8a9cc6f6"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "advisory_counterexample": {
+   "api_probe_exit": 0,
+   "api_results": [
+    {
+     "bad": false,
+     "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/consumer",
+     "entry": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/consumer/node_modules/jev-fixture-native/src/hint-extension.ts",
+     "exit": 0,
+     "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/home",
+     "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/home/.omp",
+     "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5",
+     "status": "installed",
+     "writes": [
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/home/.omp/agent/config.yml",
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-fIRnv5/home/.omp/agent/jev-shims.json"
+     ]
+    },
+    {
+     "bad": true,
+     "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/consumer",
+     "entry": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/consumer/node_modules/jev-fixture-native/src/hint-extension.ts",
+     "exit": 0,
+     "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/home",
+     "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/home/.omp",
+     "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj",
+     "status": "installed",
+     "writes": [
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/home/.omp/agent/config.yml",
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-xa2Bsj/home/.omp/agent/jev-shims.json"
+     ]
+    }
+   ],
+   "host_results": [
+    {
+     "bad": false,
+     "exit": 0,
+     "no_prompt": true,
+     "pid": 42430,
+     "stderr": "",
+     "stdout_sha256": "3f6c03b06bed7904a35d9b94401e6b67475147f4d2e0cde7705795b339d72748"
+    },
+    {
+     "bad": true,
+     "exit": 0,
+     "no_prompt": true,
+     "pid": 42471,
+     "stderr": "Failed to load extension /Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null…: Failed to load extension: null is not an object (evaluating 'u.sourcePath')\n",
+     "stdout_sha256": "8e770425b69dd95f5857d41e935e78b605ae7a14b0f21347d47579ddd7f81239"
+    }
+   ],
+   "negative_source_sha256": "cdf09f37a85d73cecfefaf74abc538cd334a2397f8d440f6c8bed534e6ddc63c",
+   "positive_source_matches_candidate": true,
+   "positive_source_sha256": "deabd5d459d9b109f6e64f8acddcf43a35cc306d7fec0393eb77cdfe8a9cc6f6",
+   "single_observed_argument_mutation": "pi.registerTool(valid observed tool object) -> pi.registerTool(null)"
+  },
+  "candidate": "f1c231cefee643210160bc84a494f56d346e7711",
+  "exact_ci": {
+   "log_sha256": "6518cac79427771da804e5480b4781e3a8bd9ccb25fff5296196472226f2b2c3",
+   "original_suite_rows": [
+    "registered-suites\tRun registered suites\t2026-10-16T13:59:52.5495006Z kit/test/install-cli.test.mjs\t0\t8\t0.13\t\tPASS",
+    "registered-suites\tRun registered suites\t2026-10-16T13:59:52.5495619Z kit/test/install-omp-profile.test.mjs\t0\t26\t0.36\t\tPASS",
+    "registered-suites\tRun registered suites\t2026-10-16T13:59:52.5496505Z kit/test/install-skills.test.mjs\t0\t5\t0.10\t\tPASS",
+    "registered-suites\tRun registered suites\t2026-10-16T13:59:52.5498244Z kit/test/omp-config-merge.test.mjs\t0\t12\t0.13\t\tPASS",
+    "registered-suites\tRun registered suites\t2026-10-16T13:59:52.5498540Z kit/test/omp-paths.test.mjs\t0\t12\t0.08\t\tPASS"
+   ],
+   "prepare": "success",
+   "registered_job": 117007743137,
+   "run": 38911365249,
+   "whole_ci_green_claim": false
+  },
+  "harness_corrections": "Initial JS escaping and missing manifest budget corrected to the original observed 800ms before measured advisory probes; saved separately in owned scratch.",
+  "model_prompts_sent": 0,
+  "native_artifact_binding": {
+   "exit": 0,
+   "filesystemUnchanged": true,
+   "hookSha256": "dd94716301f466bf73427b8bb17e5c9c01a1b696d7055401c9636ae6d3372d40",
+   "packageEntrySha256": "b2d52a3b486a6ffe7b42ddd451422fcb3948a05ae49a7146725ade42f2c39777",
+   "reportedWrites": 0,
+   "status": "already"
+  },
+  "native_binary": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+  "native_marker_controls": [
+   {
+    "exit": 0,
+    "flags": [],
+    "label": "marker-positive",
+    "marker_rows": [
+     {
+      "family": "gate",
+      "nonce": "native-f1c-marker-positive-1792159573759503000",
+      "ts": 1792159574056
+     }
+    ],
+    "matching_fresh_markers": 1,
+    "no_prompt": true,
+    "nonce": "native-f1c-marker-positive-1792159573759503000",
+    "pid": 83599,
+    "start_ms": 1792159573759,
+    "stderr": "",
+    "stdout_sha256": "efa7aff8d75a1f176428dc9225e1d0c844c77142664428b5be46ca75ce1cfd9d"
+   },
+   {
+    "exit": 0,
+    "flags": [
+     "--no-extensions"
+    ],
+    "label": "marker-disabled",
+    "marker_rows": [],
+    "matching_fresh_markers": 0,
+    "no_prompt": true,
+    "nonce": "native-f1c-marker-disabled-1792159574619856000",
+    "pid": 83669,
+    "start_ms": 1792159574619,
+    "stderr": "",
+    "stdout_sha256": "adc606b4b46fa3f3208b24132f06a72139a1d5d06cba87e177c11ba48269edc0"
+   }
+  ],
+  "native_version": "omp/18.11.1",
+  "prior_native_evidence": "ev_30ff707b94fa6e80bd387125a4ab2bb9c0be14b2008d8a55a814f9635dac80d4",
+  "product_source_or_canonical_fixture_edits": false,
+  "runtimes": [
+   {
+    "stdout_sha256": "3c3f18e47e04e79db6eb098cd76c46b3c0d46ac6da9b93d26394827d38b2401e",
+    "suite_exit": 0,
+    "tests": 63,
+    "version": "v22.18.0"
+   },
+   {
+    "stdout_sha256": "b4dca98ebff42f7342f816630d757df31cd87a297bdc1fc0771ada52c33283ae",
+    "suite_exit": 0,
+    "tests": 63,
+    "version": "v22.23.3"
+   }
+  ],
+  "verdict": "REWORK: invalid advisory tool registration falsely installs and writes before real native-host rejection"
+ }
+}
