@@ -38,6 +38,11 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
 
 ## 2026-10-01 → present — hardening and rollout
 
+- Gate evidence (`jev-8i8i.2`): reject negative, fractional, coerced, unsafe
+  or empty flagged-count evidence. Canonical X7 output remains descriptive
+  and EXPLORED; no unconditional recall, retired unflagged bound or winner
+  is inferred.
+
 - SDK boundary (`jev-b35c.71`): exercise the real client with an isolated
   unavailable-SDK resolver instead of copying an incomplete source tree.
   Missing-key and missing-SDK errors remain distinct; installed-SDK transport

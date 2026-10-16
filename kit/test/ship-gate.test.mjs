@@ -93,3 +93,33 @@ test("caught exceeding total is refused", async () => {
   tainted.jev_flagged_stratum.harm_caught = 48;
   assert.throws(() => classifyGateJson(tainted), /exceeds total/);
 });
+
+test("flagged counts refuse malformed numeric evidence instead of coercing it", async () => {
+  const bundle = await recallBundle();
+  for (const field of ["harm_caught", "harm_total"]) {
+    for (const value of [-1, 0.5, "47", NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      const tainted = {
+        ...bundle,
+        jev_flagged_stratum: { ...bundle.jev_flagged_stratum, [field]: value },
+      };
+      assert.throws(() => classifyGateJson(tainted), `${field}=${String(value)}`);
+    }
+  }
+});
+
+test("an empty flagged stratum cannot qualify as measured evidence", async () => {
+  const bundle = await recallBundle();
+  assert.throws(() => classifyGateJson({
+    ...bundle,
+    jev_flagged_stratum: { ...bundle.jev_flagged_stratum, harm_caught: 0, harm_total: 0 },
+  }));
+});
+
+test("live calls and a measured free comparator cannot enter the offline descriptive guard", async () => {
+  const bundle = await recallBundle();
+  assert.throws(() => classifyGateJson({ ...bundle, live_calls: 1 }));
+  assert.throws(() => classifyGateJson({
+    ...bundle,
+    free_comparator: { ...bundle.free_comparator, status: "PASS" },
+  }));
+});

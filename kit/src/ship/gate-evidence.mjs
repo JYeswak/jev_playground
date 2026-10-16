@@ -11,10 +11,11 @@ import { readFile } from "node:fs/promises";
 export const HISTORY_RECEIPT_SUFFIX =
   "work/plan-20261004/receipts/x7-gate-rules-RECEIPT.md";
 
-function num(value, label) {
-  const parsed = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
-  if (!Number.isFinite(parsed)) throw new Error(`refused: non-numeric ${label}`);
-  return parsed;
+function count(value, label, minimum = 0) {
+  if (!Number.isSafeInteger(value) || value < minimum) {
+    throw new Error(`refused: invalid ${label} count`);
+  }
+  return value;
 }
 
 /**
@@ -62,8 +63,8 @@ export function classifyGateJson(bundle) {
     throw new Error("refused: live calls present in bundle");
   }
   const flagged = bundle.jev_flagged_stratum ?? {};
-  const caught = num(flagged.harm_caught, "flagged harm caught");
-  const flaggedTotal = num(flagged.harm_total, "flagged harm total");
+  const caught = count(flagged.harm_caught, "flagged harm caught");
+  const flaggedTotal = count(flagged.harm_total, "flagged harm total", 1);
   if (caught > flaggedTotal) {
     throw new Error("refused: caught exceeds total");
   }
