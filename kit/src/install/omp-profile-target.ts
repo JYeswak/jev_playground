@@ -333,9 +333,12 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   }
   if (expectedEvent === undefined) {
     // Advisory contract, derived from the in-repo extension exemplar: the
-    // entry must register at least one tool. Clean completion alone is not
-    // registration.
-    const toolsRegistered = calls.some((call) => call.method === "registerTool");
+    // entry must register at least one well-formed tool (object with a
+    // non-empty name). Clean completion alone is not registration, and a
+    // null or nameless registration does not satisfy it either.
+    const toolsRegistered = calls.some((call) => call.method === "registerTool" && call.args.length >= 1 &&
+      typeof call.args[0] === "object" && call.args[0] !== null &&
+      "name" in call.args[0] && typeof call.args[0].name === "string" && call.args[0].name !== "");
     if (!toolsRegistered) {
       throw new Error("native entry registers no tool: " + familyId);
     }

@@ -607,6 +607,32 @@ test('a factory that throws when invoked is refused before writing', async () =>
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
+test('a null tool registration does not satisfy the advisory proof', async () => {
+  const home = await freshHome('installer-profile-null-tool');
+  const ompHome = join(home, 'omp-home');
+  const contracts = {
+    gate: await loadJson(join(contractsDir, 'gate.json')),
+    screen: await loadJson(join(contractsDir, 'screen.json')),
+    hint: await loadJson(join(contractsDir, 'hint.json')),
+  };
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies(contracts)).filter((family) => family.id === 'hint')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/null-tool.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('registers no tool'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
 test('an unknown host method call fails closed like the real host', async () => {
   const home = await freshHome('installer-profile-unknown-method');
   const ompHome = join(home, 'omp-home');
