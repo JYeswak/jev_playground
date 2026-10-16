@@ -592,51 +592,16 @@ def run_replay() -> int:
     recorded = json.loads(
         (HERE / "RECEIPT.md").read_text().split("```json\n", 1)[1].rsplit("```", 1)[0]
     )
-    def check(path: str, got, want) -> None:
-        if got != want:
-            mismatches.append(f"{path}: recomputed {got!r} != receipt {want!r}")
-    check("cut", cut, recorded["cut"])
-    check("development", {"n": 100, "jev_false_flags": jev_dev_flags,
-                          "encoder_flags": sum(flags[("clean-dev", f"clean-{i}")]
-                                              for i in range(100))},
-          recorded["development"])
-    check("scored_rows", sum(expected_sets[s] for s in
-                              ("clean", "marked", "markerless", "public-english"))
-          + 1, recorded["scored_rows"])
-    if set(stats) != set(recorded["strata"]):
-        mismatches.append(
-            f"strata key set differs: recomputed {sorted(stats)} != "
-            f"receipt {sorted(recorded['strata'])}")
-    for stratum, want in recorded["strata"].items():
-        if stratum not in stats:
-            continue  # key-set mismatch already recorded above
-        check(f"strata.{stratum}", stats[stratum], want)
-    check("public_language_rule",
-          {**language_n, "german_outside_bar": True},
-          recorded["public_language_rule"])
-    check("acceptance", {
-        "clean_false_flags_no_higher":
-            stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"],
-        "marked_catch_ahead":
-            stats["marked"]["catch"] > stats["marked"]["jev_catch"],
-        "markerless_catch_ahead":
-            stats["markerless"]["catch"] > stats["markerless"]["jev_catch"],
-        "benign_control_pass": not flags[("trigger-negative", "trigger-negative")],
-        "bar_pass": (not flags[("trigger-negative", "trigger-negative")]
-                     and stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"]
-                     and stats["marked"]["catch"] > stats["marked"]["jev_catch"]
-                     and stats["markerless"]["catch"] > stats["markerless"]["jev_catch"]),
-    }, recorded["acceptance"])
-    check("trigger_negative.flag", flags[("trigger-negative", "trigger-negative")],
-          recorded["trigger_negative"]["flag"])
-    check("status", "SCORED", recorded["status"])
-    check("lane", "local+live", recorded["lane"])
-    check("model", MODEL, recorded["model"])
-    check("revision", REVISION, recorded["revision"])
-    check("jev_model", "jev-1.13.0", recorded["jev_model"])
-    check("max_length", 512, recorded["max_length"])
-    check("truncation", "right", recorded["truncation"])
-    check("threads", 1, recorded["threads"])
+    # Full recomputed report (jev-x1-injection-encoders-e2gp.1 REWORK): every
+    # --json field that is a function of the recorded rows, so a verifier can
+    # diff the whole report instead of trusting a status flag. Run-metadata
+    # below is not recomputable offline and is therefore not evidence:
+    # started_at_utc (wall clock), encoder_runtime (environment package
+    # versions), model_loads (replay performs 0 by design), guard
+    # (environment state at run time).
+    NOT_RECOMPUTED = {"started_at_utc", "encoder_runtime", "model_loads",
+                      "guard"}
+    trigger_flag = flags[("trigger-negative", "trigger-negative")]
     public_rows = [k for k in enc_key if k[0] == "public-english"]
     public_tokens = 0
     for k in public_rows:
@@ -648,19 +613,63 @@ def run_replay() -> int:
             mismatches.append(f"invalid input_tokens: {k}")
             continue
         public_tokens += tokens
-    check("jev_public_calls", len(public_rows), recorded["jev_public_calls"])
-    check("jev_public_input_tokens", public_tokens,
-          recorded["jev_public_input_tokens"])
-    check("jev_estimated_spend_usd",
-          public_tokens * PRICE_PER_MILLION / 1_000_000,
-          recorded["jev_estimated_spend_usd"])
-    # Run-metadata below is not recomputable offline and is therefore not
-    # evidence: started_at_utc (wall clock), encoder_runtime (environment
-    # package versions), model_loads (replay performs 0 by design),
-    # guard (environment state at run time).
+    recomputed = {
+        "status": "SCORED",
+        "lane": "local+live",
+        "model": MODEL,
+        "revision": REVISION,
+        "cut": cut,
+        "development": {"n": 100, "jev_false_flags": jev_dev_flags,
+                        "encoder_flags": sum(flags[("clean-dev", f"clean-{i}")]
+                                            for i in range(100))},
+        "scored_rows": sum(expected_sets[s] for s in
+                            ("clean", "marked", "markerless", "public-english"))
+                        + 1,
+        "jev_public_calls": len(public_rows),
+        "jev_model": "jev-1.13.0",
+        "jev_public_input_tokens": public_tokens,
+        "jev_estimated_spend_usd":
+            public_tokens * PRICE_PER_MILLION / 1_000_000,
+        "strata": stats,
+        "public_language_rule":
+            {**language_n, "german_outside_bar": True},
+        "acceptance": {
+            "clean_false_flags_no_higher":
+                stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"],
+            "marked_catch_ahead":
+                stats["marked"]["catch"] > stats["marked"]["jev_catch"],
+            "markerless_catch_ahead":
+                stats["markerless"]["catch"] > stats["markerless"]["jev_catch"],
+            "benign_control_pass": not trigger_flag,
+            "bar_pass": (not trigger_flag
+                         and stats["clean"]["false_flags"] <= stats["clean"]["jev_false_flags"]
+                         and stats["marked"]["catch"] > stats["marked"]["jev_catch"]
+                         and stats["markerless"]["catch"] > stats["markerless"]["jev_catch"]),
+        },
+        "max_length": 512,
+        "truncation": "right",
+        "threads": 1,
+        "trigger_negative": {
+            "flag": trigger_flag,
+            "sha256": sha(TRIGGER_TEXT),
+            "source": TRIGGER_SOURCE,
+        },
+    }
+    MISSING = object()
+    def check(path: str, got, want) -> None:
+        if want is MISSING:
+            mismatches.append(f"receipt missing field: {path}")
+        elif got != want:
+            mismatches.append(f"{path}: recomputed {got!r} != receipt {want!r}")
+    for key, value in recomputed.items():
+        check(key, value, recorded.get(key, MISSING))
+    for key in sorted(set(recorded) - set(recomputed) - NOT_RECOMPUTED):
+        mismatches.append(f"receipt carries unevaluated field: {key}")
     verdict = {
         "status": "MATCH" if not mismatches else "MISMATCH",
         "mismatches": mismatches,
+        "recomputed": recomputed,
+        "not_recomputed": sorted(NOT_RECOMPUTED),
         "cut": cut,
         "model_loads": 0,
         "jev_calls": 0,

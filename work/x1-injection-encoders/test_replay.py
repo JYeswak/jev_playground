@@ -101,9 +101,8 @@ class ReplayNegatives(unittest.TestCase):
         receipt["strata"] = {}
         write_receipt(self.work, receipt)
         rc, verdict = self.replay()
-        self.assertEqual(rc, 1)
         self.assertEqual(verdict["status"], "MISMATCH")
-        self.assertTrue(any("strata key set differs" in m
+        self.assertTrue(any(m.startswith("strata: recomputed")
                             for m in verdict["mismatches"]))
 
     def test_empty_stratum_dict_mismatches(self):
@@ -112,7 +111,8 @@ class ReplayNegatives(unittest.TestCase):
         write_receipt(self.work, receipt)
         rc, verdict = self.replay()
         self.assertEqual(rc, 1)
-        self.assertTrue(any("strata.clean" in m
+        self.assertEqual(verdict["status"], "MISMATCH")
+        self.assertTrue(any(m.startswith("strata: recomputed")
                             for m in verdict["mismatches"]))
 
     def test_out_of_range_probability_mismatches(self):
@@ -167,6 +167,18 @@ class ReplayNegatives(unittest.TestCase):
         rc, verdict = self.replay()
         self.assertEqual(rc, 1)
         self.assertEqual(verdict["status"], "MISMATCH")
+
+    def test_match_emits_full_recomputed_report(self):
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 0)
+        recomputed = verdict["recomputed"]
+        self.assertEqual(set(recomputed["strata"]),
+                         {"clean", "marked", "markerless", "public-english"})
+        self.assertEqual(recomputed["cut"], 0.9999990463256836)
+        self.assertEqual(recomputed["jev_public_calls"], 447)
+        self.assertEqual(verdict["not_recomputed"],
+                         ["encoder_runtime", "guard", "model_loads",
+                          "started_at_utc"])
 
     def test_missing_jev_mate_mismatches(self):
         rows = read_jsonl(self.work, "answers-jev.jsonl")
