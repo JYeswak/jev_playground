@@ -1,0 +1,33 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_324b3c59afea329cd09a598495cd3fc793b26f2ddd1765e89cc995b26e78b636",
+ "limitations": [
+  "CI package preparation passed but full CI failed; spec author cannot provide final non-author closure; no local heavy compilation."
+ ],
+ "operation": "jev-b35c.68-published-compilation-observation",
+ "parameters": {
+  "subject_sha256": "dd51edec903f254847bacfba1ff98103c9ee347e1b92e60f42eda39eaeef533c"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "backend_command": "node --test kit/test/backend.test.mjs",
+  "backend_exit": 0,
+  "backend_stderr": "",
+  "backend_stdout": "TAP version 13\n# Subtest: default Jev keeps the exact System One request bytes and makes no Clef request\nok 1 - default Jev keeps the exact System One request bytes and makes no Clef request\n  ---\n  duration_ms: 22.074916\n  type: 'test'\n  ...\n# Subtest: auto rejects the public Banking77 calibration as a family receipt\nok 2 - auto rejects the public Banking77 calibration as a family receipt\n  ---\n  duration_ms: 0.729959\n  type: 'test'\n  ...\n# Subtest: the auto route gate requires every family, receipt, question, fingerprint, and hold condition\nok 3 - the auto route gate requires every family, receipt, question, fingerprint, and hold condition\n  ---\n  duration_ms: 0.103542\n  type: 'test'\n  ...\n# Subtest: auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\nok 4 - auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\n  ---\n  duration_ms: 0.632708\n  type: 'test'\n  ...\n# Subtest: two consecutive Clef transport failures start a 60-second hold\nok 5 - two consecutive Clef transport failures start a 60-second hold\n  ---\n  duration_ms: 0.147292\n  type: 'test'\n  ...\n# Subtest: bundles and score never route to Clef\nok 6 - bundles and score never route to Clef\n  ---\n  duration_ms: 0.698333\n  type: 'test'\n  ...\n# Subtest: CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\nok 7 - CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\n  ---\n  duration_ms: 0.290375\n  type: 'test'\n  ...\n# Subtest: dry-run previews the canonical Jev request without calling the asker\nok 8 - dry-run previews the canonical Jev request without calling the asker\n  ---\n  duration_ms: 0.208458\n  type: 'test'\n  ...\n# Subtest: rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\nok 9 - rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\n  ---\n  duration_ms: 0.528417\n  type: 'test'\n  ...\n1..9\n# tests 9\n# suites 0\n# pass 9\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 142.960375\n",
+  "candidate": "2836e93b202cecbfe6b871a81a518ab12ce1b4f7",
+  "ci_conclusion": "failure",
+  "ci_head": "2836e93b202cecbfe6b871a81a518ab12ce1b4f7",
+  "ci_log_sha256": "7acd8b95e98823b00b11dd42eab314f6f60b2dfe3633441cbd0b140d4a4f3beb",
+  "ci_prepare_lines": [
+   "registered-suites\tInstall the prerequisites the suite command names\t2026-10-16T07:31:37.7155621Z > node scripts/copy-questions.mjs && tsc -p tsconfig.json"
+  ],
+  "ci_prepare_step": "success",
+  "ci_run": 38867744365,
+  "implementation_author": "RubyMeadow",
+  "no_TS2322": true,
+  "not_closing_own_bead": true,
+  "source_sha256": "dd51edec903f254847bacfba1ff98103c9ee347e1b92e60f42eda39eaeef533c",
+  "spec_author": "LavenderDune"
+ }
+}
