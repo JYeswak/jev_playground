@@ -354,7 +354,7 @@ async function askClefNoul(options: AskOptions, requested: BackendMode, callerKe
   else recordClefFailure(result.reason, options.nowMs?.() ?? Date.now());
   if (result.ok && "scores" in result) return withBackendMetadata(result, "clef", requested);
   if (!result.ok) return withBackendMetadata(result, "clef", requested);
-  return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
+  return withBackendMetadata({ ok: false, reason: "uncalibrated" as const, error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
 }
 
 async function askClefChoice(options: AskChoiceOptions, requested: BackendMode, question: Record<string, unknown>): Promise<JevChoiceResult> {
@@ -374,7 +374,7 @@ async function askClefChoice(options: AskChoiceOptions, requested: BackendMode, 
   else recordClefFailure(result.reason, options.nowMs?.() ?? Date.now());
   if (result.ok && "choice" in result) return withBackendMetadata(result, "clef", requested);
   if (!result.ok) return withBackendMetadata(result, "clef", requested);
-  return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
+  return withBackendMetadata({ ok: false, reason: "uncalibrated" as const, error: "Clef returned the wrong answer primitive", latencyMs: result.latencyMs, model: result.model }, "clef", requested);
 }
 
 /**
@@ -652,7 +652,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
     if (route.backend === "jev") return withBackendMetadata(await askJevUsingJev(options), "jev", requested, routeReason);
   }
   if (keys.length !== 1) {
-    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef requires exactly one calibrated question", latencyMs: 0, model }, "clef", requested);
+    return withBackendMetadata({ ok: false, reason: "uncalibrated" as const, error: "Clef requires exactly one calibrated question", latencyMs: 0, model }, "clef", requested);
   }
   const callerKey = keys[0];
   const rawQuestion = options.questions[callerKey];
@@ -753,7 +753,7 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
     if (route.backend === "jev") return withBackendMetadata(await askJevChoiceUsingJev(options), "jev", requested, route.routeReason);
   }
   if (Array.isArray(options.classes) || Object.keys(options.classes ?? {}).length < 2) {
-    return withBackendMetadata({ ok: false, reason: "no-answers", error: "Clef choice requires at least two labels", latencyMs: 0, model }, "clef", requested);
+    return withBackendMetadata({ ok: false, reason: "no-answers" as const, error: "Clef choice requires at least two labels", latencyMs: 0, model }, "clef", requested);
   }
   const clefAttempt = () => askClefChoice(options, requested, question);
   if (requested === "auto") {
@@ -842,7 +842,7 @@ export async function askJevScore(options: AskScoreOptions): Promise<JevScoreRes
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
   if (requested === "clef") {
-    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef has no score calibration", latencyMs: 0, model }, "clef", requested);
+    return withBackendMetadata({ ok: false, reason: "uncalibrated" as const, error: "Clef has no score calibration", latencyMs: 0, model }, "clef", requested);
   }
   if (requested === "auto") {
     const route = resolveBackendRoute({
@@ -925,7 +925,7 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   if (!requested) return { ok: false, reason: "usage", error: "backend must be jev, clef, or auto", latencyMs: 0, model };
   if (requested === "clef") {
-    return withBackendMetadata({ ok: false, reason: "uncalibrated", error: "Clef does not support bundled questions", latencyMs: 0, model }, "clef", requested);
+    return withBackendMetadata({ ok: false, reason: "uncalibrated" as const, error: "Clef does not support bundled questions", latencyMs: 0, model }, "clef", requested);
   }
   if (requested === "auto") {
     const route = resolveBackendRoute({
