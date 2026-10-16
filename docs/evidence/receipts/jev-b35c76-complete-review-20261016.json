@@ -1,0 +1,270 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_618fb9cb8d0e7a0359d7f6dc3fc76d65de37b1f92af7a524971bf8349fbc7c42",
+ "limitations": [
+  "Fixture relocation acceptance only; separate .74 mixed-registration bug remains open; no parent/whole-main claim."
+ ],
+ "operation": "jev-b35c.76.complete-fixture-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "WildDog",
+  "bead": "jev-b35c.76",
+  "build_reuse": {
+   "fixture_installation": "owning test still physically cp into consumer/node_modules, realpath guard retained; not installed source symlink",
+   "generated_dist_and_dependency_artifacts_only": "read-only links to prior admitted built archive",
+   "git_diff_exit": 0,
+   "production_inputs_compared_unchanged": [
+    "kit/src",
+    "kit/package.json",
+    "kit/package-lock.json",
+    "kit/tsconfig.json",
+    "kit/scripts",
+    "kit/templates",
+    "work/bicameral-gate",
+    "work/rerank-scifact"
+   ],
+   "qualified_source": "402757671b774b1149bc8d0526768a791b1902bf"
+  },
+  "candidate": "a04f40d55cc2bb9340433985df13b8f324b3c694",
+  "classifier": {
+   "before_and_partial": [
+    {
+     "label": "before",
+     "native_pkg_suites": [
+      "kit/test/fixtures/installer/native-pkg/package.json",
+      "kit/test/fixtures/installer/native-pkg/src/bad-handler.ts",
+      "kit/test/fixtures/installer/native-pkg/src/dead-hook.ts",
+      "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts",
+      "kit/test/fixtures/installer/native-pkg/src/hint-extension.ts",
+      "kit/test/fixtures/installer/native-pkg/src/inert-hook.ts",
+      "kit/test/fixtures/installer/native-pkg/src/lib-only.ts",
+      "kit/test/fixtures/installer/native-pkg/src/missing-dep.ts",
+      "kit/test/fixtures/installer/native-pkg/src/null-default.ts",
+      "kit/test/fixtures/installer/native-pkg/src/null-tool.ts",
+      "kit/test/fixtures/installer/native-pkg/src/screen-hook.ts",
+      "kit/test/fixtures/installer/native-pkg/src/throwing.ts",
+      "kit/test/fixtures/installer/native-pkg/src/unknown-method.ts"
+     ],
+     "positive_consumer": true
+    },
+    {
+     "label": "after",
+     "native_pkg_suites": [
+      "kit/test/fixtures/installer/native-pkg/src/unknown-method.ts"
+     ],
+     "positive_consumer": true
+    }
+   ],
+   "command": "import importlib.util,json,os\np=\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/fixture76-fixed/source/scripts/run-registered-suites.py\"\ns=importlib.util.spec_from_file_location(\"native_registry\",p);m=importlib.util.module_from_spec(s);s.loader.exec_module(m)\nt=m.tracked_tests(\"/Users/josh/Developer/jev\")\nprint(json.dumps({\"native_pkg_suites\":[p for p in t if \"native-pkg\" in p],\"positive_consumer\":\"kit/test/install-omp-profile.test.mjs\" in t}))",
+   "exit": 0,
+   "input": "actual Git tracked trees through owned private GIT_INDEX_FILE; canonical/shared index unchanged",
+   "repaired": {
+    "native_pkg_suites": [],
+    "positive_consumer": true
+   },
+   "sha256": "e8eaf8db1dc681549f7028929e0b2745f47be3eb0894b9a6451f343082eb804c",
+   "source_unchanged": true
+  },
+  "limits": [
+   "Only byte-preserving fixture categorization and owning-consumer invariants; does NOT resolve separate .74 mixed-registration compatibility bug or close .72/.19.",
+   "No whole-main-CI, native-session/model-quality, provider/model call or real profile/service effect claim.",
+   "Reviewer changed no production/fixture/test/gate source; old failing exact-candidate result preserved, new candidate independently exercised."
+  ],
+  "matrix": {
+   "admission": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 168689254400,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 168689254400,
+    "free_excludes_purgeable": true,
+    "free_pct": 16.95944504792288,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/fixture76-fixed/source",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 168689254400,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 206696448,
+        "method": "apfs_unattributed"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 162832515072,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 162832515072,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   },
+   "canonical_heavy_label": "fixture76-original-matrix",
+   "complete_output_sha256": "1dd10fbdf88a609e82b3598de4a2a5bdd61be0b583c2d3326be620da012cf07c",
+   "decisive_output": [
+    "# Subtest: an entry with an unresolvable import is refused before writing",
+    "ok 23 - an entry with an unresolvable import is refused before writing",
+    "# Subtest: an unknown host method call fails closed like the real host",
+    "ok 27 - an unknown host method call fails closed like the real host",
+    "1..64",
+    "# tests 64",
+    "# pass 64",
+    "# fail 0",
+    "# skipped 0",
+    "# Subtest: an entry with an unresolvable import is refused before writing",
+    "ok 23 - an entry with an unresolvable import is refused before writing",
+    "# Subtest: an unknown host method call fails closed like the real host",
+    "ok 27 - an unknown host method call fails closed like the real host",
+    "1..64",
+    "# tests 64",
+    "# pass 64",
+    "# fail 0",
+    "# skipped 0"
+   ],
+   "exit": 0,
+   "fail_per_runtime": 0,
+   "files": [
+    "kit/test/install-cli.test.mjs",
+    "kit/test/omp-paths.test.mjs",
+    "kit/test/omp-config-merge.test.mjs",
+    "kit/test/install-omp-profile.test.mjs",
+    "kit/test/install-skills.test.mjs"
+   ],
+   "pass_per_runtime": 64,
+   "runtimes": [
+    "current Node22.23.3",
+    "supported fnm Node22.18.0"
+   ],
+   "skip_per_runtime": 0,
+   "source": "exact immutable git archive a04f40d55cc2bb9340433985df13b8f324b3c694",
+   "tests_per_runtime": 64
+  },
+  "moved": [
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/package.json",
+    "old": "kit/test/fixtures/installer/native-pkg/package.json",
+    "original_blob": "f685cfd595dfe5f52cbbe435f334d1e831b6ad2b",
+    "repaired_blob": "f685cfd595dfe5f52cbbe435f334d1e831b6ad2b"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/bad-handler.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/bad-handler.ts",
+    "original_blob": "32e5e0686ed0ab036d71b8ce819258557077be26",
+    "repaired_blob": "32e5e0686ed0ab036d71b8ce819258557077be26"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/dead-hook.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/dead-hook.ts",
+    "original_blob": "f441f8cd65b6a8b825ead6fafdac1d72d88f7bb2",
+    "repaired_blob": "f441f8cd65b6a8b825ead6fafdac1d72d88f7bb2"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/gate-hook.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts",
+    "original_blob": "d824d6c7ece6b72f4fea34b1d6ab75b7a5224909",
+    "repaired_blob": "d824d6c7ece6b72f4fea34b1d6ab75b7a5224909"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/hint-extension.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/hint-extension.ts",
+    "original_blob": "39488878c64ff2251915fc79bf3569eaeb0eeb55",
+    "repaired_blob": "39488878c64ff2251915fc79bf3569eaeb0eeb55"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/inert-hook.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/inert-hook.ts",
+    "original_blob": "943fe7ac2e1416a7f96b64495363486c27dc8f5a",
+    "repaired_blob": "943fe7ac2e1416a7f96b64495363486c27dc8f5a"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/lib-only.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/lib-only.ts",
+    "original_blob": "d6177e0243ce7bc7167e9b6bccb8e35da5970d5c",
+    "repaired_blob": "d6177e0243ce7bc7167e9b6bccb8e35da5970d5c"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/missing-dep.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/missing-dep.ts",
+    "original_blob": "9b5f03a74b0ecd708ece3a9737b34da663b4817b",
+    "repaired_blob": "9b5f03a74b0ecd708ece3a9737b34da663b4817b"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/null-default.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/null-default.ts",
+    "original_blob": "28faacce5dc00aea083fee66ae2b2b9585ba4a26",
+    "repaired_blob": "28faacce5dc00aea083fee66ae2b2b9585ba4a26"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/null-tool.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/null-tool.ts",
+    "original_blob": "76e47741f1243b34a13c42cc38331226b5734c7c",
+    "repaired_blob": "76e47741f1243b34a13c42cc38331226b5734c7c"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/screen-hook.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/screen-hook.ts",
+    "original_blob": "3a076f286564223973dbdf94ec342c5b9a00aaf5",
+    "repaired_blob": "3a076f286564223973dbdf94ec342c5b9a00aaf5"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/throwing.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/throwing.ts",
+    "original_blob": "7b075d1ca27789ea6f96b9277d6d4189a0fb7e7d",
+    "repaired_blob": "7b075d1ca27789ea6f96b9277d6d4189a0fb7e7d"
+   },
+   {
+    "identical": true,
+    "next": "kit/fixtures/installer/native-pkg/src/unknown-method.ts",
+    "old": "kit/test/fixtures/installer/native-pkg/src/unknown-method.ts",
+    "original_blob": "bbde13f904a1f373e26586050a6b6d58acebed8c",
+    "repaired_blob": "bbde13f904a1f373e26586050a6b6d58acebed8c"
+   }
+  ],
+  "prior_failed_candidate": "1c50e398547cb79ec901008acdd59dca54675416",
+  "reviewer": "DarkBear",
+  "verdict": "PASS_ORIGINAL_FIXTURE_RELOCATION_ONLY"
+ }
+}
