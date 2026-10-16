@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_0839aa07af90ca6ebe2cc7bc297596404274684a846e1421b0d40b3194dd9e15",
+ "limitations": [
+  "No live Jev/model calls; live local omp routes only; pytest wraps module-level SKIP exit as INTERNALERROR (unittest runner gives exit 8)."
+ ],
+ "operation": "jev-z66l-non-author-verify",
+ "parameters": {
+  "candidate": "3398e5ab"
+ },
+ "producer": "WildDog",
+ "result_ref": {
+  "bytes": 191,
+  "sha256": "dddab34529423a45688229058e699aa0f583bd2a7483a987eb6e12575d2c3beb"
+ }
+}
