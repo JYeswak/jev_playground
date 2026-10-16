@@ -303,22 +303,30 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   if (!isRecord(loaded) || !("default" in loaded) || typeof loaded.default !== "function") {
     throw new Error("native entry has no default function export: " + familyId);
   }
-  if (expectedEvent === undefined) return;
+  // Every entry factory runs against a recording stub, hooks and extensions
+  // alike: a factory that throws is incompatible, whatever it declares.
+  // The stub records host calls instead of implementing them; only flat
+  // recorder calls are supported, deep host APIs fail closed.
+  const calls: Array<{ method: string; args: unknown[] }> = [];
+  const stubPi = new Proxy({}, {
+    get(_target, property) {
+      if (property === "then") return undefined;
+      return (...args: unknown[]) => { calls.push({ method: String(property), args }); };
+    },
+  });
   // The typeof check above proves callability; name the factory shape once
   // for the invocation below.
   const factory: (pi: unknown) => unknown = loaded.default as (pi: unknown) => unknown;
-  const seen: string[] = [];
-  const stubPi = { on: (event: string, handler: unknown) => {
-    // Registration counts only for callable handlers: pi.on(name, null)
-    // must not satisfy the event proof.
-    if (typeof handler === "function") seen.push(event);
-  } };
   try {
     await factory(stubPi);
   } catch (error) {
     throw new Error("native entry factory throws: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
-  if (!seen.includes(expectedEvent)) {
+  if (expectedEvent === undefined) return;
+  // Hook contract: the declared event must be registered with a callable
+  // handler. pi.on(name, null) does not count.
+  const registered = calls.some((call) => call.method === "on" && call.args.length >= 2 && call.args[0] === expectedEvent && typeof call.args[1] === "function");
+  if (!registered) {
     throw new Error("native entry does not register " + expectedEvent + ": " + familyId);
   }
 }
