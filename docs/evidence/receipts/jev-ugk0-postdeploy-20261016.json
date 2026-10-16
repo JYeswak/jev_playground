@@ -1,0 +1,168 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_928cf4672b963e8dcbe397627158fdfd5c30504c3d69c96edd7efaec1e6ce103",
+ "limitations": [
+  "Original host-log row oracle plus offline44; no physical all-network/API coverage, cost saving, config reconciliation or model-quality claim."
+ ],
+ "operation": "original_memory_scoring_off_acceptance",
+ "parameters": {
+  "bead": "jev-ugk0"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 8081,
+  "details": {
+   "bead": "jev-ugk0",
+   "cohort": {
+    "all_window_status": {
+     "cap3-pruned": 15677,
+     "scoring-off": 1935
+    },
+    "first_window_row": "2026-10-15T09:30:32.517000+00:00",
+    "future_birth_rows": 0,
+    "guard_cutoff": "2026-10-05T10:26:46+00:00",
+    "input": {
+     "inode": 1907745221,
+     "inode_still_matches": true,
+     "path": "/Users/josh/.local/state/jev/memory-filter.jsonl",
+     "prefix_bytes": 114723216,
+     "prefix_sha256": "37199ec66a44a300273a12adb20317f9662055493ccce128cbabfcb0d09760f7",
+     "prefix_still_present": true
+    },
+    "last_window_row": "2026-10-16T09:29:20.536000+00:00",
+    "latest_prefix_row": "2026-10-16T09:29:20.536000+00:00",
+    "loaded_commit_labels": {
+     "065e8134d3669b8a8096bd150fe3718276f831dd": 3289,
+     "10e8ee0cd981da74df3cc9f9af71f7842cb85019": 388,
+     "2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb": 13666,
+     "8129c9aaa2ff5b74044e819e45298be286bf8eab": 269
+    },
+    "malformed_prefix_rows": 0,
+    "post_guard_instances": 43,
+    "post_guard_status": {
+     "cap3-pruned": 15677,
+     "scoring-off": 1935
+    },
+    "pre_guard_window_rows": 0,
+    "unbound_window_rows": 0,
+    "window": {
+     "bounds": "[start,end)",
+     "end": "2026-10-16T09:30:04.119703+00:00",
+     "seconds": 86400,
+     "start": "2026-10-15T09:30:04.119703+00:00"
+    }
+   },
+   "cohort_replay_argv": [
+    "nice",
+    "-n",
+    "10",
+    "/opt/homebrew/bin/python3",
+    "-c",
+    "<cohort_replay_program>",
+    "/Users/josh/.local/state/jev/memory-filter.jsonl",
+    "2026-10-15T09:30:04.119703+00:00",
+    "2026-10-16T09:30:04.119703+00:00",
+    "2026-10-05T10:26:46+00:00",
+    "114723216",
+    "1907745221"
+   ],
+   "cohort_replay_exit": 0,
+   "cohort_replay_program": "import sys,json,hashlib,datetime,os\nfrom collections import Counter\npath,start_s,end_s,cut_s,n_s,inode_s=sys.argv[1:]\nstart,end,cut=[datetime.datetime.fromisoformat(x) for x in (start_s,end_s,cut_s)]\nleft=int(n_s);h=hashlib.sha256();counts=Counter();allcounts=Counter();versions=Counter();instances=set();malformed=0;unbound=0;future=0;old=0;latest=None;first=None;last=None\nwith open(path,\"rb\") as f:\n if os.fstat(f.fileno()).st_ino!=int(inode_s):raise RuntimeError(\"log inode changed\")\n while left:\n  raw=f.readline(left)\n  if not raw:raise RuntimeError(\"snapshot prefix shortened\")\n  left-=len(raw);h.update(raw)\n  try:\n   row=json.loads(raw)\n   if not isinstance(row,dict):raise ValueError(\"nonobject\")\n   ts=datetime.datetime.fromisoformat(str(row.get(\"ts\",\"\")).replace(\"Z\",\"+00:00\"))\n   if ts.tzinfo is None:raise ValueError(\"naive timestamp\")\n  except (ValueError,TypeError):malformed+=1;continue\n  latest=ts if latest is None or ts>latest else latest\n  if not start<=ts<end:continue\n  first=ts if first is None or ts<first else first;last=ts if last is None or ts>last else last\n  status=row.get(\"status\");status=status if status in (\"scoring-off\",\"scored\",\"deadline-keep\",\"late-ignored\",\"daily-cap\",\"cap3-pruned\",\"cap3-shadowed\",\"memo\",\"paused\") else \"other\"\n  allcounts[status]+=1\n  try:\n   born=datetime.datetime.fromisoformat(str(row.get(\"instanceStartedAt\",\"\")).replace(\"Z\",\"+00:00\"))\n   if born.tzinfo is None:raise ValueError(\"naive birth\")\n  except (ValueError,TypeError):unbound+=1;continue\n  if born>ts:future+=1\n  if born<=cut:old+=1;continue\n  counts[status]+=1;instances.add(str(row.get(\"instance\")))\n  v=row.get(\"loadedCommit\");v=v if isinstance(v,str) and len(v) in (40,64) and all(c in \"0123456789abcdef\" for c in v) else \"unknown\"\n  versions[v]+=1\npost=os.stat(path)\nprint(json.dumps({\"window\":{\"start\":start_s,\"end\":end_s,\"bounds\":\"[start,end)\",\"seconds\":int((end-start).total_seconds())},\"guard_cutoff\":cut_s,\"input\":{\"path\":path,\"inode\":int(inode_s),\"prefix_bytes\":int(n_s),\"prefix_sha256\":h.hexdigest(),\"inode_still_matches\":post.st_ino==int(inode_s),\"prefix_still_present\":post.st_size>=int(n_s)},\"all_window_status\":dict(allcounts),\"post_guard_status\":dict(counts),\"post_guard_instances\":len(instances),\"loaded_commit_labels\":dict(versions),\"malformed_prefix_rows\":malformed,\"unbound_window_rows\":unbound,\"future_birth_rows\":future,\"pre_guard_window_rows\":old,\"first_window_row\":first.isoformat() if first else None,\"last_window_row\":last.isoformat() if last else None,\"latest_prefix_row\":latest.isoformat() if latest else None}))\n",
+   "cohort_replay_stderr": "",
+   "global_memory_entrypoints": [
+    {
+     "config_path": "/Users/josh/.omp/agent/config.yml",
+     "entry_count": 5,
+     "extensions_shape": "list",
+     "memory_pinned_entries": [
+      "/Users/josh/.omp/jev-pinned/2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb/repo/.omp/extensions/jev-memory-filter.ts"
+     ],
+     "profile": "default"
+    },
+    {
+     "config_path": "/Users/josh/.omp/profiles/claude/agent/config.yml",
+     "entry_count": 13,
+     "extensions_shape": "list",
+     "memory_pinned_entries": [
+      "/Users/josh/.omp/jev-pinned/2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb/repo/.omp/extensions/jev-memory-filter.ts"
+     ],
+     "profile": "claude"
+    },
+    {
+     "config_path": "/Users/josh/.omp/profiles/codex/agent/config.yml",
+     "entry_count": 14,
+     "extensions_shape": "list",
+     "memory_pinned_entries": [
+      "/Users/josh/.omp/jev-pinned/2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb/repo/.omp/extensions/jev-memory-filter.ts"
+     ],
+     "profile": "codex"
+    },
+    {
+     "config_path": "/Users/josh/.omp/profiles/grok/agent/config.yml",
+     "entry_count": 13,
+     "extensions_shape": "list",
+     "memory_pinned_entries": [
+      "/Users/josh/.omp/jev-pinned/2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb/repo/.omp/extensions/jev-memory-filter.ts"
+     ],
+     "profile": "grok"
+    },
+    {
+     "config_path": "/Users/josh/.omp/profiles/muse/agent/config.yml",
+     "entry_count": 13,
+     "extensions_shape": "list",
+     "memory_pinned_entries": [
+      "/Users/josh/.omp/jev-pinned/2eacc3307ba1b54a4435ac2f4140f9ba8374b0bb/repo/.omp/extensions/jev-memory-filter.ts"
+     ],
+     "profile": "muse"
+    }
+   ],
+   "lane": "local host-log observation plus offline injected-transport acceptance",
+   "limitations": [
+    "Original log-row oracle only; no physical all-network/API instrumentation or per-instance immutable binary attestation.",
+    "Global advisor/default/config-manifest drift jtm6 remains unresolved; no config, pin, enforcement switch or service mutation.",
+    "Cap3-pruned15677 is an allowed separate existing mechanical path, not a new quality gain."
+   ],
+   "mandatory_static_evidence": {
+    "evidence_id": "ev_9d6d997f38bce43da36ecbc16cf3cdda653dfc87330b4fa759f84acf9384f73b",
+    "receipt": "docs/evidence/receipts/jev-rtjv-independent-20261016.json",
+    "scope": "Complete original memory-filter exact SHA0f scan with unchanged authenticated official5.5.0; same bytes, no repeat old timeout/global install."
+   },
+   "model_and_spend": {
+    "billing": "NOT_QUERIED",
+    "configured_code_model_label": "jev-1.13.0",
+    "limits": "Status counts are log rows, not measured API calls saved, money saved, model quality or latency.",
+    "measurement_provider_requests": "none initiated; tests use injected transport and measurement reads existing metadata only"
+   },
+   "source": {
+    "code_sha256": "0f0227fda5decf5fbeafc588688ad51b7692da98ef04051b32474ba8efd02521",
+    "original_guard_author_and_commit_time": "2026-10-05T04:26:46-06:00",
+    "original_guard_commit": "3a02a7274d819295d3116d9d540730e706b52682",
+    "pin_commit_code_sha256": "0f0227fda5decf5fbeafc588688ad51b7692da98ef04051b32474ba8efd02521",
+    "pin_manifest_memory_module_sha256": "0f0227fda5decf5fbeafc588688ad51b7692da98ef04051b32474ba8efd02521",
+    "pin_manifest_sha256": "b0e9d03e7189fc595b9a35435f87d0e0f34a9226b09ab111ccbd850ed62bd596",
+    "pinned_code_sha256": "0f0227fda5decf5fbeafc588688ad51b7692da98ef04051b32474ba8efd02521",
+    "provenance_note": "2a994707 row-tag candidate is not an ancestor of pin2eacc; no ancestry inference from dates. Actual current, pin-file and pin-commit code SHA256 match. Original guard3a02, not later row-tag date, is the frozen cohort cutoff.",
+    "test_sha256": "eec99a820b2bbf0edaaf42f1c490dd892a688db70b4454c249c80f090d10bcaf",
+    "working_code_and_test_equal_HEAD": true
+   },
+   "unit_acceptance": {
+    "argv": [
+     "/opt/homebrew/bin/node",
+     "--test",
+     ".omp/extensions/jev-memory-filter.test.mjs"
+    ],
+    "controls": "test18 injected never-resolving ask,100ms race,calls0/scoring-off; test19 enforce-on reaches scoring and prunes; original cap3 tests pass unchanged",
+    "decisive_output": "# tests 44\n# pass 44\n# fail 0\n# skipped 0",
+    "environment": "TYPESAFE_API_KEY unset; owned TMPDIR; nice10",
+    "exit": 0,
+    "fail": 0,
+    "pass": 44,
+    "skipped": 0,
+    "tests": 44,
+    "warning": "MODULE_TYPELESS_PACKAGE_JSON warning retained; no unrelated package/config change."
+   }
+  },
+  "sha256": "e31efbc3bcf523c08ae198af053f14cd5f0524378eca25528a1b88b3faf1cd6d"
+ }
+}
