@@ -131,3 +131,34 @@ node kit/bin/conformance-matrix.mjs
 ```
 
 The second command checks fixture `PROVENANCE.md` files and regenerates `work/plan-20261004/CONFORMANCE.md`. Untested clauses remain blank and block shipped backends. Known adapter limitations are recorded in `conformance/DISCREPANCIES.md`; the regex adapter's missing probabilities are an explicit C2 XFAIL, not a skipped test.
+
+## Install the prepared CLI
+
+After the existing dependency-install and prepare steps, the CLI target installs the
+prepared package—not just its JavaScript launcher. It copies the declared runtime
+files and installed production dependencies into a versioned directory, records
+their hashes using the install manifest, and binds `current/bin/classifier` and the
+user bin link to that owned payload. Installation performs no dependency download.
+
+From the repository root:
+
+```bash
+node kit/bin/jev.mjs install cli --dry-run --dir "$HOME" --robot
+node kit/bin/jev.mjs install cli --apply --dir "$HOME" --robot
+"$HOME/.local/bin/classifier" --version
+"$HOME/.local/bin/classifier" doctor --robot
+```
+
+For the `cli` target, `--dir` is the home-shaped installation root; omitted, it
+defaults to the current user's home. Use an owned temporary root for validation.
+The version comes from the prepared package. An incomplete runtime, mismatched
+version, or conflicting owned payload is refused rather than reported as installed.
+A foreign bin is refused without modification. Repeating the same complete payload
+does not rewrite its files, state, or links; rollback verifies the previous payload
+before switching to it.
+
+`doctor` may return structured `FINDINGS` in a keyless or otherwise unconfigured
+environment. A runnable installation does not claim classifier quality, an enabled
+scheduled service, or a healthy external backend. Bootstrap/signing/registry
+publication and the real N0b daily-miner implementation remain separate.
+

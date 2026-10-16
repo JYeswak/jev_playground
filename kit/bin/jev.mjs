@@ -13,6 +13,7 @@ import { gateCommand } from "../dist/gate.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery, uninstallOmp } from "../dist/install.js";
 import { createInstallPlan } from "../dist/install/plan.js";
+import { installCli, uninstallCli } from "../dist/install/cli-target.js";
 import { acquireInstallLock } from "../dist/install/manifest.js";
 import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
@@ -299,6 +300,18 @@ async function miner(args) {
   return { ok: false, reason: "ERROR", verdict, runnerExit: probe.code, message: `miner failed (runner exit ${probe.code})`, detail: payload ?? probe.stderr.trim().split("\n").slice(-3) };
 }
 
+async function applyStandaloneTarget(command, target, directory) {
+  if (target !== "cli") return usageFailure(`--apply is not available for ${target}; use --dry-run to inspect its plan`);
+  const home = directory ?? homedir();
+  const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const result = command === "install"
+    ? await installCli({ home, version: pkg.version, packageDir: fileURLToPath(ROOT) })
+    : await uninstallCli({ home, apply: true });
+  return result.exit === 0
+    ? { ok: true, ...result }
+    : { ok: false, ...result, reason: "refused-unsafe", error: "CLI target ownership or payload conflicts with the requested operation" };
+}
+
 async function runInstaller(command, args, parsed) {
   if (hasFlag(args, "--dry-run") && hasFlag(args, "--apply")) {
     return usageFailure("--dry-run and --apply cannot be used together");
@@ -314,7 +327,7 @@ async function runInstaller(command, args, parsed) {
   const apply = hasFlag(args, "--apply");
 
   if (target !== "omp-project") {
-    if (apply) return usageFailure(`--apply is not available for ${target}; use --dry-run to inspect its plan`);
+    if (apply) return applyStandaloneTarget(command, target, plan.dir);
     const base = command === "install" ? plan : {
       status: plan.status,
       target: plan.target,

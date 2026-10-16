@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { lstat, mkdir, readdir, readFile, readlink, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { cp, lstat, mkdir, readdir, readFile, readlink, symlink, writeFile } from 'node:fs/promises';
+import { dirname, join, relative } from 'node:path';
 import { freshHome } from './cli-support.mjs';
 import {
   installCli,
@@ -10,8 +12,31 @@ import {
   uninstallCli,
 } from '../dist/install/cli-target.js';
 
-const BIN = Buffer.from('#!/usr/bin/env node\nconsole.log("classifier fixture");\n');
-const BIN_V2 = Buffer.from('#!/usr/bin/env node\nconsole.log("classifier fixture v2");\n');
+const PACKAGE_DIR = fileURLToPath(new URL('..', import.meta.url));
+const prepared = new Map();
+
+async function artifact(version, omit = []) {
+  if (omit.length === 0 && prepared.has(version)) return prepared.get(version);
+  const directory = await freshHome('installer-cli-prepared-package');
+  const pkg = JSON.parse(await readFile(join(PACKAGE_DIR, 'package.json'), 'utf8'));
+  const excluded = new Set(omit);
+  for (const path of pkg.files) {
+    const destination = join(directory, path);
+    await mkdir(dirname(destination), { recursive: true });
+    await cp(join(PACKAGE_DIR, path), destination, {
+      recursive: true,
+      filter: (source) => !excluded.has(relative(PACKAGE_DIR, source)),
+    });
+  }
+  for (const name of Object.keys(pkg.dependencies)) {
+    const destination = join(directory, 'node_modules', name);
+    await mkdir(dirname(destination), { recursive: true });
+    await cp(join(PACKAGE_DIR, 'node_modules', name), destination, { recursive: true });
+  }
+  await writeFile(join(directory, 'package.json'), JSON.stringify({ ...pkg, version }));
+  if (omit.length === 0) prepared.set(version, directory);
+  return directory;
+}
 const FOREIGN = Buffer.from('#!/bin/sh\necho hermes-foreign-bin\n');
 
 async function snapshotTree(root) {
@@ -58,27 +83,24 @@ function binPaths(home, binName = 'classifier') {
 
 test('fresh install lays out versions, current and the bin link', async () => {
   const home = await freshHome('installer-cli-fresh');
-  const before = await snapshotTree(home);
-  const result = await installCli({ home, version: '1.0.0', binBytes: BIN });
+  const result = await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
   assert.equal(result.exit, 0);
   assert.equal(result.status, 'installed');
-  assert.ok(result.writes.length > 0);
   const paths = binPaths(home);
   assert.equal(await readlink(paths.current), paths.versionDir);
   assert.equal(await readlink(paths.link), join(paths.versionDir, 'bin', 'classifier'));
-  assert.deepEqual(await readFile(join(paths.versionDir, 'bin', 'classifier')), BIN);
+  assert.equal(execFileSync(paths.link, ['--version'], { encoding: 'utf8' }), 'classifier 1.0.0\n');
   const state = JSON.parse(await readFile(paths.state, 'utf8'));
   assert.deepEqual(state.versions, ['1.0.0']);
   assert.equal(state.current, '1.0.0');
-  void before;
 });
 
 test('re-run is already with zero writes', async () => {
   const home = await freshHome('installer-cli-rerun');
-  const first = await installCli({ home, version: '1.0.0', binBytes: BIN });
+  const first = await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
   assert.equal(first.status, 'installed');
   const before = await snapshotTree(home);
-  const second = await installCli({ home, version: '1.0.0', binBytes: BIN });
+  const second = await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
   assert.equal(second.exit, 0);
   assert.equal(second.status, 'already');
   assert.deepEqual(second.writes, []);
@@ -91,7 +113,7 @@ test('a foreign bin without take-over refuses with exit 4 and stays byte-identic
   await mkdir(join(home, '.local', 'bin'), { recursive: true });
   await writeFile(paths.link, FOREIGN);
   const before = await snapshotTree(home);
-  const result = await installCli({ home, version: '1.0.0', binBytes: BIN });
+  const result = await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
   assert.equal(result.exit, 4);
   assert.equal(result.status, 'conflict');
   assert.deepEqual(result.writes, []);
@@ -104,14 +126,14 @@ test('take-over records the displaced bin and uninstall restores it', async () =
   const paths = binPaths(home);
   await mkdir(join(home, '.local', 'bin'), { recursive: true });
   await writeFile(paths.link, FOREIGN);
-  const taken = await installCli({ home, version: '1.0.0', binBytes: BIN, takeOverBin: true });
+  const taken = await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0'), takeOverBin: true });
   assert.equal(taken.exit, 0);
   assert.equal(taken.status, 'installed');
-  assert.deepEqual(await readFile(join(paths.versionDir, 'bin', 'classifier')), BIN);
+  assert.equal(execFileSync(paths.link, ['--version'], { encoding: 'utf8' }), 'classifier 1.0.0\n');
+  const beforeDry = await snapshotTree(home);
   const dry = await uninstallCli({ home });
   assert.equal(dry.status, 'dry-run');
   assert.ok(dry.wouldRemove.length > 0);
-  const beforeDry = await snapshotTree(home);
   assert.deepEqual(await snapshotTree(home), beforeDry);
   const removed = await uninstallCli({ home, apply: true });
   assert.equal(removed.exit, 0);
@@ -122,19 +144,19 @@ test('take-over records the displaced bin and uninstall restores it', async () =
 test('rollback flips current to the previous version', async () => {
   const home = await freshHome('installer-cli-rollback');
   const paths = binPaths(home);
-  await installCli({ home, version: '1.0.0', binBytes: BIN });
-  await installCli({ home, version: '2.0.0', binBytes: BIN_V2 });
+  await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
+  await installCli({ home, version: '2.0.0', packageDir: await artifact('2.0.0') });
   assert.equal(await readlink(paths.current), join(paths.base, 'versions', '2.0.0'));
   const rolled = await rollbackCli({ home });
   assert.equal(rolled.exit, 0);
   assert.equal(rolled.status, 'rolled-back');
   assert.equal(await readlink(paths.current), join(paths.base, 'versions', '1.0.0'));
-  assert.deepEqual(await readFile(paths.link), BIN);
+  assert.equal(execFileSync(paths.link, ['--version'], { encoding: 'utf8' }), 'classifier 1.0.0\n');
 });
 
 test('rollback with a single version refuses without writes', async () => {
   const home = await freshHome('installer-cli-rollback-single');
-  await installCli({ home, version: '1.0.0', binBytes: BIN });
+  await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
   const before = await snapshotTree(home);
   const rolled = await rollbackCli({ home });
   assert.equal(rolled.exit, 4);
@@ -147,7 +169,7 @@ test('a traversal version is refused as usage with no writes', async () => {
   const home = await freshHome('installer-cli-traversal');
   const before = await snapshotTree(home);
   await assert.rejects(
-    installCli({ home, version: '../evil', binBytes: BIN }),
+    installCli({ home, version: '../evil', packageDir: await artifact('1.0.0') }),
     (error) => error.code === 'USAGE',
   );
   assert.deepEqual(await snapshotTree(home), before);
@@ -159,7 +181,117 @@ test('a corrupt state file fails typed IO, not a raw parse throw', async () => {
   await mkdir(join(home, '.local', 'share', 'classifier'), { recursive: true });
   await writeFile(paths.state, 'not-json{{{');
   await assert.rejects(
-    installCli({ home, version: '1.0.0', binBytes: BIN }),
+    installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') }),
     (error) => error.code === 'IO' && error.message.includes('not JSON'),
   );
+});
+
+test('the real prepared classifier stays runnable after versioned installation', async () => {
+  const home = await freshHome('installer-cli-real-artifact');
+  const packageDir = fileURLToPath(new URL('..', import.meta.url));
+  const pkg = JSON.parse(await readFile(join(packageDir, 'package.json'), 'utf8'));
+  const result = await installCli({
+    home,
+    version: pkg.version,
+    packageDir,
+  });
+  assert.equal(result.status, 'installed');
+  const output = execFileSync(join(home, '.local', 'share', 'classifier', 'current', 'bin', 'classifier'), [
+    '--version',
+  ], { encoding: 'utf8', env: { ...process.env, HOME: home }, timeout: 10000 });
+  assert.equal(output, `classifier ${pkg.version}\n`);
+});
+
+test('an incomplete real package refuses before publishing any consumer state', async () => {
+  const home = await freshHome('installer-cli-incomplete-artifact');
+  const before = await snapshotTree(home);
+  await assert.rejects(installCli({
+    home,
+    version: '1.0.0',
+    packageDir: await artifact('1.0.0', ['dist/client.js']),
+  }), (error) => error.code === 'USAGE');
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a modified installed dependency refuses reinstallation without overwriting it', async () => {
+  const home = await freshHome('installer-cli-modified-payload');
+  const packageDir = await artifact('1.0.0');
+  await installCli({ home, version: '1.0.0', packageDir });
+  const modified = join(binPaths(home).versionDir, 'dist', 'client.js');
+  await writeFile(modified, '// operator-owned change\n');
+  const before = await snapshotTree(home);
+  const refused = await installCli({ home, version: '1.0.0', packageDir });
+  assert.equal(refused.status, 'conflict');
+  assert.equal(refused.exit, 4);
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('rollback refuses a previous version whose real runtime payload was changed', async () => {
+  const home = await freshHome('installer-cli-rollback-modified-payload');
+  await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
+  await installCli({ home, version: '2.0.0', packageDir: await artifact('2.0.0') });
+  await writeFile(join(binPaths(home).versionDir, 'dist', 'client.js'), '// changed previous version\n');
+  const before = await snapshotTree(home);
+  const refused = await rollbackCli({ home });
+  assert.equal(refused.status, 'conflict');
+  assert.equal(refused.exit, 4);
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a package version mismatch refuses before consumer writes', async () => {
+  const home = await freshHome('installer-cli-version-mismatch');
+  const before = await snapshotTree(home);
+  await assert.rejects(
+    installCli({ home, version: '2.0.0', packageDir: await artifact('1.0.0') }),
+    (error) => error.code === 'USAGE',
+  );
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a declared asset cannot escape the prepared package through a symlinked parent', async () => {
+  const home = await freshHome('installer-cli-source-escape');
+  const packageDir = await artifact('3.0.0');
+  const pkg = JSON.parse(await readFile(join(packageDir, 'package.json'), 'utf8'));
+  await symlink(join(PACKAGE_DIR, 'dist'), join(packageDir, 'external'));
+  await writeFile(join(packageDir, 'package.json'), JSON.stringify({
+    ...pkg, files: [...pkg.files, 'external/client.js'],
+  }));
+  const before = await snapshotTree(home);
+  await assert.rejects(installCli({ home, version: '3.0.0', packageDir }),
+    (error) => error.code === 'USAGE');
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('unsafe recorded version paths cannot delete files outside the owned payload', async () => {
+  const home = await freshHome('installer-cli-unsafe-recorded-version');
+  await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0') });
+  const paths = binPaths(home);
+  const foreign = join(home, 'foreign-retained-file');
+  await writeFile(foreign, FOREIGN);
+  const state = JSON.parse(await readFile(paths.state, 'utf8'));
+  await writeFile(paths.state, JSON.stringify({
+    ...state, versions: [relative(join(paths.base, 'versions'), foreign)],
+  }));
+  const before = await snapshotTree(home);
+  await assert.rejects(uninstallCli({ home, apply: true }), (error) => error.code === 'IO');
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a displaced backup outside its owned location cannot be restored as the bin', async () => {
+  const home = await freshHome('installer-cli-unsafe-recorded-backup');
+  const paths = binPaths(home);
+  await mkdir(dirname(paths.link), { recursive: true });
+  await writeFile(paths.link, FOREIGN);
+  await installCli({ home, version: '1.0.0', packageDir: await artifact('1.0.0'), takeOverBin: true });
+  const state = JSON.parse(await readFile(paths.state, 'utf8'));
+  const unrelated = join(home, 'unrelated-retained-file');
+  await writeFile(unrelated, FOREIGN);
+  await writeFile(paths.state, JSON.stringify({
+    ...state, displaced: { ...state.displaced, backup: unrelated },
+  }));
+  const before = await snapshotTree(home);
+  const refused = await uninstallCli({ home, apply: true });
+  assert.equal(refused.exit, 4);
+  assert.equal(refused.status, 'conflict');
+  assert.deepEqual(await snapshotTree(home), before);
 });

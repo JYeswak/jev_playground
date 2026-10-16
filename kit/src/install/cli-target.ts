@@ -5,8 +5,10 @@
 // refusals leave bytes and mtimes alone.
 
 import { createHash } from "node:crypto";
-import { chmod, lstat, mkdir, readFile, readlink, rm, symlink, unlink, writeFile } from "node:fs/promises";
-import { dirname, join, resolve, sep } from "node:path";
+import { chmod, lstat, mkdir, readFile, readdir, readlink, realpath, rm, symlink, unlink, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { INSTALL_MANIFEST_MARKER, INSTALL_MANIFEST_VERSION, readInstallManifest, writeInstallManifest, type InstallManifest } from "./manifest.js";
 import { EXIT_CODES } from "../families/registry.js";
 
 export type CliTargetError = Error & { code: "USAGE" | "IO" };
@@ -119,6 +121,12 @@ async function readState(stateFile: string): Promise<CliState> {
   }
   const versions = parsed.versions.filter((v): v is string => typeof v === "string");
   const current = "current" in parsed && typeof parsed.current === "string" ? parsed.current : null;
+  try {
+    for (const version of versions) checkSegment(version, "state version");
+    if (current !== null) checkSegment(current, "current state version");
+  } catch {
+    throw targetError(`install state contains an unsafe version path: ${stateFile}`, "IO");
+  }
   const displacedRaw: unknown = "displaced" in parsed ? parsed.displaced : null;
   const displaced =
     displacedRaw !== null &&
@@ -135,7 +143,7 @@ async function readState(stateFile: string): Promise<CliState> {
 export type CliInstallInput = {
   home: string;
   version: string;
-  binBytes: Uint8Array;
+  packageDir: string;
   binName?: string;
   takeOverBin?: boolean;
 };
@@ -161,11 +169,192 @@ async function pointLink(link: string, target: string, writes: string[]): Promis
   writes.push(link);
 }
 
+const CLI_PAYLOAD_MANIFEST = ".classifier-install.json";
+
+type PayloadFile = { path: string; bytes: Buffer; mode: number };
+type CliPayload = { entry: string; files: PayloadFile[]; manifest: InstallManifest };
+
+function packagePath(path: string): string {
+  const clean = path.startsWith("./") ? path.slice(2) : path;
+  if (!clean || isAbsolute(clean) || clean.includes("\\") || clean.includes("\0")
+    || clean.split("/").some((part) => part === ".." || part === "" || part === ".")
+    || clean.includes("*") || clean.includes("?")) {
+    throw targetError(`unsafe prepared-package path: ${path}`, "USAGE");
+  }
+  return clean;
+}
+
+async function packageJson(path: string): Promise<Record<string, unknown>> {
+  let value: unknown;
+  try {
+    if (await pathKind(path) !== "file") {
+      throw targetError(`prepared package metadata is not a regular file: ${path}`, "USAGE");
+    }
+    value = JSON.parse(await readFile(path, "utf8"));
+  } catch (cause) {
+    throw targetError(`cannot read prepared package metadata ${path}: ${errorMessage(cause)}`, "USAGE");
+  }
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw targetError(`invalid prepared package metadata: ${path}`, "USAGE");
+  }
+  return value as Record<string, unknown>;
+}
+
+async function preparePayload(input: CliInstallInput): Promise<CliPayload> {
+  if (typeof input.packageDir !== "string" || !input.packageDir) {
+    throw targetError("CLI installation requires a complete prepared package directory", "USAGE");
+  }
+  let root: string;
+  try {
+    root = await realpath(resolve(input.packageDir));
+  } catch (cause) {
+    throw targetError(`prepared package directory is unavailable: ${errorMessage(cause)}`, "USAGE");
+  }
+  const pkg = await packageJson(join(root, "package.json"));
+  if (pkg.version !== input.version || !Array.isArray(pkg.files) || pkg.files.length === 0
+    || pkg.bin === null || typeof pkg.bin !== "object" || Array.isArray(pkg.bin)
+    || !("classifier" in pkg.bin) || typeof pkg.bin.classifier !== "string") {
+    throw targetError("prepared classifier package has no matching version, file inventory, or classifier entry", "USAGE");
+  }
+  const entry = packagePath(pkg.bin.classifier);
+  const alias = `bin/${input.binName ?? "classifier"}`;
+  const files = new Map<string, PayloadFile>();
+  const collect = async (path: string): Promise<void> => {
+    const rel = packagePath(relative(root, path).split(sep).join("/"));
+    if (files.has(rel)) return;
+    let metadata;
+    try {
+      metadata = await lstat(path);
+      if (!(await realpath(path)).startsWith(root + sep)) {
+        throw targetError(`prepared package asset escapes its source root: ${rel}`, "USAGE");
+      }
+    } catch (cause) {
+      throw targetError(`prepared package asset is unavailable: ${rel}: ${errorMessage(cause)}`, "USAGE");
+    }
+    if (metadata.isSymbolicLink()) {
+      // A previously installed package has this derived, wholly internal alias.
+      if (rel === alias && resolve(dirname(path), await readlink(path)) === join(root, entry)) return;
+      throw targetError(`prepared package asset is a symlink: ${rel}`, "USAGE");
+    }
+    if (metadata.isDirectory()) {
+      for (const name of (await readdir(path)).sort()) await collect(join(path, name));
+      return;
+    }
+    if (!metadata.isFile()) throw targetError(`prepared package asset is not a file: ${rel}`, "USAGE");
+    files.set(rel, { path: rel, bytes: await readFile(path), mode: metadata.mode & 0o777 });
+  };
+  await collect(join(root, "package.json"));
+  for (const path of pkg.files) {
+    if (typeof path !== "string") throw targetError("prepared package file inventory must contain paths", "USAGE");
+    await collect(join(root, packagePath(path)));
+  }
+  if (!files.has(entry) || (alias !== entry && files.has(alias))) {
+    throw targetError("prepared package is missing its classifier entry or conflicts with the installed alias", "USAGE");
+  }
+  const visited = new Set<string>();
+  const dependencies = async (metadata: Record<string, unknown>, from: string): Promise<void> => {
+    const declared = metadata.dependencies;
+    if (declared === undefined) return;
+    if (declared === null || typeof declared !== "object" || Array.isArray(declared)) {
+      throw targetError("invalid prepared runtime dependency inventory", "USAGE");
+    }
+    for (const name of Object.keys(declared).sort()) {
+      packagePath(name);
+      let parent = from;
+      let found: string | undefined;
+      while (parent === root || parent.startsWith(root + sep)) {
+        const candidate = join(parent, "node_modules", name);
+        if (await pathKind(candidate) === "dir") { found = candidate; break; }
+        if (parent === root) break;
+        parent = dirname(parent);
+      }
+      if (found === undefined) throw targetError(`prepared runtime dependency is missing: ${name}`, "USAGE");
+      if (!(await realpath(found)).startsWith(root + sep)) {
+        throw targetError(`prepared runtime dependency escapes its source root: ${name}`, "USAGE");
+      }
+      if (visited.has(found)) continue;
+      visited.add(found);
+      const dependency = await packageJson(join(found, "package.json"));
+      if (dependency.name !== name) throw targetError(`prepared runtime dependency identity differs: ${name}`, "USAGE");
+      await collect(found);
+      await dependencies(dependency, found);
+    }
+  };
+  await dependencies(pkg, root);
+  try {
+    await new Promise<void>((accept, reject) => {
+      execFile(process.execPath, [join(root, entry), "--version"], {
+        cwd: root, env: { HOME: input.home }, encoding: "utf8", timeout: 10000, maxBuffer: 1024 * 1024,
+      }, (cause, stdout, stderr) => {
+        if (cause || stdout !== `classifier ${input.version}\n`) {
+          reject(targetError(`prepared classifier cannot run its declared version: ${stderr.trim() || errorMessage(cause)}`, "USAGE"));
+        } else accept();
+      });
+    });
+  } catch (cause) {
+    if (cause instanceof Error && "code" in cause && cause.code === "USAGE") throw cause;
+    throw targetError(`cannot verify prepared classifier: ${errorMessage(cause)}`, "USAGE");
+  }
+  for (const file of files.values()) {
+    if (!(await readFile(join(root, file.path))).equals(file.bytes)) {
+      throw targetError(`prepared package changed during verification: ${file.path}`, "USAGE");
+    }
+  }
+  const ordered = [...files.values()].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  return {
+    entry, files: ordered,
+    manifest: {
+      version: INSTALL_MANIFEST_VERSION,
+      entries: ordered.map((file) => ({
+        target: "cli", path: file.path, sha256: sha256Hex(file.bytes),
+        marker: INSTALL_MANIFEST_MARKER, version: input.version,
+      })),
+    },
+  };
+}
+
+async function payloadMatches(directory: string, manifest: InstallManifest, entry: string, alias: string): Promise<boolean> {
+  try {
+    const stored = await readInstallManifest(join(directory, CLI_PAYLOAD_MANIFEST));
+    if (!stored || JSON.stringify(stored) !== JSON.stringify(manifest)) return false;
+    const expected = new Set([CLI_PAYLOAD_MANIFEST, ...manifest.entries.map((file) => file.path)]);
+    if (alias !== entry) expected.add(alias);
+    const observed = new Set<string>();
+    const walk = async (path: string): Promise<void> => {
+      for (const name of await readdir(path)) {
+        const full = join(path, name);
+        const metadata = await lstat(full);
+        if (metadata.isDirectory()) await walk(full);
+        else observed.add(relative(directory, full).split(sep).join("/"));
+      }
+    };
+    await walk(directory);
+    if (observed.size !== expected.size || [...observed].some((path) => !expected.has(path))) return false;
+    for (const file of manifest.entries) {
+      const path = join(directory, packagePath(file.path));
+      if (await pathKind(path) !== "file" || sha256Hex(await readFile(path)) !== file.sha256) return false;
+    }
+    const executable = join(directory, entry);
+    if (((await lstat(executable)).mode & 0o111) === 0) return false;
+    return alias === entry || (await pathKind(join(directory, alias)) === "symlink"
+      && resolve(dirname(join(directory, alias)), await readlink(join(directory, alias))) === executable);
+  } catch {
+    return false;
+  }
+}
+
 export async function installCli(input: CliInstallInput): Promise<CliResult> {
   const binName = input.binName ?? "classifier";
   const layout = cliLayout(input.home, input.version, binName);
+  // Read and execute the prepared artifact before touching any consumer state.
+  const payload = await preparePayload(input);
   const state = await readState(layout.stateFile);
   const writes: string[] = [];
+  const versionKind = await pathKind(layout.versionDir);
+  if (versionKind !== "missing" && (!state.versions.includes(input.version)
+    || !await payloadMatches(layout.versionDir, payload.manifest, payload.entry, `bin/${binName}`))) {
+    return { status: "conflict", exit: EXIT_CODES.REFUSED_UNSAFE, writes, current: state.current };
+  }
 
   const binKind = await pathKind(layout.binLink);
   if (binKind !== "missing") {
@@ -195,32 +384,27 @@ export async function installCli(input: CliInstallInput): Promise<CliResult> {
     }
   }
 
-  if (
-    state.current === input.version &&
-    state.versions.includes(input.version) &&
-    (await pathKind(layout.versionBin)) === "file"
-  ) {
-    const onDisk = await readFile(layout.versionBin);
-    if (sha256Hex(onDisk) === sha256Hex(input.binBytes)) {
-      const currentTarget =
-        (await pathKind(layout.currentLink)) === "symlink"
-          ? resolve(dirname(layout.currentLink), await readlink(layout.currentLink))
-          : undefined;
-      const binTarget =
-        (await pathKind(layout.binLink)) === "symlink"
-          ? resolve(dirname(layout.binLink), await readlink(layout.binLink))
-          : undefined;
-      if (currentTarget === layout.versionDir && binTarget === layout.versionBin) {
-        return { status: "already", exit: EXIT_CODES.OK, writes, current: state.current };
-      }
+  if (versionKind === "missing") {
+    for (const file of payload.files) {
+      const destination = join(layout.versionDir, file.path);
+      await writeBytesIfChanged(destination, file.bytes, writes);
+      await chmod(destination, file.mode);
+    }
+    await chmod(join(layout.versionDir, payload.entry), 0o755);
+    if (layout.versionBin !== join(layout.versionDir, payload.entry)) {
+      await pointLink(layout.versionBin, join(layout.versionDir, payload.entry), writes);
+    }
+    if (await writeInstallManifest(join(layout.versionDir, CLI_PAYLOAD_MANIFEST), payload.manifest)) {
+      writes.push(join(layout.versionDir, CLI_PAYLOAD_MANIFEST));
     }
   }
-
-  await writeBytesIfChanged(layout.versionBin, input.binBytes, writes);
-  try {
-    await chmod(layout.versionBin, 0o755);
-  } catch (error) {
-    throw targetError(`cannot chmod ${layout.versionBin}: ${errorMessage(error)}`, "IO");
+  if (state.current === input.version
+    && await pathKind(layout.currentLink) === "symlink"
+    && resolve(dirname(layout.currentLink), await readlink(layout.currentLink)) === layout.versionDir
+    && await pathKind(layout.binLink) === "symlink"
+    && resolve(dirname(layout.binLink), await readlink(layout.binLink)) === layout.versionBin
+    && writes.length === 0) {
+    return { status: "already", exit: EXIT_CODES.OK, writes, current: state.current };
   }
   await pointLink(layout.currentLink, layout.versionDir, writes);
   await pointLink(layout.binLink, layout.versionBin, writes);
@@ -240,7 +424,7 @@ export type CliRollbackInput = {
 };
 
 export type CliRollbackResult = {
-  status: "rolled-back" | "no-previous-version";
+  status: "rolled-back" | "no-previous-version" | "conflict";
   exit: number;
   writes: string[];
   current: string | null;
@@ -255,6 +439,22 @@ export async function rollbackCli(input: CliRollbackInput): Promise<CliRollbackR
     return { status: "no-previous-version", exit: EXIT_CODES.REFUSED_UNSAFE, writes, current: state.current };
   }
   const layout = cliLayout(input.home, previous, binName);
+  let intact = false;
+  try {
+    const manifest = await readInstallManifest(join(layout.versionDir, CLI_PAYLOAD_MANIFEST));
+    const pkg = await packageJson(join(layout.versionDir, "package.json"));
+    if (manifest && manifest.entries.every((file) => file.target === "cli"
+      && file.marker === INSTALL_MANIFEST_MARKER && file.version === previous)
+      && pkg.version === previous && pkg.bin !== null && typeof pkg.bin === "object"
+      && "classifier" in pkg.bin && typeof pkg.bin.classifier === "string") {
+      intact = await payloadMatches(layout.versionDir, manifest, packagePath(pkg.bin.classifier), `bin/${binName}`);
+    }
+  } catch {
+    intact = false;
+  }
+  if (!intact) {
+    return { status: "conflict", exit: EXIT_CODES.REFUSED_UNSAFE, writes, current: state.current };
+  }
   await pointLink(layout.currentLink, layout.versionDir, writes);
   await pointLink(layout.binLink, layout.versionBin, writes);
   state.current = previous;
@@ -273,32 +473,52 @@ export type CliUninstallInput = {
 };
 
 export type CliUninstallResult = {
-  status: "dry-run" | "removed";
+  status: "dry-run" | "removed" | "conflict";
   exit: number;
   writes: string[];
   wouldRemove: string[];
   restored: string | null;
 };
 
-export async function uninstallCli(input: CliUninstallInput): Promise<CliUninstallResult> {
+type CliRemovalPlan =
+  | { status: "conflict" }
+  | { status: "ready"; layout: CliLayout; owned: string[]; backup: Buffer | undefined };
+
+async function planCliRemoval(input: CliUninstallInput): Promise<CliRemovalPlan> {
   const binName = input.binName ?? "classifier";
   const base = join(input.home, ".local", "share", "classifier");
   const stateFile = join(base, "install-state.json");
   const state = await readState(stateFile);
   const layout = cliLayout(input.home, state.current ?? "none", binName);
+  if (state.displaced && (resolve(state.displaced.bin) !== resolve(layout.binLink)
+    || resolve(state.displaced.backup) !== resolve(layout.displacedBackup))) {
+    return { status: "conflict" };
+  }
   const owned: string[] = [];
   const binKind = await pathKind(layout.binLink);
   if (binKind === "symlink") {
-    const resolved = resolve(dirname(layout.binLink), await readlink(layout.binLink));
-    const underBase = resolved === layout.versionBin || resolved.startsWith(base + "/");
-    if (underBase) owned.push(layout.binLink);
+    const target = resolve(dirname(layout.binLink), await readlink(layout.binLink));
+    if (target === layout.versionBin || target.startsWith(base + "/")) owned.push(layout.binLink);
   }
-  if ((await pathKind(layout.currentLink)) === "symlink") owned.push(layout.currentLink);
+  if (await pathKind(layout.currentLink) === "symlink") owned.push(layout.currentLink);
   for (const version of state.versions) {
-    const dir = join(base, "versions", version);
-    if ((await pathKind(dir)) === "dir") owned.push(dir);
+    const directory = join(base, "versions", version);
+    if (await pathKind(directory) === "dir") owned.push(directory);
   }
-  if ((await pathKind(stateFile)) !== "missing") owned.push(stateFile);
+  if (await pathKind(stateFile) !== "missing") owned.push(stateFile);
+  if (input.apply !== true || state.displaced === null) {
+    return { status: "ready", layout, owned, backup: undefined };
+  }
+  if (binKind !== "missing" && !owned.includes(layout.binLink)) return { status: "conflict" };
+  return { status: "ready", layout, owned, backup: await readFile(layout.displacedBackup) };
+}
+
+export async function uninstallCli(input: CliUninstallInput): Promise<CliUninstallResult> {
+  const plan = await planCliRemoval(input);
+  if (plan.status === "conflict") {
+    return { status: "conflict", exit: EXIT_CODES.REFUSED_UNSAFE, writes: [], wouldRemove: [], restored: null };
+  }
+  const { layout, owned, backup } = plan;
   if (input.apply !== true) {
     return { status: "dry-run", exit: EXIT_CODES.OK, writes: [], wouldRemove: owned, restored: null };
   }
@@ -315,10 +535,9 @@ export async function uninstallCli(input: CliUninstallInput): Promise<CliUninsta
     writes.push(path);
   }
   let restored: string | null = null;
-  if (state.displaced !== null) {
-    const backup = await readFile(state.displaced.backup);
-    await writeBytesIfChanged(state.displaced.bin, backup, writes);
-    restored = state.displaced.bin;
+  if (backup !== undefined) {
+    await writeBytesIfChanged(layout.binLink, backup, writes);
+    restored = layout.binLink;
   }
   return { status: "removed", exit: EXIT_CODES.OK, writes, wouldRemove: owned, restored };
 }
