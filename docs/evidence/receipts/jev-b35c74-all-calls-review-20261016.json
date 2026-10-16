@@ -1,0 +1,126 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_51fa095a3fae29d756eb620df4dc2056c2b5f694afae3ae10bfe9a619b484ca9",
+ "limitations": [
+  "Exact git-archive build and physical recorded fixture package. No parent/full-main-CI, model-quality or provider-call claim. Initial throwaway harness selected unsupported muse hint and then incorrect screen contract; corrected to committed default profile and hint contract without changing source or fixtures."
+ ],
+ "operation": "jev-b35c.74.all-calls-native-review",
+ "parameters": {
+  "subject_sha256": "eb9b20b2849aa59c8e26987a90b888dd153751c6770ee708f68f1463b7e14288"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "actual_install_repeat_and_mixed_refusal": [
+   {
+    "bad": false,
+    "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-valid-dD8WMz/consumer",
+    "first": {
+     "exit": 0,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "default",
+       "status": "installed"
+      },
+      {
+       "family": "hint",
+       "profile": "default",
+       "status": "installed"
+      }
+     ],
+     "writes": [
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/supported-contract/good-home/.omp/agent/hooks/pre/jev-gate.ts",
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/supported-contract/good-home/.omp/agent/config.yml",
+      "/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/supported-contract/good-home/.omp/agent/jev-shims.json"
+     ]
+    },
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/supported-contract/good-home",
+    "second": {
+     "exit": 0,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "default",
+       "status": "already"
+      },
+      {
+       "family": "hint",
+       "profile": "default",
+       "status": "already"
+      }
+     ],
+     "writes": []
+    }
+   },
+   {
+    "bad": true,
+    "consumer": "/Users/josh/Developer/jev/var/agent-tmp/native74-f1c-review.59421/advisory-null-ybnrb4/consumer",
+    "first": {
+     "exit": 4,
+     "families": [
+      {
+       "family": "hint",
+       "profile": "default",
+       "reason": "native entry registers a malformed tool: hint",
+       "status": "refused"
+      }
+     ],
+     "writes": []
+    },
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-20-review.59421/supported-contract/bad-home",
+    "second": null
+   }
+  ],
+  "candidate": "20da0ca1c62e450709eb230a66b5c8a3f2600e5e",
+  "compiled_sha256": "194e676fa4959b4ef01a7cc017103e0d702d4122234bcf1ed8f8c2618c7813cf",
+  "model_prompts": 0,
+  "native_controls": [
+   {
+    "advisory_listed": true,
+    "exit": 0,
+    "label": "enabled",
+    "marker_rows": 1,
+    "model_prompts": 0,
+    "stderr": "",
+    "stdout_sha256": "4b3f70780d47b2abf024defe25374319f7d081dee7c63796d732327e25129592"
+   },
+   {
+    "advisory_listed": false,
+    "exit": 0,
+    "label": "disabled",
+    "marker_rows": 0,
+    "model_prompts": 0,
+    "stderr": "",
+    "stdout_sha256": "6512f8e7d70c8bc311414d1077da4bd29eac28d8d132117d079c1261907fceba"
+   }
+  ],
+  "native_executable": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+  "native_stdin": "{\"id\": \"neg\", \"type\": \"negotiate_protocol\", \"protocolVersion\": 2}\n{\"id\": \"state\", \"type\": \"get_state\"}\n",
+  "negative_actual_files": [],
+  "original_installer_matrix": {
+   "exit": 0,
+   "files": [
+    "kit/test/install-cli.test.mjs",
+    "kit/test/omp-paths.test.mjs",
+    "kit/test/omp-config-merge.test.mjs",
+    "kit/test/install-omp-profile.test.mjs",
+    "kit/test/install-skills.test.mjs"
+   ],
+   "stderr": "",
+   "stdout": "TAP version 13\n# Subtest: fresh install lays out versions, current and the bin link\nok 1 - fresh install lays out versions, current and the bin link\n  ---\n  duration_ms: 11.243292\n  type: 'test'\n  ...\n# Subtest: re-run is already with zero writes\nok 2 - re-run is already with zero writes\n  ---\n  duration_ms: 6.369292\n  type: 'test'\n  ...\n# Subtest: a foreign bin without take-over refuses with exit 4 and stays byte-identical\nok 3 - a foreign bin without take-over refuses with exit 4 and stays byte-identical\n  ---\n  duration_ms: 2.111125\n  type: 'test'\n  ...\n# Subtest: take-over records the displaced bin and uninstall restores it\nok 4 - take-over records the displaced bin and uninstall restores it\n  ---\n  duration_ms: 9.159667\n  type: 'test'\n  ...\n# Subtest: rollback flips current to the previous version\nok 5 - rollback flips current to the previous version\n  ---\n  duration_ms: 5.144875\n  type: 'test'\n  ...\n# Subtest: rollback with a single version refuses without writes\nok 6 - rollback with a single version refuses without writes\n  ---\n  duration_ms: 4.170167\n  type: 'test'\n  ...\n# Subtest: a traversal version is refused as usage with no writes\nok 7 - a traversal version is refused as usage with no writes\n  ---\n  duration_ms: 1.200041\n  type: 'test'\n  ...\n# Subtest: a corrupt state file fails typed IO, not a raw parse throw\nok 8 - a corrupt state file fails typed IO, not a raw parse throw\n  ---\n  duration_ms: 1.092542\n  type: 'test'\n  ...\n# (node:1761) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: a declared-ON gate family installs its locked package shim on a measured profile\nok 9 - a declared-ON gate family installs its locked package shim on a measured profile\n  ---\n  duration_ms: 21.632542\n  type: 'test'\n  ...\n# Subtest: the fixture hook entry registers and judges through a stub pi\nok 10 - the fixture hook entry registers and judges through a stub pi\n  ---\n  duration_ms: 0.72\n  type: 'test'\n  ...\n# Subtest: the screen safe-side id executes the pass-on-unreachable contract test\nok 11 - the screen safe-side id executes the pass-on-unreachable contract test\n  ---\n  duration_ms: 1.490209\n  type: 'test'\n  ...\n# Subtest: an unknown safe-side id is refused before writing\nok 12 - an unknown safe-side id is refused before writing\n  ---\n  duration_ms: 7.648292\n  type: 'test'\n  ...\n# Subtest: a screen cannot use the gate refuse-on-unreachable contract test\nok 13 - a screen cannot use the gate refuse-on-unreachable contract test\n  ---\n  duration_ms: 5.712916\n  type: 'test'\n  ...\n# Subtest: a registered entry naming a nonexistent executable proof is refused\nok 14 - a registered entry naming a nonexistent executable proof is refused\n  ---\n  duration_ms: 6.306125\n  type: 'test'\n  ...\n# Subtest: a lock resolving the package to another commit is refused before writing\nok 15 - a lock resolving the package to another commit is refused before writing\n  ---\n  duration_ms: 6.069291\n  type: 'test'\n  ...\n# Subtest: a declared-OFF family is never installed\nok 16 - a declared-OFF family is never installed\n  ---\n  duration_ms: 4.471333\n  type: 'test'\n  ...\n# Subtest: an extension family on codex is unsupported\nok 17 - an extension family on codex is unsupported\n  ---\n  duration_ms: 4.327084\n  type: 'test'\n  ...\n# Subtest: an advisory family registers its packaged entry in profile config\nok 18 - an advisory family registers its packaged entry in profile config\n  ---\n  duration_ms: 8.870083\n  type: 'test'\n  ...\n# Subtest: a package entry without a native default export is refused before writing\nok 19 - a package entry without a native default export is refused before writing\n  ---\n  duration_ms: 6.790583\n  type: 'test'\n  ...\n# Subtest: a default export that is not a function is refused before writing\nok 20 - a default export that is not a function is refused before writing\n  ---\n  duration_ms: 5.561458\n  type: 'test'\n  ...\n# Subtest: a factory that never registers the declared event is refused before writing\nok 21 - a factory that never registers the declared event is refused before writing\n  ---\n  duration_ms: 5.442208\n  type: 'test'\n  ...\n# Subtest: a factory with only dead-code registration is refused before writing\nok 22 - a factory with only dead-code registration is refused before writing\n  ---\n  duration_ms: 6.474333\n  type: 'test'\n  ...\n# Subtest: an entry with an unresolvable import is refused before writing\nok 23 - an entry with an unresolvable import is refused before writing\n  ---\n  duration_ms: 5.356709\n  type: 'test'\n  ...\n# Subtest: a null handler registration is malformed and refused before writing\nok 24 - a null handler registration is malformed and refused before writing\n  ---\n  duration_ms: 5.687959\n  type: 'test'\n  ...\n# Subtest: a factory that throws when invoked is refused before writing\nok 25 - a factory that throws when invoked is refused before writing\n  ---\n  duration_ms: 5.889958\n  type: 'test'\n  ...\n# Subtest: a null tool registration is malformed and refused before writing\nok 26 - a null tool registration is malformed and refused before writing\n  ---\n  duration_ms: 7.026083\n  type: 'test'\n  ...\n# Subtest: a null registration before a valid one still refuses the whole entry\nok 27 - a null registration before a valid one still refuses the whole entry\n  ---\n  duration_ms: 15.318958\n  type: 'test'\n  ...\n# Subtest: an unknown host method call fails closed like the real host\nok 28 - an unknown host method call fails closed like the real host\n  ---\n  duration_ms: 12.927334\n  type: 'test'\n  ...\n# Subtest: a surface absent from the switch registry is refused with exit 4\nok 29 - a surface absent from the switch registry is refused with exit 4\n  ---\n  duration_ms: 4.95575\n  type: 'test'\n  ...\n# Subtest: a registry surface with a null off switch is refused with exit 4\nok 30 - a registry surface with a null off switch is refused with exit 4\n  ---\n  duration_ms: 5.780917\n  type: 'test'\n  ...\n# Subtest: a manifest naming a different switch path is refused with exit 4\nok 31 - a manifest naming a different switch path is refused with exit 4\n  ---\n  duration_ms: 4.68625\n  type: 'test'\n  ...\n# Subtest: a manifest without latency, test id, or over the handler limit is refused\nok 32 - a manifest without latency, test id, or over the handler limit is refused\n  ---\n  duration_ms: 6.010333\n  type: 'test'\n  ...\n# Subtest: a screen contract declaring refuse contradicts its surface type and is refused\nok 33 - a screen contract declaring refuse contradicts its surface type and is refused\n  ---\n  duration_ms: 5.914958\n  type: 'test'\n  ...\n# Subtest: a repo-path predecessor shim is refused and stays byte-identical\nok 34 - a repo-path predecessor shim is refused and stays byte-identical\n  ---\n  duration_ms: 8.10775\n  type: 'test'\n  ...\n# Subtest: a hardlink predecessor conflicts unless migrated with backup\nok 35 - a hardlink predecessor conflicts unless migrated with backup\n  ---\n  duration_ms: 9.62075\n  type: 'test'\n  ...\n# Subtest: re-run is already with zero writes\nok 36 - re-run is already with zero writes\n  ---\n  duration_ms: 7.942959\n  type: 'test'\n  ...\n# Subtest: install copies the packaged skill tree into one store with a marker\nok 37 - install copies the packaged skill tree into one store with a marker\n  ---\n  duration_ms: 13.132916\n  type: 'test'\n  ...\n# Subtest: re-run is already with zero writes\nok 38 - re-run is already with zero writes\n  ---\n  duration_ms: 6.248375\n  type: 'test'\n  ...\n# Subtest: a hand-written skill file stays byte-identical on conflict\nok 39 - a hand-written skill file stays byte-identical on conflict\n  ---\n  duration_ms: 2.8075\n  type: 'test'\n  ...\n# Subtest: uninstall dry-runs by default and removes only marked files on apply\nok 40 - uninstall dry-runs by default and removes only marked files on apply\n  ---\n  duration_ms: 4.446959\n  type: 'test'\n  ...\n# Subtest: uninstall without a marker refuses an unmarked tree\nok 41 - uninstall without a marker refuses an unmarked tree\n  ---\n  duration_ms: 1.327083\n  type: 'test'\n  ...\n# Subtest: merge appends missing entries once and re-run is already\nok 42 - merge appends missing entries once and re-run is already\n  ---\n  duration_ms: 11.82775\n  type: 'test'\n  ...\n# Subtest: missing extensions key is added\nok 43 - missing extensions key is added\n  ---\n  duration_ms: 1.77375\n  type: 'test'\n  ...\n# Subtest: commented entries are not treated as installed\nok 44 - commented entries are not treated as installed\n  ---\n  duration_ms: 1.742625\n  type: 'test'\n  ...\n# Subtest: dedup matches by resolved path and by basename\nok 45 - dedup matches by resolved path and by basename\n  ---\n  duration_ms: 1.174125\n  type: 'test'\n  ...\n# Subtest: an inline empty extensions value refuses with exit 4 and stays byte-identical\nok 46 - an inline empty extensions value refuses with exit 4 and stays byte-identical\n  ---\n  duration_ms: 2.020666\n  type: 'test'\n  ...\n# Subtest: corrupt YAML fails without writing\nok 47 - corrupt YAML fails without writing\n  ---\n  duration_ms: 1.16875\n  type: 'test'\n  ...\n# Subtest: CRLF files keep every host entry\nok 48 - CRLF files keep every host entry\n  ---\n  duration_ms: 1.34725\n  type: 'test'\n  ...\n# Subtest: a nested map item under extensions fails without writing\nok 49 - a nested map item under extensions fails without writing\n  ---\n  duration_ms: 1.169\n  type: 'test'\n  ...\n# Subtest: quoted items with shell-special characters merge verbatim\nok 50 - quoted items with shell-special characters merge verbatim\n  ---\n  duration_ms: 1.9055\n  type: 'test'\n  ...\n# Subtest: an absolute dev-path predecessor is preserved\nok 51 - an absolute dev-path predecessor is preserved\n  ---\n  duration_ms: 1.505167\n  type: 'test'\n  ...\n# Subtest: a read-back that drops a host entry throws\nok 52 - a read-back that drops a host entry throws\n  ---\n  duration_ms: 0.312125\n  type: 'test'\n  ...\n# Subtest: rollback restores the backup bytes\nok 53 - rollback restores the backup bytes\n  ---\n  duration_ms: 3.192459\n  type: 'test'\n  ...\n# Subtest: OMP_PROFILE selects the named profile agent dir\nok 54 - OMP_PROFILE selects the named profile agent dir\n  ---\n  duration_ms: 0.800417\n  type: 'test'\n  ...\n# Subtest: empty OMP_PROFILE resolves to the default agent dir, shadowing PI_PROFILE\nok 55 - empty OMP_PROFILE resolves to the default agent dir, shadowing PI_PROFILE\n  ---\n  duration_ms: 0.131333\n  type: 'test'\n  ...\n# Subtest: unset profiles resolve to the default agent dir\nok 56 - unset profiles resolve to the default agent dir\n  ---\n  duration_ms: 0.053542\n  type: 'test'\n  ...\n# Subtest: unset OMP_PROFILE falls back to PI_PROFILE\nok 57 - unset OMP_PROFILE falls back to PI_PROFILE\n  ---\n  duration_ms: 0.057375\n  type: 'test'\n  ...\n# Subtest: a custom absolute PI_CODING_AGENT_DIR wins when no OMP_PROFILE is set\nok 58 - a custom absolute PI_CODING_AGENT_DIR wins when no OMP_PROFILE is set\n  ---\n  duration_ms: 0.061042\n  type: 'test'\n  ...\n# Subtest: a legacy-derived PI_CODING_AGENT_DIR falls through to the PI chain\nok 59 - a legacy-derived PI_CODING_AGENT_DIR falls through to the PI chain\n  ---\n  duration_ms: 0.067375\n  type: 'test'\n  ...\n# Subtest: a relative PI_CODING_AGENT_DIR is refused as usage\nok 60 - a relative PI_CODING_AGENT_DIR is refused as usage\n  ---\n  duration_ms: 0.21375\n  type: 'test'\n  ...\n# Subtest: reserved and traversal profile names are refused\nok 61 - reserved and traversal profile names are refused\n  ---\n  duration_ms: 0.195125\n  type: 'test'\n  ...\n# Subtest: default profile name maps to the default agent dir\nok 62 - default profile name maps to the default agent dir\n  ---\n  duration_ms: 0.21475\n  type: 'test'\n  ...\n# Subtest: config path defaults to the resolved agent dir\nok 63 - config path defaults to the resolved agent dir\n  ---\n  duration_ms: 0.405333\n  type: 'test'\n  ...\n# Subtest: an absolute PI_CONFIG_DIR overrides the config path\nok 64 - an absolute PI_CONFIG_DIR overrides the config path\n  ---\n  duration_ms: 0.101334\n  type: 'test'\n  ...\n# Subtest: a relative PI_CONFIG_DIR is refused as usage\nok 65 - a relative PI_CONFIG_DIR is refused as usage\n  ---\n  duration_ms: 0.065333\n  type: 'test'\n  ...\n1..65\n# tests 65\n# suites 0\n# pass 65\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 316.25575\n"
+  },
+  "prepare": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "\n> jev-kit@0.0.0 prepare\n> node scripts/copy-questions.mjs && tsc -p tsconfig.json\n\n"
+  },
+  "scope": "Native entry installer only; parent72/19 original acceptance remains separate.",
+  "source_sha256": "eb9b20b2849aa59c8e26987a90b888dd153751c6770ee708f68f1463b7e14288",
+  "supported_node22_18": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "TAP version 13\n# (node:6255) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: a declared-ON gate family installs its locked package shim on a measured profile\nok 1 - a declared-ON gate family installs its locked package shim on a measured profile\n  ---\n  duration_ms: 23.126708\n  type: 'test'\n  ...\n# Subtest: the fixture hook entry registers and judges through a stub pi\nok 2 - the fixture hook entry registers and judges through a stub pi\n  ---\n  duration_ms: 0.609833\n  type: 'test'\n  ...\n# Subtest: the screen safe-side id executes the pass-on-unreachable contract test\nok 3 - the screen safe-side id executes the pass-on-unreachable contract test\n  ---\n  duration_ms: 0.616875\n  type: 'test'\n  ...\n# Subtest: an unknown safe-side id is refused before writing\nok 4 - an unknown safe-side id is refused before writing\n  ---\n  duration_ms: 6.733625\n  type: 'test'\n  ...\n# Subtest: a screen cannot use the gate refuse-on-unreachable contract test\nok 5 - a screen cannot use the gate refuse-on-unreachable contract test\n  ---\n  duration_ms: 6.356167\n  type: 'test'\n  ...\n# Subtest: a registered entry naming a nonexistent executable proof is refused\nok 6 - a registered entry naming a nonexistent executable proof is refused\n  ---\n  duration_ms: 6.50075\n  type: 'test'\n  ...\n# Subtest: a lock resolving the package to another commit is refused before writing\nok 7 - a lock resolving the package to another commit is refused before writing\n  ---\n  duration_ms: 4.971666\n  type: 'test'\n  ...\n# Subtest: a declared-OFF family is never installed\nok 8 - a declared-OFF family is never installed\n  ---\n  duration_ms: 4.993042\n  type: 'test'\n  ...\n# Subtest: an extension family on codex is unsupported\nok 9 - an extension family on codex is unsupported\n  ---\n  duration_ms: 4.154792\n  type: 'test'\n  ...\n# Subtest: an advisory family registers its packaged entry in profile config\nok 10 - an advisory family registers its packaged entry in profile config\n  ---\n  duration_ms: 9.735042\n  type: 'test'\n  ...\n# Subtest: a package entry without a native default export is refused before writing\nok 11 - a package entry without a native default export is refused before writing\n  ---\n  duration_ms: 5.788292\n  type: 'test'\n  ...\n# Subtest: a default export that is not a function is refused before writing\nok 12 - a default export that is not a function is refused before writing\n  ---\n  duration_ms: 5.853334\n  type: 'test'\n  ...\n# Subtest: a factory that never registers the declared event is refused before writing\nok 13 - a factory that never registers the declared event is refused before writing\n  ---\n  duration_ms: 5.042709\n  type: 'test'\n  ...\n# Subtest: a factory with only dead-code registration is refused before writing\nok 14 - a factory with only dead-code registration is refused before writing\n  ---\n  duration_ms: 5.5355\n  type: 'test'\n  ...\n# Subtest: an entry with an unresolvable import is refused before writing\nok 15 - an entry with an unresolvable import is refused before writing\n  ---\n  duration_ms: 4.947125\n  type: 'test'\n  ...\n# Subtest: a null handler registration is malformed and refused before writing\nok 16 - a null handler registration is malformed and refused before writing\n  ---\n  duration_ms: 5.651291\n  type: 'test'\n  ...\n# Subtest: a factory that throws when invoked is refused before writing\nok 17 - a factory that throws when invoked is refused before writing\n  ---\n  duration_ms: 4.975959\n  type: 'test'\n  ...\n# Subtest: a null tool registration is malformed and refused before writing\nok 18 - a null tool registration is malformed and refused before writing\n  ---\n  duration_ms: 5.598291\n  type: 'test'\n  ...\n# Subtest: a null registration before a valid one still refuses the whole entry\nok 19 - a null registration before a valid one still refuses the whole entry\n  ---\n  duration_ms: 5.364\n  type: 'test'\n  ...\n# Subtest: an unknown host method call fails closed like the real host\nok 20 - an unknown host method call fails closed like the real host\n  ---\n  duration_ms: 5.338042\n  type: 'test'\n  ...\n# Subtest: a surface absent from the switch registry is refused with exit 4\nok 21 - a surface absent from the switch registry is refused with exit 4\n  ---\n  duration_ms: 4.188875\n  type: 'test'\n  ...\n# Subtest: a registry surface with a null off switch is refused with exit 4\nok 22 - a registry surface with a null off switch is refused with exit 4\n  ---\n  duration_ms: 4.768792\n  type: 'test'\n  ...\n# Subtest: a manifest naming a different switch path is refused with exit 4\nok 23 - a manifest naming a different switch path is refused with exit 4\n  ---\n  duration_ms: 4.151625\n  type: 'test'\n  ...\n# Subtest: a manifest without latency, test id, or over the handler limit is refused\nok 24 - a manifest without latency, test id, or over the handler limit is refused\n  ---\n  duration_ms: 5.421542\n  type: 'test'\n  ...\n# Subtest: a screen contract declaring refuse contradicts its surface type and is refused\nok 25 - a screen contract declaring refuse contradicts its surface type and is refused\n  ---\n  duration_ms: 4.792917\n  type: 'test'\n  ...\n# Subtest: a repo-path predecessor shim is refused and stays byte-identical\nok 26 - a repo-path predecessor shim is refused and stays byte-identical\n  ---\n  duration_ms: 5.991958\n  type: 'test'\n  ...\n# Subtest: a hardlink predecessor conflicts unless migrated with backup\nok 27 - a hardlink predecessor conflicts unless migrated with backup\n  ---\n  duration_ms: 8.653334\n  type: 'test'\n  ...\n# Subtest: re-run is already with zero writes\nok 28 - re-run is already with zero writes\n  ---\n  duration_ms: 7.239542\n  type: 'test'\n  ...\n1..28\n# tests 28\n# suites 0\n# pass 28\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 260.2075\n"
+  }
+ }
+}
