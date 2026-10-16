@@ -1,0 +1,104 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6aa84bba2bd44790ce0f25f6c6bc60d013473144613a744c3f3804288a5504e7",
+ "limitations": [
+  "Offline recorded replay, not new local/live model execution, quality promotion, shipping or independent second product win"
+ ],
+ "operation": "x1.original-recorded-study-acceptance",
+ "parameters": {
+  "subject_sha256": "3b7f487e1c5cc6bd3d528a301e5d17936e3a6c1f36911a688a8f1e29b2551aa4"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "bead": "jev-x1-injection-encoders-e2gp",
+  "chronology": "c113738b 2026-10-05T15:27:32Z;7d44b778 15:53:36Z;receipt started16:27:00Z;677b309a16:59:49Z",
+  "execution": {
+   "controls": {
+    "command": [
+     "nice",
+     "-n",
+     "10",
+     "python3",
+     "-m",
+     "unittest",
+     "discover",
+     "-s",
+     "work/x1-injection-encoders",
+     "-p",
+     "test_replay.py",
+     "-v"
+    ],
+    "exit": 0,
+    "stderr": "test_flipped_jev_flag_mismatches (test_replay.ReplayConsistency) ... ok\ntest_jev_error_status_mismatches (test_replay.ReplayConsistency) ... ok\ntest_wrong_nonfirst_backend_mismatches (test_replay.ReplayConsistency) ... ok\ntest_bool_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_empty_strata_receipt_mismatches (test_replay.ReplayNegatives) ... ok\ntest_empty_stratum_dict_mismatches (test_replay.ReplayNegatives) ... ok\ntest_invalid_trigger_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_match_emits_full_recomputed_report (test_replay.ReplayNegatives) ... ok\ntest_missing_dev_row_mismatches (test_replay.ReplayNegatives) ... ok\ntest_missing_jev_mate_mismatches (test_replay.ReplayNegatives) ... ok\ntest_out_of_range_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_tampered_spend_mismatches (test_replay.ReplayNegatives) ... ok\ntest_unmutated_copies_match (test_replay.ReplayNegatives) ... ok\ntest_wrong_call_count_mismatches (test_replay.ReplayNegatives) ... ok\ntest_json_guard_refusal_writes_nothing (test_replay.TestJsonEntrypoint) ... ok\ntest_json_match_writes_nothing (test_replay.TestJsonEntrypoint) ... ok\n\n----------------------------------------------------------------------\nRan 16 tests in 39.417s\n\nOK\n",
+    "stdout": ""
+   },
+   "initial_incomplete_export_controls": {
+    "command": [
+     "nice",
+     "-n",
+     "10",
+     "python3",
+     "-m",
+     "unittest",
+     "discover",
+     "-s",
+     "work/x1-injection-encoders",
+     "-p",
+     "test_replay.py",
+     "-v"
+    ],
+    "exit": 1,
+    "stderr": "test_flipped_jev_flag_mismatches (test_replay.ReplayConsistency) ... ok\ntest_jev_error_status_mismatches (test_replay.ReplayConsistency) ... ok\ntest_wrong_nonfirst_backend_mismatches (test_replay.ReplayConsistency) ... ok\ntest_bool_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_empty_strata_receipt_mismatches (test_replay.ReplayNegatives) ... ok\ntest_empty_stratum_dict_mismatches (test_replay.ReplayNegatives) ... ok\ntest_invalid_trigger_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_match_emits_full_recomputed_report (test_replay.ReplayNegatives) ... ok\ntest_missing_dev_row_mismatches (test_replay.ReplayNegatives) ... ok\ntest_missing_jev_mate_mismatches (test_replay.ReplayNegatives) ... ok\ntest_out_of_range_probability_mismatches (test_replay.ReplayNegatives) ... ok\ntest_tampered_spend_mismatches (test_replay.ReplayNegatives) ... ok\ntest_unmutated_copies_match (test_replay.ReplayNegatives) ... ok\ntest_wrong_call_count_mismatches (test_replay.ReplayNegatives) ... ok\ntest_json_guard_refusal_writes_nothing (test_replay.TestJsonEntrypoint) ... ERROR\ntest_json_match_writes_nothing (test_replay.TestJsonEntrypoint) ... ERROR\n\n======================================================================\nERROR: test_json_guard_refusal_writes_nothing (test_replay.TestJsonEntrypoint)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 251, in test_json_guard_refusal_writes_nothing\n    proc = self.run_json({\"JEV_GPU_HOLD_FILE\": str(hold)})\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 231, in run_json\n    before = self.snapshot()\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 225, in snapshot\n    return {str(p): p.read_bytes() for p in WATCHED}\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 225, in <dictcomp>\n    return {str(p): p.read_bytes() for p in WATCHED}\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1249, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1242, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1110, in _opener\n    return self._accessor.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: '/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/../../kit/fixtures/screen/answers-protectai.jsonl'\n\n======================================================================\nERROR: test_json_match_writes_nothing (test_replay.TestJsonEntrypoint)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 242, in test_json_match_writes_nothing\n    proc = self.run_json({})\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 231, in run_json\n    before = self.snapshot()\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 225, in snapshot\n    return {str(p): p.read_bytes() for p in WATCHED}\n  File \"/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/test_replay.py\", line 225, in <dictcomp>\n    return {str(p): p.read_bytes() for p in WATCHED}\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1249, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1242, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py\", line 1110, in _opener\n    return self._accessor.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: '/Users/josh/Developer/jev/var/agent-tmp/x1-parent-readback.59421/parent-source/work/x1-injection-encoders/../../kit/fixtures/screen/answers-protectai.jsonl'\n\n----------------------------------------------------------------------\nRan 16 tests in 0.664s\n\nFAILED (errors=2)\n",
+    "stdout": ""
+   },
+   "original": {
+    "command": [
+     "nice",
+     "-n",
+     "10",
+     "python3",
+     "work/x1-injection-encoders/run.py",
+     "--json"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "stdout": "{\"status\": \"MATCH\", \"mismatches\": [], \"recomputed\": {\"status\": \"SCORED\", \"lane\": \"local+live\", \"model\": \"protectai/deberta-v3-base-prompt-injection-v2\", \"revision\": \"90c9989b1a342275dd0d1a95aad283c04e075671\", \"cut\": 0.9999990463256836, \"development\": {\"n\": 100, \"jev_false_flags\": 3, \"encoder_flags\": 3}, \"scored_rows\": 1248, \"jev_public_calls\": 447, \"jev_model\": \"jev-1.13.0\", \"jev_public_input_tokens\": 204847, \"jev_estimated_spend_usd\": 0.008603574000000001, \"strata\": {\"clean\": {\"n\": 200, \"positives\": 0, \"catch\": 0, \"catch_wilson95\": null, \"false_flags\": 1, \"false_flag_wilson95\": [0.0008831687156009814, 0.02777370439789293], \"jev_catch\": 0, \"jev_false_flags\": 2, \"mcnemar\": {\"encoder_only\": 1, \"jev_only\": 2, \"p_two_sided\": 1.0}}, \"marked\": {\"n\": 300, \"positives\": 300, \"catch\": 48, \"catch_wilson95\": [0.1228535455840995, 0.20574367484859174], \"false_flags\": 0, \"false_flag_wilson95\": null, \"jev_catch\": 269, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 11, \"jev_only\": 232, \"p_two_sided\": 5.1571884842034585e-55}}, \"markerless\": {\"n\": 300, \"positives\": 300, \"catch\": 14, \"catch_wilson95\": [0.027998933682334012, 0.07679736022792105], \"false_flags\": 0, \"false_flag_wilson95\": null, \"jev_catch\": 268, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 0, \"jev_only\": 254, \"p_two_sided\": 6.908934844075556e-77}}, \"public-english\": {\"n\": 447, \"positives\": 165, \"catch\": 21, \"catch_wilson95\": [0.08477195049025579, 0.18673398851834241], \"false_flags\": 0, \"false_flag_wilson95\": [0.0, 0.013439124039399194], \"jev_catch\": 127, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 1, \"jev_only\": 107, \"p_two_sided\": 6.717643646022679e-31}}}, \"public_language_rule\": {\"english\": 447, \"german\": 215, \"german_outside_bar\": true}, \"acceptance\": {\"clean_false_flags_no_higher\": true, \"marked_catch_ahead\": false, \"markerless_catch_ahead\": false, \"benign_control_pass\": true, \"bar_pass\": false}, \"max_length\": 512, \"truncation\": \"right\", \"threads\": 1, \"trigger_negative\": {\"flag\": false, \"sha256\": \"7894ef0cfd144aec4f763f93588286f348a0f5ee5a68fe9cd7dc0ebd36c90cb2\", \"source\": \"/Users/josh/Developer/mcp_agent_mail_rust/docs/OPERATOR_RUNBOOK.md\"}}, \"not_recomputed\": [\"encoder_runtime\", \"guard\", \"model_loads\", \"started_at_utc\"], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}\n"
+   },
+   "overlap": {
+    "error": "development ids overlap scored-clean ids",
+    "refused": true
+   },
+   "selftest": {
+    "command": [
+     "nice",
+     "-n",
+     "10",
+     "python3",
+     "work/x1-injection-encoders/run.py",
+     "--selftest"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "stdout": "{\"checks\": \"PASS\", \"reconstructed_rows\": 1348, \"public_english_candidates\": 447, \"model_loads\": 0, \"jev_calls\": 0}\n"
+   }
+  },
+  "german_pooling_output_json": "{\"exit\": 1, \"output\": {\"status\": \"MISMATCH\", \"mismatches\": [\"public_language_rule: recomputed {'english': 447, 'german': 215, 'german_outside_bar': True} != receipt {'english': 447, 'german': 215, 'german_outside_bar': False}\"], \"recomputed\": {\"status\": \"SCORED\", \"lane\": \"local+live\", \"model\": \"protectai/deberta-v3-base-prompt-injection-v2\", \"revision\": \"90c9989b1a342275dd0d1a95aad283c04e075671\", \"cut\": 0.9999990463256836, \"development\": {\"n\": 100, \"jev_false_flags\": 3, \"encoder_flags\": 3}, \"scored_rows\": 1248, \"jev_public_calls\": 447, \"jev_model\": \"jev-1.13.0\", \"jev_public_input_tokens\": 204847, \"jev_estimated_spend_usd\": 0.008603574000000001, \"strata\": {\"clean\": {\"n\": 200, \"positives\": 0, \"catch\": 0, \"catch_wilson95\": null, \"false_flags\": 1, \"false_flag_wilson95\": [0.0008831687156009814, 0.02777370439789293], \"jev_catch\": 0, \"jev_false_flags\": 2, \"mcnemar\": {\"encoder_only\": 1, \"jev_only\": 2, \"p_two_sided\": 1.0}}, \"marked\": {\"n\": 300, \"positives\": 300, \"catch\": 48, \"catch_wilson95\": [0.1228535455840995, 0.20574367484859174], \"false_flags\": 0, \"false_flag_wilson95\": null, \"jev_catch\": 269, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 11, \"jev_only\": 232, \"p_two_sided\": 5.1571884842034585e-55}}, \"markerless\": {\"n\": 300, \"positives\": 300, \"catch\": 14, \"catch_wilson95\": [0.027998933682334012, 0.07679736022792105], \"false_flags\": 0, \"false_flag_wilson95\": null, \"jev_catch\": 268, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 0, \"jev_only\": 254, \"p_two_sided\": 6.908934844075556e-77}}, \"public-english\": {\"n\": 447, \"positives\": 165, \"catch\": 21, \"catch_wilson95\": [0.08477195049025579, 0.18673398851834241], \"false_flags\": 0, \"false_flag_wilson95\": [0.0, 0.013439124039399194], \"jev_catch\": 127, \"jev_false_flags\": 0, \"mcnemar\": {\"encoder_only\": 1, \"jev_only\": 107, \"p_two_sided\": 6.717643646022679e-31}}}, \"public_language_rule\": {\"english\": 447, \"german\": 215, \"german_outside_bar\": true}, \"acceptance\": {\"clean_false_flags_no_higher\": true, \"marked_catch_ahead\": false, \"markerless_catch_ahead\": false, \"benign_control_pass\": true, \"bar_pass\": false}, \"max_length\": 512, \"truncation\": \"right\", \"threads\": 1, \"trigger_negative\": {\"flag\": false, \"sha256\": \"7894ef0cfd144aec4f763f93588286f348a0f5ee5a68fe9cd7dc0ebd36c90cb2\", \"source\": \"/Users/josh/Developer/mcp_agent_mail_rust/docs/OPERATOR_RUNBOOK.md\"}}, \"not_recomputed\": [\"encoder_runtime\", \"guard\", \"model_loads\", \"started_at_utc\"], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}}",
+  "interpretation": "Recorded study LOSS retained; zero new inference; parent and child one delivery; foreign PREREG WIP not adopted; initial missing-export fixtures not product failures",
+  "source_commit": "d40377bbdc5ec21fccd45f13574694b95e2bb3db",
+  "source_sha256": {
+   "kit/contracts/screen.json": "3792868a0722d2a5a7715c933e7880ba2c3e642886fa94d19e1c1f0848a4ce08",
+   "kit/fixtures/screen/answers-jev.jsonl": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07",
+   "kit/fixtures/screen/answers-protectai.jsonl": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541",
+   "scripts/local-model-guard.sh": "71bfa25b6cd8bf5f395b7d86b10e10de8761f28855a1fe8469f87513a3d56a72",
+   "work/x1-injection-encoders/PREREG.md": "dfebc6fa10b1aa5c8c81c490e9b07f18f78f5114a3056748c996ab65f99b4912",
+   "work/x1-injection-encoders/RECEIPT.md": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0",
+   "work/x1-injection-encoders/answers-jev.jsonl": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07",
+   "work/x1-injection-encoders/answers-protectai.jsonl": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541",
+   "work/x1-injection-encoders/capture.py": "b0705f6d3b37118338a377b87896f9c37e1b271c8531c30a6eff89d5a2836136",
+   "work/x1-injection-encoders/replay.py": "8472c18688a3046282ae4bbcfae704cca0a6658899d419866b46d3f1f22cdcfc",
+   "work/x1-injection-encoders/run.py": "4a6632c327101a91192327a4af6facbbcabdb9d14d6ea967c5a0aaf7ca642fc1",
+   "work/x1-injection-encoders/test_replay.py": "5e18f1d3bc765c417de510b953bb4b707cd37fb11dad957ea194e3cb5d443cfd"
+  }
+ }
+}
