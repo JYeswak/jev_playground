@@ -1,0 +1,186 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_a7f3d8aafe186cb4d0417f8b03344771c9b72c20719bad3d42519c63cd107cba",
+ "limitations": [
+  "Authorized post-observation full-vector reference; prior scalar failure retained. Author proof pending independent closure."
+ ],
+ "operation": "jev-b35c.23.d2-d7-acceptance",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_cases": [
+   {
+    "name": "id sets reproduce the frozen DEV 200 / held 600 split",
+    "tap": "ok 221 - id sets reproduce the frozen DEV 200 / held 600 split"
+   },
+   {
+    "name": "D2 held Jev ECE reproduces the authorized full-vector reference within unchanged .002",
+    "tap": "ok 222 - D2 held Jev ECE reproduces the authorized full-vector reference within unchanged .002"
+   },
+   {
+    "name": "D2 held ECE after Platt reproduces Clef .0246 within .002",
+    "tap": "ok 223 - D2 held ECE after Platt reproduces Clef .0246 within .002"
+   },
+   {
+    "name": "paired bootstrap CI reproduces [-.010, +.037] within .005 and reports NO DETECTED DIFFERENCE",
+    "tap": "ok 224 - paired bootstrap CI reproduces [-.010, +.037] within .005 and reports NO DETECTED DIFFERENCE"
+   },
+   {
+    "name": "D7 three committed runs give envelope 17 on run2 vs run3, McNemar reproduces .0076",
+    "tap": "ok 225 - D7 three committed runs give envelope 17 on run2 vs run3, McNemar reproduces .0076"
+   },
+   {
+    "name": "fewer than 3 committed runs returns NOT_CALIBRATED",
+    "tap": "ok 226 - fewer than 3 committed runs returns NOT_CALIBRATED"
+   },
+   {
+    "name": "planted quiet rerun (run3 re-scored against run2) stays quiet",
+    "tap": "ok 227 - planted quiet rerun (run3 re-scored against run2) stays quiet"
+   },
+   {
+    "name": "planted 2% shift (62 fixed-seed flips) alarms",
+    "tap": "ok 228 - planted 2% shift (62 fixed-seed flips) alarms"
+   },
+   {
+    "name": "missing probabilities refuse instead of looking calibrated",
+    "tap": "ok 229 - missing probabilities refuse instead of looking calibrated"
+   },
+   {
+    "name": "vector floor+renormalise matches hand-computed values and preserves argmax",
+    "tap": "ok 230 - vector floor+renormalise matches hand-computed values and preserves argmax"
+   },
+   {
+    "name": "coin-flip judge ECE exceeds its Bernoulli noise floor and fails the gate",
+    "tap": "ok 231 - coin-flip judge ECE exceeds its Bernoulli noise floor and fails the gate"
+   },
+   {
+    "name": "D2 reference requires derivation provenance even for a matching point",
+    "tap": "ok 232 - D2 reference requires derivation provenance even for a matching point"
+   },
+   {
+    "name": "D2 reference refuses an edited center even inside the numeric tolerance",
+    "tap": "ok 233 - D2 reference refuses an edited center even inside the numeric tolerance"
+   }
+  ],
+  "aggregate": {
+   "command": "npm test --prefix kit",
+   "exit": 0,
+   "fail": 0,
+   "full_output_sha256": "3009c7f6b362518f8bea91d1f428a66d7128a618aa152cae09fe758df70c86c4",
+   "pass": 364,
+   "receipt": "ev_c8943729e6367505d77167325252c5f695520f9c2c6d3a739576c4a31f2e4847",
+   "skipped": 0,
+   "tests": 364
+  },
+  "author": "DarkBear",
+  "bead": "jev-b35c.23",
+  "case_count": 13,
+  "d7_inputs": [
+   {
+    "canonicalMatchesExercised": true,
+    "path": "work/choice-banking77/rows-full-jev-run2.jsonl",
+    "sha256": "9aa10351dab2a945f9189796c2d1df2a38b694e35bd1664ea218ed133a587523"
+   },
+   {
+    "canonicalMatchesExercised": true,
+    "path": "work/choice-banking77/rows-full-jev-run3.jsonl",
+    "sha256": "f161ae5e21d15ff2343ecbcf497d36a66643e7b60f67df9e965693f2daa34447"
+   }
+  ],
+  "frozen_method": {
+   "all_19_original_functions_unchanged": true,
+   "bootstrap": "2000 paired resamples, seed0, endpoint tolerance .005",
+   "constants_unchanged": true,
+   "d7": "3 runs of3080 rows; envelope17, McNemar .0076; quiet unchanged and62-row shift exercised in actual TAP rows",
+   "dev": 200,
+   "fit": "DEV only",
+   "floor": "0.005",
+   "held": 600,
+   "tolerance": "0.002"
+  },
+  "governing_disposition": {
+   "authorization": "J-2026-10-15-07 Option A",
+   "bead": "jev-9odh",
+   "close_reason": "RubyMeadow non-author close: calibration 13/13 exit 0 on commit:3d48fa3e tree (frozen split, D2 ECE within .002, provenance/edited-center negatives pass); reviewer gate min_reviewers PASS reviewer:RubyMeadow; no live calls",
+   "closed_at": "2026-10-16T14:46:36.083889Z",
+   "scope": "Original .0276 scalar reference NOT reproduced by frozen full-vector method; historical FAIL retained. Authorized full-vector reference .03175198653414941 with original .002 tolerance, not prospective quality win."
+  },
+  "inputs": [
+   {
+    "actual": "60c42d092665d74e78db7b524c9c214a75215df699734388164136d34d60956e",
+    "expected": "60c42d092665d74e78db7b524c9c214a75215df699734388164136d34d60956e",
+    "path": "work/choice-banking77/full.jsonl"
+   },
+   {
+    "actual": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3",
+    "expected": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3",
+    "path": "work/choice-banking77/rows-full-jev.jsonl"
+   },
+   {
+    "actual": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099",
+    "expected": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099",
+    "path": "work/local-decision-arms/rows-clefflash-dev.jsonl"
+   },
+   {
+    "actual": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb",
+    "expected": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb",
+    "path": "work/local-decision-arms/rows-clefflash.jsonl"
+   },
+   {
+    "actual": "3ba2998c280ca25f58413f8b8f5e516f9439663d00cc262598ce059c5db01f78",
+    "expected": "3ba2998c280ca25f58413f8b8f5e516f9439663d00cc262598ce059c5db01f78",
+    "path": "work/local-decision-arms/run.py"
+   }
+  ],
+  "limits": [
+   "Reuse still-current exact source-bound admitted output; no duplicate unchanged test rerun or additional provider calls.",
+   "No assertion original scalar .0276 bar passed, equivalence/tie, stable tail estimate, fresh prospective model-quality win or new experiment.",
+   "Author handoff only; a non-author must verify and close. No production source edits in this continuation."
+  ],
+  "producer_checks": [
+   {
+    "exit": 0,
+    "id": "exact",
+    "stderr": "",
+    "stdout": "{\"checked\": \"work/local-decision-arms/calibration-reference.json\", \"jev_held_ece\": \"0.03175198653414941\", \"status\": \"OK\"}\n"
+   },
+   {
+    "exit": 1,
+    "id": "invalid-json",
+    "stderr": "REFUSE: Expecting value: line 1 column 1 (char 0)\n",
+    "stdout": ""
+   },
+   {
+    "exit": 1,
+    "id": "bare-reference",
+    "stderr": "REFUSE: reference/provenance disagreement with independent re-derivation\n",
+    "stdout": ""
+   }
+  ],
+  "source": [
+   {
+    "canonical_matches_exercised": true,
+    "path": "kit/test/measurement-calibration.test.mjs",
+    "sha256": "5aa743b8a63120776df72898803138b0061584aec2f271b5ce23f99ec5343265"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/local-decision-arms/derive-calibration-reference.py",
+    "sha256": "29e412de451d738ff3e611606e2eee4e6e8d182b30ea4d341b4af4c09ab22f86"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/local-decision-arms/calibration-reference.json",
+    "sha256": "eba57941b1678e86ecb6cdbc6650e89419b075916e9007b1d3ad6dff3db37be5"
+   },
+   {
+    "canonical_matches_exercised": true,
+    "path": "work/plan-20261004/specs/advanced-mathops.md",
+    "sha256": "e53b4bed8924e76d31571b0aefcf693d09aa78d0fcbd3149918f39216c094e51"
+   }
+  ],
+  "source_commit": "402757671b774b1149bc8d0526768a791b1902bf",
+  "status": "AUTHOR_ACCEPTANCE_COMPLETE_PENDING_NONAUTHOR"
+ }
+}
