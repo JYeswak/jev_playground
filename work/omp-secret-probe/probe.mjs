@@ -296,6 +296,9 @@ async function run(masking, inspectResult) {
       });
       child.once("error", rejectComplete);
       const exited = once(child, "exit");
+      // A failed spawn rejects this race leg too; the failure already surfaces via
+      // rejectComplete above, so swallow here to avoid an unhandled rejection crash.
+      exited.catch(() => {});
       child.stdin.write(JSON.stringify({ id: "n1", type: "negotiate_protocol", protocolVersion: 2 }) + "\n");
       timeoutId = setTimeout(() => rejectComplete(new Error(`local omp route timed out: requests=${requestCount}`)), 45_000);
       const toolResult = await captured;
