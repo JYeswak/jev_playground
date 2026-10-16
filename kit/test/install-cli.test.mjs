@@ -31,7 +31,10 @@ async function artifact(version, omit = []) {
   for (const name of Object.keys(pkg.dependencies)) {
     const destination = join(directory, 'node_modules', name);
     await mkdir(dirname(destination), { recursive: true });
-    await cp(join(PACKAGE_DIR, 'node_modules', name), destination, { recursive: true });
+    await cp(join(PACKAGE_DIR, 'node_modules', name), destination, {
+      recursive: true,
+      filter: (source) => !excluded.has(relative(PACKAGE_DIR, source)),
+    });
   }
   await writeFile(join(directory, 'package.json'), JSON.stringify({ ...pkg, version }));
   if (omit.length === 0) prepared.set(version, directory);
@@ -293,5 +296,28 @@ test('a displaced backup outside its owned location cannot be restored as the bi
   const refused = await uninstallCli({ home, apply: true });
   assert.equal(refused.exit, 4);
   assert.equal(refused.status, 'conflict');
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a missing real SDK runtime entry refuses before installation despite a working CLI version', async () => {
+  const home = await freshHome('installer-cli-incomplete-sdk');
+  const packageDir = await artifact('4.0.0', ['node_modules/@typesafe-ai/sdk/dist/index.mjs']);
+  const before = await snapshotTree(home);
+  await assert.rejects(installCli({ home, version: '4.0.0', packageDir }),
+    (error) => error.code === 'USAGE');
+  assert.deepEqual(await snapshotTree(home), before);
+});
+
+test('a declared asset cannot occupy the installer manifest namespace', async () => {
+  const home = await freshHome('installer-cli-reserved-manifest');
+  const packageDir = await artifact('5.0.0');
+  const pkg = JSON.parse(await readFile(join(packageDir, 'package.json'), 'utf8'));
+  await writeFile(join(packageDir, '.classifier-install.json'), JSON.stringify({ version: 2, entries: [] }));
+  await writeFile(join(packageDir, 'package.json'), JSON.stringify({
+    ...pkg, files: [...pkg.files, '.classifier-install.json'],
+  }));
+  const before = await snapshotTree(home);
+  await assert.rejects(installCli({ home, version: '5.0.0', packageDir }),
+    (error) => error.code === 'USAGE');
   assert.deepEqual(await snapshotTree(home), before);
 });

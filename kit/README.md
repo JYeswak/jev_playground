@@ -151,8 +151,11 @@ node kit/bin/jev.mjs install cli --apply --dir "$HOME" --robot
 
 For the `cli` target, `--dir` is the home-shaped installation root; omitted, it
 defaults to the current user's home. Use an owned temporary root for validation.
-The version comes from the prepared package. An incomplete runtime, mismatched
-version, or conflicting owned payload is refused rather than reported as installed.
+Before consumer writes, the installer runs the declared CLI version and imports
+production dependencies through Node's runtime resolver, including lazily loaded SDKs.
+Declared assets cannot occupy `.classifier-install.json`, the installer's own metadata
+namespace. An incomplete runtime, mismatched version, or conflicting owned payload
+is refused rather than reported as installed.
 A foreign bin is refused without modification. Repeating the same complete payload
 does not rewrite its files, state, or links; rollback verifies the previous payload
 before switching to it.

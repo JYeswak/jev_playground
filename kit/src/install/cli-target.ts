@@ -221,6 +221,9 @@ async function preparePayload(input: CliInstallInput): Promise<CliPayload> {
   const files = new Map<string, PayloadFile>();
   const collect = async (path: string): Promise<void> => {
     const rel = packagePath(relative(root, path).split(sep).join("/"));
+    if (rel === CLI_PAYLOAD_MANIFEST || rel.startsWith(CLI_PAYLOAD_MANIFEST + "/")) {
+      throw targetError(`prepared package asset uses the reserved installer manifest path: ${rel}`, "USAGE");
+    }
     if (files.has(rel)) return;
     let metadata;
     try {
@@ -278,6 +281,16 @@ async function preparePayload(input: CliInstallInput): Promise<CliPayload> {
       if (dependency.name !== name) throw targetError(`prepared runtime dependency identity differs: ${name}`, "USAGE");
       await collect(found);
       await dependencies(dependency, found);
+      // Dependency names come from the prepared package; load their actual runtime-selected ESM entries.
+      await new Promise<void>((accept, reject) => {
+        execFile(process.execPath, ["--input-type=module", "--eval", "await import(process.argv[1])", name], {
+          cwd: from, env: { HOME: input.home }, encoding: "utf8", timeout: 10000, maxBuffer: 1024 * 1024,
+        }, (cause, _stdout, stderr) => {
+          if (cause) {
+            reject(targetError(`prepared runtime dependency cannot load: ${name}: ${stderr.trim() || errorMessage(cause)}`, "USAGE"));
+          } else accept();
+        });
+      });
     }
   };
   await dependencies(pkg, root);
