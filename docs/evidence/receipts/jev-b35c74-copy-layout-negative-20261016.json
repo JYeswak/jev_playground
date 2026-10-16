@@ -1,0 +1,79 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_bc53f10be331617bf8dec584f67a4790d35cdd1513c5c741b95b2d6ab2ebb156",
+ "limitations": [
+  "Working runtime false refusal, not independently rebuilt artifact; native compatibility probe had unrelated legacy extension errors and did not prove installed discovery; no closure or global-health claim."
+ ],
+ "operation": "jev-b35c.74-copied-native-package-negative",
+ "parameters": {
+  "subject_sha256": "9dade647f53e398a3f3af718928218092233f7ce61d0e76a641c810105cc5419"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "bead": "jev-b35c.74",
+  "copied_package_probe": {
+   "exit": 0,
+   "result": {
+    "first": {
+     "exit": 4,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "muse",
+       "reason": "native entry does not load: gate: Stripping types is currently unsupported for files under node_modules, for \"/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/consumer/node_modules/jev-fixture-native/src/gate-hook.ts\"",
+       "status": "refused"
+      }
+     ],
+     "writes": []
+    },
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/home",
+    "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/home/.omp",
+    "repeat": {
+     "exit": 4,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "muse",
+       "reason": "native entry does not load: gate: Stripping types is currently unsupported for files under node_modules, for \"/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/consumer/node_modules/jev-fixture-native/src/gate-hook.ts\"",
+       "status": "refused"
+      }
+     ],
+     "writes": []
+    },
+    "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe"
+   }
+  },
+  "initial_harness_failure": {
+   "exit": 1,
+   "stderr": "node:internal/fs/promises:639\n  return new FileHandle(await PromisePrototypeThen(\n                        ^\n\nError: ENOENT: no such file or directory, open '/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-sdb565/home/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts'\n    at async open (node:internal/fs/promises:639:25)\n    at async readFile (node:internal/fs/promises:1252:14)\n    at async file:///Users/josh/Developer/jev/[eval1]:1:1990 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-sdb565/home/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts'\n}\n\nNode.js v22.23.3\n"
+  },
+  "native_compatibility_probe": {
+   "config_root": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/home/.omp",
+   "exit": 0,
+   "home": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.59421/profile-zKLFBe/home",
+   "installed_discovery_proven": false,
+   "profile": "muse",
+   "prompt_sent": false,
+   "ready": true,
+   "state_success": true,
+   "stderr_sha256": "056862c5e76a1642195bc79dd61526a43dcf2477c643f152c19edb2f7d877bf6",
+   "stdout_sha256": "a14f8484627d4fe8cfa60d56e4c984d4a219e6dac40375729412d32cc2a018aa",
+   "unrelated_extension_load_errors": true
+  },
+  "no_full_published_build_verdict": true,
+  "no_provider_or_model_prompt": true,
+  "published_candidate": "6bb53fc004ee14f96a4a7d904a14164f21905244",
+  "source_sha256": {
+   "kit/src/install/omp-profile-target.ts": "9dade647f53e398a3f3af718928218092233f7ce61d0e76a641c810105cc5419",
+   "kit/test/fixtures/installer/native-pkg/package.json": "4397e2a0d693bf39d48401168611522c30871ee01b384ec87d8646606c9a0c18",
+   "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts": "9e4304de82888d452747b34fbf4ffc99118c11ba438cf040217dcb2d4d5333f7"
+  },
+  "verdict": "REWORK",
+  "working_runtime_suite": {
+   "exit": 0,
+   "stdout_sha256": "7b099603e5fac45caf733d6fe08a99d7923b33ef736f981aadaf0d4a7c48ad76",
+   "tests": 55
+  }
+ }
+}
