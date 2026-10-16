@@ -38,6 +38,11 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
 
 ## 2026-10-01 → present — hardening and rollout
 
+- SDK boundary (`jev-b35c.71`): exercise the real client with an isolated
+  unavailable-SDK resolver instead of copying an incomplete source tree.
+  Missing-key and missing-SDK errors remain distinct; installed-SDK transport
+  controls remain active. No SDK install/removal or production-loader change.
+
 - Legacy alias canary (`jev-jh6f`): the missing-secret-manager test now injects
   its notifier, and a PATH trap rejects accidental default-notifier execution.
   HTTP-boundary tests replace policy-only tests; non-object JSON reports ERROR

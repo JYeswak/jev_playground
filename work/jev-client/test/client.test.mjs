@@ -61,31 +61,32 @@ test('an unset key is unconfigured, never a score', async () => {
   }
 });
 
-test('a key with no installed SDK is sdk-missing, not unconfigured, and makes no call', async () => {
-  // A fresh clone has no work/sdk/node_modules. Rebuild that layout: the client file alone, at
-  // the same relative depth, with no SDK beside it.
-  const { mkdtempSync, mkdirSync, copyFileSync } = await import('node:fs');
-  const { tmpdir } = await import('node:os');
-  const { join } = await import('node:path');
-  const { pathToFileURL, fileURLToPath } = await import('node:url');
-  const root = mkdtempSync(join(tmpdir(), 'jev-client-nosdk-'));
-  mkdirSync(join(root, 'work/jev-client/src'), { recursive: true });
-  mkdirSync(join(root, 'kit/src'), { recursive: true });
-  const copy = join(root, 'work/jev-client/src/index.ts');
-  copyFileSync(fileURLToPath(new URL('../../../kit/src/client.ts', import.meta.url)), copy);
-  copyFileSync(fileURLToPath(new URL('../../../kit/src/validate.ts', import.meta.url)), join(root, 'work/jev-client/src/validate.ts'));
-  copyFileSync(fileURLToPath(new URL('../../../kit/src/client.ts', import.meta.url)), join(root, 'kit/src/client.ts'));
-  copyFileSync(fileURLToPath(new URL('../../../kit/src/validate.ts', import.meta.url)), join(root, 'kit/src/validate.ts'));
-  const bare = await import(pathToFileURL(copy).href);
-  let called = false;
-  const r = await bare.askJev({
-    state: STATE, questions: QUESTIONS, apiKey: 'test-key',
-    fetchImpl: async () => { called = true; throw new Error('must not be reached'); },
+test('an unavailable SDK with a key is sdk-missing, not unconfigured, and makes no call', async () => {
+  // Exercise the real client and its full dependency graph without removing an installed SDK.
+  const { registerHooks } = await import('node:module');
+  const clientUrl = new URL('../../../kit/src/client.ts?unavailable-sdk', import.meta.url);
+  const hooks = registerHooks({
+    resolve(specifier, context, nextResolve) {
+      if (context.parentURL === clientUrl.href && specifier.endsWith('/@typesafe-ai/sdk/dist/index.mjs')) {
+        throw Object.assign(new Error('SDK dependency is unavailable'), { code: 'ERR_MODULE_NOT_FOUND' });
+      }
+      return nextResolve(specifier, context);
+    },
   });
-  assert.equal(r.ok, false);
-  assert.equal(r.reason, 'sdk-missing');
-  assert.match(r.error, /npm ci --prefix work\/sdk/);   // the fix is IN the error
-  assert.equal(called, false);
+  try {
+    const bare = await import(clientUrl.href);
+    let called = false;
+    const r = await bare.askJev({
+      state: STATE, questions: QUESTIONS, apiKey: 'test-key',
+      fetchImpl: async () => { called = true; throw new Error('must not be reached'); },
+    });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'sdk-missing');
+    assert.match(r.error, /npm ci --prefix work\/sdk/);   // the fix is IN the error
+    assert.equal(called, false);
+  } finally {
+    hooks.deregister();
+  }
 });
 
 test('HTTP 400 is reported as http with the body, not swallowed',
