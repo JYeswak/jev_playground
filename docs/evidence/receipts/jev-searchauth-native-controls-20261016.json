@@ -1,0 +1,327 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_e5fd869928bea839b33fea6fd6da74a41963e94b081a877d9698f4f461e2b147",
+ "limitations": [
+  "Partial actual standalone/resident healthy controls, not gateway repair, model-facing in-process absent-key rendering, exact server source binding or full92.1acceptance."
+ ],
+ "operation": "bounded_native_find_serving_controls",
+ "parameters": {
+  "consumer": "jev-b35c.36 / canonicalSEARCHAUTH92.1"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 26180,
+  "details": {
+   "artifact": {
+    "bytes": 194405408,
+    "initial_observed_sha256": "bdeb1626b99dc29d844146ea7940d367e61b1032b77e1c77880125f379ca2dda",
+    "real_executable": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+    "reported_version": "18.11.1",
+    "sha256_before_and_after": "bdeb1626b99dc29d844146ea7940d367e61b1032b77e1c77880125f379ca2dda",
+    "source_executable_equivalence": "UNVERIFIED; version/hash identify tested executable, not a source checkout or gateway server build"
+   },
+   "causal_contrast": "Same isolated registered model, role, inputs and denied-network OS policy; absent credential -> exit1/errors3/no judge model available; add ONLY nonsecret diagnostic fixture credential -> exit1/errors3/actual EPERM transport failures. Model definition is recognized; no-key result is not ordinary successful no-match. No real credential in either fixture.",
+   "credential_presence_contrast": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)\n(allow default)\n(deny network*)\n(deny file-write* (require-not (require-any (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative\") (literal \"/dev/null\"))))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.env\"))\n(deny file-read* (subpath \"/Users/josh/.omp\"))\n(deny file-read* (subpath \"/Users/josh/.pi\"))\n(deny file-read* (subpath \"/Users/josh/.claude\"))\n(deny file-read* (subpath \"/Users/josh/.agents\"))\n(deny file-read* (subpath \"/Users/josh/.codex\"))\n(deny file-read* (subpath \"/Users/josh/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/.env\"))\n(deny file-read* (subpath \"/Users/.omp\"))\n(deny file-read* (subpath \"/Users/.pi\"))\n(deny file-read* (subpath \"/Users/.claude\"))\n(deny file-read* (subpath \"/Users/.agents\"))\n(deny file-read* (subpath \"/Users/.codex\"))\n(deny file-read* (subpath \"/Users/.gemini\"))\n(deny file-read* (subpath \"/Users/.opencode\"))\n(deny file-read* (subpath \"/Users/.env\"))\n(deny file-read* (subpath \"/.omp\"))\n(deny file-read* (subpath \"/.pi\"))\n(deny file-read* (subpath \"/.claude\"))\n(deny file-read* (subpath \"/.agents\"))\n(deny file-read* (subpath \"/.codex\"))\n(deny file-read* (subpath \"/.gemini\"))\n(deny file-read* (subpath \"/.opencode\"))\n(deny file-read* (subpath \"/.env\"))",
+     "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+     "find",
+     "native find request state questions metadata",
+     "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/fixture",
+     "--json",
+     "-q"
+    ],
+    "contrast_models_sha256": "51540e97639825ad64a65edb944ca80b1ba4b8f59f7f9f86ead179b8e76fa351",
+    "control": "synthetic nonsecret dummy apiKey, same isolated model/settings/fixture, all network still denied",
+    "definition_before_sha256": "d46c9cf78e7b32b8c425e5acb20d30872ce6ed97a450ce7538aeab0a8a54888b",
+    "exit": 1,
+    "pid_started": 17774,
+    "stderr": "",
+    "stdout": "{\n  \"query\": \"native find request state questions metadata\",\n  \"root\": \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/fixture\",\n  \"elapsedMs\": 4554.43,\n  \"hits\": [],\n  \"threshold\": 0.2,\n  \"keywords\": [\n    \"native\",\n    \"find\",\n    \"request\",\n    \"state\",\n    \"question\",\n    \"metadata\"\n  ],\n  \"stats\": {\n    \"listed\": 1,\n    \"requests\": 3,\n    \"errors\": 3,\n    \"judged\": 0,\n    \"filesRead\": 1,\n    \"fileBytes\": 183,\n    \"inputTokens\": 0,\n    \"outputTokens\": 0,\n    \"cost\": 0,\n    \"apiMs\": 4539.658541999999,\n    \"windowsJudged\": 0,\n    \"windowsPruned\": 0,\n    \"mapCards\": 1,\n    \"failures\": [\n      \"filenames: judgment: every judge candidate failed: EPERM: Was there a typo in the url or port?\",\n      \"sketches: judgment: every judge candidate failed: EPERM: Was there a typo in the url or port?\",\n      \"verification: judgment: every judge candidate failed: EPERM: Was there a typo in the url or port?\"\n    ]\n  }\n}\n"
+   },
+   "fresh_authorized_positive": {
+    "argv": [
+     "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+     "--profile",
+     "codex",
+     "find",
+     "The canary runner logs and notifies ERROR when creating its child-start marker fails before starting the secret manager",
+     "/Users/josh/Developer/jev/scripts/jev-latest-canary-run.sh",
+     "--json",
+     "-q"
+    ],
+    "exit": 0,
+    "pid_started": 96759,
+    "stderr": "",
+    "stdout": "{\n  \"query\": \"The canary runner logs and notifies ERROR when creating its child-start marker fails before starting the secret manager\",\n  \"root\": \"/Users/josh/Developer/jev/scripts/jev-latest-canary-run.sh\",\n  \"elapsedMs\": 6260.758834,\n  \"hits\": [\n    {\n      \"rel\": \"scripts/jev-latest-canary-run.sh\",\n      \"nameScore\": 0.66,\n      \"contentScore\": 0.8706,\n      \"ranges\": [\n        {\n          \"start\": 1,\n          \"end\": 124,\n          \"p\": 0.8706,\n          \"snippet\": \"#!/usr/bin/env bash\"\n        }\n      ],\n      \"linesSeen\": 124,\n      \"truncated\": false\n    }\n  ],\n  \"threshold\": 0.2,\n  \"keywords\": [\n    \"canary\",\n    \"runner\",\n    \"logs\",\n    \"notifi\",\n    \"error\",\n    \"creat\",\n    \"child\",\n    \"start\",\n    \"marker\",\n    \"fail\",\n    \"secret\",\n    \"manager\"\n  ],\n  \"stats\": {\n    \"listed\": 1,\n    \"requests\": 3,\n    \"errors\": 0,\n    \"judged\": 1,\n    \"filesRead\": 1,\n    \"fileBytes\": 6346,\n    \"inputTokens\": 386,\n    \"outputTokens\": 0,\n    \"cost\": 0.000014668,\n    \"apiMs\": 6257.713375000002,\n    \"windowsJudged\": 1,\n    \"windowsPruned\": 0,\n    \"mapCards\": 1,\n    \"failures\": []\n  }\n}\n"
+   },
+   "fresh_isolated_missing_credential": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)\n(allow default)\n(deny network*)\n(deny file-write* (require-not (require-any (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative\") (literal \"/dev/null\"))))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.env\"))\n(deny file-read* (subpath \"/Users/josh/.omp\"))\n(deny file-read* (subpath \"/Users/josh/.pi\"))\n(deny file-read* (subpath \"/Users/josh/.claude\"))\n(deny file-read* (subpath \"/Users/josh/.agents\"))\n(deny file-read* (subpath \"/Users/josh/.codex\"))\n(deny file-read* (subpath \"/Users/josh/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/.env\"))\n(deny file-read* (subpath \"/Users/.omp\"))\n(deny file-read* (subpath \"/Users/.pi\"))\n(deny file-read* (subpath \"/Users/.claude\"))\n(deny file-read* (subpath \"/Users/.agents\"))\n(deny file-read* (subpath \"/Users/.codex\"))\n(deny file-read* (subpath \"/Users/.gemini\"))\n(deny file-read* (subpath \"/Users/.opencode\"))\n(deny file-read* (subpath \"/Users/.env\"))\n(deny file-read* (subpath \"/.omp\"))\n(deny file-read* (subpath \"/.pi\"))\n(deny file-read* (subpath \"/.claude\"))\n(deny file-read* (subpath \"/.agents\"))\n(deny file-read* (subpath \"/.codex\"))\n(deny file-read* (subpath \"/.gemini\"))\n(deny file-read* (subpath \"/.opencode\"))\n(deny file-read* (subpath \"/.env\"))",
+     "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+     "find",
+     "native find request state questions metadata",
+     "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/fixture",
+     "--json",
+     "-q"
+    ],
+    "environment_keys": [
+     "HOME",
+     "OMP_JUDGMENT_CACHE_DB",
+     "OMP_PROFILE",
+     "PATH",
+     "PI_CODING_AGENT_DIR",
+     "PI_CONFIG_FILES",
+     "PI_PROFILE",
+     "TMPDIR",
+     "XDG_CACHE_HOME",
+     "XDG_CONFIG_HOME",
+     "XDG_DATA_HOME",
+     "XDG_STATE_HOME"
+    ],
+    "exit": 1,
+    "no_secret_values_in_env": true,
+    "pid_started": 3811,
+    "stderr": "",
+    "stdout": "{\n  \"query\": \"native find request state questions metadata\",\n  \"root\": \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/fixture\",\n  \"elapsedMs\": 10.498207999999977,\n  \"hits\": [],\n  \"threshold\": 0.2,\n  \"keywords\": [\n    \"native\",\n    \"find\",\n    \"request\",\n    \"state\",\n    \"question\",\n    \"metadata\"\n  ],\n  \"stats\": {\n    \"listed\": 1,\n    \"requests\": 3,\n    \"errors\": 3,\n    \"judged\": 0,\n    \"filesRead\": 1,\n    \"fileBytes\": 183,\n    \"inputTokens\": 0,\n    \"outputTokens\": 0,\n    \"cost\": 0,\n    \"apiMs\": 2.871708000000126,\n    \"windowsJudged\": 0,\n    \"windowsPruned\": 0,\n    \"mapCards\": 1,\n    \"failures\": [\n      \"filenames: judgment: no judge model available\",\n      \"sketches: judgment: no judge model available\",\n      \"verification: judgment: no judge model available\"\n    ]\n  }\n}\n"
+   },
+   "fresh_successful_no_match": {
+    "argv": [
+     "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+     "--profile",
+     "codex",
+     "find",
+     "jev_no_match_804f58c5b31841aebef7c3972ef31a11",
+     "/Users/josh/Developer/jev/scripts/jev-latest-canary-run.sh",
+     "--json",
+     "-q"
+    ],
+    "exit": 0,
+    "pid_started": 21225,
+    "stderr": "",
+    "stdout": "{\n  \"query\": \"jev_no_match_804f58c5b31841aebef7c3972ef31a11\",\n  \"root\": \"/Users/josh/Developer/jev/scripts/jev-latest-canary-run.sh\",\n  \"elapsedMs\": 4226.573833,\n  \"hits\": [],\n  \"threshold\": 0.2,\n  \"keywords\": [\n    \"jev_no_match_804f58c5b31841aebef7c3972ef31a11\"\n  ],\n  \"stats\": {\n    \"listed\": 1,\n    \"requests\": 2,\n    \"errors\": 0,\n    \"judged\": 1,\n    \"filesRead\": 1,\n    \"fileBytes\": 376,\n    \"inputTokens\": 921,\n    \"outputTokens\": 0,\n    \"cost\": 0.00003499799999999999,\n    \"apiMs\": 4222.850209,\n    \"windowsJudged\": 0,\n    \"windowsPruned\": 1,\n    \"mapCards\": 1,\n    \"failures\": []\n  }\n}\n"
+   },
+   "initial_secret_scan_triage": {
+    "human_severity": "none",
+    "reason": "Matched value equals SHA256 of the exact351-byte credential-ABSENT synthetic model-definition JSON, not a credential. Renamed ambiguous measurement field to definition_before_sha256; digest value and original raw private capture preserved, no secret-scanner rule/threshold/allowlist change.",
+    "reported_match_redacted": "original_no_key_models_sha256: REDACTED",
+    "tool_exit": 1,
+    "tool_rule": "generic-api-key",
+    "triage_verdict": "false_positive"
+   },
+   "lane": "actual resident tool and fresh standalone native processes",
+   "limits": [
+    "Resident known-present and nonce controls plus fresh normalCLI positive/no-match and isolated absent-credential/contrast are actually exercised; no model-facing in-process absent-key rendering claim.",
+    "Current Clef primary still errors502; auth cause, resident gateway source/pool/skip and physical server build are UNOBSERVED.",
+    "Canonical92.1 remainsOPEN/unassigned; accountable controller is not admitted implementation doer/ETA. No new Worker/proxy/sharedconfig/secret/service/modelrole change."
+   ],
+   "model_and_spend": {
+    "billing": "NOT_QUERIED",
+    "comparison": "No paid comparator/model-quality run",
+    "fresh_configured_profile": "codex",
+    "fresh_served_backend_fingerprint": "NOT separately bound by standalone output; do not infer it only from profile label",
+    "native_stats_cost": "Reported estimates retained inside rawJSON, not actual billing",
+    "resident_attributed_provider": "cloudflare-workers-ai",
+    "resident_model": "@cf/cloudflare/clef-flash"
+   },
+   "no_key_fixture": {
+    "environment": {
+     "HOME": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/home",
+     "OMP_JUDGMENT_CACHE_DB": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/cache/judgment.db",
+     "OMP_PROFILE": "",
+     "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin",
+     "PI_CODING_AGENT_DIR": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/agent",
+     "PI_CONFIG_FILES": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/capture-overlay.yml",
+     "PI_PROFILE": "",
+     "TMPDIR": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/tmp",
+     "XDG_CACHE_HOME": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/cache",
+     "XDG_CONFIG_HOME": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/xdg-config",
+     "XDG_DATA_HOME": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/xdg-data",
+     "XDG_STATE_HOME": "/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative/xdg-state"
+    },
+    "models": {
+     "providers": {
+      "searchauth-no-key": {
+       "api": "typesafe",
+       "baseUrl": "http://127.0.0.1:11300",
+       "models": [
+        {
+         "contextWindow": 32768,
+         "cost": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "input": 0,
+          "output": 0
+         },
+         "id": "missing-credential",
+         "input": [
+          "text"
+         ],
+         "kind": "judge",
+         "maxTokens": 1024,
+         "name": "SEARCHAUTH absent credential fixture",
+         "reasoning": false
+        }
+       ]
+      }
+     }
+    },
+    "models_sha256": "d46c9cf78e7b32b8c425e5acb20d30872ce6ed97a450ce7538aeab0a8a54888b",
+    "only_metadata_input": "Public native-find-contract text from committed3ck9 template, no copied historical corpus",
+    "overlay": {
+     "extensions": [],
+     "modelRoles": {
+      "judge": "searchauth-no-key/missing-credential"
+     },
+     "retry": {
+      "fallbackChains": {
+       "judge": []
+      }
+     }
+    },
+    "policy": "(version 1)\n(allow default)\n(deny network*)\n(deny file-write* (require-not (require-any (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/negative\") (literal \"/dev/null\"))))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/searchauth-native.86553/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/agent-tmp/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/var/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/jev/.env\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.omp\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.pi\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.claude\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.agents\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.codex\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/Developer/.env\"))\n(deny file-read* (subpath \"/Users/josh/.omp\"))\n(deny file-read* (subpath \"/Users/josh/.pi\"))\n(deny file-read* (subpath \"/Users/josh/.claude\"))\n(deny file-read* (subpath \"/Users/josh/.agents\"))\n(deny file-read* (subpath \"/Users/josh/.codex\"))\n(deny file-read* (subpath \"/Users/josh/.gemini\"))\n(deny file-read* (subpath \"/Users/josh/.opencode\"))\n(deny file-read* (subpath \"/Users/josh/.env\"))\n(deny file-read* (subpath \"/Users/.omp\"))\n(deny file-read* (subpath \"/Users/.pi\"))\n(deny file-read* (subpath \"/Users/.claude\"))\n(deny file-read* (subpath \"/Users/.agents\"))\n(deny file-read* (subpath \"/Users/.codex\"))\n(deny file-read* (subpath \"/Users/.gemini\"))\n(deny file-read* (subpath \"/Users/.opencode\"))\n(deny file-read* (subpath \"/Users/.env\"))\n(deny file-read* (subpath \"/.omp\"))\n(deny file-read* (subpath \"/.pi\"))\n(deny file-read* (subpath \"/.claude\"))\n(deny file-read* (subpath \"/.agents\"))\n(deny file-read* (subpath \"/.codex\"))\n(deny file-read* (subpath \"/.gemini\"))\n(deny file-read* (subpath \"/.opencode\"))\n(deny file-read* (subpath \"/.env\"))"
+   },
+   "purpose": "SEARCHAUTH consumer observation, NOT full gateway/Case92.1 closure",
+   "resident_controls": {
+    "absent_query_hits": 0,
+    "meaning": "Five Clef primary502 error entries then five cloudflare-workers-ai/@cf/cloudflare/clef-flash stop entries; api/role typesafe is a protocol/role label, NOT evidence of TypeSafe provider billing.",
+    "model_usage_records": [
+     {
+      "api": "typesafe",
+      "error502": true,
+      "id": "6cea96a0",
+      "model": "clef-flash",
+      "provider": "clef",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "error",
+      "timestamp": "2026-10-16T11:36:09.011Z"
+     },
+     {
+      "api": "workers-ai-systemone",
+      "error502": false,
+      "id": "52160ad6",
+      "model": "@cf/cloudflare/clef-flash",
+      "provider": "cloudflare-workers-ai",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "stop",
+      "timestamp": "2026-10-16T11:36:10.447Z"
+     },
+     {
+      "api": "typesafe",
+      "error502": true,
+      "id": "41f8c578",
+      "model": "clef-flash",
+      "provider": "clef",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "error",
+      "timestamp": "2026-10-16T11:36:11.971Z"
+     },
+     {
+      "api": "workers-ai-systemone",
+      "error502": false,
+      "id": "9c3146e6",
+      "model": "@cf/cloudflare/clef-flash",
+      "provider": "cloudflare-workers-ai",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "stop",
+      "timestamp": "2026-10-16T11:36:12.607Z"
+     },
+     {
+      "api": "typesafe",
+      "error502": true,
+      "id": "ece0dc05",
+      "model": "clef-flash",
+      "provider": "clef",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "error",
+      "timestamp": "2026-10-16T11:36:14.138Z"
+     },
+     {
+      "api": "workers-ai-systemone",
+      "error502": false,
+      "id": "90181b46",
+      "model": "@cf/cloudflare/clef-flash",
+      "provider": "cloudflare-workers-ai",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "stop",
+      "timestamp": "2026-10-16T11:36:15.100Z"
+     },
+     {
+      "api": "typesafe",
+      "error502": true,
+      "id": "3bb64dfd",
+      "model": "clef-flash",
+      "provider": "clef",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "error",
+      "timestamp": "2026-10-16T11:36:22.445Z"
+     },
+     {
+      "api": "workers-ai-systemone",
+      "error502": false,
+      "id": "bc212e03",
+      "model": "@cf/cloudflare/clef-flash",
+      "provider": "cloudflare-workers-ai",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "stop",
+      "timestamp": "2026-10-16T11:36:22.989Z"
+     },
+     {
+      "api": "typesafe",
+      "error502": true,
+      "id": "21a588ad",
+      "model": "clef-flash",
+      "provider": "clef",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "error",
+      "timestamp": "2026-10-16T11:36:24.527Z"
+     },
+     {
+      "api": "workers-ai-systemone",
+      "error502": false,
+      "id": "c2db882a",
+      "model": "@cf/cloudflare/clef-flash",
+      "provider": "cloudflare-workers-ai",
+      "purpose": "find",
+      "role": "typesafe",
+      "runtime_version": "18.11.1",
+      "stopReason": "stop",
+      "timestamp": "2026-10-16T11:36:25.183Z"
+     }
+    ],
+    "positive": "actual canary marker-error implementation path,1hit atscripts/jev-latest-canary-run.sh",
+    "start": "2026-10-16T11:36:02.298864+00:00",
+    "successful_absent_query": "jev_no_match_804f58c5b31841aebef7c3972ef31a11"
+   },
+   "reuse": {
+    "helper_sha256": "6ac46a4177144e8af67627445c9b05a1d45d8c1e0dadbdd2b995136ab2ceb58a",
+    "helpers": "work/jev-3ck9/capture.mjs isolatedEnvironment/sandboxProfile ONLY",
+    "no_createCaptureFetch": "No fixed Noul answers or capture-only substitution used for live positive or auth negative."
+   }
+  },
+  "sha256": "7ea7ae2a191d4481ad8a973d4cee151cf900de3e7163a86d3f97d32a3ff6477a"
+ }
+}
