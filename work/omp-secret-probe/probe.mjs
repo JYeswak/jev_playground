@@ -62,6 +62,9 @@ function completion(res, model, message, finishReason, stream) {
 // Assigned by run(): the outer catch below must tear down the same child/server the
 // session started, or a timed-out route lingers (2026-10-11 CI stall).
 let activeTeardown = () => {};
+// Capability-detection child, owned by teardown as well as done(): the total
+// budget may expire while detection is still in flight.
+let detectionChild = null;
 // --no-ui exists only on newer omp (present 18.10.0, absent 18.3.0 which rejects it
 // as "unknown flag" before reading stdin, so the route times out with requests=0).
 // The probe already passes --no-extensions, so omitting --no-ui where unsupported
@@ -71,23 +74,29 @@ let noUiSupport;
 function ompSupportsNoUi() {
   if (noUiSupport !== undefined) return Promise.resolve(noUiSupport);
   return new Promise((resolve) => {
-    const done = (v) => { noUiSupport = v; resolve(v); };
+    let child;
+    const done = (v) => {
+      try { child?.kill("SIGKILL"); } catch { /* already gone */ }
+      detectionChild = null;
+      clearTimeout(timer);
+      noUiSupport = v; resolve(v);
+    };
     let timer;
     try {
-      const p = spawn("omp", ["--help"], { stdio: ["ignore", "pipe", "ignore"] });
+      child = spawn("omp", ["--help"], { stdio: ["ignore", "pipe", "ignore"] });
+      detectionChild = child;
       let text = "";
-      timer = setTimeout(() => { try { p.kill("SIGKILL"); } catch {} done(true); }, 15000);
+      timer = setTimeout(() => done(true), 15000);
       if (timer.unref) timer.unref();
-      p.stdout.on("data", (c) => {
+      child.stdout.on("data", (c) => {
         text += c;
-        if (text.length > 200000) { try { p.kill("SIGKILL"); } catch {} clearTimeout(timer); done(true); }
+        if (text.length > 200000) done(true);
       });
-      p.on("error", () => { clearTimeout(timer); done(true); });
-      p.on("close", () => {
-        clearTimeout(timer);
+      child.on("error", () => done(true));
+      child.on("close", () => {
         done(text.split("\n").some((l) => l.trimStart().startsWith("--no-ui")));
       });
-    } catch { clearTimeout(timer); done(true); }
+    } catch { done(true); }
   });
 }
 
@@ -153,12 +162,16 @@ async function run(masking, inspectResult) {
   // Hard teardown: the 2026-10-11 CI stall was node lingering after the 45 s timer
   // fired (child + open keep-alive sockets hold the loop; exitCode alone never exits).
   // Every exit path below goes through here; a wedged loop still exits via watchdog.
+  // Single total budget (jev-z66l REWORK): capability detection, route and
+  // cleanup share one 45 s deadline so a hanging --help cannot push the run
+  // past the CI killer on top of the route budget.
   function teardown() {
     try {
       clearTimeout(timeoutId);
       try { child?.stdin?.end(); } catch { /* already gone */ }
       try { child?.kill("SIGTERM"); } catch { /* never spawned */ }
       setTimeout(() => { try { child?.kill("SIGKILL"); } catch { /* gone */ } }, 2000).unref();
+      try { detectionChild?.kill("SIGKILL"); detectionChild = null; } catch { /* settled */ }
       for (const s of sockets) { try { s.destroy(); } catch { /* gone */ } }
       try { server?.closeAllConnections?.(); } catch { /* old node */ }
       try { server?.close(); } catch { /* never listened */ }
@@ -166,6 +179,8 @@ async function run(masking, inspectResult) {
     } catch { /* teardown never throws */ }
   }
   activeTeardown = teardown;
+  timeoutId = setTimeout(() => rejectComplete(
+    new Error(`local omp route timed out: requests=${requestCount}`)), 45_000);
 
   server = createServer(async (req, res) => {
     try {
@@ -300,24 +315,23 @@ async function run(masking, inspectResult) {
       // rejectComplete above, so swallow here to avoid an unhandled rejection crash.
       exited.catch(() => {});
       child.stdin.write(JSON.stringify({ id: "n1", type: "negotiate_protocol", protocolVersion: 2 }) + "\n");
-      timeoutId = setTimeout(() => rejectComplete(new Error(`local omp route timed out: requests=${requestCount}`)), 45_000);
       const toolResult = await captured;
       const promptStatus = await Promise.race([
         promptResult,
         new Promise((_, reject) => setTimeout(() => reject(new Error("prompt did not settle after local provider reply")), 10_000)),
       ]);
-      clearTimeout(timeoutId);
       child.stdin.end();
       await Promise.race([exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
-      if (child.exitCode === null) child.kill("SIGTERM");
-      server.close();
+      // Same bounded cleanup as failure paths: the total watchdog stays armed
+      // until teardown clears it, so a child that ignores EOF/SIGTERM still
+      // meets SIGKILL escalation, socket destruction and server close.
+      teardown();
       resolveComplete({
         ...toolResult,
         promptStatus,
         providerRequests: requestCount,
         toolExecutionEnds,
       });
-      await rm(scratch, { recursive: true, force: true });
     } catch (error) {
       try { lines?.close(); } catch { /* gone */ }
       teardown();
