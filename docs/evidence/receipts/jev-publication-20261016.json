@@ -1,0 +1,23 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_e7cc5d23a9d842b1439e126cd7d559f492dfcc82865e4d9dc32603a0baa11613",
+ "limitations": [
+  "This bundle preserves already independently verified transaction witnesses; it is not a new model experiment or deployment.",
+  "Original a5 index comparator canonical preimages were recovered from later raw snapshots matching both original action-time digests, not mislabelled as original raw captures.",
+  "No whole-main CI or .138 feature/release/installation claim.",
+  "Mixed JS/Python UBS5.4.17 scan timed out120s; no UBS patch/update and no timeout-to-PASS promotion.",
+  "Owner-held candidate counts remain preserved observations, not newly blessed immutable references."
+ ],
+ "operation": "preserve_already_verified_publication_witnesses",
+ "parameters": {
+  "commit": "80e0a00a859531669f6e3aa85b6992b4da91d6c7",
+  "witness_archive_sha256": "f82d9665aedd49887b0930fe9e1c756ef12e8ae09b8c8b28a67affdf8cb7aeb0"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bytes": 6178,
+  "path": "docs/evidence/receipts/jev-publication-20261016.outputs.json",
+  "sha256": "f13f8484d3a91af76cd4d622b0b69ad404b5acf6f6bea0204feea78a65799b0d"
+ }
+}

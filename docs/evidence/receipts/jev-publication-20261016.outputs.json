@@ -1,0 +1,56 @@
+{
+  "producer": "JadeSpire",
+  "recorded_at": "2026-10-16T04:38:32.042227+00:00",
+  "subject_commit": "80e0a00a859531669f6e3aa85b6992b4da91d6c7",
+  "product_commit": "a5d64c75f292f2810a42f7e44c7c2cea31a105b9",
+  "actual_apply": {
+    "exit": 0,
+    "stdout": "{\"repo\": \"/Users/josh/Developer/jev\", \"state\": \"MERGED\", \"reason\": null, \"applied\": true, \"pushed\": false, \"conflicts\": [], \"old\": \"9043cc123ffb52d481becf63d8492e5f121fb2dc\", \"up\": \"100422b9306114898c802478452427eeea85415a\", \"paths\": 80, \"resolutions\": {\".beads/issues.jsonl\": \"ours\", \"TESTS.md\": \"ours\", \"docs/evidence/receipts/jev-b35c.31-x2-validator-20261012.receipt.json\": \"ours\", \"docs/evidence/receipts/jev-b35c.31-x2-validator-20261012.result.json\": \"ours\", \"kit/test/doctor-repair.test.mjs\": \"theirs\", \"kit/test/measurement-calibration.test.mjs\": \"ours\", \"kit/test/measurement-conformal.test.mjs\": \"ours\", \"scripts/jev-latest-canary-run.sh\": \"ours\", \"scripts/test_jev_latest_canary_run.py\": \"ours\", \"work/gate-family/demand/census.py\": \"ours\", \"work/gate-family/demand/seam-audit.py\": \"ours\", \"work/jev-census/candidates.json\": \"ours\", \"work/x7-gate-rules/RECEIPT.md\": \"ours\", \"work/x7-gate-rules/recall_bound.py\": \"ours\", \"work/x7-gate-rules/test_np_cut.py\": \"ours\"}, \"new_head\": \"80e0a00a859531669f6e3aa85b6992b4da91d6c7\", \"worktree_written\": 4, \"index_updated\": 80, \"races\": [], \"elapsed_s\": 0.769}\n",
+    "stderr": "",
+    "outside_index_sha256": "58edd37feb2dd5b455f05c26dc411f7d36382e6d29e236a0c51462b4a8f874fb",
+    "foreign_x1_prereg_sha256": "670578d55bee0587c9c9002ebd8e21f162904dcaa8f1f2afd70cc74130f002ce"
+  },
+  "actual_publication": {
+    "exit": 0,
+    "stdout": "{\"repo\": \"/Users/josh/Developer/jev\", \"state\": \"AHEAD\", \"reason\": null, \"applied\": true, \"pushed\": true, \"conflicts\": [], \"old\": \"80e0a00a859531669f6e3aa85b6992b4da91d6c7\", \"up\": \"100422b9306114898c802478452427eeea85415a\", \"paths\": 0, \"resolutions\": {}, \"new_head\": \"80e0a00a859531669f6e3aa85b6992b4da91d6c7\", \"worktree_written\": 0, \"index_updated\": 0, \"races\": [], \"published_commits\": 111, \"remote_after\": \"80e0a00a859531669f6e3aa85b6992b4da91d6c7\", \"elapsed_s\": 4.069}\n",
+    "stderr": "",
+    "candidate": "80e0a00a859531669f6e3aa85b6992b4da91d6c7"
+  },
+  "native_closed_records": [
+    {
+      "id": "jev-jzgm",
+      "status": "closed",
+      "closed_at": "2026-10-16T04:11:58.053942Z",
+      "close_reason": "commit:80e0a00a859531669f6e3aa85b6992b4da91d6c7; non-author LavenderDune3865/gate175. Published exact snapshot uv unittest work/jev-jzgm/test_replay.py -v ->exit0 9/9; original amended cap3/noop CLI ->exit0 REPLAYED378/noopzero;30day INSUFFICIENT_COVERAGE0;cap4 NOT_IDENTIFIABLE2. Receipt verify0 ev_8ddb3d44a0799d04515018996e99e7f9113c1c521fe07569e0296d2c55dd0afb. Historical+183FAIL, retained-byte determinism and PROVISIONAL gate preserved; no global quality/CI/live claim."
+    },
+    {
+      "id": "jev-b35c.64",
+      "status": "closed",
+      "closed_at": "2026-10-16T04:28:21.064621Z",
+      "close_reason": "commit:80e0a00a859531669f6e3aa85b6992b4da91d6c7; investigation:docs/evidence/receipts/p2-census-20261013.json; investigation:docs/evidence/receipts/jev-b35c.31-x2-validator-20261012.receipt.json; investigation:docs/evidence/receipts/jev-jzgm-archive-replay-20261016.json. Non-author PubBridgeVerifier original administrative contract PASS comment3873/gate176. Actualremote80e+merge-base0 includes saved a5d64c75; exact owner resolution tree/all80entries and8/5/2/apply outside-index byte equality independently verified. Canonical receipt verify0 resolves ev_95d9681aa450147b4711463b879c9535645d395b3ec0e13512ba3c99d99b65a2 ev_c3cb7b5ee2f76e05828e2542ad16f126184a0bec75b317b787d2a7aea49cb3cd ev_8ddb3d44a0799d04515018996e99e7f9113c1c521fe07569e0296d2c55dd0afb. Both branch legitimate source/evidence and tracker histories preserved; actual jzgm published-before-LavenderDune3865/3866/gate175 postcondition checked without touching closed product. Administrative dependency only; no product authorship/closure credit, UBSJS timeout pass, whole-mainCI, release, model-quality or full.138 claim."
+    },
+    {
+      "id": "jev-b35c.63",
+      "status": "closed",
+      "closed_at": "2026-10-16T04:33:23.215203Z",
+      "close_reason": "Non-author full original staged-intent/save administrative acceptance independently verified3876; min_reviewers177 reviewer:StageSaveVerifier. Original action-time strict comparator exit0 and independently recomputed703608-byte canonical preimages match both historical df2da9ea hashes; exact four-path save and retained loader regression verified. Fresh actual origin80e ancestry exit0; canonical receipt verify exit0 ev_8ddb3d44a0799d04515018996e99e7f9113c1c521fe07569e0296d2c55dd0afb. commit:a5d64c75f292f2810a42f7e44c7c2cea31a105b9 investigation:docs/evidence/receipts/jev-jzgm-archive-replay-20261016.json. Administrative closure only; no new product capability, historical stager attribution, whole-mainCI or model-quality claim."
+    }
+  ],
+  "index_witness_archive": {
+    "path": "docs/evidence/receipts/jev-publication-20261016.index-witnesses.tar.gz",
+    "sha256": "f82d9665aedd49887b0930fe9e1c756ef12e8ae09b8c8b28a67affdf8cb7aeb0",
+    "bytes": 2136705
+  },
+  "independent_acceptance_refs": {
+    "product": "LavenderDune comments3865/3866 gate175",
+    "publication": "PubBridgeVerifier comments3873/3874 gate176",
+    "staged_save": "StageSaveVerifier comments3876/3877 gate177"
+  },
+  "boundaries": [
+    "This bundle preserves already independently verified transaction witnesses; it is not a new model experiment or deployment.",
+    "Original a5 index comparator canonical preimages were recovered from later raw snapshots matching both original action-time digests, not mislabelled as original raw captures.",
+    "No whole-main CI or .138 feature/release/installation claim.",
+    "Mixed JS/Python UBS5.4.17 scan timed out120s; no UBS patch/update and no timeout-to-PASS promotion.",
+    "Owner-held candidate counts remain preserved observations, not newly blessed immutable references."
+  ]
+}
