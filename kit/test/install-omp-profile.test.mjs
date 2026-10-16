@@ -192,15 +192,28 @@ test('a declared-ON gate family installs its locked package shim on a measured p
   assert.equal(lockedPackage.packages['node_modules/jev-fixture-native'].resolved, PACKAGE_GIT + '#' + PACKAGE_PIN);
   const resolvedImport = consumer.resolve(family.packageSpecifier);
   assert.equal(await readFile(resolvedImport, 'utf8'), await readFile(join(nativePkgDir, 'src', 'gate-hook.ts'), 'utf8'));
-  const result = await installProfileTargets({
-    ompHome,
-    profiles: ['default'],
-    families,
-    switchRegistry: await loadJson(surfacesFixture),
-    maxHandlerLatencyMs: 5000,
-  });
+  const probeDir = join(home, 'probe');
+  await mkdir(probeDir, { recursive: true });
+  const probeNonce = 'positive-install-marker';
+  process.env.JEV_HOOK_PROBE_DIR = probeDir;
+  process.env.JEV_HOOK_PROBE_NONCE = probeNonce;
+  let result;
+  try {
+    result = await installProfileTargets({
+      ompHome,
+      profiles: ['default'],
+      families,
+      switchRegistry: await loadJson(surfacesFixture),
+      maxHandlerLatencyMs: 5000,
+    });
+  } finally {
+    delete process.env.JEV_HOOK_PROBE_DIR;
+    delete process.env.JEV_HOOK_PROBE_NONCE;
+  }
   assert.equal(result.exit, 0);
   assert.equal(result.families[0].status, 'installed');
+  const loadRows = (await readFile(join(probeDir, 'hook-loads.jsonl'), 'utf8')).trim().split('\n').map((line) => JSON.parse(line));
+  assert.deepEqual(loadRows.map((row) => [row.nonce, row.family]), [[probeNonce, 'gate']]);
   const shim = await readFile(hookShimPath(ompHome, 'default', 'gate', 'pre'), 'utf8');
   assert.ok(shim.includes('classifier-shim-v2 family=gate'));
   assert.ok(shim.includes('native-pkg/src/gate-hook.ts'));
