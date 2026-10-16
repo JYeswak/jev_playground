@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_b71373077af01ac5cad80d5aac10f833110792cc8885de9b0e428cff37cb9c15",
+ "limitations": [
+  "UBS/gitleaks FP triage is author's; verifier relies on stage30 tree scan for secret absence."
+ ],
+ "operation": "jev-b35c.78-non-author-verify",
+ "parameters": {
+  "candidate": "6aa3904c"
+ },
+ "producer": "RubyMeadow",
+ "result_ref": {
+  "bytes": 205,
+  "sha256": "e0153f3478a1c0bc25a0b086d6f3a27e6bb021efae853f15eedf4ee2fb1251e0"
+ }
+}
