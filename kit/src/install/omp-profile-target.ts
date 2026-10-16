@@ -303,17 +303,26 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   if (!isRecord(loaded) || !("default" in loaded) || typeof loaded.default !== "function") {
     throw new Error("native entry has no default function export: " + familyId);
   }
-  // Every entry factory runs against a recording stub, hooks and extensions
-  // alike: a factory that throws is incompatible, whatever it declares.
-  // The stub records host calls instead of implementing them; only flat
-  // recorder calls are supported, deep host APIs fail closed.
+  // Every entry factory runs against a closed-world stub mirroring the
+  // observed host surface (on, registerTool, flat zod builders). Unknown
+  // host methods are absent, so calling one throws exactly as the real
+  // host would — nothing is fabricated. A factory that throws is
+  // incompatible, whatever it declares. Deep chained host APIs fail
+  // closed; the stub is a boundary probe, not an emulator.
   const calls: Array<{ method: string; args: unknown[] }> = [];
-  const stubPi = new Proxy({}, {
-    get(_target, property) {
-      if (property === "then") return undefined;
-      return (...args: unknown[]) => { calls.push({ method: String(property), args }); };
+  const stubPi = {
+    on: (event: string, handler: unknown) => {
+      calls.push({ method: "on", args: [event, handler] });
     },
-  });
+    registerTool: (tool: unknown) => {
+      calls.push({ method: "registerTool", args: [tool] });
+    },
+    zod: {
+      object: (shape: unknown) => { calls.push({ method: "zod.object", args: [shape] }); return {}; },
+      string: () => { calls.push({ method: "zod.string", args: [] }); return {}; },
+      array: (of: unknown) => { calls.push({ method: "zod.array", args: [of] }); return {}; },
+    },
+  };
   // The typeof check above proves callability; name the factory shape once
   // for the invocation below.
   const factory: (pi: unknown) => unknown = loaded.default as (pi: unknown) => unknown;
@@ -322,7 +331,16 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   } catch (error) {
     throw new Error("native entry factory throws: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
-  if (expectedEvent === undefined) return;
+  if (expectedEvent === undefined) {
+    // Advisory contract, derived from the in-repo extension exemplar: the
+    // entry must register at least one tool. Clean completion alone is not
+    // registration.
+    const toolsRegistered = calls.some((call) => call.method === "registerTool");
+    if (!toolsRegistered) {
+      throw new Error("native entry registers no tool: " + familyId);
+    }
+    return;
+  }
   // Hook contract: the declared event must be registered with a callable
   // handler. pi.on(name, null) does not count.
   const registered = calls.some((call) => call.method === "on" && call.args.length >= 2 && call.args[0] === expectedEvent && typeof call.args[1] === "function");

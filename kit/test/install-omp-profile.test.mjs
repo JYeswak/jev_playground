@@ -607,6 +607,28 @@ test('a factory that throws when invoked is refused before writing', async () =>
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
+test('an unknown host method call fails closed like the real host', async () => {
+  const home = await freshHome('installer-profile-unknown-method');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/unknown-method.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('factory throws'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
 test('a surface absent from the switch registry is refused with exit 4', async () => {
   const home = await freshHome('installer-profile-ghost');
   const ompHome = join(home, 'omp-home');
