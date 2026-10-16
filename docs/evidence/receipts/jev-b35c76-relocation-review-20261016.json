@@ -1,0 +1,139 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6311d25239011da58235b7945f530dc71ddf6f2d764855d117a4b348b2db285e",
+ "limitations": [
+  "Exact candidate relocation/classifier and real owning-test counterexample; no full-suite pass or parent close."
+ ],
+ "operation": "jev-b35c.76.relocation-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_consumer": {
+   "cause": "new nativePkgDir copies kit/fixtures/...; unknown-method.ts remains only at old kit/test/fixtures/...; owning negative cannot load intended entry",
+   "command": "node --test --test-name-pattern='^an unknown host method call fails closed like the real host$' kit/test/install-omp-profile.test.mjs",
+   "cwd": "exact git archive 1c50e398547cb79ec901008acdd59dca54675416",
+   "decisive_output": "assert.ok((result.families[0].reason ?? '').includes('factory throws')) -> ERR_ASSERTION expected true actual false, line653",
+   "exit": 1,
+   "fail": 1,
+   "pass": 0
+  },
+  "author": "WildDog",
+  "bead": "jev-b35c.76",
+  "candidate": "1c50e398547cb79ec901008acdd59dca54675416",
+  "classification": {
+   "classifier_source_sha256": "e8eaf8db1dc681549f7028929e0b2745f47be3eb0894b9a6451f343082eb804c",
+   "command": "unchanged tracked_tests(canonical_repo), exact before/after Git trees supplied by caller-owned GIT_INDEX_FILE snapshots",
+   "exit": 0,
+   "shared_index_mutated": false,
+   "stderr": "",
+   "stdout": "[{\"label\": \"before\", \"native_pkg_suites\": [\"kit/test/fixtures/installer/native-pkg/package.json\", \"kit/test/fixtures/installer/native-pkg/src/bad-handler.ts\", \"kit/test/fixtures/installer/native-pkg/src/dead-hook.ts\", \"kit/test/fixtures/installer/native-pkg/src/gate-hook.ts\", \"kit/test/fixtures/installer/native-pkg/src/hint-extension.ts\", \"kit/test/fixtures/installer/native-pkg/src/inert-hook.ts\", \"kit/test/fixtures/installer/native-pkg/src/lib-only.ts\", \"kit/test/fixtures/installer/native-pkg/src/missing-dep.ts\", \"kit/test/fixtures/installer/native-pkg/src/null-default.ts\", \"kit/test/fixtures/installer/native-pkg/src/null-tool.ts\", \"kit/test/fixtures/installer/native-pkg/src/screen-hook.ts\", \"kit/test/fixtures/installer/native-pkg/src/throwing.ts\", \"kit/test/fixtures/installer/native-pkg/src/unknown-method.ts\"], \"positive_consumer\": true}, {\"label\": \"after\", \"native_pkg_suites\": [\"kit/test/fixtures/installer/native-pkg/src/unknown-method.ts\"], \"positive_consumer\": true}]\n"
+  },
+  "limits": [
+   "Full five-suite matrix NOT_RUN after decisive real consumer failure; no repeated known-bad run.",
+   "Reused qualified generated dist only after source/package/lock/config/script/template/work inputs compared unchanged from40275767; fixture remains physically copied by owning tests.",
+   "No canonical source/fixture/gate edits or source compatibility workaround; author custody preserved.",
+   "One initial bad revision read failed before effects; corrected to actual Git-resolved candidate identity.",
+   "No provider/model/real-profile/service effects, no whole-main-CI/parent acceptance claim."
+  ],
+  "relocation": {
+   "moved": [
+    {
+     "identical": true,
+     "new_blob": "f685cfd595dfe5f52cbbe435f334d1e831b6ad2b",
+     "next": "kit/fixtures/installer/native-pkg/package.json",
+     "old": "kit/test/fixtures/installer/native-pkg/package.json",
+     "old_blob": "f685cfd595dfe5f52cbbe435f334d1e831b6ad2b"
+    },
+    {
+     "identical": true,
+     "new_blob": "32e5e0686ed0ab036d71b8ce819258557077be26",
+     "next": "kit/fixtures/installer/native-pkg/src/bad-handler.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/bad-handler.ts",
+     "old_blob": "32e5e0686ed0ab036d71b8ce819258557077be26"
+    },
+    {
+     "identical": true,
+     "new_blob": "f441f8cd65b6a8b825ead6fafdac1d72d88f7bb2",
+     "next": "kit/fixtures/installer/native-pkg/src/dead-hook.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/dead-hook.ts",
+     "old_blob": "f441f8cd65b6a8b825ead6fafdac1d72d88f7bb2"
+    },
+    {
+     "identical": true,
+     "new_blob": "d824d6c7ece6b72f4fea34b1d6ab75b7a5224909",
+     "next": "kit/fixtures/installer/native-pkg/src/gate-hook.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts",
+     "old_blob": "d824d6c7ece6b72f4fea34b1d6ab75b7a5224909"
+    },
+    {
+     "identical": true,
+     "new_blob": "39488878c64ff2251915fc79bf3569eaeb0eeb55",
+     "next": "kit/fixtures/installer/native-pkg/src/hint-extension.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/hint-extension.ts",
+     "old_blob": "39488878c64ff2251915fc79bf3569eaeb0eeb55"
+    },
+    {
+     "identical": true,
+     "new_blob": "943fe7ac2e1416a7f96b64495363486c27dc8f5a",
+     "next": "kit/fixtures/installer/native-pkg/src/inert-hook.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/inert-hook.ts",
+     "old_blob": "943fe7ac2e1416a7f96b64495363486c27dc8f5a"
+    },
+    {
+     "identical": true,
+     "new_blob": "d6177e0243ce7bc7167e9b6bccb8e35da5970d5c",
+     "next": "kit/fixtures/installer/native-pkg/src/lib-only.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/lib-only.ts",
+     "old_blob": "d6177e0243ce7bc7167e9b6bccb8e35da5970d5c"
+    },
+    {
+     "identical": true,
+     "new_blob": "9b5f03a74b0ecd708ece3a9737b34da663b4817b",
+     "next": "kit/fixtures/installer/native-pkg/src/missing-dep.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/missing-dep.ts",
+     "old_blob": "9b5f03a74b0ecd708ece3a9737b34da663b4817b"
+    },
+    {
+     "identical": true,
+     "new_blob": "28faacce5dc00aea083fee66ae2b2b9585ba4a26",
+     "next": "kit/fixtures/installer/native-pkg/src/null-default.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/null-default.ts",
+     "old_blob": "28faacce5dc00aea083fee66ae2b2b9585ba4a26"
+    },
+    {
+     "identical": true,
+     "new_blob": "76e47741f1243b34a13c42cc38331226b5734c7c",
+     "next": "kit/fixtures/installer/native-pkg/src/null-tool.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/null-tool.ts",
+     "old_blob": "76e47741f1243b34a13c42cc38331226b5734c7c"
+    },
+    {
+     "identical": true,
+     "new_blob": "3a076f286564223973dbdf94ec342c5b9a00aaf5",
+     "next": "kit/fixtures/installer/native-pkg/src/screen-hook.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/screen-hook.ts",
+     "old_blob": "3a076f286564223973dbdf94ec342c5b9a00aaf5"
+    },
+    {
+     "identical": true,
+     "new_blob": "7b075d1ca27789ea6f96b9277d6d4189a0fb7e7d",
+     "next": "kit/fixtures/installer/native-pkg/src/throwing.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/throwing.ts",
+     "old_blob": "7b075d1ca27789ea6f96b9277d6d4189a0fb7e7d"
+    }
+   ],
+   "moved_identically": 12,
+   "omitted": [
+    {
+     "expected": "kit/fixtures/installer/native-pkg/src/unknown-method.ts",
+     "old": "kit/test/fixtures/installer/native-pkg/src/unknown-method.ts",
+     "old_blob": "bbde13f904a1f373e26586050a6b6d58acebed8c"
+    }
+   ],
+   "pre_move_files": 13
+  },
+  "reviewer": "DarkBear",
+  "verdict": "REWORK"
+ }
+}
