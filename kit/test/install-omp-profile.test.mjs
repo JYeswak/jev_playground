@@ -15,6 +15,7 @@ const fixtureDir = join(testDir, 'fixtures', 'installer');
 const familiesFixture = join(fixtureDir, 'families.json');
 const contractsDir = join(fixtureDir, 'contracts');
 const surfacesFixture = join(fixtureDir, 'surfaces.json');
+const nativePkgDir = join(fixtureDir, 'native-pkg');
 const PACKAGE_PIN = 'c2d7871afbc14c190b564eebdbaf3de190c35f17';
 const PACKAGE_GIT = 'git+https://github.com/JYeswak/jev_playground.git';
 const GATE_SAFE_SIDE_TEST = 'installer.gate.unreachable.refuses';
@@ -31,7 +32,7 @@ async function loadJson(path) {
 
 async function makePackageResolution() {
   const host = await freshHome('installer-profile-package-resolution');
-  const packageManifest = await loadJson(join(kitRoot, 'package.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
   const resolved = PACKAGE_GIT + '#' + PACKAGE_PIN;
   const rootManifest = {
     name: 'installer-profile-fixture',
@@ -51,7 +52,7 @@ async function makePackageResolution() {
   };
   const packageRoot = join(host, 'node_modules', packageManifest.name);
   await mkdir(join(host, 'node_modules'), { recursive: true });
-  await symlink(kitRoot, packageRoot, 'dir');
+  await symlink(nativePkgDir, packageRoot, 'dir');
   await writeFile(join(host, 'package.json'), JSON.stringify(rootManifest, null, 2) + '\n');
   const packageLockPath = join(host, 'package-lock.json');
   await writeFile(packageLockPath, JSON.stringify(lock, null, 2) + '\n');
@@ -62,7 +63,7 @@ async function loadFamilies(contracts) {
   const families = (await loadJson(familiesFixture)).families;
   const packageResolution = await makePackageResolution();
   return families.map((family) => {
-    const subpath = family.id === 'gate' ? 'src/gate.ts' : family.id === 'screen' ? 'src/conformance.ts' : 'src/skill-hint.ts';
+    const subpath = family.id === 'gate' ? 'src/gate-hook.ts' : family.id === 'screen' ? 'src/screen-hook.ts' : 'src/hint-extension.ts';
     return {
       id: family.id,
       surfaceType: family.surface_type,
@@ -113,10 +114,14 @@ const safeSideContractTests = new Map([
     test: 'screenNetworkUnreachablePasses',
     run: (contract) => assertUnreachableSafeSide(contract, 'pass'),
   }],
+  ['installer.hint.unreachable.passes', {
+    test: 'hintAdvisoryUnreachablePasses',
+    run: (contract) => assertUnreachableSafeSide(contract, 'pass'),
+  }],
 ]);
 
 async function runSafeSideContractTest(id, contract) {
-  const packageManifest = await loadJson(join(kitRoot, 'package.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
   const registration = packageManifest.jev?.safe_side_tests?.[id];
   const registeredTest = safeSideContractTests.get(id);
   if (!registeredTest) throw new Error('safe-side manifest ID has no executable contract test: ' + id);
@@ -165,9 +170,9 @@ async function snapshotTree(root) {
   return out;
 }
 
-function shimPath(ompHome, profile, family) {
+function hookShimPath(ompHome, profile, family, hooksDir) {
   const agent = profile === 'default' ? 'agent' : `profiles/${profile}/agent`;
-  return join(ompHome, agent, 'shims', `jev-${family}.ts`);
+  return join(ompHome, agent, 'hooks', hooksDir, `jev-${family}.ts`);
 }
 
 test('a declared-ON gate family installs its locked package shim on a measured profile', async () => {
@@ -184,9 +189,9 @@ test('a declared-ON gate family installs its locked package shim on a measured p
   const consumerRoot = dirname(family.packageLockPath);
   const consumer = createRequire(join(consumerRoot, 'package.json'));
   const lockedPackage = await loadJson(family.packageLockPath);
-  assert.equal(lockedPackage.packages['node_modules/jev-kit'].resolved, PACKAGE_GIT + '#' + PACKAGE_PIN);
+  assert.equal(lockedPackage.packages['node_modules/jev-fixture-native'].resolved, PACKAGE_GIT + '#' + PACKAGE_PIN);
   const resolvedImport = consumer.resolve(family.packageSpecifier);
-  assert.equal(await readFile(resolvedImport, 'utf8'), await readFile(join(kitRoot, 'src', 'gate.ts'), 'utf8'));
+  assert.equal(await readFile(resolvedImport, 'utf8'), await readFile(join(nativePkgDir, 'src', 'gate-hook.ts'), 'utf8'));
   const result = await installProfileTargets({
     ompHome,
     profiles: ['default'],
@@ -196,17 +201,20 @@ test('a declared-ON gate family installs its locked package shim on a measured p
   });
   assert.equal(result.exit, 0);
   assert.equal(result.families[0].status, 'installed');
-  const shim = await readFile(shimPath(ompHome, 'default', 'gate'), 'utf8');
+  const shim = await readFile(hookShimPath(ompHome, 'default', 'gate', 'pre'), 'utf8');
   assert.ok(shim.includes('classifier-shim-v2 family=gate'));
-  assert.ok(shim.includes('kit/src/gate.ts'));
+  assert.ok(shim.includes('native-pkg/src/gate-hook.ts'));
   assert.equal(shim.includes('jev-kit/'), false);
   assert.ok(shim.includes('pin=' + PACKAGE_PIN));
   assert.equal(shim.includes('/Users/'), false);
   assert.equal(shim.includes('Developer/jev'), false);
-  const loadedShim = await import(pathToFileURL(shimPath(ompHome, 'default', 'gate')).href);
-  assert.equal(typeof loadedShim.gateCommand, 'function');
-  assert.equal(typeof loadedShim.CUT, 'number');
-  assert.equal(typeof loadedShim.RISK, 'object');
+  const loadedShim = await import(pathToFileURL(hookShimPath(ompHome, 'default', 'gate', 'pre')).href);
+  assert.equal(typeof loadedShim.default, 'function');
+  const registered = {};
+  await loadedShim.default({ on: (event, handler) => { registered[event] = handler; } });
+  assert.equal(typeof registered.tool_call, 'function');
+  assert.deepEqual(await registered.tool_call({ command: 'rm -rf /important' }), { block: true, reason: 'fixture-risk' });
+  assert.deepEqual(await registered.tool_call({ command: 'ls' }), { block: false, reason: 'fixture-allow' });
   const marker = await loadJson(join(ompHome, 'agent', 'jev-shims.json'));
   assert.equal(marker.shims.gate.sha256.length, 64);
   assert.equal(marker.shims.gate.pin, PACKAGE_PIN);
@@ -313,7 +321,7 @@ test('a lock resolving the package to another commit is refused before writing',
   const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate');
   const family = families[0];
   const lock = await loadJson(family.packageLockPath);
-  lock.packages['node_modules/jev-kit'].resolved = PACKAGE_GIT + '#' + '0'.repeat(40);
+  lock.packages['node_modules/jev-fixture-native'].resolved = PACKAGE_GIT + '#' + '0'.repeat(40);
   await writeFile(family.packageLockPath, JSON.stringify(lock, null, 2) + '\n');
   const before = await snapshotTree(ompHome);
   const result = await installProfileTargets({
@@ -371,6 +379,62 @@ test('an extension family on codex is unsupported', async () => {
   });
   assert.equal(result.exit, 0);
   assert.equal(result.families[0].status, 'unsupported');
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('an advisory family registers its packaged entry in profile config', async () => {
+  const home = await freshHome('installer-profile-extension');
+  const ompHome = join(home, 'omp-home');
+  const contracts = {
+    gate: await loadJson(join(contractsDir, 'gate.json')),
+    screen: await loadJson(join(contractsDir, 'screen.json')),
+    hint: await loadJson(join(contractsDir, 'hint.json')),
+  };
+  const families = (await loadFamilies(contracts)).filter((family) => family.id === 'hint');
+  const before = await snapshotTree(ompHome);
+  assert.deepEqual(before.size, 0);
+  const input = {
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  };
+  const result = await installProfileTargets(input);
+  assert.equal(result.exit, 0);
+  assert.equal(result.families[0].status, 'installed');
+  const config = await readFile(join(ompHome, 'agent', 'config.yml'), 'utf8');
+  assert.ok(config.includes('hint-extension.ts'));
+  const marker = await loadJson(join(ompHome, 'agent', 'jev-shims.json'));
+  assert.equal(marker.extensions.hint.pin, PACKAGE_PIN);
+  assert.ok(marker.extensions.hint.entry.endsWith('hint-extension.ts'));
+  const secondBefore = await snapshotTree(ompHome);
+  const second = await installProfileTargets(input);
+  assert.equal(second.exit, 0);
+  assert.equal(second.families[0].status, 'already');
+  assert.deepEqual(second.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), secondBefore);
+});
+
+test('a package entry without a native default export is refused before writing', async () => {
+  const home = await freshHome('installer-profile-lib-only');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/lib-only.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('no default function export'));
   assert.deepEqual(result.writes, []);
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
@@ -510,8 +574,8 @@ test('a repo-path predecessor shim is refused and stays byte-identical', async (
     hint: await loadJson(join(contractsDir, 'screen.json')),
   };
   const families = (await loadFamilies(contracts)).filter((family) => family.id === 'gate');
-  const dest = shimPath(ompHome, 'default', 'gate');
-  await mkdir(join(ompHome, 'agent', 'shims'), { recursive: true });
+  const dest = hookShimPath(ompHome, 'default', 'gate', 'pre');
+  await mkdir(join(ompHome, 'agent', 'hooks', 'pre'), { recursive: true });
   const repoShim = "export * from '/Users/someone/Developer/jev/kit/src/gate.ts';\n";
   await writeFile(dest, repoShim);
   const before = await snapshotTree(ompHome);
@@ -538,8 +602,8 @@ test('a hardlink predecessor conflicts unless migrated with backup', async () =>
     hint: await loadJson(join(contractsDir, 'screen.json')),
   };
   const families = (await loadFamilies(contracts)).filter((family) => family.id === 'gate');
-  const dest = shimPath(ompHome, 'default', 'gate');
-  await mkdir(join(ompHome, 'agent', 'shims'), { recursive: true });
+  const dest = hookShimPath(ompHome, 'default', 'gate', 'pre');
+  await mkdir(join(ompHome, 'agent', 'hooks', 'pre'), { recursive: true });
   await writeFile(dest, 'user-owned predecessor\n');
   const { link } = await import('node:fs/promises');
   await link(dest, `${dest}.sibling`);

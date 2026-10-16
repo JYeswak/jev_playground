@@ -1,0 +1,25 @@
+{
+  "name": "jev-fixture-native",
+  "version": "0.0.1-fixture.1",
+  "private": true,
+  "description": "Fixture native package for installer profile-target tests: real hook/extension entry shapes, never published.",
+  "jev": {
+    "safe_side_tests": {
+      "installer.gate.unreachable.refuses": {
+        "surface_type": "command-gate",
+        "safe_side": "refuse",
+        "test": "gateNetworkUnreachableRefuses"
+      },
+      "installer.screen.unreachable.passes": {
+        "surface_type": "result-screen",
+        "safe_side": "pass",
+        "test": "screenNetworkUnreachablePasses"
+      },
+      "installer.hint.unreachable.passes": {
+        "surface_type": "advisory",
+        "safe_side": "pass",
+        "test": "hintAdvisoryUnreachablePasses"
+      }
+    }
+  }
+}

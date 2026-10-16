@@ -20,7 +20,7 @@
       "surface_type": "advisory",
       "kind": "extension",
       "declared": "ON",
-      "safe_side_test_id": "installer.screen.unreachable.passes",
+      "safe_side_test_id": "installer.hint.unreachable.passes",
       "supported_profiles": ["default"]
     }
   ]

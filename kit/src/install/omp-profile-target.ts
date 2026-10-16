@@ -18,6 +18,8 @@ import { EXIT_CODES } from "../families/registry.js";
 import { validateContract, type DecisionContract } from "../contracts.js";
 import { isSafeProfileName, profileAgentDir } from "./omp-paths.js";
 import { decide } from "../conformance.js";
+import { mergeExtensions } from "./omp-config-merge.js";
+import { pathToFileURL } from "node:url";
 
 export const SHIM_MARKER_PREFIX = "// classifier-shim-v2";
 export type TargetFamily = {
@@ -75,14 +77,16 @@ function digestOf(bytes: Uint8Array): string {
 
 type ShimRecord = { path: string; sha256: string; pin: string };
 
-async function readShimMarker(agentDir: string): Promise<{ marker: Record<string, ShimRecord>; raw: Buffer | undefined; path: string }> {
+type ExtensionRecord = { config: string; entry: string; pin: string };
+
+async function readShimMarker(agentDir: string): Promise<{ marker: Record<string, ShimRecord>; extensions: Record<string, ExtensionRecord>; raw: Buffer | undefined; path: string }> {
   const path = join(agentDir, "jev-shims.json");
   let raw: Buffer | undefined;
   try {
     raw = await readFile(path);
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
-      return { marker: {}, raw: undefined, path };
+      return { marker: {}, extensions: {}, raw: undefined, path };
     }
     throw new Error(`cannot read ${path}: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -93,6 +97,7 @@ async function readShimMarker(agentDir: string): Promise<{ marker: Record<string
     throw new Error(`cannot parse shim marker: ${path}`);
   }
   const marker: Record<string, ShimRecord> = {};
+  const extensions: Record<string, ExtensionRecord> = {};
   if (parsed && typeof parsed === "object" && "shims" in parsed && parsed.shims !== null && typeof parsed.shims === "object") {
     for (const [key, value] of Object.entries(parsed.shims)) {
       if (
@@ -106,7 +111,20 @@ async function readShimMarker(agentDir: string): Promise<{ marker: Record<string
       }
     }
   }
-  return { marker, raw, path };
+  if (parsed && typeof parsed === "object" && "extensions" in parsed && parsed.extensions !== null && typeof parsed.extensions === "object") {
+    for (const [key, value] of Object.entries(parsed.extensions)) {
+      if (
+        value !== null &&
+        typeof value === "object" &&
+        "config" in value && typeof value.config === "string" &&
+        "entry" in value && typeof value.entry === "string" &&
+        "pin" in value && typeof value.pin === "string"
+      ) {
+        extensions[key] = { config: value.config, entry: value.entry, pin: value.pin };
+      }
+    }
+  }
+  return { marker, extensions, raw, path };
 }
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -192,17 +210,21 @@ async function resolveFamilyPackage(family: TargetFamily): Promise<{ safeSideTes
 
 
 function shimSource(family: TargetFamily, profile: string, offSwitch: { path: string; polarity: string }, safeSide: string, importSpecifier: string): string {
+  // export * re-exports named bindings only; the native default factory is
+  // forwarded explicitly so the installed entry exposes the host contract.
   return (
     `${SHIM_MARKER_PREFIX} family=${family.id} profile=${profile} pin=${family.pin}\n` +
     `// off-switch: ${offSwitch.path} (${offSwitch.polarity})\n` +
     `// safe-side: ${safeSide} (test ${family.manifest.safeSideTestId})\n` +
-    "export * from " + JSON.stringify(importSpecifier) + ";\n"
+    "export * from " + JSON.stringify(importSpecifier) + ";\n" +
+    "export { default } from " + JSON.stringify(importSpecifier) + ";\n"
   );
 }
 
 const CANONICAL_SAFE_SIDE_PROOFS: Record<string, string> = {
   "command-gate:refuse": "gateNetworkUnreachableRefuses",
   "result-screen:pass": "screenNetworkUnreachablePasses",
+  "advisory:pass": "hintAdvisoryUnreachablePasses",
 };
 
 async function proveSafeSideUnreachable(contract: DecisionContract): Promise<string> {
@@ -225,6 +247,53 @@ async function proveSafeSideUnreachable(contract: DecisionContract): Promise<str
     throw new Error("safe-side proof did not reach the unreachable transport");
   }
   return outcome.action;
+}
+
+type NativeMechanism = { kind: "hook"; hooksDir: "pre" | "post"; event: string } | { kind: "extension" };
+
+// Declared surface -> native installation mechanism. A command gate must
+// intercept before execution (pre tool_call hook); a result screen triages
+// completed results (post tool_result hook); an advisory registers by path
+// (config.yml extensions). Surfaces outside this table refuse rather than
+// fake-install.
+const NATIVE_SURFACE_MECHANISMS: Record<string, NativeMechanism> = {
+  "command-gate": { kind: "hook", hooksDir: "pre", event: "tool_call" },
+  "result-screen": { kind: "hook", hooksDir: "post", event: "tool_result" },
+  "advisory": { kind: "extension" },
+};
+
+// A package entry is native-compatible when it loads, exposes a default
+// function export, and — for hook mechanisms — registers its declared host
+// event when invoked with a stub pi. Pure library modules without a default
+// export, and factories that never register, are refused before any write.
+// Loading executes the entry's top level: that import is the install-time
+// load check, so entries must stay side-effect free.
+async function loadNativeEntry(importedPath: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
+  let loaded: unknown;
+  try {
+    // Dynamic import: the specifier is computed at runtime from the validated
+    // locked package path, so no static import can name this module.
+    loaded = await import(pathToFileURL(importedPath).href);
+  } catch (error) {
+    throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  if (!isRecord(loaded) || !("default" in loaded) || typeof loaded.default !== "function") {
+    throw new Error("native entry has no default function export: " + familyId);
+  }
+  if (expectedEvent === undefined) return;
+  // The typeof check above proves callability; name the factory shape once
+  // for the invocation below.
+  const factory: (pi: unknown) => unknown = loaded.default as (pi: unknown) => unknown;
+  const seen: string[] = [];
+  const stubPi = { on: (event: string, _handler: (event: unknown) => Promise<unknown>) => { seen.push(event); } };
+  try {
+    await factory(stubPi);
+  } catch (error) {
+    throw new Error("native entry factory throws: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  if (!seen.includes(expectedEvent)) {
+    throw new Error("native entry does not register " + expectedEvent + ": " + familyId);
+  }
 }
 
 async function checkBlastRadius(
@@ -286,7 +355,9 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
     }
     const markerState = await readShimMarker(agentDir);
     let marker = markerState.marker;
+    let extensions = markerState.extensions;
     let markerDirty = false;
+    let extensionsDirty = false;
     for (const family of input.families) {
       if (family.declared !== "ON") {
         families.push({ family: family.id, profile, status: "skipped-off" });
@@ -306,16 +377,47 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
       }
       let gate: { offSwitch: { path: string; polarity: string }; safeSide: string };
       let importedPath: string;
+      let mechanism: NativeMechanism;
       try {
         const resolved = await resolveFamilyPackage(family);
         importedPath = resolved.importedPath;
         gate = await checkBlastRadius(family, input.switchRegistry, input.maxHandlerLatencyMs, resolved.safeSideTests);
+        const found = NATIVE_SURFACE_MECHANISMS[family.surfaceType];
+        if (found === undefined) {
+          throw new Error("unsupported native surface: " + family.id);
+        }
+        mechanism = found;
+        await loadNativeEntry(importedPath, family.id, mechanism.kind === "hook" ? mechanism.event : undefined);
       } catch (error) {
         families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
         refused = true;
         continue;
       }
-      const dest = join(agentDir, "shims", `jev-${family.id}.ts`);
+      if (mechanism.kind === "extension") {
+        const entryAbs = importedPath;
+        let merge;
+        try {
+          merge = await mergeExtensions({ configPath: join(agentDir, "config.yml"), profileDir: agentDir, addExtensions: [entryAbs] });
+        } catch (error) {
+          families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
+          refused = true;
+          continue;
+        }
+        writes.push(...merge.writes);
+        if (merge.status === "merged" || merge.status === "already") {
+          const known = extensions[family.id];
+          if (merge.status === "merged" || known === undefined || known.entry !== entryAbs || known.pin !== family.pin) {
+            extensions = { ...extensions, [family.id]: { config: "config.yml", entry: entryAbs, pin: family.pin } };
+            extensionsDirty = true;
+          }
+          families.push({ family: family.id, profile, status: merge.status === "merged" ? "installed" : "already" });
+        } else {
+          families.push({ family: family.id, profile, status: "refused", reason: "extension config " + merge.status + ": " + family.id });
+          refused = true;
+        }
+        continue;
+      }
+      const dest = join(agentDir, "hooks", mechanism.hooksDir, `jev-${family.id}.ts`);
       const shimRelative = relative(dirname(dest), importedPath);
       const importSpecifier = shimRelative.startsWith(".") ? shimRelative : "./" + shimRelative;
       const source = shimSource(family, profile, gate.offSwitch, gate.safeSide, importSpecifier);
@@ -361,12 +463,12 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
         await writeFile(dest, source);
         writes.push(dest);
       }
-      marker = { ...marker, [family.id]: { path: `shims/jev-${family.id}.ts`, sha256: digestOf(Buffer.from(source, "utf8")), pin: family.pin } };
+      marker = { ...marker, [family.id]: { path: `hooks/${mechanism.hooksDir}/jev-${family.id}.ts`, sha256: digestOf(Buffer.from(source, "utf8")), pin: family.pin } };
       markerDirty = true;
       families.push({ family: family.id, profile, status: "installed" });
     }
-    if (markerDirty) {
-      const text = JSON.stringify({ shims: marker }, null, 2) + "\n";
+    if (markerDirty || extensionsDirty) {
+      const text = JSON.stringify({ shims: marker, extensions }, null, 2) + "\n";
       const current = markerState.raw === undefined ? undefined : markerState.raw.toString("utf8");
       if (current !== text) {
         await mkdir(agentDir, { recursive: true });
