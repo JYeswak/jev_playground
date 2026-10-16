@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_7e9fc9d4a78553749e82005a8afa4a567a69c2fc76a02931143a89f694ab59ca",
+ "limitations": [
+  "Negotiate-only startup; no get_state frame (format unknown to verifier), no model turn. Keyless single run in contained fake HOME."
+ ],
+ "operation": "jev-b35c.72-non-author-native-verify",
+ "parameters": {
+  "candidate": "ee8a9ce1"
+ },
+ "producer": "RubyMeadow",
+ "result_ref": {
+  "bytes": 430,
+  "sha256": "d503c45dad6bada7b1c57359a252d488862715c377e11b0a5db9df1faf2f5cc4"
+ }
+}
