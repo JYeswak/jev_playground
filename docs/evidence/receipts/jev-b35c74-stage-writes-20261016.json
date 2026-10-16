@@ -1,0 +1,68 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_46b54b9516a1d8690f12397789f2ab637420baf8c0b5818980a417ade86f8029",
+ "limitations": [
+  "Observed changed compiled runtime and complete owned-fixture filesystem differences; no immutable full-build, model, native-host startup or whole-CI claim."
+ ],
+ "operation": "jev-b35c.74-actual-refusal-and-rerun-writes",
+ "parameters": {
+  "subject_sha256": "7a016b3c60bd52cd1e688175c86ef33d7abea1d21b11e7cd72ea31dffa1f82ba"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "candidate_locator": "80181db1",
+  "identical_rerun": {
+   "probe_exit": 0,
+   "result": {
+    "addedFiles": [
+     "consumer/.jev-native-stage/stage-gate-94724-1/package.json:3be4d60274fca3f8ffaa1656faf5163456bce5f910695ecffa6383460f18a65b",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/dead-hook.ts:bb7331c9785353643cbe8ad91bba0998ad9c0b4ebd06291ad32bfd20bfb96d13",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/gate-hook.ts:02f3571fad1c12eb27b18ff7bd8302d0ebd53cb75af028476444b9a438f85242",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/hint-extension.ts:ce3b5d5ccb2257c21a53769c4b2959a6e7cb7faaa9939535cfccc43ed0097018",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/inert-hook.ts:26cb357b095ebc20e62fccf736e159b8460d58478050ba5cdc221881a77bbf2a",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/lib-only.ts:cb8b8af2f2d132d5193fa2a9c32517fc7e0f05d6acdb542923d71045f94f83c0",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/missing-dep.ts:f87c1f7449183028a0d8ae73a48ce7f9357ec017c58e20362f3371c3ddd1149d",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/null-default.ts:da1ab05b466f5a144f74a3303149c8507bf960157b64fb092902a8f22b1153f5",
+     "consumer/.jev-native-stage/stage-gate-94724-1/src/screen-hook.ts:a577c66cecea5a99d7f99e9f68be6b699f4d7b72ce752e61ccd53005b88f2aa1"
+    ],
+    "firstExit": 0,
+    "reportedWrites": [],
+    "secondExit": 0,
+    "status": "already"
+   },
+   "stderr": "(node:94724) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  },
+  "native_host_started": false,
+  "negative": {
+   "probe_exit": 0,
+   "result": {
+    "addedCount": 9,
+    "addedFiles": [
+     "consumer/.jev-native-stage/stage-gate-93594-0/package.json:3be4d60274fca3f8ffaa1656faf5163456bce5f910695ecffa6383460f18a65b",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/dead-hook.ts:bb7331c9785353643cbe8ad91bba0998ad9c0b4ebd06291ad32bfd20bfb96d13",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/gate-hook.ts:b2d52a3b486a6ffe7b42ddd451422fcb3948a05ae49a7146725ade42f2c39777",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/hint-extension.ts:ce3b5d5ccb2257c21a53769c4b2959a6e7cb7faaa9939535cfccc43ed0097018",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/inert-hook.ts:26cb357b095ebc20e62fccf736e159b8460d58478050ba5cdc221881a77bbf2a",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/lib-only.ts:b42236b589fb0cd51d9d80de23e23d3b2d04ae1e989e249bd953b3c4d5427411",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/missing-dep.ts:f87c1f7449183028a0d8ae73a48ce7f9357ec017c58e20362f3371c3ddd1149d",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/null-default.ts:da1ab05b466f5a144f74a3303149c8507bf960157b64fb092902a8f22b1153f5",
+     "consumer/.jev-native-stage/stage-gate-93594-0/src/screen-hook.ts:a577c66cecea5a99d7f99e9f68be6b699f4d7b72ce752e61ccd53005b88f2aa1"
+    ],
+    "exit": 4,
+    "reason": "native entry has no default function export: gate",
+    "reportedWrites": [],
+    "root": "/Users/josh/Developer/jev/var/agent-tmp/native74-stage-review.59421/profile-mJ7cFi",
+    "status": "refused"
+   },
+   "stderr": "(node:93594) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+  },
+  "oracle": "whole owned fixture recursive pathname+SHA256 inventory before/after; not API writes[]",
+  "other_source_or_profile_mutation": false,
+  "provider_or_model_calls": false,
+  "runtime_scope": "current compiled runtime, not independently rebuilt immutable artifact",
+  "source_sha256": "7a016b3c60bd52cd1e688175c86ef33d7abea1d21b11e7cd72ea31dffa1f82ba",
+  "unchanged_fixture": "native-pkg lib-only.ts negative; original gate-hook.ts positive",
+  "verdict": "REWORK"
+ }
+}
