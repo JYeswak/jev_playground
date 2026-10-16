@@ -227,11 +227,13 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertIn("TMPDIR", proc.stdout)
 
     def test_auth_text_overrides_canary_exit_1(self):
-        # The planted Infisical failure exits 1 like a MOVED canary; only the
-        # AUTH text (and exit 4) may distinguish it.
-        proc = self.invoke(1, AUTH_TEXT + ". Please run login manually.", sm_mode="auth")
+        # The manager succeeds, then the child emits the AUTH diagnostic while
+        # exiting 1. Keep this distinct from a pre-child acquisition failure.
+        proc = self.invoke(1, AUTH_TEXT + ". Please run login manually.")
         self.assertEqual(proc.returncode, 4)
+        self.assertIn("NOTIFY AUTH:", proc.stdout)
         self.assertNotIn("MOVED", proc.stdout)
+        self.assertEqual(len(self.notify_calls()), 1)
 
     def test_failing_notifier_leaves_runner_outcome_unchanged(self):
         proc = self.invoke(1, "MOVED: x", notify_rc="1")
