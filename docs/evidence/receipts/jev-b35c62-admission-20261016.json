@@ -1,0 +1,186 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_8a295b2ce81939f42717f4dd918c39907ef01551f630980280b3c3655605d6bc",
+ "limitations": [
+  "Time-bound admission only; no physical reclaim attribution or whole-bead/calibration acceptance"
+ ],
+ "operation": "observe_actual_storage_admission",
+ "parameters": {
+  "subject_sha256": "9fe907229bd4e590c5132b80172b1d99de4309725f67780a5ad345b4637a05fa"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "bead": "jev-b35c.62",
+  "canonical_owner_route": {
+   "actual_owner": "PeachLeopard / RECLAIM1",
+   "bead": "ompkit-7e9g.1",
+   "decision": "J-2026-10-16-03",
+   "decision_source": "skills/omp-kit-orchestration/decisions/joshua.jsonl",
+   "observed_owner_comment_id": 4230,
+   "owner_reported_effect": "149 finished directories / 11694714221 logical bytes / zero deletion failures; physical attribution explicitly unproven, own before/after sbh remained critical"
+  },
+  "command": [
+   "sbh",
+   "check",
+   "--need",
+   "10G"
+  ],
+  "cwd": "/Users/josh/Developer/jev",
+  "decoded_output": {
+   "ballast": {
+    "authoritative": true,
+    "available_count": 0,
+    "configured_pool_bytes": 5368709120,
+    "health": "empty",
+    "missing_count": 5,
+    "releasable_bytes": 0,
+    "unreadable_count": 0
+   },
+   "command": "check",
+   "container_available_bytes": 153779109888,
+   "container_id": "/dev/disk3",
+   "container_total_bytes": 994662584320,
+   "exit_code": 0,
+   "forecast": null,
+   "free_bytes": 153779109888,
+   "free_excludes_purgeable": true,
+   "free_pct": 15.460429728854326,
+   "mount_point": "/System/Volumes/Data",
+   "path": "/Users/josh/Developer/jev",
+   "platform": {
+    "darwin": {
+     "apfs": {
+      "container_available_bytes": 153779109888,
+      "container_id": "/dev/disk3",
+      "container_total_bytes": 994662584320,
+      "estimated_reclaimable_by_snapshot_thinning": {
+       "bytes": 3282075008,
+       "method": "foundation"
+      },
+      "free_excludes_purgeable": true,
+      "is_primary": true,
+      "shared_volumes": [
+       "BuildCast",
+       "BuildFH",
+       "BuildShared",
+       "Macintosh HD",
+       "Preboot",
+       "Recovery",
+       "Update",
+       "VM"
+      ],
+      "volume_available_bytes": 153046138880,
+      "volume_role": "Data",
+      "volume_total_bytes": 994662584320
+     }
+    }
+   },
+   "schema_version": 2,
+   "status": "ok",
+   "total_bytes": 994662584320,
+   "unprotected": null,
+   "volume_available_bytes": 153046138880,
+   "volume_role": "Data",
+   "volume_total_bytes": 994662584320
+  },
+  "executable": {
+   "path": "/Users/josh/.local/bin/sbh",
+   "sha256": "9fe907229bd4e590c5132b80172b1d99de4309725f67780a5ad345b4637a05fa"
+  },
+  "exit": 0,
+  "independent_statvfs": {
+   "fragment_bytes": 4096,
+   "free_bytes_excluding_reserved": 152827998208,
+   "path": "/Users/josh/Developer/jev",
+   "recorded_at": "2026-10-16T14:25:33.516250+00:00"
+  },
+  "lane": "local actual command/native filesystem observations",
+  "limits": [
+   "Actual time-bound same-volume admission only, not durable headroom or global storage-health green",
+   "No claim of physical reclaim causality, helper safety qualification or canonical reclaimer completion",
+   "No full-kit test, calibration acceptance, .9odh close, package/runtime CI or product throughput claim",
+   "Heavy command must recheck admission and machine load immediately before execution"
+  ],
+  "negative_boundary": {
+   "classification": "historical recorded refusal retained; NOT rerun or treated as current admission",
+   "recorded_exit": 1,
+   "recorded_free_pct": 13.564745,
+   "required_floor_pct": 14,
+   "source": "original jev-b35c.62 description"
+  },
+  "no_changes": [
+   "no filesystem deletion by Jade",
+   "no threshold/ballast/service/config changes",
+   "no source/scientific method/bar/input/tolerance changes",
+   "no model calls"
+  ],
+  "observation_window": {
+   "ended": "2026-10-16T14:23:40.677615+00:00",
+   "started": "2026-10-16T14:23:40.613569+00:00"
+  },
+  "prior_changed_boundary": {
+   "decoded_output": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 147207720960,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 147207720960,
+    "free_excludes_purgeable": true,
+    "free_pct": 14.799764591591469,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 147207720960,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 3944816000,
+        "method": "foundation"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 147135418368,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 147135418368,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   },
+   "exit": 0
+  },
+  "producer_role": "non-author director; original bead author DarkBear",
+  "stderr": "",
+  "stdout": "{\"ballast\":{\"authoritative\":true,\"available_count\":0,\"configured_pool_bytes\":5368709120,\"health\":\"empty\",\"missing_count\":5,\"releasable_bytes\":0,\"unreadable_count\":0},\"command\":\"check\",\"container_available_bytes\":153779109888,\"container_id\":\"/dev/disk3\",\"container_total_bytes\":994662584320,\"exit_code\":0,\"forecast\":null,\"free_bytes\":153779109888,\"free_excludes_purgeable\":true,\"free_pct\":15.460429728854326,\"mount_point\":\"/System/Volumes/Data\",\"path\":\"/Users/josh/Developer/jev\",\"platform\":{\"darwin\":{\"apfs\":{\"container_available_bytes\":153779109888,\"container_id\":\"/dev/disk3\",\"container_total_bytes\":994662584320,\"estimated_reclaimable_by_snapshot_thinning\":{\"bytes\":3282075008,\"method\":\"foundation\"},\"free_excludes_purgeable\":true,\"is_primary\":true,\"shared_volumes\":[\"BuildCast\",\"BuildFH\",\"BuildShared\",\"Macintosh HD\",\"Preboot\",\"Recovery\",\"Update\",\"VM\"],\"volume_available_bytes\":153046138880,\"volume_role\":\"Data\",\"volume_total_bytes\":994662584320}}},\"schema_version\":2,\"status\":\"ok\",\"total_bytes\":994662584320,\"unprotected\":null,\"volume_available_bytes\":153046138880,\"volume_role\":\"Data\",\"volume_total_bytes\":994662584320}\n"
+ }
+}
