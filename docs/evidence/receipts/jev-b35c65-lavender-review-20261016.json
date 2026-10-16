@@ -1,0 +1,47 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_3500f91946b097705eaad489b5d9d5ac5c0b815402e202c6176f4770d87efc5a",
+ "limitations": [
+  "Offline injected transports and read-only consumer; no live-provider, billing, deployment or whole-main CI claim."
+ ],
+ "operation": "jev-b35c.65-independent-published-review",
+ "parameters": {
+  "subject_sha256": "9d99e56101e24a37b02c95226190aca21f0530ea426e318d3ac8a81eaf50611c"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "backend_suite": {
+   "command": "node --test kit/test/backend.test.mjs",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "TAP version 13\n# Subtest: default Jev keeps the exact System One request bytes and makes no Clef request\nok 1 - default Jev keeps the exact System One request bytes and makes no Clef request\n  ---\n  duration_ms: 22.980959\n  type: 'test'\n  ...\n# Subtest: auto rejects the public Banking77 calibration as a family receipt\nok 2 - auto rejects the public Banking77 calibration as a family receipt\n  ---\n  duration_ms: 0.756709\n  type: 'test'\n  ...\n# Subtest: the auto route gate requires every family, receipt, question, fingerprint, and hold condition\nok 3 - the auto route gate requires every family, receipt, question, fingerprint, and hold condition\n  ---\n  duration_ms: 0.104792\n  type: 'test'\n  ...\n# Subtest: auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\nok 4 - auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\n  ---\n  duration_ms: 0.604208\n  type: 'test'\n  ...\n# Subtest: two consecutive Clef transport failures start a 60-second hold\nok 5 - two consecutive Clef transport failures start a 60-second hold\n  ---\n  duration_ms: 0.149\n  type: 'test'\n  ...\n# Subtest: bundles and score never route to Clef\nok 6 - bundles and score never route to Clef\n  ---\n  duration_ms: 0.747625\n  type: 'test'\n  ...\n# Subtest: CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\nok 7 - CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\n  ---\n  duration_ms: 0.305084\n  type: 'test'\n  ...\n# Subtest: dry-run previews the canonical Jev request without calling the asker\nok 8 - dry-run previews the canonical Jev request without calling the asker\n  ---\n  duration_ms: 0.217875\n  type: 'test'\n  ...\n# Subtest: rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\nok 9 - rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\n  ---\n  duration_ms: 0.570667\n  type: 'test'\n  ...\n1..9\n# tests 9\n# suites 0\n# pass 9\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 148.759416\n"
+  },
+  "candidate": "89f0a2e69094a8f6adce2c94ac9cc95e97181896",
+  "consumer_smoke": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "{\"previewDryRun\":true,\"previewBackend\":\"jev\",\"refusal\":\"classify failed (uncalibrated): no exact calibration and model fingerprint match\",\"contacts\":0}\n"
+  },
+  "guard_mutant": {
+   "exit": 1,
+   "failures": 1,
+   "specific_test": 5,
+   "stderr": "",
+   "stdout": "TAP version 13\n# Subtest: default Jev keeps the exact System One request bytes and makes no Clef request\nok 1 - default Jev keeps the exact System One request bytes and makes no Clef request\n  ---\n  duration_ms: 23.169375\n  type: 'test'\n  ...\n# Subtest: auto rejects the public Banking77 calibration as a family receipt\nok 2 - auto rejects the public Banking77 calibration as a family receipt\n  ---\n  duration_ms: 0.758834\n  type: 'test'\n  ...\n# Subtest: the auto route gate requires every family, receipt, question, fingerprint, and hold condition\nok 3 - the auto route gate requires every family, receipt, question, fingerprint, and hold condition\n  ---\n  duration_ms: 0.111084\n  type: 'test'\n  ...\n# Subtest: auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\nok 4 - auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\n  ---\n  duration_ms: 0.629125\n  type: 'test'\n  ...\n# Subtest: two consecutive Clef transport failures start a 60-second hold\nnot ok 5 - two consecutive Clef transport failures start a 60-second hold\n  ---\n  duration_ms: 0.579542\n  type: 'test'\n  location: '/Users/josh/Developer/jev/var/agent-tmp/backend65-review.59421/corrected/kit/test/backend.test.mjs:145:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    false !== true\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file:///Users/josh/Developer/jev/var/agent-tmp/backend65-review.59421/corrected/kit/test/backend.test.mjs:151:12)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:744:18)\n    Test.postRun (node:internal/test_runner/test:1173:19)\n    Test.run (node:internal/test_runner/test:1101:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)\n  ...\n# Subtest: bundles and score never route to Clef\nok 6 - bundles and score never route to Clef\n  ---\n  duration_ms: 0.795875\n  type: 'test'\n  ...\n# Subtest: CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\nok 7 - CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\n  ---\n  duration_ms: 0.315375\n  type: 'test'\n  ...\n# Subtest: dry-run previews the canonical Jev request without calling the asker\nok 8 - dry-run previews the canonical Jev request without calling the asker\n  ---\n  duration_ms: 0.235875\n  type: 'test'\n  ...\n# Subtest: rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\nok 9 - rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\n  ---\n  duration_ms: 0.569083\n  type: 'test'\n  ...\n1..9\n# tests 9\n# suites 0\n# pass 8\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 157.729375\n"
+  },
+  "reviewer_implemented_source": false,
+  "source_sha256": {
+   "kit/src/classify.ts": "cc0c29a791cefef33edbc9266df51fab78f77a204607dd1760ebccc6b6b545ef",
+   "kit/src/cli/argv.mjs": "bc48646e9a62e594ed364ec056c90ea368c41ef6628b1202c0a2c8bd46d6fcb6",
+   "kit/src/cli/envelope.mjs": "c335c3c232d928f7020ee9d7edd3ff2daf9be6f64ce8acc54bf111218085b4d7",
+   "kit/src/cli/exit.mjs": "5df42b8f3260b7d59a439c47db8522380cdd77c9293c9947a603c9e34d087f05",
+   "kit/src/client.ts": "6ba5a423e57d48757733f7154d1c88f4bb209edbff0a2aefe40436686fb52322",
+   "kit/src/gate.ts": "0875a6b46b3c1020744d3272302e2c0c6f2abe7f72e15fca65ba358c4a468ce8",
+   "kit/src/rerank.ts": "aa1a5af30e51de1f2a0f98cc5c9bfde462d095250653e4e1949569970995188a",
+   "kit/src/score.ts": "32d592c6e2973d4a603784d98ccf0f8e8b2a1940cf9b93662b92f2ed0e1aa4aa",
+   "kit/src/verify.ts": "1123f5416ccfbc575f904eddbe8421f5f18d1f3a3373329253a6a4bce3860617",
+   "kit/test/backend.test.mjs": "a44f7c98653fc4e8d4ea252cfb069ffb1235a73ef5127a06caf4cb6484dcdf39"
+  }
+ }
+}
