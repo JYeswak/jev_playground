@@ -20,7 +20,7 @@ CANONICAL = ("answers-protectai.jsonl", "answers-jev.jsonl", "RECEIPT.md")
 
 
 def load_replay():
-    spec = importlib.util.spec_from_file_location("x1run", HERE / "run.py")
+    spec = importlib.util.spec_from_file_location("x1replay", HERE / "replay.py")
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
