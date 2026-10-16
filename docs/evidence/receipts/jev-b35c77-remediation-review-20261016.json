@@ -1,0 +1,347 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_07d0bd18d7f682932fd9a8bb03e2191b0f65c9cd92b41a21a3f4c4c1056bbe3c",
+ "limitations": [
+  "Diagnostics leaf only;75/19 unresolved. Wrong-cwd canonical run excluded and incident disclosed; qualified evidence is exact archive373 plus real no-mutation smoke."
+ ],
+ "operation": "jev-b35c.77.remediation-review",
+ "parameters": {
+  "subject_sha256": "f7ea127bd7b84a7b03146d4bec2cbdc66c69fc6f92cd5b0918bd151701b098af"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_foreign_fixture": {
+   "foreign_executable_never_invoked": true,
+   "modes": [
+    {
+     "advice": [
+      "CLI target ownership or payload conflicts with the requested operation",
+      "back up, then remove the conflicting file, and rerun: classifier install cli --apply",
+      "see: classifier install --help"
+     ],
+     "errorCode": null,
+     "exit": 4,
+     "foreignStillRegular": true,
+     "hasUnrelatedBackendAdvice": false,
+     "mode": "human",
+     "status": null,
+     "stderr": "CLI target ownership or payload conflicts with the requested operation\nback up, then remove the conflicting file, and rerun: classifier install cli --apply\nsee: classifier install --help\n",
+     "wholeHomeUnchanged": true
+    },
+    {
+     "advice": [
+      "back up, then remove the conflicting file, and rerun: classifier install cli --apply"
+     ],
+     "errorCode": "REFUSED_UNSAFE",
+     "exit": 4,
+     "foreignStillRegular": true,
+     "hasUnrelatedBackendAdvice": false,
+     "mode": "json",
+     "status": "REFUSED_UNSAFE",
+     "stderr": "CLI target ownership or payload conflicts with the requested operation\nback up, then remove the conflicting file, and rerun: classifier install cli --apply\nsee: classifier install --help\n",
+     "wholeHomeUnchanged": true
+    },
+    {
+     "advice": [
+      "back up, then remove the conflicting file, and rerun: classifier install cli --apply"
+     ],
+     "errorCode": "REFUSED_UNSAFE",
+     "exit": 4,
+     "foreignStillRegular": true,
+     "hasUnrelatedBackendAdvice": false,
+     "mode": "robot",
+     "status": "REFUSED_UNSAFE",
+     "stderr": "CLI target ownership or payload conflicts with the requested operation\nback up, then remove the conflicting file, and rerun: classifier install cli --apply\nsee: classifier install --help\n",
+     "wholeHomeUnchanged": true
+    }
+   ],
+   "regular_before_any_install": true,
+   "snapshot_after_sha256": "ff1bcbc6746cdcb2fcf1567ba5b646f6758af2825858458648a329f8cf7aeea8",
+   "snapshot_before_sha256": "ff1bcbc6746cdcb2fcf1567ba5b646f6758af2825858458648a329f8cf7aeea8",
+   "whole_home_snapshot_fields": [
+    "bytes SHA256",
+    "inode",
+    "device",
+    "mode",
+    "mtimeNs",
+    "ctimeNs",
+    "symlink targets",
+    "directory entries"
+   ]
+  },
+  "author": "RubyMeadow",
+  "bead": "jev-b35c.77",
+  "candidate": "dbc75238eb3baef910094922aba4f72932b9d036",
+  "captures": {
+   "path": "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/captures.json",
+   "sha256": "ab1cd0eaff4b16448a0e54b57e8e5a7bd9e63bb160cf2c9469f2b06d41348e14"
+  },
+  "genuine_backend_producer": {
+   "actual_result": {
+    "fixture_source": "existing clef.test.mjs recorded Banking77-shaped refusal fixture; fingerprint is test-only, not a deployed model",
+    "rows": [
+     {
+      "failure": {
+       "backend": "clef",
+       "error": "Clef gateway URL is not configured",
+       "latencyMs": 0,
+       "model": "clef-flash",
+       "ok": false,
+       "reason": "online-required"
+      },
+      "label": "missing-gateway",
+      "rendered": {
+       "code": "ONLINE_REQUIRED",
+       "exit_code": 6,
+       "message": "Clef gateway URL is not configured",
+       "remediation": [
+        "rerun: classifier ask --backend jev",
+        "diagnose: classifier doctor"
+       ],
+       "see": "classifier ask --help"
+      }
+     },
+     {
+      "failure": {
+       "backend": "clef",
+       "error": "Clef URL must be an explicit loopback gateway URL and may not use port 8010",
+       "latencyMs": 0,
+       "model": "clef-flash",
+       "ok": false,
+       "reason": "refused-unsafe"
+      },
+      "label": "direct-server",
+      "rendered": {
+       "code": "REFUSED_UNSAFE",
+       "exit_code": 4,
+       "message": "Clef URL must be an explicit loopback gateway URL and may not use port 8010",
+       "remediation": [
+        "rerun: classifier ask --backend jev",
+        "configure the localbench gateway URL instead of a direct Clef server"
+       ],
+       "see": "classifier ask --help"
+      }
+     },
+     {
+      "failure": {
+       "backend": "clef",
+       "error": "Clef URL must be an explicit loopback gateway URL and may not use port 8010",
+       "latencyMs": 0,
+       "model": "clef-flash",
+       "ok": false,
+       "reason": "refused-unsafe"
+      },
+      "label": "non-loopback",
+      "rendered": {
+       "code": "REFUSED_UNSAFE",
+       "exit_code": 4,
+       "message": "Clef URL must be an explicit loopback gateway URL and may not use port 8010",
+       "remediation": [
+        "rerun: classifier ask --backend jev",
+        "configure the localbench gateway URL instead of a direct Clef server"
+       ],
+       "see": "classifier ask --help"
+      }
+     }
+    ],
+    "transport_calls": 0
+   },
+   "comparison_to_prefixed_before_source": {
+    "candidate": "fef7a71953f9f8c869a058a1b4d7231c431aaeb8",
+    "exit": 0,
+    "rows": [
+     {
+      "label": "missing-gateway",
+      "unchanged": true
+     },
+     {
+      "label": "direct-server",
+      "unchanged": true
+     },
+     {
+      "label": "non-loopback",
+      "unchanged": true
+     }
+    ]
+   },
+   "input_provenance": "Existing clef.test.mjs recorded Banking77-shaped fixture and existing forbidden-URL cases; model fingerprints are explicit test-only values, not live model evidence.",
+   "transport_calls": 0
+  },
+  "historical_before": {
+   "observation": {
+    "argv": [
+     "node",
+     "/Users/josh/Developer/jev/var/agent-tmp/installer19-final-review.59421/source/kit/bin/jev.mjs",
+     "install",
+     "cli",
+     "--apply",
+     "--dir",
+     "/Users/josh/Developer/jev/var/agent-tmp/installer19-final-review.59421/foreign-home",
+     "--robot"
+    ],
+    "exit": 4,
+    "label": "public-foreign-bin-refusal",
+    "stderr": "CLI target ownership or payload conflicts with the requested operation\nrerun: classifier install --backend jev\nconfigure the localbench gateway URL instead of a direct Clef server\nsee: classifier install --help\n",
+    "stdout": "{\"ok\":false,\"schema\":\"classifier.install.v1\",\"status\":\"REFUSED_UNSAFE\",\"data\":null,\"meta\":{\"version\":\"0.0.0\",\"backend\":\"jev\",\"backend_requested\":\"jev\",\"fallback_reason\":null,\"model\":null,\"latency_ms\":0,\"usage\":null},\"warnings\":[],\"commands\":[\"classifier install --help\"],\"errors\":[{\"code\":\"REFUSED_UNSAFE\",\"exit_code\":4,\"message\":\"CLI target ownership or payload conflicts with the requested operation\",\"remediation\":[\"rerun: classifier install --backend jev\",\"configure the localbench gateway URL instead of a direct Clef server\"],\"see\":\"classifier install --help\"}]}\n"
+   },
+   "receipt": "ev_fa6ee7b2d52f5fa257bfa24d3daaf6a8701aec3962e89a29bb849c7272226701",
+   "scope": "Only old actually observed wrong-advice row reused; old whole19 grade remains withdrawn for separate75 failures.",
+   "signature_verified": true
+  },
+  "limits": [
+   "Only ownership-remediation routing, refusal exit/envelope and filesystem preservation; separate75 artifact/runtime closure and19 rollup stay open/blocked.",
+   "No actual provider/model request: backend guards returned before injected fetch, transport_calls0; public commands were install refusal only.",
+   "Public and backend probes network-denied/write-confined; real launchctl execution denied. Full suite child environment isolated, canonical heavy wrapper used for full-suite admission.",
+   "No manual changes to reviewed error/test files. Mis-scoped canonical prepare incident is disclosed, excluded, and not relabeled pristine."
+  ],
+  "preflight": "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/preflight.json",
+  "qualified_build_and_tests": {
+   "absolute_package_prefix": "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/source/kit",
+   "admission": {
+    "cores": "32\n",
+    "sbh": {
+     "ballast": {
+      "authoritative": true,
+      "available_count": 0,
+      "configured_pool_bytes": 5368709120,
+      "health": "empty",
+      "missing_count": 5,
+      "releasable_bytes": 0,
+      "unreadable_count": 0
+     },
+     "command": "check",
+     "container_available_bytes": 146151362560,
+     "container_id": "/dev/disk3",
+     "container_total_bytes": 994662584320,
+     "exit_code": 0,
+     "forecast": null,
+     "free_bytes": 146151362560,
+     "free_excludes_purgeable": true,
+     "free_pct": 14.693561903699859,
+     "mount_point": "/System/Volumes/Data",
+     "path": "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/source",
+     "platform": {
+      "darwin": {
+       "apfs": {
+        "container_available_bytes": 146151362560,
+        "container_id": "/dev/disk3",
+        "container_total_bytes": 994662584320,
+        "estimated_reclaimable_by_snapshot_thinning": {
+         "bytes": 3935673728,
+         "method": "foundation"
+        },
+        "free_excludes_purgeable": true,
+        "is_primary": true,
+        "shared_volumes": [
+         "BuildCast",
+         "BuildFH",
+         "BuildShared",
+         "Macintosh HD",
+         "Preboot",
+         "Recovery",
+         "Update",
+         "VM"
+        ],
+        "volume_available_bytes": 146069708800,
+        "volume_role": "Data",
+        "volume_total_bytes": 994662584320
+       }
+      }
+     },
+     "schema_version": 2,
+     "status": "ok",
+     "total_bytes": 994662584320,
+     "unprotected": null,
+     "volume_available_bytes": 146069708800,
+     "volume_role": "Data",
+     "volume_total_bytes": 994662584320
+    },
+    "uptime": "11:59  up 25 days, 21:29, 5 users, load averages: 7.70 8.15 8.27\n"
+   },
+   "archive_cwd": "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/source",
+   "fail": 0,
+   "focused_existing_error_and_installer_tests": {
+    "fail": 0,
+    "output_artifact": "artifact://1535",
+    "pass": 21,
+    "skipped": 0,
+    "tests": 21
+   },
+   "full_command": [
+    "heavy",
+    "--label",
+    "cli77-exact-full-kit",
+    "--",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/Users/josh/Library/Application Support/Tern/omp/bin:/Users/josh/.grok/bin:/Users/josh/.rch/shims:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/josh/.local/bin:/Users/josh/bin:/Users/josh/.orbstack/bin:/Users/josh/.opencode/bin:/Users/josh/.grok/bin:/Users/josh/.rbenv/shims:/Users/josh/.bun/bin:/Users/josh/.cargo/bin:/Users/josh/go/bin:/opt/homebrew/opt/ffmpeg-full/bin:/opt/homebrew/sbin:/Applications/Tern.app/Contents/MacOS:/Users/josh/.orbstack/bin",
+    "HOME=/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/full-home",
+    "TMPDIR=/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572",
+    "UV_CACHE_DIR=/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/uv-cache",
+    "NPM_CONFIG_USERCONFIG=/dev/null",
+    "NPM_CONFIG_CACHE=/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/npm-cache",
+    "NODE_DISABLE_COMPILE_CACHE=1",
+    "LANG=en_US.UTF-8",
+    "/opt/homebrew/bin/npm",
+    "test",
+    "--prefix",
+    "/Users/josh/Developer/jev/var/agent-tmp/cli77-review.25572/source/kit"
+   ],
+   "full_exit": 0,
+   "full_stderr_sha256": "c884fe29effaff733ee4200ea15832ae7dbfd4e66cfb0b21656e1561b3060545",
+   "full_stdout_sha256": "ccc213becf619964cf4835a316a02552f5fa75fac1dea1da12a08316586a7486",
+   "no_verifier_permanent_tests_added": true,
+   "npm_ci_exit": 0,
+   "pass": 373,
+   "prepare_exit": 0,
+   "skipped": 0,
+   "tests": 373,
+   "wording_only_added_test_removed": true
+  },
+  "reviewer": "DarkBear",
+  "source": [
+   {
+    "matches_exact_commit": true,
+    "path": "kit/src/cli/errors.ts",
+    "sha256": "8901c31722e98b4a939f399da71ed316e6a3ad7cf7ae3c004e4841f3105bf7b3"
+   },
+   {
+    "matches_exact_commit": true,
+    "path": "kit/test/cli-exit.test.mjs",
+    "sha256": "e833fde712136c59ba9000d2c68eeb7e56c3bb760cbcf4b373e4521d5e8d8586"
+   },
+   {
+    "matches_exact_commit": true,
+    "path": "kit/bin/jev.mjs",
+    "sha256": "92fb4faa8fe81148b89eca3abddacc028952370abc2b0efa70ecf7df9e847c02"
+   },
+   {
+    "matches_exact_commit": true,
+    "path": "kit/src/clef.ts",
+    "sha256": "b29bd7ae6feae02ad8b18128b697d2b685b9c36a5c5a20bee6868b2ae37ea6b9"
+   },
+   {
+    "matches_exact_commit": true,
+    "path": "kit/src/questions.mjs",
+    "sha256": "01ed13a3ab5b0605e148430fee99e79c127cc71b5abbe176b6ad6a4b3423237c"
+   }
+  ],
+  "verdict": "PASS_ORIGINAL_DIAGNOSTICS_LEAF_ACCEPTANCE",
+  "verification_incident": {
+   "actual_cwd": "/Users/josh/Developer/jev",
+   "commands": "npm ci --ignore-scripts --prefix kit; npm run prepare --prefix kit; focused tests",
+   "current_question_file_blob_matches_index": "e87b3ffa5dd91e9a50de7dadbf2b9f51018cdb90",
+   "discarded_focused_count": 23,
+   "disclosed_to_owners": [
+    "AM59190",
+    "AM59204"
+   ],
+   "effects": "Canonical generated node_modules replaced/recreated, dist rebuilt from WIP; copy-questions also refreshed tracked kit/src/questions.mjs from work/bicameral-gate/questions.mjs.",
+   "excluded_run": "bg_103 / artifact://1534",
+   "prior_unstaged_state_or_transient_peer_impact": "UNKNOWN; no before-snapshot, no speculative restore/reset/cleanup attempted",
+   "qualified_proof": false,
+   "stop_attempt": "Already completed when own-job stop requested"
+  }
+ }
+}
