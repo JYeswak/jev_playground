@@ -18,6 +18,8 @@ export type DailyJob = {
   offSwitch: string;
   timeCapSecs: number;
   keylessSkip: boolean;
+  /** Defer while the 1-minute load average is above this value (miner only). */
+  deferWhileLoadAbove?: number;
 };
 
 export type DailyJobsOptions = {
@@ -34,11 +36,25 @@ function fail(message: string): never {
   throw new Error(`daily-jobs refused: ${message}`);
 }
 
-/** A command token must be a bare argv word: no path separators, no launchctl. */
+/**
+ * Command tokens must not escape to a checkout or a service manager.
+ * Refused: absolute paths, `..` traversal, `/Users/` and `Developer/jev`
+ * checkout markers, and launchctl/systemctl. Plain relative script paths
+ * (e.g. the miner/canary runners named by jev-b35c.20 AC3/AC4) are allowed:
+ * they resolve against the service runner's working directory, never a
+ * pinned checkout.
+ */
 export function assertSafeCommand(command: string[]): void {
   for (const token of command) {
-    if (token.includes('/')) fail(`repository path in command token: ${token}`);
-    if (token === 'launchctl') fail(`service-manager call in command: ${token}`);
+    if (
+      token.startsWith('/') ||
+      token.split('/').includes('..') ||
+      token.includes('/Users/') ||
+      token.includes('Developer/jev')
+    ) {
+      fail(`repository path in command token: ${token}`);
+    }
+    if (token === 'launchctl' || token === 'systemctl') fail(`service-manager call in command: ${token}`);
   }
 }
 
@@ -76,6 +92,70 @@ export function buildDailyJobs(
   for (const job of jobs) {
     if (labels.has(job.label)) fail(`duplicate job label: ${job.label}`);
     labels.add(job.label);
+  }
+  return [...jobs].sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+}
+
+const MINER_TIME_CAP_SECS = 3000;
+const MINER_DEFER_LOAD_ABOVE = 80;
+const MINER_COMMAND = ['nice', '-n', '10', 'python3', 'work/fleet-schema/miner.py', '--daily', '--json'];
+const CANARY_COMMAND = ['scripts/jev-latest-canary-run.sh'];
+
+/**
+ * Canary job (jev-b35c.20 AC3): wraps the fixed jev-jh6f canary runner
+ * (scripts/jev-latest-canary-run.sh, e17bb591), not an inline shell string.
+ */
+export function buildCanaryJob(options: DailyJobsOptions): DailyJob {
+  if (!options.stateDir || typeof options.stateDir !== 'string') fail('stateDir is required');
+  assertSafeCommand(CANARY_COMMAND);
+  return {
+    label: 'classifier-canary-daily',
+    schedule: SCHEDULE_DAILY,
+    command: [...CANARY_COMMAND],
+    offSwitch: `${options.stateDir}/canary.off`,
+    timeCapSecs: options.timeCapSecs ?? DEFAULT_TIME_CAP_SECS,
+    keylessSkip: true,
+  };
+}
+
+/**
+ * N0b daily miner job (jev-b35c.20 AC4): fixed 3,000 s cap and deferral
+ * while the 1-minute load is above 80.
+ */
+export function buildMinerJob(options: DailyJobsOptions): DailyJob {
+  if (!options.stateDir || typeof options.stateDir !== 'string') fail('stateDir is required');
+  assertSafeCommand(MINER_COMMAND);
+  return {
+    label: 'classifier-miner-daily',
+    schedule: SCHEDULE_DAILY,
+    command: [...MINER_COMMAND],
+    offSwitch: `${options.stateDir}/miner.off`,
+    timeCapSecs: MINER_TIME_CAP_SECS,
+    keylessSkip: true,
+    deferWhileLoadAbove: MINER_DEFER_LOAD_ABOVE,
+  };
+}
+
+/** A miner definition is valid only with the fixed cap and load deferral. */
+export function validateMinerJob(job: DailyJob): void {
+  if (job.label !== 'classifier-miner-daily') fail(`not a miner job: ${job.label}`);
+  if (job.timeCapSecs !== MINER_TIME_CAP_SECS) fail(`miner job without the 3,000 s time cap: ${job.label}`);
+  if (job.deferWhileLoadAbove !== MINER_DEFER_LOAD_ABOVE) fail(`miner job without the load-80 deferral: ${job.label}`);
+}
+
+/**
+ * Full dry-run listing: family evals plus canary and miner. Pure: builds
+ * definitions only, writes nothing (the CLI `--dry-run --robot` surface).
+ */
+export function listDailyJobs(
+  families: readonly { name: string }[],
+  options: DailyJobsOptions,
+): DailyJob[] {
+  const jobs = [...buildDailyJobs(defaultSpecForFamilies(families), options), buildCanaryJob(options), buildMinerJob(options)];
+  const seen: Record<string, true> = {};
+  for (const job of jobs) {
+    if (seen[job.label]) fail(`duplicate job label: ${job.label}`);
+    seen[job.label] = true;
   }
   return [...jobs].sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
 }

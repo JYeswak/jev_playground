@@ -5,11 +5,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   assertSafeCommand,
+  buildCanaryJob,
   buildDailyJob,
   buildDailyJobs,
+  buildMinerJob,
   defaultSpecForFamilies,
+  listDailyJobs,
+  validateMinerJob,
 } from "../src/install/daily-jobs.ts";
-
 const FAMILIES = [
   { name: "classify" },
   { name: "rank" },
@@ -80,5 +83,50 @@ test("duplicate family labels are refused", () => {
         { stateDir },
       ),
     /duplicate job label/,
+  );
+});
+
+test("canary job wraps the fixed runner, not an inline shell string", () => {
+  const stateDir = tempState();
+  const job = buildCanaryJob({ stateDir });
+  assert.equal(job.label, "classifier-canary-daily");
+  assert.deepEqual(job.command, ["scripts/jev-latest-canary-run.sh"]);
+  assert.equal(job.keylessSkip, true);
+  assert.equal(job.offSwitch, `${stateDir}/canary.off`);
+  for (const token of job.command) {
+    assert.ok(!token.includes("zsh"), "no inline shell wrapper");
+  }
+});
+
+test("miner job carries the fixed cap and load deferral", () => {
+  const stateDir = tempState();
+  const job = buildMinerJob({ stateDir });
+  assert.equal(job.label, "classifier-miner-daily");
+  assert.deepEqual(job.command, ["nice", "-n", "10", "python3", "work/fleet-schema/miner.py", "--daily", "--json"]);
+  assert.equal(job.timeCapSecs, 3000);
+  assert.equal(job.deferWhileLoadAbove, 80);
+  assert.equal(job.keylessSkip, true);
+  validateMinerJob(job);
+  assert.throws(() => validateMinerJob({ ...job, timeCapSecs: 600 }), /without the 3,000 s time cap/);
+  assert.throws(() => validateMinerJob({ ...job, deferWhileLoadAbove: undefined }), /without the load-80 deferral/);
+});
+
+test("plain relative runner paths pass; absolute and traversal paths refuse", () => {
+  assert.doesNotThrow(() => assertSafeCommand(["work/fleet-schema/miner.py", "--daily"]));
+  assert.doesNotThrow(() => assertSafeCommand(["scripts/jev-latest-canary-run.sh"]));
+  assert.throws(() => assertSafeCommand(["/abs/path/x"]), /repository path/);
+  assert.throws(() => assertSafeCommand(["a/../../evil"]), /repository path/);
+  assert.throws(() => assertSafeCommand(["systemctl", "start", "x"]), /service-manager/);
+});
+
+test("dry-run listing composes evals, canary and miner without writing", () => {
+  const stateDir = tempState();
+  const jobs = listDailyJobs(
+    [{ name: "classify" }, { name: "gate" }],
+    { stateDir },
+  );
+  assert.deepEqual(
+    jobs.map((job) => job.label),
+    ["classifier-canary-daily", "classifier-classify-eval-daily", "classifier-gate-eval-daily", "classifier-miner-daily"],
   );
 });
