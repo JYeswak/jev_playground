@@ -13,6 +13,7 @@
     "bin",
     "dist",
     "src",
+    "runners",
     "ROBOT.md",
     "test/fixtures",
     "examples",

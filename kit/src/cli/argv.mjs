@@ -11,7 +11,7 @@ const VALUE_OPTIONS = {
   score: new Set(['--text', '--levels', '--backend']),
   gate: new Set(['--command', '--backend']),
   canary: new Set([]),
-  miner: new Set(['--input', '--as-of', '--labels']),
+  miner: new Set(['--input', '--as-of', '--labels', '--rank-output']),
   omp: new Set(['--dir']),
   install: new Set(['--dir']),
   uninstall: new Set(['--dir']),

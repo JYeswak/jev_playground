@@ -243,8 +243,8 @@ async function score(args) {
     : undefined;
   return scoreText({ text, levels, backend: fake ? "jev" : option(args, "--backend"), dryRun, apiKey: fake && !dryRun ? "fixture-key" : undefined, fetchImpl, model: fake && !dryRun ? "fake" : undefined });
 }
-const CANARY_RUNNER = new URL("../scripts/jev-latest-canary-run.sh", ROOT);
-const MINER_RUNNER = new URL("../work/fleet-schema/miner.py", ROOT);
+const CANARY_RUNNER = new URL("./runners/jev-latest-canary-run.sh", ROOT);
+const MINER_RUNNER = new URL("./runners/miner.py", ROOT);
 
 function allOptions(args, name) {
   const values = [];
@@ -272,11 +272,14 @@ async function miner(args) {
   const labels = option(args, "--labels");
   const rank = hasFlag(args, "--rank");
   if (!labels && !rank) return usageFailure("classifier miner --labels FAMILY|--rank [--input FILE] [--as-of YYYY-MM-DD] [--json|--robot]");
+  const rankOutput = option(args, "--rank-output")
+    ?? (rank ? join(process.env.HOME ?? homedir(), ".local/state/jev/miner-RANK.md") : undefined);
   const minerArgs = [
     ...(labels ? ["--labels", labels] : []),
     ...(rank ? ["--rank"] : []),
     ...inputs.flatMap((input) => ["--input", input]),
     "--as-of", asOf, "--json",
+    ...(rankOutput ? ["--rank-output", rankOutput] : []),
   ];
   const probe = await execProbe("python3", [fileURLToPath(MINER_RUNNER), ...minerArgs], { timeout: 120000 });
   if (probe.code !== 0) return { ok: false, reason: "ERROR", runnerExit: probe.code, message: `miner failed (runner exit ${probe.code})`, detail: probe.stderr.trim().split("\n").slice(-3) };
