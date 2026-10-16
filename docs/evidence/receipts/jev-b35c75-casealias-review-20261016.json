@@ -1,0 +1,177 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_96a84b17efe10c3410da272d5cabcb4949e0cee5278e00296d2f71bb331f0034",
+ "limitations": [
+  "Case-alias of reserved metadata still violates original pre-publication/repeat criteria; known fixes and normal18/controls valid partial only."
+ ],
+ "operation": "jev-b35c.75.case-alias-review",
+ "parameters": {
+  "subject_sha256": "a85e2661eb506fca88a5bc5b77289722eb6ce065721c2eb6659881ecd9f1fec6"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "JadeSpire",
+  "bead": "jev-b35c.75",
+  "build": {
+   "absolute_package_prefix": "/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source/kit",
+   "admission": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 144594157568,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 144594157568,
+    "free_excludes_purgeable": true,
+    "free_pct": 14.537005799494473,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 144594157568,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 3025042816,
+        "method": "foundation"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 143601852416,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 143601852416,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   },
+   "command": "npm ci --ignore-scripts --no-audit --no-fund --prefix /Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source/kit && npm run prepare --prefix /Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source/kit && node --test /Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source/kit/test/install-cli.test.mjs",
+   "cores": "32\n",
+   "cwd": "/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/source",
+   "exit": 0,
+   "fail": 0,
+   "focused_tests": 18,
+   "output_sha256": "fe7b7c5942bd7216dd9297e30405f6af502835af008cfc24146a035e27cf2ba2",
+   "pass": 18,
+   "uptime": "12:20  up 25 days, 21:50, 5 users, load averages: 8.72 8.91 8.80\n"
+  },
+  "candidate": "2d585b76137a42450cc00f7a93095c67479efead",
+  "captures": {
+   "bytes": 399627,
+   "path": "/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/captures.json",
+   "sha256": "5f7f12713021cc9d570c570a8812b18ee769dcf2d86146b78680ad3a9c6cc13f"
+  },
+  "exact_git_source": true,
+  "limits": [
+   "SDK entry and exact-lowercase namespace fixes are independently confirmed, not retracted. Remaining alias is same original AC2/3 path-identity failure, not a new contract.",
+   "Full-kit aggregate and complete real takeover/rollback remainder NOT_RUN after decisive new original-scope failure. No narrowed close/parent19/20/whole-main claim.",
+   "No production/test/gate edits or file deletions by verifier; input artifact metadata/data created as owned variants.",
+   "Child network/launchctl denied; no classifier inference/provider prompt/real HOME/service effects.",
+   "Receipt reservation MCP timed out; authoritative same-server native CLI confirmed exact granted lease before write."
+  ],
+  "normal_real_controls": {
+   "canary_help_exit": 0,
+   "doctor": {
+    "exit": 1,
+    "schema": "classifier.doctor.v1",
+    "status": "FINDINGS"
+   },
+   "install": {
+    "exit": 0,
+    "status": "installed",
+    "stderr": "",
+    "stdout_sha256": "5d9c94e340205f06a7aec0d6a0603cb3d811eda670c274e45834b9f54b34d522",
+    "writes": 202
+   },
+   "installed_version": {
+    "exit": 0,
+    "stdout": "classifier 0.0.0\n"
+   },
+   "package_version": "0.0.0",
+   "sdk_import": {
+    "exit": 0,
+    "stdout": "{\"resolved\":\"file:///Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/normal-home/.local/share/classifier/versions/0.0.0/node_modules/@typesafe-ai/sdk/dist/index.mjs\",\"imported\":true}\n"
+   },
+   "self_repeat": {
+    "exit": 0,
+    "status": "already",
+    "stderr": "",
+    "stdout_sha256": "16618a24bbe63ba1eb377c925734a835816b3009a003ecc48c131f5d587e2b5b",
+    "writes": 0
+   },
+   "whole_identity_stable": true
+  },
+  "preflight": "/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/preflight.json",
+  "previous_negatives_now_fixed": [
+   {
+    "exit": 64,
+    "label": "missing-sdk-entry",
+    "stderr": "prepared runtime dependency cannot load: @typesafe-ai/sdk: node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/node_modules/@typesafe-ai/sdk/dist/index.mjs' imported from /Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/[eval1]\nDid you mean to import \"@typesafe-ai/sdk/dist/index.cjs\"?\n    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n    at defaultResolve (node:internal/modules/esm/resolve:989:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)\n    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)\n    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)\n    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/node_modules/@typesafe-ai/sdk/dist/index.mjs'\n}\n\nNode.js v22.23.3\nrerun: classifier install --help\nsee: classifier install --help\n",
+    "stdout": "{\"ok\":false,\"schema\":\"classifier.install.v1\",\"status\":\"USAGE\",\"data\":null,\"meta\":{\"version\":\"0.0.0\",\"backend\":\"jev\",\"backend_requested\":\"jev\",\"fallback_reason\":null,\"model\":null,\"latency_ms\":0,\"usage\":null},\"warnings\":[],\"commands\":[\"classifier install --help\"],\"errors\":[{\"code\":\"USAGE\",\"exit_code\":64,\"message\":\"prepared runtime dependency cannot load: @typesafe-ai/sdk: node:internal/modules/run_main:123\\n    triggerUncaughtException(\\n    ^\\n\\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/node_modules/@typesafe-ai/sdk/dist/index.mjs' imported from /Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/[eval1]\\nDid you mean to import \\\"@typesafe-ai/sdk/dist/index.cjs\\\"?\\n    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\\n    at defaultResolve (node:internal/modules/esm/resolve:989:11)\\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)\\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)\\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)\\n    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)\\n    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)\\n    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)\\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {\\n  code: 'ERR_MODULE_NOT_FOUND',\\n  url: 'file:///Users/josh/Developer/jev/var/agent-tmp/cli75-fixed-review.25572/negative-sdk/package/node_modules/@typesafe-ai/sdk/dist/index.mjs'\\n}\\n\\nNode.js v22.23.3\",\"remediation\":[\"rerun: classifier install --help\"],\"see\":\"classifier install --help\"}]}\n",
+    "unchanged": true
+   },
+   {
+    "asset": ".classifier-install.json",
+    "exit": 64,
+    "label": "reserved-lower",
+    "status": "USAGE",
+    "stderr": "prepared package asset uses the reserved installer manifest path: .classifier-install.json\nrerun: classifier install --help\nsee: classifier install --help\n",
+    "stdout": "{\"ok\":false,\"schema\":\"classifier.install.v1\",\"status\":\"USAGE\",\"data\":null,\"meta\":{\"version\":\"0.0.0\",\"backend\":\"jev\",\"backend_requested\":\"jev\",\"fallback_reason\":null,\"model\":null,\"latency_ms\":0,\"usage\":null},\"warnings\":[],\"commands\":[\"classifier install --help\"],\"errors\":[{\"code\":\"USAGE\",\"exit_code\":64,\"message\":\"prepared package asset uses the reserved installer manifest path: .classifier-install.json\",\"remediation\":[\"rerun: classifier install --help\"],\"see\":\"classifier install --help\"}]}\n",
+    "unchanged": true
+   }
+  ],
+  "remaining_original_scope_failure": {
+   "actual_install_exit": 0,
+   "actual_install_status": "installed",
+   "consumer_unchanged": false,
+   "declared_asset": ".CLASSIFIER-INSTALL.JSON",
+   "declared_asset_preserved": false,
+   "expected": "Case aliases of reserved metadata must refuse before publication on this actual case-insensitive target; do not overwrite declared content or return conflict on identical repeat.",
+   "identical_payload_repeat_exit": 4,
+   "input": "Real prepared artifact with complete production SDK; only adds declared asset under case alias, valid version2/entries[] JSON; no symlink/fake launcher.",
+   "installed_asset_bytes": 45551,
+   "installed_asset_sha256": "c8d9e370ad283830973d3c024ad6381866da4e3280892f1413e4c9228bc68697",
+   "internal_manifest": ".classifier-install.json",
+   "repeat_stderr": "CLI target ownership or payload conflicts with the requested operation\nback up, then remove the conflicting file, and rerun: classifier install cli --apply\nsee: classifier install --help\n",
+   "same_physical_target": {
+    "device": "16777233",
+    "inode": "2010035857",
+    "same_device": true,
+    "same_inode": true
+   },
+   "source_asset_bytes": 27,
+   "source_asset_sha256": "a7c2132f13604b3167d5d6ff427f2aaa57e4806c6bf76c30ffdcbadda3af4382",
+   "source_boundary": "cli-target.ts223-225 raw case-sensitive namespace comparison"
+  },
+  "reviewer": "DarkBear",
+  "source_sha256": "a85e2661eb506fca88a5bc5b77289722eb6ce065721c2eb6659881ecd9f1fec6",
+  "verdict": "REWORK_ORIGINAL_NAMESPACE_AND_REPEAT_INVARIANT"
+ }
+}
