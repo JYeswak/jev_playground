@@ -1,0 +1,78 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_30ff707b94fa6e80bd387125a4ab2bb9c0be14b2008d8a55a814f9635dac80d4",
+ "limitations": [
+  "Local filesystem/native ambient positives do not override exact published CI profile failures; no full main, all-runtime, whole-feature, model or billing claim."
+ ],
+ "operation": "jev-b35c.74-inplace-native-review",
+ "parameters": {
+  "subject_sha256": "2d9320ee52405aa4cabc07b9c035806ff580c47d30459e947fdf40c6d7ab0b8d"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "ambient_positive": {
+   "exit": 0,
+   "pid": 52264,
+   "ready": true,
+   "state_success": true,
+   "stderr": "",
+   "stdout_sha256": "c614ab807078b28ec2eed72334070bca7fcd10644cc47e324d0094ee731d69fa"
+  },
+  "broken_generated_shim_control": {
+   "exit": 0,
+   "nonce": "JEV_NATIVE_DISCOVERY_NEGATIVE_7BB1E854",
+   "pid": 54577,
+   "ready": true,
+   "restored_sha256": "dd94716301f466bf73427b8bb17e5c9c01a1b696d7055401c9636ae6d3372d40",
+   "state_success": true,
+   "stderr": "Failed to load extension ~/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts: Failed to load extension: JEV_NATIVE_DISCOVERY_NEGATIVE_7BB1E854\n"
+  },
+  "candidate": "7bb1e854d271aad23bdc6fb2bdc4787c1e268ca0",
+  "cause": "UNPROVEN; no causal platform attribution from this comparison",
+  "ci": {
+   "head": "7bb1e854d271aad23bdc6fb2bdc4787c1e268ca0",
+   "log_sha256": "2d9320ee52405aa4cabc07b9c035806ff580c47d30459e947fdf40c6d7ab0b8d",
+   "node": "22.18.0",
+   "prepare": "success",
+   "profile_suite": {
+    "exit": 1,
+    "fail": 9,
+    "pass": 15,
+    "tests": 24
+   },
+   "run": 38906629836,
+   "ts_errors": false
+  },
+  "initial_harness_failure": {
+   "exit": 1,
+   "ready": false,
+   "stderr": "No default model selected. Use /login, set an API key environment variable, or select a local model with /model or --model.\n\nSet an API key environment variable:\n  ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, etc.\n\nOr create /Users/josh/Developer/jev/var/agent-tmp/native74-inplace-review.59421/profile-Rt9CuD/home/Users/josh/Developer/jev/var/agent-tmp/native74-inplace-review.59421/profile-Rt9CuD/home/.omp/profiles/muse/agent/models.yml\n"
+  },
+  "local_runtime": "Node22.23.3/current compiled artifacts",
+  "local_suite": {
+   "exit": 0,
+   "stdout_sha256": "e00c4eee00a99336e9019af34871412d6c87ca0b6c9b6a2c4436ab93071a8081",
+   "tests": 61
+  },
+  "native_binary": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+  "native_config": "isolated HOME default .omp; no PI_CONFIG_DIR override; owned consumer cwd; no -e/disable flags",
+  "native_model_selection_only": "openai/gpt-4o; no prompt sent",
+  "native_profile": "muse",
+  "native_version": "omp/18.11.1",
+  "no_model_prompt_or_product_source_edits": true,
+  "no_op_repeat": {
+   "actual_added_files": 0,
+   "first_exit": 0,
+   "reported_writes": 0,
+   "second_exit": 0,
+   "status": "already"
+  },
+  "no_write_negative": {
+   "actual_added_files": 0,
+   "exit": 4,
+   "reported_writes": 0
+  },
+  "verdict": "REWORK: exact supported-runtime CI original profile suite fails"
+ }
+}
