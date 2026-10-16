@@ -1,0 +1,103 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_9afa3da51da42a995668f70811d1e9d53c08f434544c297714fd88033dcd8f76",
+ "limitations": [
+  "Source-backed original README truth failure only; not a new model test, quality result, global config/health audit, full-current stranger-run PASS or new closure criterion. Valid historical16/433/selftest/card/changelog observations preserved."
+ ],
+ "operation": "jev-qx7b.current-readme-truth-review",
+ "parameters": {
+  "subject_sha256": "c3b6815957fc3c6c7c49ffe68f1be0e6e633e27409230cc7dbe05009f6671c5d"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "new_model_requests": 0,
+  "not_rerun": [
+   "Real previously successful stranger16",
+   "Previously passed broad foundation/stranger selftests solely to reconfirm",
+   "Model inference, runtime/config activation or live current-provider audit"
+  ],
+  "overall_original_scope_verdict": "REWORK due concrete original README-truth AC2. No new globalCI/finalregistry requirement; other observations not declaredfalse or inflated into current wholePASS.",
+  "primary_original_ac2_failure": {
+   "claim": "- **The classic encoder family is our biggest unmeasured gap:** one small encoder has run on our rows and failed: localbench's Laya-MLX (421M ModernBERT with decision heads) is rejected on all four jev suites it saw (bash gate, SST-5, auto-thinking, unexpected stop; `localbench/docs/evidence/NEGATIVE_EVIDENCE.md:1076-1090`). Fine-tuned encoders, SetFit, NLI cross-encoders, open injection-guard models and fact-check models have not been run on our rows yet.",
+   "contradiction": "Open ProtectAI injection-guard encoder already has a committed real historical execution; pending replay/full acceptance does not mean it never ran.",
+   "encoder_answer_path": "work/x1-injection-encoders/answers-protectai.jsonl",
+   "encoder_rows": 1348,
+   "readme_line": 24,
+   "receipt_path": "work/x1-injection-encoders/RECEIPT.md",
+   "recorded_execution": {
+    "acceptance": {
+     "bar_pass": false,
+     "benign_control_pass": true,
+     "clean_false_flags_no_higher": true,
+     "marked_catch_ahead": false,
+     "markerless_catch_ahead": false
+    },
+    "development": {
+     "encoder_flags": 3,
+     "jev_false_flags": 3,
+     "n": 100
+    },
+    "lane": "local+live",
+    "model": "protectai/deberta-v3-base-prompt-injection-v2",
+    "model_loads": 1,
+    "revision": "90c9989b1a342275dd0d1a95aad283c04e075671",
+    "scored_rows": 1248,
+    "started_at_utc": "2026-10-05T16:27:00Z",
+    "status": "SCORED"
+   },
+   "row_model_counts": {
+    "null": 1348
+   }
+  },
+  "prior_real_successes_preserved": [
+   "Ruby fresh stranger16 and gates/selftest/433 evidence4319",
+   "Current README190 now correctly names1b8ea68b and pendingwbel/.67",
+   "cab6012f historical changelog/README campaign and4fd8fb84 card remain historical accepted inputs"
+  ],
+  "readme_manual_review": "All205lines, including full raw long lines61/179/194; no regex-based prose edit.",
+  "reviewed_published_handoff": "01368d69fa0c301fde0cc21254f0ddcd224edb5b",
+  "secondary_document_source_reconciliation": {
+   "later_recorded_source": "EVAL.md3856-3865",
+   "later_source_lines": [
+    "## 2026-10-15 jev-3ck9 hosted-first native judge availability [live, bounded]",
+    "",
+    "- **Authority / scope:** Joshua's all-five Clef-only chain relayed in chief AM54511 and director AM54569. Default, claude, codex, grok and muse now resolve `modelRoles.judge=clef/clef-flash` and `retry.fallbackChains.judge=[cloudflare-workers-ai/@cf/cloudflare/clef-flash]`; TypeSafe is absent from that chain. Native grouped config reads exit 0 for all five; `find.enabled` remains `auto`. Unrelated roles/settings/provider entries compare equal to private originals. No generic chat retry-policy or local service change.",
+    "- **Credentials / rollback:** native `workers-ai-systemone` receives its supported structured token/account credential from an exact-scope Infisical command (`prod`, root folder, imports/expansion/personal overrides disabled). No token/account value, prefix or raw auth/config was emitted. Ten original files are retained privately, files 0600/directory 0700, at `var/agent-tmp/jev-b35c.50.46486/free-judge-originals/{profile}.{config,models}.yml`; restoring those exact originals to the corresponding leased profile paths is the rollback, subject to fresh custody/readback so later owners' changes are not overwritten.",
+    "- **Fresh native session:** OMP 18.11.0, real Jev cwd, `--profile codex --mode json --tools find --no-title --no-lsp --no-extensions --no-skills --no-rules --session-dir <owned scratch>/free-judge-native-session --max-time 90 -p <one-find prompt>`. The uncached query “Where does doctor check global installed hook source identity and OFF-writer activity?” scoped to `kit/src/doctor/detectors` returns `drift.mjs:163-303`, p=0.8662, three requests, zero find errors, 6,297 input tokens, 6,968.903 ms tool wall time, process exit 0. Same-session `model_usage` rows record local Clef 502 followed by hosted `cloudflare-workers-ai/@cf/cloudflare/clef-flash` success for each find request; TypeSafe-provider attempts are zero. Native unexpected-stop also falls through local 502 to hosted success. No direct hosted judge override was used for this positive.",
+    "- **Native footer boundary:** the actual find footer prints counts/tokens/cost/time, not a provider label. Hosted identity and configured fallback execution are proven by the session ledger, not an invented footer field. The first identical-query session hit the native answer cache; the separate uncached query above is the paid-attempt attribution proof. Discovery-disabled session flags isolate the native seam from unrelated legacy hooks and are not proof every project extension stopped making its own calls.",
+    "- **Bad-token negative:** isolated `PI_CODING_AGENT_DIR=<owned scratch>/free-judge-bad-token-agent`, both `OMP_PROFILE` and `PI_PROFILE` unset, native hosted-only credential control, synthetic invalid token and privately command-resolved account. `omp find ... --json` exits 1, three requests/three errors, visible 401 Authentication error followed by that isolated registry's rejection cooldown; no empty-success grade. The first isolation attempt unset only `OMP_PROFILE`, inherited `PI_PROFILE`, and exercised the healthy profile instead: invalid negative evidence, explicitly discarded. After correct isolation, a fresh uncached `claude` profile native find returns the actual drift file, three requests/zero errors, 3,560 input tokens, exit 0; shared credentials/cooldown were not poisoned.",
+    "- **N / cost:** availability only, not a comparison: six native-find invocations in total (four standalone CLI invocations including both negative-harness attempts, plus two fresh sessions); 18,601 hosted input tokens including native unexpected-stop, catalog estimate **$0.000706838**. Correct invalid-token requests report zero usage. Actual Cloudflare billing/balance was not queried; hosted allowance is limited, not unlimited free capacity. No new TypeSafe call or paid comparator.",
+    "- **Evidence:** `docs/evidence/receipts/jev-3ck9-hosted-first-20261015.json`, `ev_5e7afe8f53282fdd0a9b85e4acc85ade01e76971d13f86dcb3f300f02cf346eb`; canonical kit signer and verify both exit 0. The receipt binds all ten installed config hashes, decisive output hashes, and the fresh session journal hash. Journal: `var/agent-tmp/jev-b35c.50.46486/free-judge-native-session/2026-10-15T05-15-23-715Z_01a13dfc-8cc3-7143-912b-32d82db8e602.jsonl`. Global hashes bind mutable observed state, not immutable publication.",
+    "- **Boundary / ownership:** original `jev-3ck9` captured-request preregistration, parity/non-inferiority, per-use value and final local rollout acceptance remain open; no self-close. Installed package source reports 18.10.3 while the exercised binary is 18.11.0, so source-read chain semantics are corroboration, not an exact binary-source identity claim. Tracker claim attempts failed WAL-recovery/busy with exit 2; no DB surgery or source-scope narrowing. Global runtime changes stay under LavenderDune's explicit leases; no raw push. QuietBadger is the independent verifier."
+   ],
+   "readme_lines": [
+    173,
+    194
+   ],
+   "scope": "Internal source chronology/current-wording reconciliation; NOT a fresh audit of mutable global settings, billing, health, model quality, parity or value."
+  },
+  "skills_read": [
+   "changelog-md-workmanship",
+   "readme-writing",
+   "de-slopify",
+   "installer-workmanship",
+   "gh-og-share-images"
+  ],
+  "source_bindings": {
+   "README.md": {
+    "matches_review_commit": true,
+    "sha256": "55ac8013e3a60c812c1dee232c3241c45b295393d6409e52f4ebf639f28a8d5e"
+   },
+   "work/x1-injection-encoders/RECEIPT.md": {
+    "matches_review_commit": true,
+    "sha256": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0"
+   },
+   "work/x1-injection-encoders/answers-protectai.jsonl": {
+    "matches_review_commit": true,
+    "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+   }
+  },
+  "source_or_runtime_edits_by_reviewer": false
+ }
+}
