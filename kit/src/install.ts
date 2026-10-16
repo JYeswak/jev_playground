@@ -16,7 +16,7 @@ export const INSTALL_FILES = {
   "extensions/jev-screen.ts": "omp/extensions/jev-screen.ts",
   "extensions/jev-flag.ts": "omp/extensions/jev-flag.ts",
   "extensions/jev-classify.ts": "omp/extensions/jev-classify.ts",
-  "jev-kit/client.ts": "jev-kit/client.ts",
+  "jev-kit/client.ts": "../src/client.ts",
   "jev-kit/validate.ts": "jev-kit/validate.ts",
   "jev-kit/preflight.ts": "jev-kit/preflight.ts",
   "jev-kit/fake.ts": "jev-kit/fake.ts",
@@ -32,6 +32,9 @@ export const INSTALL_FILES = {
   "jev-kit/verify.ts": "../src/verify.ts",
   "jev-kit/classify.ts": "../src/classify.ts",
   "jev-kit/gate.ts": "../src/gate.ts",
+  "jev-kit/clef.ts": "../src/clef.ts",
+  "jev-kit/calibration.ts": "../src/calibration.ts",
+  "jev-kit/usage.ts": "../src/usage.ts",
 };
 
 const MANIFEST_PATH = ".omp/jev-kit-manifest.json";
