@@ -1,0 +1,69 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_f3a30df8fd085957d5452532eb8064c1c7197bf9c39d0ee750bedb060a9e9cad",
+ "limitations": [
+  "Remote exact-source prepare lifecycle observed; standalone local acceptance argv NOT_RUN. Full workflow remains red; no complete-close claim."
+ ],
+ "operation": "jev-b35c.68.published-nonauthor-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "bytes": 127,
+  "details": {
+   "author": "RubyMeadow",
+   "backend": {
+    "HOME_and_OMP_HOME": "owned isolated directories",
+    "command": "node --test kit/test/backend.test.mjs",
+    "cwd": "owned exact published archive",
+    "dependency_staging": "npm ci --ignore-scripts --no-audit --no-fund, 4 locked packages in owned prefix; not a prepare result",
+    "exit": 0,
+    "fail": 0,
+    "network": "OS denied",
+    "pass": 9,
+    "skip": 0
+   },
+   "bead": "jev-b35c.68",
+   "boundaries": [
+    "No local build admission waiver, source/profile/config/model changes or known-bad replay",
+    "CI lifecycle executes the same declared prepare script; exact standalone acceptance argv was not executed by this reviewer, and is not mislabeled as such",
+    "Whole workflow remains red: registered suites plus independent close-reference job; no main CI or installer-parent clearance",
+    "Current review evidence is sufficient for runtime/source/typecheck observations, not an automatic full-original-AC close pending exact preparation/admission interpretation"
+   ],
+   "ci": {
+    "actual_invocation": "npm ci --prefix kit invokes the declared prepare lifecycle",
+    "actual_prepare_script": "node scripts/copy-questions.mjs && tsc -p tsconfig.json",
+    "head": "2836e93b202cecbfe6b871a81a518ab12ce1b4f7",
+    "job": 116864366025,
+    "known_bad_TS2322_positive_control": 6,
+    "known_bad_build_rerun": false,
+    "prepare_prerequisite_step": "success",
+    "raw_log_bytes": 100532,
+    "raw_log_sha256": "d212aaa0cb4d278e847e035cc0942c9572bfd64d82d19d88fa71c83c2107103f",
+    "repaired_TS2322": 0,
+    "run": 38867744365,
+    "standalone_local_npm_run_prepare": "NOT_RUN: no new same-volume positive local compilation admission; do not infer it from CI lifecycle",
+    "url": "https://github.com/JYeswak/jev_playground/actions/runs/38867744365",
+    "workflow_conclusion": "failure",
+    "workflow_lines": "195-206, set -euo pipefail; no continue-on-error or ||true"
+   },
+   "consumer_smoke": {
+    "exit": 0,
+    "provider_contacts": 0,
+    "scope": "real public score/bundle/choice failure-return branches; injected transports must not be called",
+    "stderr": "",
+    "stdout": "{\"score\":{\"reason\":\"uncalibrated\",\"backend\":\"clef\"},\"bundle\":{\"reason\":\"uncalibrated\",\"backend\":\"clef\"},\"choice\":{\"reason\":\"no-answers\",\"backend\":\"clef\"},\"provider_contacts\":0}\n"
+   },
+   "diff": "six reason string literals gain as const; no assertion to JevFailure, no runtime routing/fail-safe edits",
+   "published_source": "2836e93b202cecbfe6b871a81a518ab12ce1b4f7",
+   "reviewer": "DarkBear",
+   "source_binding": {
+    "exact_git_archive": true,
+    "git_tree_manifest_sha256": "bb99ac3af91d9081394a570cda8861a7e8f3968d7518306b5c89091292a8fd0d",
+    "mismatches": [],
+    "package_files_byte_checked": 199
+   }
+  },
+  "sha256": "591295b28cdac340be1dac85313ae0612b415a81a5f11bc43264fd24e5ad5bc9"
+ }
+}
