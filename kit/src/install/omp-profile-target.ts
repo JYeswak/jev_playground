@@ -2,23 +2,24 @@
 // families behind blast-radius checks. Every family install requires: the
 // surface present in the shared switch registry with a non-null off switch
 // the manifest names exactly; a positive-integer latency at or under the
-// handler limit; a non-empty declared-safe-side test id; and a contract that
-// passes validateContract (which itself refuses safe-side/surface-type
+// handler limit; a declared-safe-side test id bound to a canonical executable
+// proof; and a contract that passes validateContract (which itself refuses
 // contradictions). Declared-OFF families never install; extension families
 // outside their supported profiles are unsupported. Predecessors that are not
 // our shims conflict (exit 4) unless migrate backs them up; repo-path
 // predecessors are refused untouched. All paths derive from explicit inputs;
 // nothing reads process.env.
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { dirname, join } from "node:path";
+import { createRequire } from "node:module";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { EXIT_CODES } from "../families/registry.js";
-import { validateContract } from "../contracts.js";
+import { validateContract, type DecisionContract } from "../contracts.js";
 import { isSafeProfileName, profileAgentDir } from "./omp-paths.js";
+import { decide } from "../conformance.js";
 
 export const SHIM_MARKER_PREFIX = "// classifier-shim-v2";
-
 export type TargetFamily = {
   id: string;
   surfaceType: string;
@@ -32,6 +33,8 @@ export type TargetFamily = {
     offSwitchPath: string;
   };
   packageSpecifier: string;
+  packageRoot: string;
+  packageLockPath: string;
   pin: string;
 };
 
@@ -105,43 +108,165 @@ async function readShimMarker(agentDir: string): Promise<{ marker: Record<string
   }
   return { marker, raw, path };
 }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isGitCommit(value: unknown): value is string {
+  if (typeof value !== "string" || value.length !== 40) return false;
+  for (const character of value) {
+    const code = character.charCodeAt(0);
+    if (!((code >= 48 && code <= 57) || (code >= 97 && code <= 102))) return false;
+  }
+  return true;
+}
+
+function packageNameFromSpecifier(specifier: string): string {
+  if (!specifier || specifier.startsWith("/") || specifier.includes("\\") || specifier.includes("\0")) {
+    throw new Error("invalid packaged import specifier");
+  }
+  const segments = specifier.split("/");
+  if (segments.some((segment) => segment === "" || segment === "." || segment === "..")) {
+    throw new Error("invalid packaged import path");
+  }
+  if (segments[0].startsWith("@")) {
+    if (segments.length < 2 || segments[0].length < 2) throw new Error("invalid scoped package import");
+    return segments[0] + "/" + segments[1];
+  }
+  return segments[0];
+}
+
+async function resolveFamilyPackage(family: TargetFamily): Promise<Record<string, unknown>> {
+  const packageName = packageNameFromSpecifier(family.packageSpecifier);
+  const packageRoot = resolve(family.packageRoot);
+  const packageLockPath = resolve(family.packageLockPath);
+  const lockRoot = dirname(packageLockPath);
+  let packageValue: unknown;
+  let consumerValue: unknown;
+  let lockValue: unknown;
+  try {
+    packageValue = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as unknown;
+    consumerValue = JSON.parse(await readFile(join(lockRoot, "package.json"), "utf8")) as unknown;
+    lockValue = JSON.parse(await readFile(packageLockPath, "utf8")) as unknown;
+  } catch (error) {
+    throw new Error("package manifest or lockfile cannot be read: " + family.id + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  if (!isRecord(packageValue) || packageValue.name !== packageName || typeof packageValue.version !== "string") {
+    throw new Error("package manifest does not identify imported package: " + family.id);
+  }
+  if (!isRecord(consumerValue) || !isRecord(consumerValue.dependencies) || !isRecord(lockValue) ||
+      (lockValue.lockfileVersion !== 2 && lockValue.lockfileVersion !== 3) || !isRecord(lockValue.packages)) {
+    throw new Error("package manifest or lockfile is invalid: " + family.id);
+  }
+  const lockRootEntry = lockValue.packages[""];
+  const packageEntry = lockValue.packages["node_modules/" + packageName];
+  if (!isRecord(lockRootEntry) || !isRecord(lockRootEntry.dependencies) || !isRecord(packageEntry)) {
+    throw new Error("package lock does not contain imported package: " + family.id);
+  }
+  const declared = consumerValue.dependencies[packageName];
+  const lockedRoot = lockRootEntry.dependencies[packageName];
+  const resolved = packageEntry.resolved;
+  if (typeof declared !== "string" || typeof lockedRoot !== "string" || typeof resolved !== "string" ||
+      declared !== lockedRoot || declared !== resolved || packageEntry.version !== packageValue.version || !isGitCommit(family.pin)) {
+    throw new Error("package manifest and lock do not agree: " + family.id);
+  }
+  const hashOffset = resolved.lastIndexOf("#");
+  const resolvedCommit = hashOffset < 0 ? "" : resolved.slice(hashOffset + 1);
+  if (!resolved.startsWith("git+https://") || !isGitCommit(resolvedCommit) || resolvedCommit !== family.pin) {
+    throw new Error("package lock does not pin the declared commit: " + family.id);
+  }
+  const installedPackageRoot = await realpath(join(lockRoot, "node_modules", ...packageName.split("/")));
+  const actualPackageRoot = await realpath(packageRoot);
+  if (installedPackageRoot !== actualPackageRoot) throw new Error("package root differs from locked install: " + family.id);
+  const requireFromConsumer = createRequire(join(lockRoot, "package.json"));
+  const importedPath = await realpath(requireFromConsumer.resolve(family.packageSpecifier));
+  const importRelative = relative(actualPackageRoot, importedPath);
+  if (importRelative === ".." || importRelative.startsWith(".." + sep) || isAbsolute(importRelative) || !(await stat(importedPath)).isFile()) {
+    throw new Error("package import does not resolve inside the locked package: " + family.id);
+  }
+  const jevMetadata = packageValue.jev;
+  const safeSideTests = isRecord(jevMetadata) ? jevMetadata.safe_side_tests : undefined;
+  if (!isRecord(safeSideTests)) throw new Error("package manifest has no safe-side test registry: " + family.id);
+  return safeSideTests;
+}
+
 
 function shimSource(family: TargetFamily, profile: string, offSwitch: { path: string; polarity: string }, safeSide: string): string {
   return (
     `${SHIM_MARKER_PREFIX} family=${family.id} profile=${profile} pin=${family.pin}\n` +
     `// off-switch: ${offSwitch.path} (${offSwitch.polarity})\n` +
     `// safe-side: ${safeSide} (test ${family.manifest.safeSideTestId})\n` +
-    `export * from '${family.packageSpecifier}';\n`
+    "export * from " + JSON.stringify(family.packageSpecifier) + ";\n"
   );
 }
 
-function checkBlastRadius(
+const CANONICAL_SAFE_SIDE_PROOFS: Record<string, string> = {
+  "command-gate:refuse": "gateNetworkUnreachableRefuses",
+  "result-screen:pass": "screenNetworkUnreachablePasses",
+};
+
+async function proveSafeSideUnreachable(contract: DecisionContract): Promise<string> {
+  const state = Object.fromEntries(contract.state.fields.map((field) => [field, "fixture"]));
+  const outcome = await decide({
+    contract,
+    state,
+    result: { fixture: "unchanged" },
+    adapter: {
+      id: "offline-unreachable",
+      modelId: "offline-unreachable",
+      probabilities: "required",
+      evaluate: async (request, transport) => transport(request),
+    },
+    transport: async () => {
+      throw new Error("network unreachable");
+    },
+  });
+  if (outcome.status !== "transport-error" || outcome.reason !== "transport") {
+    throw new Error("safe-side proof did not reach the unreachable transport");
+  }
+  return outcome.action;
+}
+
+async function checkBlastRadius(
   family: TargetFamily,
   registry: SwitchRegistry,
   maxHandlerLatencyMs: number,
-): { offSwitch: { path: string; polarity: string }; safeSide: string } {
+  safeSideTests: Record<string, unknown>,
+): Promise<{ offSwitch: { path: string; polarity: string }; safeSide: string }> {
   const surface = registry.surfaces.find((entry) => entry.id === family.id);
-  if (surface === undefined) {
-    throw new Error(`unknown surface: ${family.id}`);
-  }
-  if (surface.off_switch === null || surface.off_switch === undefined) {
-    throw new Error(`surface has no off switch: ${family.id}`);
-  }
-  if (family.manifest.offSwitchPath !== surface.off_switch.path) {
-    throw new Error(`manifest off switch does not match registry: ${family.id}`);
-  }
+  if (surface === undefined) throw new Error("unknown surface: " + family.id);
+  if (surface.off_switch === null || surface.off_switch === undefined) throw new Error("surface has no off switch: " + family.id);
+  if (family.manifest.offSwitchPath !== surface.off_switch.path) throw new Error("manifest off switch does not match registry: " + family.id);
   const latency = family.manifest.latencyBudgetMs;
   if (!Number.isSafeInteger(latency) || (latency as number) < 1 || (latency as number) > maxHandlerLatencyMs) {
-    throw new Error(`latency budget outside the handler limit: ${family.id}`);
+    throw new Error("latency budget outside the handler limit: " + family.id);
   }
   if (typeof family.manifest.safeSideTestId !== "string" || family.manifest.safeSideTestId.trim() === "") {
-    throw new Error(`manifest names no declared-safe-side test: ${family.id}`);
+    throw new Error("manifest names no declared-safe-side test: " + family.id);
   }
-  let contract: { safe_side: string };
+  let contract: DecisionContract & { safe_side_test_id?: string };
   try {
     contract = validateContract(family.contract);
   } catch (error) {
-    throw new Error(`contract refused: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error("contract refused: " + (error instanceof Error ? error.message : String(error)));
+  }
+  const testId = contract.safe_side_test_id;
+  if (typeof testId !== "string" || testId.trim() === "" || family.manifest.safeSideTestId !== testId) {
+    throw new Error("manifest safe-side test ID does not match contract: " + family.id);
+  }
+  if (family.surfaceType !== contract.surface_type) throw new Error("family surface type does not match contract: " + family.id);
+  const registration = safeSideTests[testId];
+  if (!isRecord(registration) || registration.surface_type !== contract.surface_type ||
+      registration.safe_side !== contract.safe_side || typeof registration.test !== "string" || registration.test.trim() === "") {
+    throw new Error("contract safe-side test ID is not registered for this surface/action: " + family.id);
+  }
+  const canonicalProof = CANONICAL_SAFE_SIDE_PROOFS[contract.surface_type + ":" + contract.safe_side];
+  if (canonicalProof === undefined || registration.test !== canonicalProof) {
+    throw new Error("contract safe-side test is not a known executable proof: " + family.id);
+  }
+  const provenAction = await proveSafeSideUnreachable(contract);
+  if (provenAction !== contract.safe_side) {
+    throw new Error("safe-side proof did not produce the contracted action: " + family.id);
   }
   return { offSwitch: surface.off_switch, safeSide: contract.safe_side };
 }
@@ -181,7 +306,8 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
       }
       let gate: { offSwitch: { path: string; polarity: string }; safeSide: string };
       try {
-        gate = checkBlastRadius(family, input.switchRegistry, input.maxHandlerLatencyMs);
+        const safeSideTests = await resolveFamilyPackage(family);
+        gate = await checkBlastRadius(family, input.switchRegistry, input.maxHandlerLatencyMs, safeSideTests);
       } catch (error) {
         families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
         refused = true;

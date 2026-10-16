@@ -19,6 +19,20 @@
     "package.json",
     "templates"
   ],
+  "jev": {
+    "safe_side_tests": {
+      "installer.gate.unreachable.refuses": {
+        "surface_type": "command-gate",
+        "safe_side": "refuse",
+        "test": "gateNetworkUnreachableRefuses"
+      },
+      "installer.screen.unreachable.passes": {
+        "surface_type": "result-screen",
+        "safe_side": "pass",
+        "test": "screenNetworkUnreachablePasses"
+      }
+    }
+  },
   "dependencies": {
     "@typesafe-ai/sdk": "0.6.0"
   },

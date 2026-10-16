@@ -1,41 +1,138 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { lstat, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { freshHome } from './cli-support.mjs';
 import { installProfileTargets } from '../dist/install/omp-profile-target.js';
-
+import { decide } from '../src/conformance.ts';
 const testDir = dirname(fileURLToPath(import.meta.url));
+const kitRoot = dirname(testDir);
 const fixtureDir = join(testDir, 'fixtures', 'installer');
 const familiesFixture = join(fixtureDir, 'families.json');
 const contractsDir = join(fixtureDir, 'contracts');
 const surfacesFixture = join(fixtureDir, 'surfaces.json');
+const PACKAGE_PIN = 'c2d7871afbc14c190b564eebdbaf3de190c35f17';
+const PACKAGE_GIT = 'git+https://github.com/JYeswak/jev_playground.git';
+const GATE_SAFE_SIDE_TEST = 'installer.gate.unreachable.refuses';
+const SCREEN_SAFE_SIDE_TEST = 'installer.screen.unreachable.passes';
+
 
 async function loadJson(path) {
-  return JSON.parse(await readFile(path, 'utf8'));
+  try {
+    return JSON.parse(await readFile(path, 'utf8'));
+  } catch (error) {
+    throw new Error('cannot load JSON fixture ' + path + ': ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+
+async function makePackageResolution() {
+  const host = await freshHome('installer-profile-package-resolution');
+  const packageManifest = await loadJson(join(kitRoot, 'package.json'));
+  const resolved = PACKAGE_GIT + '#' + PACKAGE_PIN;
+  const rootManifest = {
+    name: 'installer-profile-fixture',
+    version: '1.0.0',
+    private: true,
+    dependencies: { [packageManifest.name]: resolved },
+  };
+  const lock = {
+    name: rootManifest.name,
+    version: rootManifest.version,
+    lockfileVersion: 3,
+    requires: true,
+    packages: {
+      '': { name: rootManifest.name, version: rootManifest.version, dependencies: rootManifest.dependencies },
+      ['node_modules/' + packageManifest.name]: { version: packageManifest.version, resolved },
+    },
+  };
+  const packageRoot = join(host, 'node_modules', packageManifest.name);
+  await mkdir(join(host, 'node_modules'), { recursive: true });
+  await symlink(kitRoot, packageRoot, 'dir');
+  await writeFile(join(host, 'package.json'), JSON.stringify(rootManifest, null, 2) + '\n');
+  const packageLockPath = join(host, 'package-lock.json');
+  await writeFile(packageLockPath, JSON.stringify(lock, null, 2) + '\n');
+  return { packageRoot, packageLockPath, packageManifest, resolved };
 }
 
 async function loadFamilies(contracts) {
   const families = (await loadJson(familiesFixture)).families;
-  return families.map((family) => ({
-    id: family.id,
-    surfaceType: family.surface_type,
-    kind: family.kind,
-    declared: family.declared,
-    supportedProfiles: family.supported_profiles,
-    contract: contracts[family.id],
-    manifest: {
-      latencyBudgetMs: family.id === 'gate' ? 1500 : 800,
-      safeSideTestId: `${family.id}-refuses-when-unreachable`,
-      offSwitchPath: `~/.local/state/jev/${family.id}-fixture-off`,
-    },
-    packageSpecifier: '@classifier/test-kit/families',
-    pin: 'abcdef1234567890',
-  }));
+  const packageResolution = await makePackageResolution();
+  return families.map((family) => {
+    const subpath = family.id === 'gate' ? 'src/gate.ts' : family.id === 'screen' ? 'src/conformance.ts' : 'src/skill-hint.ts';
+    return {
+      id: family.id,
+      surfaceType: family.surface_type,
+      kind: family.kind,
+      declared: family.declared,
+      supportedProfiles: family.supported_profiles,
+      contract: contracts[family.id],
+      manifest: {
+        latencyBudgetMs: family.id === 'gate' ? 1500 : 800,
+        safeSideTestId: family.safe_side_test_id,
+        offSwitchPath: '~/.local/state/jev/' + family.id + '-fixture-off',
+      },
+      packageRoot: packageResolution.packageRoot,
+      packageLockPath: packageResolution.packageLockPath,
+      packageSpecifier: packageResolution.packageManifest.name + '/' + subpath,
+      pin: PACKAGE_PIN,
+    };
+  });
 }
+async function assertUnreachableSafeSide(contract, expectedAction) {
+  const resultValue = { fixture: 'unchanged' };
+  const state = Object.fromEntries(contract.state.fields.map((field) => [field, 'fixture']));
+  const result = await decide({
+    contract,
+    state,
+    result: resultValue,
+    adapter: {
+      id: 'offline-unreachable',
+      modelId: 'offline-unreachable',
+      probabilities: 'required',
+      async evaluate(request, transport) { return transport(request); },
+    },
+    transport: async () => { throw new Error('network unreachable'); },
+  });
+  assert.equal(result.status, 'transport-error');
+  assert.equal(result.reason, 'transport');
+  assert.equal(result.action, expectedAction);
+  if (expectedAction === 'pass') assert.strictEqual(result.result, resultValue);
+  else assert.equal(result.result, undefined);
+}
+
+const safeSideContractTests = new Map([
+  [GATE_SAFE_SIDE_TEST, {
+    test: 'gateNetworkUnreachableRefuses',
+    run: (contract) => assertUnreachableSafeSide(contract, 'refuse'),
+  }],
+  [SCREEN_SAFE_SIDE_TEST, {
+    test: 'screenNetworkUnreachablePasses',
+    run: (contract) => assertUnreachableSafeSide(contract, 'pass'),
+  }],
+]);
+
+async function runSafeSideContractTest(id, contract) {
+  const packageManifest = await loadJson(join(kitRoot, 'package.json'));
+  const registration = packageManifest.jev?.safe_side_tests?.[id];
+  const registeredTest = safeSideContractTests.get(id);
+  if (!registeredTest) throw new Error('safe-side manifest ID has no executable contract test: ' + id);
+  assert.deepEqual(registration, {
+    surface_type: contract.surface_type,
+    safe_side: contract.safe_side,
+    test: registeredTest.test,
+  });
+  assert.equal(contract.safe_side_test_id, id);
+  await registeredTest.run(contract);
+}
+
+async function snapshotBytes(paths) {
+  return Promise.all(paths.map(async (path) => [path, await readFile(path)]));
+}
+
 
 async function snapshotTree(root) {
   const out = new Map();
@@ -73,7 +170,7 @@ function shimPath(ompHome, profile, family) {
   return join(ompHome, agent, 'shims', `jev-${family}.ts`);
 }
 
-test('a declared-ON gate family installs its shim on a measured profile', async () => {
+test('a declared-ON gate family installs its locked package shim on a measured profile', async () => {
   const home = await freshHome('installer-profile-positive');
   const ompHome = join(home, 'omp-home');
   const contracts = {
@@ -82,6 +179,14 @@ test('a declared-ON gate family installs its shim on a measured profile', async 
     hint: await loadJson(join(contractsDir, 'screen.json')),
   };
   const families = (await loadFamilies(contracts)).filter((family) => family.id === 'gate');
+  const family = families[0];
+  await runSafeSideContractTest(family.manifest.safeSideTestId, family.contract);
+  const consumerRoot = dirname(family.packageLockPath);
+  const consumer = createRequire(join(consumerRoot, 'package.json'));
+  const lockedPackage = await loadJson(family.packageLockPath);
+  assert.equal(lockedPackage.packages['node_modules/jev-kit'].resolved, PACKAGE_GIT + '#' + PACKAGE_PIN);
+  const resolvedImport = consumer.resolve(family.packageSpecifier);
+  assert.equal(await readFile(resolvedImport, 'utf8'), await readFile(join(kitRoot, 'src', 'gate.ts'), 'utf8'));
   const result = await installProfileTargets({
     ompHome,
     profiles: ['default'],
@@ -93,13 +198,130 @@ test('a declared-ON gate family installs its shim on a measured profile', async 
   assert.equal(result.families[0].status, 'installed');
   const shim = await readFile(shimPath(ompHome, 'default', 'gate'), 'utf8');
   assert.ok(shim.includes('classifier-shim-v2 family=gate'));
-  assert.ok(shim.includes('@classifier/test-kit/families'));
+  assert.ok(shim.includes('jev-kit/src/gate.ts'));
+  assert.ok(shim.includes('pin=' + PACKAGE_PIN));
   assert.equal(shim.includes('/Users/'), false);
   assert.equal(shim.includes('Developer/jev'), false);
-  const marker = JSON.parse(
-    await readFile(join(ompHome, 'agent', 'jev-shims.json'), 'utf8'),
-  );
-  assert.ok(marker.shims.gate.sha256.length >= 7);
+  const marker = await loadJson(join(ompHome, 'agent', 'jev-shims.json'));
+  assert.equal(marker.shims.gate.sha256.length, 64);
+  assert.equal(marker.shims.gate.pin, PACKAGE_PIN);
+});
+
+test('the screen safe-side id executes the pass-on-unreachable contract test', async () => {
+  const screen = await loadJson(join(contractsDir, 'screen.json'));
+  await runSafeSideContractTest(screen.safe_side_test_id, screen);
+  assert.equal(screen.safe_side_test_id, SCREEN_SAFE_SIDE_TEST);
+});
+
+test('an unknown safe-side id is refused before writing', async () => {
+  const home = await freshHome('installer-profile-unknown-safe-test');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, manifest: { ...family.manifest, safeSideTestId: 'installer.gate.unregistered' } }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a screen cannot use the gate refuse-on-unreachable contract test', async () => {
+  const home = await freshHome('installer-profile-screen-safe-test-mismatch');
+  const ompHome = join(home, 'omp-home');
+  const screen = await loadJson(join(contractsDir, 'screen.json'));
+  const families = (await loadFamilies({ screen })).filter((family) => family.id === 'screen')
+    .map((family) => ({ ...family, declared: 'ON', manifest: { ...family.manifest, safeSideTestId: GATE_SAFE_SIDE_TEST } }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a registered entry naming a nonexistent executable proof is refused', async () => {
+  const home = await freshHome('installer-profile-bogus-proof');
+  const ompHome = join(home, 'omp-home');
+  const packageName = 'jev-bogus-proof-pkg';
+  const pin = '1'.repeat(40);
+  const resolved = 'git+https://github.com/JYeswak/jev_playground.git#' + pin;
+  const packageRoot = join(home, 'pkgroot');
+  await mkdir(join(packageRoot, 'src'), { recursive: true });
+  await writeFile(join(packageRoot, 'package.json'), JSON.stringify({
+    name: packageName,
+    version: '0.0.1',
+    jev: { safe_side_tests: { 'installer.gate.unreachable.refuses': {
+      surface_type: 'command-gate', safe_side: 'refuse', test: 'nonexistentProofName' } } },
+  }, null, 2) + '\n');
+  await writeFile(join(packageRoot, 'src', 'gate.ts'), 'export const marker = 1;\n');
+  await mkdir(join(home, 'node_modules'), { recursive: true });
+  await symlink(packageRoot, join(home, 'node_modules', packageName), 'dir');
+  await writeFile(join(home, 'package.json'), JSON.stringify({
+    name: 'bogus-proof-consumer', version: '1.0.0', private: true,
+    dependencies: { [packageName]: resolved },
+  }, null, 2) + '\n');
+  const packageLockPath = join(home, 'package-lock.json');
+  await writeFile(packageLockPath, JSON.stringify({
+    name: 'bogus-proof-consumer', version: '1.0.0', lockfileVersion: 3, requires: true,
+    packages: {
+      '': { name: 'bogus-proof-consumer', version: '1.0.0', dependencies: { [packageName]: resolved } },
+      ['node_modules/' + packageName]: { version: '0.0.1', resolved },
+    },
+  }, null, 2) + '\n');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, packageRoot, packageLockPath,
+      packageSpecifier: packageName + '/src/gate.ts', pin }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('not a known executable proof'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a lock resolving the package to another commit is refused before writing', async () => {
+  const home = await freshHome('installer-profile-package-lock-drift');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate');
+  const family = families[0];
+  const lock = await loadJson(family.packageLockPath);
+  lock.packages['node_modules/jev-kit'].resolved = PACKAGE_GIT + '#' + '0'.repeat(40);
+  await writeFile(family.packageLockPath, JSON.stringify(lock, null, 2) + '\n');
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
 test('a declared-OFF family is never installed', async () => {
@@ -317,6 +539,8 @@ test('a hardlink predecessor conflicts unless migrated with backup', async () =>
   const { link } = await import('node:fs/promises');
   await link(dest, `${dest}.sibling`);
   const before = await snapshotTree(ompHome);
+  const beforeBytes = await snapshotBytes([dest, dest + '.sibling']);
+
   const refused = await installProfileTargets({
     ompHome,
     profiles: ['default'],
@@ -327,6 +551,8 @@ test('a hardlink predecessor conflicts unless migrated with backup', async () =>
   assert.equal(refused.exit, 4);
   assert.equal(refused.families[0].status, 'conflict');
   assert.deepEqual(refused.writes, []);
+  assert.deepEqual(await snapshotBytes([dest, dest + '.sibling']), beforeBytes);
+  assert.deepEqual(await snapshotTree(ompHome), before);
   const migrated = await installProfileTargets({
     ompHome,
     profiles: ['default'],
@@ -338,7 +564,6 @@ test('a hardlink predecessor conflicts unless migrated with backup', async () =>
   assert.equal(migrated.exit, 0);
   assert.equal(migrated.families[0].status, 'installed');
   assert.equal(await readFile(`${dest}.migrate-bak`, 'utf8'), 'user-owned predecessor\n');
-  void before;
 });
 
 test('re-run is already with zero writes', async () => {
