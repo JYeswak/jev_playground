@@ -148,6 +148,17 @@ class CanaryRunnerTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 3)
         self.assertIn("NOTIFY ERROR:", proc.stdout)
 
+    def test_marker_creation_failure_notifies_and_logs_error(self):
+        write_stub(self.tmp, "mktemp", "#!/bin/sh\nexit 1\n")
+        self.log = os.path.join(self.tmp, "logs", "canary.log")
+        proc = self.invoke(0, "OK: canary must not run")
+        self.assertEqual(proc.returncode, 3)
+        self.assertIn("NOTIFY ERROR:", proc.stdout)
+        (notice,) = self.notify_calls()
+        self.assertTrue(notice.split("\x1f")[-1].startswith("ERROR:"))
+        (line,) = self.log_lines()
+        self.assertEqual(line.split(" ", 2)[1], "rc=3")
+
     def test_notifier_called_once_per_outcome_with_silence_on_ok(self):
         proc = self.invoke(0, "OK: x")
         self.assertEqual(proc.returncode, 0)

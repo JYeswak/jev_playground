@@ -12,6 +12,7 @@
 # starts, acquisition failed upstream (AUTH) whatever the message says.
 # The marker lives in owned TMPDIR and is never deleted by the runner (the
 # scratch reaper owns cleanup); an unset TMPDIR refuses instead of using /tmp.
+# Marker creation failure is logged and notified as ERROR before the manager starts.
 #
 # Outcome table (the runner's own exit codes; asserted by test_jev_latest_canary_run.py):
 #   AUTH text ("Failed to automatically trigger login flow") present -> AUTH, exit 4, notify.
@@ -84,7 +85,13 @@ if [ -z "${TMPDIR:-}" ]; then
   exit 3
 fi
 
-started_file=$(mktemp "$TMPDIR/jev-canary-started.XXXXXX") || exit 3
+started_file=$(mktemp "$TMPDIR/jev-canary-started.XXXXXX") || {
+  echo "NOTIFY ERROR: child-start marker creation failed"
+  "$NOTIFY_BIN" -e 'on run argv' -e 'display notification (item 1 of argv) with title "Jev canary"' -e 'end run' "ERROR: child-start marker creation failed" >/dev/null 2>&1 || :
+  mkdir -p "$(dirname "$LOG_FILE")"
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) rc=3 child-start marker creation failed" >> "$LOG_FILE"
+  exit 3
+}
 export JEV_CANARY_STARTED_FILE="$started_file"
 child_script='printf "started\n" > "$JEV_CANARY_STARTED_FILE"; exec "$@"'
 out="$("$SECRET_MANAGER" run --silent --projectId="$PROJECT_ID" -- /bin/sh -c "$child_script" jev-canary-child "$CANARY" 2>&1)"; rc=$?

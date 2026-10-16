@@ -748,7 +748,7 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 ## Newly registered tests — jev-qhmw
 
-- `scripts/test_jev_latest_canary_run.py` — offline coverage for authentication failure classification, notifications for distinct nonzero outcomes, success logging without notification, and offline help without checkout dependence. Run: `python3 -m unittest scripts.test_jev_latest_canary_run -v` (4 tests).
+- `scripts/test_jev_latest_canary_run.py` — offline coverage for authentication failure classification, notifications for distinct nonzero outcomes, child-start marker allocation failures that must notify and log ERROR, success logging without notification, and offline help without checkout dependence. Run: `python3 -m unittest scripts.test_jev_latest_canary_run -v`.
 
 ## Newly registered tests — jev-ir6m
 
