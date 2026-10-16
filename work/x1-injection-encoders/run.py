@@ -513,11 +513,13 @@ def run_replay() -> int:
                 mismatches.append(f"{field} mismatch: {key}")
         for field in ("p", "jev_p"):
             value = enc.get(field)
-            if not isinstance(value, (int, float)) or not math.isfinite(value):
-                mismatches.append(f"non-finite encoder {field}: {key}")
+            if (isinstance(value, bool) or not isinstance(value, (int, float))
+                    or not math.isfinite(value) or not 0.0 <= value <= 1.0):
+                mismatches.append(f"invalid encoder probability {field}: {key}")
         mate_p = mate.get("p")
-        if not isinstance(mate_p, (int, float)) or not math.isfinite(mate_p):
-            mismatches.append(f"non-finite Jev p: {key}")
+        if (isinstance(mate_p, bool) or not isinstance(mate_p, (int, float))
+                or not math.isfinite(mate_p) or not 0.0 <= mate_p <= 1.0):
+            mismatches.append(f"invalid Jev probability: {key}")
         if enc.get("jev_p") != mate.get("p"):
             mismatches.append(f"jev_p linkage mismatch: {key}")
         if mate.get("model") != "jev-1.13.0":
@@ -592,9 +594,14 @@ def run_replay() -> int:
     check("scored_rows", sum(expected_sets[s] for s in
                               ("clean", "marked", "markerless", "public-english"))
           + 1, recorded["scored_rows"])
+    if set(stats) != set(recorded["strata"]):
+        mismatches.append(
+            f"strata key set differs: recomputed {sorted(stats)} != "
+            f"receipt {sorted(recorded['strata'])}")
     for stratum, want in recorded["strata"].items():
-        for field, value in want.items():
-            check(f"strata.{stratum}.{field}", stats[stratum][field], value)
+        if stratum not in stats:
+            continue  # key-set mismatch already recorded above
+        check(f"strata.{stratum}", stats[stratum], want)
     check("public_language_rule",
           {**language_n, "german_outside_bar": True},
           recorded["public_language_rule"])
