@@ -86,6 +86,10 @@ export function rewriteCliError(input: ErrorInput): CliError {
       ['preview: classifier install omp-project --dir REPO --dry-run', 'adopt only files you own: classifier install omp-project --dir REPO --apply'], command);
   }
   if (input.reason === 'refused-unsafe') {
+    if (message.includes('ownership or payload')) {
+      return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
+        message, [`remove or relocate the foreign file, then rerun: ${command} cli --apply`], command);
+    }
     return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
       message || 'REFUSED_UNSAFE: direct or non-loopback Clef URL refused', [`rerun: ${command} --backend jev`, 'configure the localbench gateway URL instead of a direct Clef server'], command);
   }

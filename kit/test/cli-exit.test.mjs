@@ -43,6 +43,19 @@ test('retryable and unsafe installer errors retain their typed exit envelopes', 
   assert.equal(refused.exit_code, EXIT_CODES.REFUSED_UNSAFE);
 });
 
+test('ownership refusals route to installer remediation, backend refusals keep backend guidance', () => {
+  const ownership = rewriteCliError({ reason: 'refused-unsafe', message: 'CLI target ownership or payload conflicts with the requested operation', command: 'classifier install' });
+  assert.equal(ownership.code, 'REFUSED_UNSAFE');
+  assert.equal(ownership.exit_code, EXIT_CODES.REFUSED_UNSAFE);
+  assert.equal(ownership.remediation.some((line) => line.includes('--backend') || line.includes('gateway')), false);
+  assert.equal(ownership.remediation.some((line) => line.includes('install cli --apply')), true);
+
+  const backend = rewriteCliError({ reason: 'refused-unsafe', message: 'REFUSED_UNSAFE: direct or non-loopback Clef URL refused', command: 'classifier install' });
+  assert.equal(backend.code, 'REFUSED_UNSAFE');
+  assert.equal(backend.exit_code, EXIT_CODES.REFUSED_UNSAFE);
+  assert.equal(backend.remediation.some((line) => line.includes('--backend')), true);
+});
+
 test('missing credentials stay NOT_RUN with the same exit under JSON and robot modes', async () => {
   const home = await freshHome('classifier-no-key');
   const base = ['ask', 'choice', '--state', examplePath('state.json'), '--question', examplePath('question.json')];
