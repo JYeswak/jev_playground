@@ -1,0 +1,75 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_12cb64702d6d47aa16530c3ff88178a0f78d82d91b60b9131764fc7201fe7c00",
+ "limitations": [
+  "Exact-source compiler and suite proof from completed admitted CI; full CI remains red; local consumer uses matching 32 published input files and injected/absent-key transports."
+ ],
+ "operation": "jev-b35c.70-installed-consumer-review",
+ "parameters": {
+  "subject_sha256": "ab74c6a23bff9c1b7f6525231be624e6180f9e092c63ef319395ade7976ab3ad"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "actual_installed_consumer": {
+   "exit": 0,
+   "stderr": "(node:84573) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/josh/Developer/jev/var/agent-tmp/omp70-review.59421/installed-PbokG2/.omp/jev-kit/client.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /Users/josh/Developer/package.json.\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+   "stdout": "{\"positive\":\"refuse\",\"unavailable\":\"not_run\",\"reason\":\"unconfigured\",\"contacts\":0}\n"
+  },
+  "candidate": "3ce593288a14d9188474b984c496481ffedc181c",
+  "ci_log_sha256": "3b9e0c5352448f5c962c4fb1fa4e448cef6bb93adcf2da400f321a0d731828d4",
+  "ci_prepare_invocation": [
+   "registered-suites\tInstall the prerequisites the suite command names\t2026-10-16T07:47:24.4751915Z > node scripts/copy-questions.mjs && tsc -p tsconfig.json"
+  ],
+  "ci_run": 38869399770,
+  "ci_typescript_error_seen": false,
+  "exact_ci_suite_rows": [
+   "registered-suites\tRun registered suites\t2026-10-16T07:53:13.7440489Z kit/test/omp-tools.test.mjs\t0\t6\t0.43\t\tPASS"
+  ],
+  "live_provider_contact": false,
+  "local_compiler_ran": false,
+  "local_suite": {
+   "command": "node --test kit/test/omp-tools.test.mjs",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "TAP version 13\n# (node:87523) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/josh/Developer/jev/var/agent-tmp/omp70-review.59421/jev-omp-tool-gPcSnI/.omp/tools/jev-gate.ts is not specified and it doesn't parse as CommonJS.\n# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.\n# To eliminate this warning, add \"type\": \"module\" to /Users/josh/Developer/package.json.\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: installed omp gate refuses the measured RISK hit without executing\nok 1 - installed omp gate refuses the measured RISK hit without executing\n  ---\n  duration_ms: 74.408917\n  type: 'test'\n  ...\n# Subtest: installed omp rerank refuses 1/21 and selects projected 2 or recorded 20 FiQA IDs\nok 2 - installed omp rerank refuses 1/21 and selects projected 2 or recorded 20 FiQA IDs\n  ---\n  duration_ms: 26.216666\n  type: 'test'\n  ...\n# Subtest: installed omp rerank sends distinct passage text and returns selected text verbatim\nok 3 - installed omp rerank sends distinct passage text and returns selected text verbatim\n  ---\n  duration_ms: 18.125916\n  type: 'test'\n  ...\n# Subtest: installed omp claim check uses the SciFact 0.5 cut\nok 4 - installed omp claim check uses the SciFact 0.5 cut\n  ---\n  duration_ms: 17.712833\n  type: 'test'\n  ...\n# Subtest: installed omp claim check refuses numeric claims without asking\nok 5 - installed omp claim check refuses numeric claims without asking\n  ---\n  duration_ms: 17.71275\n  type: 'test'\n  ...\n# Subtest: installed omp classify calls the measured Banking77 Choice design\nok 6 - installed omp classify calls the measured Banking77 Choice design\n  ---\n  duration_ms: 18.250625\n  type: 'test'\n  ...\n1..6\n# tests 6\n# suites 0\n# pass 6\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 260.115917\n"
+  },
+  "mismatched_input_files": [],
+  "reviewer_implemented_installer": false,
+  "source_sha256": {
+   "kit/src/calibration.ts": "2aa8a52d67ab26e93dba86035aa5f2cd2ccc2756d6ac2311fefff31a5c29a6ed",
+   "kit/src/classify.ts": "cc0c29a791cefef33edbc9266df51fab78f77a204607dd1760ebccc6b6b545ef",
+   "kit/src/clef.ts": "b29bd7ae6feae02ad8b18128b697d2b685b9c36a5c5a20bee6868b2ae37ea6b9",
+   "kit/src/client.ts": "dd51edec903f254847bacfba1ff98103c9ee347e1b92e60f42eda39eaeef533c",
+   "kit/src/gate.ts": "0875a6b46b3c1020744d3272302e2c0c6f2abe7f72e15fca65ba358c4a468ce8",
+   "kit/src/install.ts": "7b795ddea254e8ba7deb457de9d9e9de5e11012f15d826e8f6484524a3b7d6da",
+   "kit/src/rerank.ts": "aa1a5af30e51de1f2a0f98cc5c9bfde462d095250653e4e1949569970995188a",
+   "kit/src/usage.ts": "c1496c512448dd0896fdb2e23899ca67c98631670c96f8c11f510144555dacce",
+   "kit/src/verify.ts": "1123f5416ccfbc575f904eddbe8421f5f18d1f3a3373329253a6a4bce3860617",
+   "kit/templates/jev-kit/fake.ts": "4fe31575e4992e08cd5948ff3cfb2029e56a0f202ba9d1ad91e510a2e7aa127d",
+   "kit/templates/jev-kit/infisical-key.ts": "d351c456565036a8220a9206a4ff9eb2b746d574e983ea36be63f728b835f972",
+   "kit/templates/jev-kit/nev-injection/live-flag.ts": "78fa311d56f1219fa95a3b91046db031853ea5d50566bf8acb35e94643cc6bf3",
+   "kit/templates/jev-kit/nev-rerank/live.ts": "de85d8db148ed21def38a66b5f3db309e44f8781cb14912154bf3e26991772d2",
+   "kit/templates/jev-kit/nev-rerank/rank.ts": "77cb2b8933784a4c63a312eab7d5badd1bec9631cb63dd83e1cf0d22be6e0463",
+   "kit/templates/jev-kit/preflight.ts": "b2d484a99e64b19fba95cde710d58057c809d3bc8393ff2376cc8121ccc20939",
+   "kit/templates/jev-kit/questions.mjs": "01ed13a3ab5b0605e148430fee99e79c127cc71b5abbe176b6ad6a4b3423237c",
+   "kit/templates/jev-kit/use-infisical-key.ts": "d24a0bdda6b29e4b8f5bf07bbf0e47476b228d69b5ec658d37e7bd51c49217a6",
+   "kit/templates/jev-kit/validate.ts": "21670dbb53e9ad2ee1cca570a4bea10e869c7c665f320e9fcd5b59bf280a7185",
+   "kit/templates/omp/extensions/jev-claim-check.ts": "d356edbeb6e518757b186b27823e7c1727f77fa77c96306467c24011064f3aa1",
+   "kit/templates/omp/extensions/jev-classify.ts": "c044badcad0531b103b01a1b0dd9bbac01391ae520dc6c502db103b11f2adc89",
+   "kit/templates/omp/extensions/jev-flag.ts": "c66a289e0c484ee9ee85e43a2b3f710ffe93bef4c299df316c40a0f2a11280c5",
+   "kit/templates/omp/extensions/jev-rerank.ts": "54169d5af919c50d554ccf471c9fc7281492a3c6256e06d2568c8a46e16b83cd",
+   "kit/templates/omp/extensions/jev-screen.ts": "00e39363d8a1b66610219a03cd447f876787439ccb3040a4fef358f323f7ebb1",
+   "kit/templates/omp/hooks/post/jev-gate-observe.ts": "fdfee9845dff36cef229b5e777111588b98b75b0d21a3a35c47e027259890083",
+   "kit/templates/omp/jev-kit/coding-agent-seat.mjs": "705ee2463aa5ad6407faf6f77ee257d04022e7bc96db8982e87d8e21e5feea4b",
+   "kit/templates/omp/tools/jev-claim-check.ts": "9da60379a01b541b1d23f6306ac6a0ce53a7d8ae44646e854efc83bf985e745f",
+   "kit/templates/omp/tools/jev-classify.ts": "887f5507638777d2a4a169be2719a1c47181aa3a0f376c686178a0a1ca04d409",
+   "kit/templates/omp/tools/jev-flag.ts": "e601424adb85a1dbd2b5f987e9d6b713f8671888e40d5d7ea9cd9a0cf31211ed",
+   "kit/templates/omp/tools/jev-gate.ts": "6f34e4828de825546561c4b98aee595a91cae3fc08ea4a68fda74f8cb4e25122",
+   "kit/templates/omp/tools/jev-rerank.ts": "1de9fc0327124cc40b909b351e967ae038bfdd288b4ea9df74605464be68aae3",
+   "kit/templates/omp/tools/jev-screen.ts": "0d4c556875d7e6d420af72b5eba6cfdb086187a67db26285398183aa063fd3ba",
+   "kit/test/omp-tools.test.mjs": "55bac8001c749625d249dd85c966af6194e3232bc4964e518658769515b2e5b4"
+  },
+  "whole_ci_green_claim": false
+ }
+}
