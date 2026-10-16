@@ -350,22 +350,23 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
 }
 
 async function loadNativeEntry(importedPath: string, packageDir: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
-  try {
-    // Dynamic import: the specifier is computed at runtime from the validated
-    // locked package path, so no static import can name this module.
-    const loaded: unknown = await import(pathToFileURL(importedPath).href);
-    await checkLoadedModule(loaded, familyId, expectedEvent);
-    return;
-  } catch (error) {
-    const strippingBan = error !== null && typeof error === "object" && "code" in error && error.code === "ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING";
-    const typeScriptEntry = importedPath.endsWith(".ts") || importedPath.endsWith(".mts") || importedPath.endsWith(".cts") || importedPath.endsWith(".tsx");
-    if (!strippingBan || !typeScriptEntry) {
+  const typeScriptEntry = importedPath.endsWith(".ts") || importedPath.endsWith(".mts") || importedPath.endsWith(".cts") || importedPath.endsWith(".tsx");
+  if (!typeScriptEntry) {
+    let loaded: unknown;
+    try {
+      // Dynamic import: the specifier is computed at runtime from the validated
+      // locked package path, so no static import can name this module.
+      loaded = await import(pathToFileURL(importedPath).href);
+    } catch (error) {
       throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
     }
+    await checkLoadedModule(loaded, familyId, expectedEvent);
+    return;
   }
-  // Scoped builtin-TS hook on the original physical path: no copy, no
-  // relocation, no parse. Adversarial entries (dead registration, missing
-  // imports, non-function defaults) fail by execution right here.
+  // TypeScript entries always go through the scoped hook FIRST: on some
+  // runtimes (observed Node 22.18) a failed direct import poisons the URL,
+  // so a direct attempt must never precede the hooked one. Exactly one
+  // import attempt per URL keeps failure caching deterministic.
   const deregister = registerPackageTsHook(packageDir, familyId);
   let loaded: unknown;
   try {
