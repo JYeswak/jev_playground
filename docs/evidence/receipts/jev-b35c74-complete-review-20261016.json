@@ -1,0 +1,294 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_97e146c9717b5672dc0443100cc0a29130cef9c8f00d5b93f14fd547a891a1b6",
+ "limitations": [
+  "Bounded native entry installer acceptance only; no parent/L3/model-quality/whole-main-CI claim."
+ ],
+ "operation": "jev-b35c.74.complete-native-review",
+ "parameters": {
+  "subject_sha256": "ad198dec131188f848566ec8bc38fdcffd0879199425a7a38c437fe6dcb22c52"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "actual_native": {
+   "cwd": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/consumer",
+   "executable": "/Users/josh/Library/Application Support/Tern/omp/versions/18.11.1",
+   "home": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home",
+   "network_denied": true,
+   "ompHome": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home/.omp",
+   "rows": [
+    {
+     "advisory_listed_in_native_tool_surface": true,
+     "args": [
+      "--profile",
+      "muse",
+      "--model",
+      "openai/gpt-4o",
+      "--mode=rpc",
+      "--session-dir",
+      "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/normal/sessions",
+      "--max-time=8"
+     ],
+     "errors": [],
+     "exit": 0,
+     "freshMarkers": [
+      {
+       "family": "gate",
+       "nonce": "native-current-normal-26d0da9f320a3b88",
+       "ts": 1792162174369
+      }
+     ],
+     "get_state_success": true,
+     "label": "normal",
+     "nonce": "native-current-normal-26d0da9f320a3b88",
+     "stderr": "",
+     "stdout_bytes": 82245,
+     "stdout_sha256": "b6904bcd5d3dad09a10913ab331be833dcc12c15819580ab3dff076ff6c09373"
+    },
+    {
+     "advisory_listed_in_native_tool_surface": false,
+     "args": [
+      "--profile",
+      "muse",
+      "--model",
+      "openai/gpt-4o",
+      "--mode=rpc",
+      "--session-dir",
+      "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/disabled/sessions",
+      "--max-time=8",
+      "--no-extensions"
+     ],
+     "errors": [],
+     "exit": 0,
+     "freshMarkers": [],
+     "get_state_success": true,
+     "label": "disabled",
+     "nonce": "native-current-disabled-de80b103c908ed04",
+     "stderr": "",
+     "stdout_bytes": 81759,
+     "stdout_sha256": "3015e52847f2954eea01f62ddc020bff34638c76ea9d1d611ee1804c3fc4229f"
+    }
+   ],
+   "stdin": [
+    {
+     "id": "neg",
+     "protocolVersion": 2,
+     "type": "negotiate_protocol"
+    },
+    {
+     "id": "state",
+     "type": "get_state"
+    }
+   ],
+   "unset": [
+    "OMP_PROFILE",
+    "PI_PROFILE",
+    "PI_CODING_AGENT_DIR",
+    "PI_CONFIG_DIR",
+    "TERN_PANE",
+    "TMUX_PANE",
+    "TMUX",
+    "OMP_HOME",
+    "XDG_CONFIG_HOME",
+    "XDG_DATA_HOME",
+    "XDG_STATE_HOME",
+    "NODE_OPTIONS",
+    "BUN_OPTIONS",
+    "OPENAI_API_KEY",
+    "TYPESAFE_API_KEY",
+    "OPENROUTER_API_KEY"
+   ],
+   "writes_confined_to_owned_scratch": true
+  },
+  "author": "RubyMeadow",
+  "bead": "jev-b35c.74",
+  "build_and_current_aggregate": {
+   "actual_npm_test_exit": 0,
+   "admission": {
+    "ballast": {
+     "authoritative": true,
+     "available_count": 0,
+     "configured_pool_bytes": 5368709120,
+     "health": "empty",
+     "missing_count": 5,
+     "releasable_bytes": 0,
+     "unreadable_count": 0
+    },
+    "command": "check",
+    "container_available_bytes": 177769828352,
+    "container_id": "/dev/disk3",
+    "container_total_bytes": 994662584320,
+    "exit_code": 0,
+    "forecast": null,
+    "free_bytes": 177769828352,
+    "free_excludes_purgeable": true,
+    "free_pct": 17.87237513046016,
+    "mount_point": "/System/Volumes/Data",
+    "path": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/source",
+    "platform": {
+     "darwin": {
+      "apfs": {
+       "container_available_bytes": 177769828352,
+       "container_id": "/dev/disk3",
+       "container_total_bytes": 994662584320,
+       "estimated_reclaimable_by_snapshot_thinning": {
+        "bytes": 3076881792,
+        "method": "foundation"
+       },
+       "free_excludes_purgeable": true,
+       "is_primary": true,
+       "shared_volumes": [
+        "BuildCast",
+        "BuildFH",
+        "BuildShared",
+        "Macintosh HD",
+        "Preboot",
+        "Recovery",
+        "Update",
+        "VM"
+       ],
+       "volume_available_bytes": 176829472768,
+       "volume_role": "Data",
+       "volume_total_bytes": 994662584320
+      }
+     }
+    },
+    "schema_version": 2,
+    "status": "ok",
+    "total_bytes": 994662584320,
+    "unprotected": null,
+    "volume_available_bytes": 176829472768,
+    "volume_role": "Data",
+    "volume_total_bytes": 994662584320
+   },
+   "fail": 0,
+   "full_output_sha256": "3009c7f6b362518f8bea91d1f428a66d7128a618aa152cae09fe758df70c86c4",
+   "node": "22.23.3",
+   "pass": 364,
+   "prepare_exit": 0,
+   "reference_receipt": "ev_c8943729e6367505d77167325252c5f695520f9c2c6d3a739576c4a31f2e4847",
+   "skipped": 0,
+   "tests": 364
+  },
+  "limits": [
+   "L2 actual native loading/registration only; no hook handler firing or classifier/model-quality claim.",
+   "No provider prompt/tool-call/model request, real HOME/profile/global switch/service edits.",
+   "Original .72 and .19 remain open until their own complete acceptance; no parent closure.",
+   "Non-author touched no production implementation or fixture; only independent evidence.",
+   "Initial retained RPC interpretation assumed systemPrompt string; corrected to actual array without rerunning probes."
+  ],
+  "packageBindings": [
+   {
+    "matches_published_source": true,
+    "name": "gate-hook.ts",
+    "sha256": "b2d52a3b486a6ffe7b42ddd451422fcb3948a05ae49a7146725ade42f2c39777"
+   },
+   {
+    "matches_published_source": true,
+    "name": "hint-extension.ts",
+    "sha256": "deabd5d459d9b109f6e64f8acddcf43a35cc306d7fec0393eb77cdfe8a9cc6f6"
+   }
+  ],
+  "real_install": {
+   "exit": 0,
+   "program": "import {mkdir,cp,readFile,writeFile,readdir,realpath} from 'node:fs/promises';import{join}from'node:path';import{createHash}from'node:crypto';import{installProfileTargets}from \"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/source/kit/dist/install/omp-profile-target.js\";const root=\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current\";const consumer=join(root,'consumer'),home=join(root,'home'),pkg=join(consumer,'node_modules','jev-fixture-native');await mkdir(join(consumer,'node_modules'),{recursive:true});await mkdir(home,{recursive:true});await cp(\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/source/kit/test/fixtures/installer/native-pkg\",pkg,{recursive:true});const pm=JSON.parse(await readFile(join(pkg,'package.json'),'utf8')),pin='c2d7871afbc14c190b564eebdbaf3de190c35f17',resolved='git+https://github.com/JYeswak/jev_playground.git#'+pin,deps={[pm.name]:resolved};await writeFile(join(consumer,'package.json'),JSON.stringify({name:'owned-native-review',dependencies:deps}));const lock=join(consumer,'package-lock.json');await writeFile(lock,JSON.stringify({lockfileVersion:3,packages:{'':{dependencies:deps},['node_modules/'+pm.name]:{version:pm.version,resolved}}}));const families=[];for(const id of ['gate','hint']){const contract=JSON.parse(await readFile(\"/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/source/kit/test/fixtures/installer/contracts/\"+id+'.json','utf8'));families.push({id,surfaceType:id==='gate'?'command-gate':'advisory',kind:id==='gate'?'gate':'extension',declared:'ON',contract,manifest:{latencyBudgetMs:id==='gate'?1500:800,safeSideTestId:contract.safe_side_test_id,offSwitchPath:'fixture-'+id+'-off'},packageRoot:pkg,packageLockPath:lock,packageSpecifier:pm.name+'/src/'+(id==='gate'?'gate-hook.ts':'hint-extension.ts'),pin});}const input={ompHome:join(home,'.omp'),profiles:['muse'],families,switchRegistry:{surfaces:families.map(f=>({id:f.id,off_switch:{path:f.manifest.offSwitchPath,polarity:'exists-disables'}}))},maxHandlerLatencyMs:1500};const first=await installProfileTargets(input);const snap=async d=>{let a=[];for(const e of await readdir(d,{withFileTypes:true})){const p=join(d,e.name);if(e.isDirectory())a.push(...await snap(p));else a.push([p,createHash('sha256').update(await readFile(p)).digest('hex')]);}return a.sort((a,b)=>a[0].localeCompare(b[0]));};const before=JSON.stringify(await snap(home));const bad=await installProfileTargets({...input,families:[{...families[0],packageSpecifier:pm.name+'/src/lib-only.ts'}]});const afterBad=JSON.stringify(await snap(home));const repeat=await installProfileTargets(input);const afterRepeat=JSON.stringify(await snap(home));console.log(JSON.stringify({first,bad,repeat,refusalUnchanged:before===afterBad,repeatUnchanged:afterBad===afterRepeat,physical:await realpath(pkg)===pkg,home,consumer,pkg}));",
+   "stderr": "(node:89537) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+   "stdout": {
+    "bad": {
+     "exit": 4,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "muse",
+       "reason": "native entry has no default function export: gate",
+       "status": "refused"
+      }
+     ],
+     "writes": []
+    },
+    "consumer": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/consumer",
+    "first": {
+     "exit": 0,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "muse",
+       "status": "installed"
+      },
+      {
+       "family": "hint",
+       "profile": "muse",
+       "status": "installed"
+      }
+     ],
+     "writes": [
+      "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home/.omp/profiles/muse/agent/hooks/pre/jev-gate.ts",
+      "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home/.omp/profiles/muse/agent/config.yml",
+      "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home/.omp/profiles/muse/agent/jev-shims.json"
+     ]
+    },
+    "home": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/home",
+    "physical": true,
+    "pkg": "/Users/josh/Developer/jev/var/agent-tmp/9odh-final.25572/native-current/consumer/node_modules/jev-fixture-native",
+    "refusalUnchanged": true,
+    "repeat": {
+     "exit": 0,
+     "families": [
+      {
+       "family": "gate",
+       "profile": "muse",
+       "status": "already"
+      },
+      {
+       "family": "hint",
+       "profile": "muse",
+       "status": "already"
+      }
+     ],
+     "writes": []
+    },
+    "repeatUnchanged": true
+   }
+  },
+  "reviewer": "DarkBear",
+  "source": [
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/omp-profile-target.ts",
+    "sha256": "522b9656cde81ad19b2f53662f6a15e238f70ad7f7d468346591d6aef16a564d"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/test/install-omp-profile.test.mjs",
+    "sha256": "e1c30d7918ed411afc0352ffb551368493cf64aefcd5fae4ab763d73f70c8209"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/test/fixtures/installer/native-pkg/package.json",
+    "sha256": "3be4d60274fca3f8ffaa1656faf5163456bce5f910695ecffa6383460f18a65b"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts",
+    "sha256": "b2d52a3b486a6ffe7b42ddd451422fcb3948a05ae49a7146725ade42f2c39777"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/test/fixtures/installer/native-pkg/src/hint-extension.ts",
+    "sha256": "deabd5d459d9b109f6e64f8acddcf43a35cc306d7fec0393eb77cdfe8a9cc6f6"
+   }
+  ],
+  "source_commit": "402757671b774b1149bc8d0526768a791b1902bf",
+  "supported_runtime_profile_suite": {
+   "command": "fnm exec --using 22.18.0 node --test kit/test/install-omp-profile.test.mjs",
+   "coverage": "physical native package positive and guard/negative/idempotence behavior, including null handler/tool and unknown host API",
+   "exit": 0,
+   "fail": 0,
+   "pass": 27,
+   "skipped": 0,
+   "tests": 27
+  },
+  "verdict": "PASS_ORIGINAL_BOUNDED_ACCEPTANCE"
+ }
+}
