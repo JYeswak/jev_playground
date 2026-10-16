@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib
+import io
+import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
@@ -252,6 +255,40 @@ class ReplayTest(unittest.TestCase):
                 "misses": 0,
             },
         )
+
+    def test_gate_replay_retains_rotated_rows_but_excludes_pending_copies(self) -> None:
+        # Projection of the recorded gate rows used by the policy-off test above.
+        rows = [
+            {"ts": "2026-10-03T02:00:21.967Z", "jevSkipped": True, "latencyMs": 1253},
+            {"ts": "2026-10-03T02:37:30.149Z", "jevSkipped": False, "latencyMs": 144},
+        ]
+        root = Path(tempfile.mkdtemp(prefix="jzgm-gate-"))
+        live = root / "gate-observe.jsonl"
+        archive = root / "gate-observe.jsonl.1791839197367.recorded.archive"
+        pending = root / (archive.name + ".pending")
+        archive.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        pending.write_bytes(archive.read_bytes())
+        live.write_text("", encoding="utf-8")
+        report = replay.gate_report(
+            live,
+            datetime(2026, 10, 3, 2, tzinfo=timezone.utc),
+            datetime(2026, 10, 3, 3, tzinfo=timezone.utc),
+            True,
+        )
+        self.assertEqual(report["eligible_screens"], 2)
+        self.assertEqual(report["free_screens"], 1)
+        self.assertEqual(report["would_reach_paid_jev"], 1)
+        self.assertEqual(report["policy_off"]["baseline"]["latency_ms"], 1397)
+        self.assertEqual(report["noop_delta"]["free_screen_share"], 0)
+
+    def test_unobserved_cap_reports_not_identifiable_instead_of_a_replay(self) -> None:
+        with (
+            patch.object(sys, "argv", ["replay.py", "--memory-cap", "4"]),
+            patch("sys.stdout", new_callable=io.StringIO) as output,
+        ):
+            exit_code = replay.main()
+        self.assertEqual(exit_code, 2)
+        self.assertEqual(json.loads(output.getvalue())["status"], "NOT_IDENTIFIABLE")
 
 
 if __name__ == "__main__":

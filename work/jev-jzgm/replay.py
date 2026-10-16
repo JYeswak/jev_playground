@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import math
 import sys
@@ -33,12 +34,17 @@ def parse_time(value: str | None) -> dt.datetime | None:
     return parsed.astimezone(dt.timezone.utc)
 
 
-def load_jsonl(path: Path) -> tuple[list[Row], int, str]:
+def load_jsonl(
+    path: Path, source_hashes: list[dict[str, Any]] | None = None
+) -> tuple[list[Row], int, str]:
     rows = []
     malformed = 0
+    digest = hashlib.sha256() if source_hashes is not None else None
     try:
-        with path.open(encoding="utf-8") as stream:
+        with path.open("rb") as stream:
             for line in stream:
+                if digest is not None:
+                    digest.update(line)
                 if not line.strip():
                     continue
                 try:
@@ -52,6 +58,8 @@ def load_jsonl(path: Path) -> tuple[list[Row], int, str]:
                     malformed += 1
     except FileNotFoundError:
         return [], 0, "missing"
+    if source_hashes is not None and digest is not None:
+        source_hashes.append({"path": str(path), "sha256": digest.hexdigest()})
     return rows, malformed, "read"
 
 
@@ -328,7 +336,14 @@ def memory_report(
 def gate_report(
     path: Path, start: dt.datetime, end: dt.datetime, noop: bool
 ) -> dict[str, Any]:
-    all_rows, malformed, _ = load_jsonl(path)
+    all_rows = []
+    malformed = 0
+    source_hashes: list[dict[str, Any]] = []
+    sources = sorted(path.parent.glob(path.name + ".*.archive")) + [path]
+    for source in sources:
+        source_rows, source_malformed, _ = load_jsonl(source, source_hashes)
+        all_rows.extend(source_rows)
+        malformed += source_malformed
     rows = [r for r in all_rows if in_window(r, start, end)]
     eligible = [r for r in rows if isinstance(r.get("jevSkipped"), bool)]
     free = sum(r.get("jevSkipped") is True for r in eligible)
@@ -352,6 +367,7 @@ def gate_report(
     interval = wilson(free, total)
     result = {
         "source": str(path),
+        "source_files": source_hashes,
         "window_utc": {
             "from_inclusive": start.isoformat(),
             "to_exclusive": end.isoformat(),
@@ -363,6 +379,8 @@ def gate_report(
         "free_screens": free,
         "free_screen_share": share,
         "free_screen_wilson95": interval,
+        "reference_status": "PROVISIONAL",
+        "reference_status_reason": "no pinned X7 gate reference; PASS requires a preregistered TOST or lower-bound rule against the pinned reference",
         "reference_96pct_in_wilson95": interval is not None
         and interval[0] <= 0.96 <= interval[1],
         "would_reach_paid_jev": paid,
@@ -500,9 +518,19 @@ def main() -> int:
     if args.days < 1 or args.days > 30:
         parser.error("--days must be between 1 and 30")
     if args.memory_cap != 3:
-        parser.error(
-            "only --memory-cap 3 is supported; other caps lack recorded rank/order evidence"
+        print(
+            json.dumps(
+                {
+                    "status": "NOT_IDENTIFIABLE",
+                    "reason": "only recorded cap 3 is identifiable; other caps lack rank/order and agent-behaviour evidence",
+                    "memory_cap": args.memory_cap,
+                    "no_live_calls": True,
+                    "raw_text_emitted": False,
+                },
+                sort_keys=True,
+            )
         )
+        return 2
     if bool(args.gate_from) != bool(args.gate_to):
         parser.error("--gate-from and --gate-to must be supplied together")
     end = parse_time(args.to_ts) if args.to_ts else dt.datetime.now(dt.timezone.utc)
@@ -581,6 +609,7 @@ def main() -> int:
                 "legacy_aggregate_reference"
             ]["matches_exactly"],
             "gate_96pct_in_wilson95": gate["reference_96pct_in_wilson95"],
+            "gate_reference_status": gate["reference_status"],
             "noop_zero_delta": not noop
             or (
                 all(value == 0 for value in memory["cap3"]["noop_delta"].values())
