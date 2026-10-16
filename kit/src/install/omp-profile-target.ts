@@ -10,9 +10,9 @@
 // predecessors are refused untouched. All paths derive from explicit inputs;
 // nothing reads process.env.
 
-import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
+import { createRequire, stripTypeScriptTypes } from "node:module";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { EXIT_CODES } from "../families/registry.js";
 import { validateContract, type DecisionContract } from "../contracts.js";
@@ -154,7 +154,7 @@ function packageNameFromSpecifier(specifier: string): string {
   return segments[0];
 }
 
-async function resolveFamilyPackage(family: TargetFamily): Promise<{ safeSideTests: Record<string, unknown>; importedPath: string }> {
+async function resolveFamilyPackage(family: TargetFamily): Promise<{ safeSideTests: Record<string, unknown>; importedPath: string; packageDir: string }> {
   const packageName = packageNameFromSpecifier(family.packageSpecifier);
   const packageRoot = resolve(family.packageRoot);
   const packageLockPath = resolve(family.packageLockPath);
@@ -205,7 +205,7 @@ async function resolveFamilyPackage(family: TargetFamily): Promise<{ safeSideTes
   const jevMetadata = packageValue.jev;
   const safeSideTests = isRecord(jevMetadata) ? jevMetadata.safe_side_tests : undefined;
   if (!isRecord(safeSideTests)) throw new Error("package manifest has no safe-side test registry: " + family.id);
-  return { safeSideTests, importedPath };
+  return { safeSideTests, importedPath, packageDir: actualPackageRoot };
 }
 
 
@@ -262,124 +262,57 @@ const NATIVE_SURFACE_MECHANISMS: Record<string, NativeMechanism> = {
   "advisory": { kind: "extension" },
 };
 
-// A package entry is native-compatible for its declared surface under one
-// of two tiers. Tier 1 executes: the entry imports under Node, exposes a
-// default function export, and — for hook mechanisms — registers its
-// declared host event when invoked with a stub pi. Tier 2 is a static
-// fallback for exactly one Node limitation: type stripping is banned for
-// files under node_modules, while the host loader accepts them. Tier 2
-// strips strings/comments and requires a line-anchored `export default
-// function` declaration (async allowed) plus the pi.on("<event>") call
-// literal for hooks; anything else — non-function defaults, re-export
-// forms, missing handlers — fails closed, and tier 2 never executes.
-// The host session start remains the final load authority.
-// No regular expressions anywhere: linear single-pass scan plus prefix and
-// substring checks. Pure library modules without a default export, and
-// factories that never register, are refused before any write in both
-// tiers. Executed or scanned entries must stay side-effect free.
-const MAX_NATIVE_SCAN_BYTES = 262144;
+// A package entry is native-compatible for its declared surface when it
+// loads, exposes a default function export, and — for hook mechanisms —
+// registers its declared host event when invoked with a stub pi. The check
+// runs by execution in both cases: directly, or — for exactly one Node
+// limitation (type stripping is banned for files under node_modules, while
+// the host loader accepts them there) — against a physical bounded copy
+// staged outside node_modules, stripped with Node's own builtin. Copying
+// preserves relative structure so sibling imports resolve as installed;
+// unresolvable ones fail closed at import. Pure library modules without a
+// default export, and factories that never register, are refused before
+// any write. The host session start remains the final load authority.
+let stageSequence = 0;
+const MAX_STAGE_FILES = 1024;
+const MAX_STAGE_BYTES = 8 * 1024 * 1024;
 
-function stripCode(source: string, keepStrings: boolean): string {
-  const parts: string[] = [];
-  let i = 0;
-  const n = source.length;
-  while (i < n) {
-    const ch = source[i];
-    const next = i + 1 < n ? source[i + 1] : "";
-    if (ch === "/" && next === "/") {
-      let j = i;
-      while (j < n && source[j] !== "\n") j++;
-      parts.push(" ".repeat(j - i));
-      i = j;
-    } else if (ch === "/" && next === "*") {
-      const end = source.indexOf("*/", i + 2);
-      const stop = end < 0 ? n : end + 2;
-      for (let k = i; k < stop; k++) parts.push(source[k] === "\n" ? "\n" : " ");
-      i = stop;
-    } else if (!keepStrings && (ch === "'" || ch === '"' || ch === "`")) {
-      let j = i + 1;
-      while (j < n) {
-        if (source[j] === "\\") { j += 2; continue; }
-        if (source[j] === ch) break;
-        if (ch !== "`" && source[j] === "\n") break;
-        j++;
+async function stagePackageCopy(packageDir: string, stagingRoot: string, familyId: string): Promise<string> {
+  // readFile follows symlinks, so the staged tree is always physical files;
+  // a link escape just costs budget, never fidelity. Left in place under
+  // the caller-owned staging root; test scratch and OS tmp reap it.
+  const dest = join(stagingRoot, `stage-${familyId}-${process.pid}-${stageSequence++}`);
+  let files = 0;
+  let bytes = 0;
+  const walk = async (src: string, dst: string): Promise<void> => {
+    await mkdir(dst, { recursive: true });
+    const entries = await readdir(src, { withFileTypes: true });
+    for (const entry of entries) {
+      const from = join(src, entry.name);
+      const to = join(dst, entry.name);
+      if (entry.isDirectory()) {
+        await walk(from, to);
+      } else {
+        const content = await readFile(from);
+        files += 1;
+        bytes += content.length;
+        if (files > MAX_STAGE_FILES || bytes > MAX_STAGE_BYTES) {
+          throw new Error("package too large to verify: " + familyId);
+        }
+        await writeFile(to, content);
       }
-      const stop = j < n && source[j] === ch ? j + 1 : j;
-      for (let k = i; k < stop; k++) parts.push(source[k] === "\n" ? "\n" : " ");
-      i = stop;
-    } else {
-      parts.push(ch);
-      i++;
     }
-  }
-  return parts.join("");
-}
-
-function callsOnEvent(codeWithStrings: string, event: string): boolean {
-  for (const quote of ["\"", "'", "`"]) {
-    const needle = quote + event + quote;
-    let at = codeWithStrings.indexOf(needle);
-    while (at >= 0) {
-      if (codeWithStrings.slice(0, at).trimEnd().endsWith(".on(")) return true;
-      at = codeWithStrings.indexOf(needle, at + 1);
-    }
-  }
-  return false;
-}
-
-function isTypeStrippingRefusal(error: unknown): boolean {
-  return error !== null && typeof error === "object" && "code" in error && error.code === "ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING";
-}
-
-function isTypeScriptPath(path: string): boolean {
-  return path.endsWith(".ts") || path.endsWith(".mts") || path.endsWith(".cts") || path.endsWith(".tsx");
-}
-
-async function scanNativeEntry(importedPath: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
-  let source: string;
+  };
   try {
-    source = await readFile(importedPath, "utf8");
+    await walk(packageDir, dest);
   } catch (error) {
-    throw new Error("native entry unreadable: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+    throw new Error("cannot stage package for verification: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
-  if (Buffer.byteLength(source, "utf8") > MAX_NATIVE_SCAN_BYTES) {
-    throw new Error("native entry too large to verify: " + familyId);
-  }
-  const stripped = stripCode(source, false);
-  let declaresDefaultFunction = false;
-  for (const line of stripped.split("\n")) {
-    const trimmed = line.trimStart();
-    if (trimmed.startsWith("export default function") || trimmed.startsWith("export default async function")) {
-      declaresDefaultFunction = true;
-      break;
-    }
-  }
-  if (!declaresDefaultFunction) {
-    throw new Error("native entry declares no default function export: " + familyId);
-  }
-  if (expectedEvent === undefined) return;
-  if (!callsOnEvent(stripCode(source, true), expectedEvent)) {
-    throw new Error("native entry never handles " + expectedEvent + ": " + familyId);
-  }
+  return dest;
 }
 
-async function loadNativeEntry(importedPath: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
-  let loaded: unknown;
-  try {
-    // Dynamic import: the specifier is computed at runtime from the validated
-    // locked package path, so no static import can name this module.
-    loaded = await import(pathToFileURL(importedPath).href);
-  } catch (error) {
-    // Exactly one Node limitation falls through: type stripping is banned
-    // for files under node_modules, while the host loader accepts them.
-    // Those entries take the static contract screen below; every other
-    // load failure refuses outright.
-    if (isTypeStrippingRefusal(error) && isTypeScriptPath(importedPath)) {
-      await scanNativeEntry(importedPath, familyId, expectedEvent);
-      return;
-    }
-    throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
-  }
+
+async function checkLoadedModule(loaded: unknown, familyId: string, expectedEvent: string | undefined): Promise<void> {
   if (!isRecord(loaded) || !("default" in loaded) || typeof loaded.default !== "function") {
     throw new Error("native entry has no default function export: " + familyId);
   }
@@ -397,6 +330,44 @@ async function loadNativeEntry(importedPath: string, familyId: string, expectedE
   if (!seen.includes(expectedEvent)) {
     throw new Error("native entry does not register " + expectedEvent + ": " + familyId);
   }
+}
+
+async function loadNativeEntry(importedPath: string, packageDir: string, stagingRoot: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
+  try {
+    // Dynamic import: the specifier is computed at runtime from the validated
+    // locked package path, so no static import can name this module.
+    const loaded: unknown = await import(pathToFileURL(importedPath).href);
+    await checkLoadedModule(loaded, familyId, expectedEvent);
+    return;
+  } catch (error) {
+    const strippingBan = error !== null && typeof error === "object" && "code" in error && error.code === "ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING";
+    const typeScriptEntry = importedPath.endsWith(".ts") || importedPath.endsWith(".mts") || importedPath.endsWith(".cts") || importedPath.endsWith(".tsx");
+    if (!strippingBan || !typeScriptEntry) {
+      throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+    }
+  }
+  const stagedDir = await stagePackageCopy(packageDir, stagingRoot, familyId);
+  const entryRel = relative(packageDir, importedPath);
+  if (entryRel === ".." || entryRel.startsWith(".." + sep) || isAbsolute(entryRel)) {
+    throw new Error("native entry escapes staged package: " + familyId);
+  }
+  const stagedEntry = join(stagedDir, entryRel);
+  let stripped: string;
+  try {
+    // Node builtin: the same stripping engine Node itself uses, so the
+    // staged entry loads exactly as Node would load it outside node_modules.
+    stripped = stripTypeScriptTypes(await readFile(stagedEntry, "utf8"), { mode: "transform" });
+  } catch (error) {
+    throw new Error("native entry does not transpile: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  await writeFile(stagedEntry, stripped);
+  let loaded: unknown;
+  try {
+    loaded = await import(pathToFileURL(stagedEntry).href);
+  } catch (error) {
+    throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  await checkLoadedModule(loaded, familyId, expectedEvent);
 }
 
 async function checkBlastRadius(
@@ -490,7 +461,8 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
           throw new Error("unsupported native surface: " + family.id);
         }
         mechanism = found;
-        await loadNativeEntry(importedPath, family.id, mechanism.kind === "hook" ? mechanism.event : undefined);
+        const stagingRoot = join(dirname(resolve(family.packageLockPath)), ".jev-native-stage");
+        await loadNativeEntry(importedPath, resolved.packageDir, stagingRoot, family.id, mechanism.kind === "hook" ? mechanism.event : undefined);
       } catch (error) {
         families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
         refused = true;
