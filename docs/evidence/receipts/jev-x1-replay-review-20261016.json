@@ -1,0 +1,224 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_28047ee6ea6c23616fc5c6944fe9939932226a2043744981bf6546f9d1d33d88",
+ "limitations": [
+  "Two recorded-data false MATCH cases; historical default replay/selftest positive remains partial, not whole AC/current-model/shipping proof."
+ ],
+ "operation": "jev-x1.recorded-replay-review",
+ "parameters": {
+  "subject_sha256": "d693185fd6306f3d63c527466018b3ed4ce93661a272441095233f1d898a405e"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "RubyMeadow",
+  "bead": "jev-x1-injection-encoders-e2gp.1",
+  "candidate": "8213c225b97ad9a50e04f955e06365fe4acda0a5",
+  "canonical_data": {
+   "after_controls": [
+    {
+     "path": "work/x1-injection-encoders/run.py",
+     "sha256": "037c4dc7a879b3f2d27c6dbb6e621a2305312180435db1dc84207a7daede85e5"
+    },
+    {
+     "path": "work/x1-injection-encoders/PREREG.md",
+     "sha256": "670578d55bee0587c9c9002ebd8e21f162904dcaa8f1f2afd70cc74130f002ce"
+    },
+    {
+     "path": "work/x1-injection-encoders/RECEIPT.md",
+     "sha256": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    }
+   ],
+   "before": [
+    {
+     "path": "work/x1-injection-encoders/run.py",
+     "sha256": "037c4dc7a879b3f2d27c6dbb6e621a2305312180435db1dc84207a7daede85e5"
+    },
+    {
+     "path": "work/x1-injection-encoders/PREREG.md",
+     "sha256": "670578d55bee0587c9c9002ebd8e21f162904dcaa8f1f2afd70cc74130f002ce"
+    },
+    {
+     "path": "work/x1-injection-encoders/RECEIPT.md",
+     "sha256": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    }
+   ],
+   "end": [
+    {
+     "path": "work/x1-injection-encoders/run.py",
+     "sha256": "037c4dc7a879b3f2d27c6dbb6e621a2305312180435db1dc84207a7daede85e5"
+    },
+    {
+     "path": "work/x1-injection-encoders/PREREG.md",
+     "sha256": "670578d55bee0587c9c9002ebd8e21f162904dcaa8f1f2afd70cc74130f002ce"
+    },
+    {
+     "path": "work/x1-injection-encoders/RECEIPT.md",
+     "sha256": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "work/x1-injection-encoders/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-jev.jsonl",
+     "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+    },
+    {
+     "path": "kit/fixtures/screen/answers-protectai.jsonl",
+     "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+    }
+   ],
+   "end_equals_before": true,
+   "unchanged_during_controls": true
+  },
+  "captures": {
+   "path": "/Users/josh/Developer/jev/var/agent-tmp/x1-replay-review.25572/captures.json",
+   "sha256": "82c55d7a43aa40b37ceba1b785ddb0712a05e344687b4499b92f29dc45cc538f"
+  },
+  "controls": {
+   "checked_metric_drift": {
+    "case": "checked-stratum-number",
+    "checker_exit": 1,
+    "expected_reject": true,
+    "stdout": "{\"status\": \"MISMATCH\", \"mismatches\": [\"strata.clean.false_flags: recomputed 1 != receipt 2\"], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}\n"
+   },
+   "expected": "MISMATCH/nonzero for changed scored-clean false flag count"
+  },
+  "failures": [
+   {
+    "case": {
+     "case": "unchecked-call-count",
+     "checker_exit": 0,
+     "expected_reject": true,
+     "stdout": "{\"status\": \"MATCH\", \"mismatches\": [], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}\n"
+    },
+    "change": "Only receipt jev_public_calls447→448; recorded English Jev rows remain447",
+    "expected": "Receipt count mismatch must fail per original AC/PREREG97-99, not MATCH0.",
+    "id": "IGNORED_RECOMPUTABLE_RECEIPT_NUMBER",
+    "source_boundary": "saved run.py584-615 selectively compares receipt fields but omits jev_public_calls"
+   },
+   {
+    "case": {
+     "case": "invalid-control-probability",
+     "checker_exit": 0,
+     "expected_reject": true,
+     "stdout": "{\"status\": \"MATCH\", \"mismatches\": [], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}\n"
+    },
+    "change": "Only existing trigger-negative recorded encoder p changed to -1; label/hash/flag unchanged",
+    "expected": "Invalid p(INJECTION) cannot establish benign-control pass; reject before score/receipt MATCH.",
+    "id": "INVALID_CONTROL_PROBABILITY_ACCEPTED",
+    "source_boundary": "saved run.py505-507 skips probability validation for trigger-negative; remaining rows only finite not range checked516-520"
+   }
+  ],
+  "limits": [
+   "No model loads/API/key lookup/provider requests or canonical answer/receipt writes; sandbox denied network/canonical writes; execution source stdlib only.",
+   "Initial safe CLI runs exit0 but system Python launcher attempted denied xcrun cache writes outside owned temp, recorded stderr retained; no clean-stderr assertion. Negative harness used verified existing managed interpreter and clean stderr.",
+   "Partial historical MATCH not whole-unit PASS, not source adoption, not current model quality, shipping/C1-C7 or original parent closure.",
+   "Metadata/control tampering only on owned data copies; no new permanent test or source/gate edits."
+  ],
+  "original_obligations": {
+   "chronology": "Committed historical PREREG/provenance exported; no foreign54/44 overwrite or new bar/data/clock. Owner readiness chronologies not promoted as a fresh model run.",
+   "full_original_json_command": "NOT_RUN; saved main626+ retains guarded live/canonical-receipt-writing path. Replay-only MATCH does not qualify original admission/hold obligations.",
+   "historical_bar_result": "LOSS/bar_passfalse retained; no area refutation or quality promotion",
+   "remaining_negatives": "Hold/cut-overlap/German-pooling/full CLI admission not newly exercised after decisive receipt/data failures.",
+   "strata": "100dev+200scored clean,300marked,300markerless,447English;215German excluded"
+  },
+  "positive_safe_runs": [
+   {
+    "exit": 0,
+    "mode": "--replay",
+    "stderr": "python3: error: couldn't create cache file '/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/xcrun_db-iMV1KiWz' (errno=Operation not permitted)\n",
+    "stdout": "{\"status\": \"MATCH\", \"mismatches\": [], \"cut\": 0.9999990463256836, \"model_loads\": 0, \"jev_calls\": 0}\n"
+   },
+   {
+    "exit": 0,
+    "mode": "--selftest",
+    "stderr": "python3: error: couldn't create cache file '/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/xcrun_db-Bof3O1Uj' (errno=Operation not permitted)\n",
+    "stdout": "{\"checks\": \"PASS\", \"reconstructed_rows\": 1348, \"public_english_candidates\": 447, \"model_loads\": 0, \"jev_calls\": 0}\n"
+   }
+  ],
+  "reviewer": "DarkBear",
+  "source": [
+   {
+    "path": "work/x1-injection-encoders/run.py",
+    "sha256": "acf2a73685de723ad4fc0e12481570aa0499b11f92dae27edd56afe88ce2c0d8"
+   },
+   {
+    "path": "work/x1-injection-encoders/PREREG.md",
+    "sha256": "dfebc6fa10b1aa5c8c81c490e9b07f18f78f5114a3056748c996ab65f99b4912"
+   },
+   {
+    "path": "work/x1-injection-encoders/RECEIPT.md",
+    "sha256": "1c98396a600560795b664145293887136c774809e9847da9651ed89fd54fc3d0"
+   },
+   {
+    "path": "work/x1-injection-encoders/answers-jev.jsonl",
+    "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+   },
+   {
+    "path": "work/x1-injection-encoders/answers-protectai.jsonl",
+    "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+   },
+   {
+    "path": "kit/fixtures/screen/answers-jev.jsonl",
+    "sha256": "d8d23f04e40662d356b3bbfd46849e9b88070792456b7bf21cfd7a00d5640d07"
+   },
+   {
+    "path": "kit/fixtures/screen/answers-protectai.jsonl",
+    "sha256": "d5b56b13ba660b119d829f2bef7acb6f1fd2466dc23ca4e2812bd18c5447e541"
+   }
+  ],
+  "source_selection": {
+   "canonical_runner_differed_from_saved_handoff": true,
+   "foreign_prereg_delta_not_adopted": true,
+   "stopped_before_executing_canonical": true,
+   "used_exact_git_archive_with_all_committed_inputs": true
+  },
+  "test_harness": {
+   "ROOT_source_reconstruction_unchanged": true,
+   "actual_saved_run_replay_function": true,
+   "answer_arrays_copied_from_exact_commit": true,
+   "code_not_patched": true,
+   "only_HERE_data_directory_redirected_for_owned_variants": true,
+   "python_for_negatives": "/Users/josh/.local/share/uv/python/cpython-3.14.2-macos-aarch64-none/bin/python3.14"
+  },
+  "verdict": "REWORK_RECORDED_RECOMPUTE_AND_ANSWER_VALIDATION"
+ }
+}
