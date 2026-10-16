@@ -1,0 +1,107 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6f2c43276b8d5cf2dd5cce4413a398473ae332bb1c163fa1b6cb2471daa238b0",
+ "limitations": [
+  "No full AC2/AC4 retirement acceptance, no new24h clock, no restart/service/config/source changes, no live Jev call. Nonzero exact controls and silent historical candidate windows do not prove original roster coverage."
+ ],
+ "operation": "jev-35sg.partial-oracle-review",
+ "parameters": {
+  "subject_sha256": "00b25a887010d9c03e95bb2949dee3d5b9bdde1f565ea1780ff2546f6770fa39"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "candidate": "013b2debde2c11e30e4890621f36de66ba89ea56",
+  "current_extension_file_paths": [
+   ".omp/extensions/jev-claim-check.ts",
+   ".omp/extensions/jev-longres-shadow.test.mjs",
+   ".omp/extensions/jev-screen.ts",
+   ".omp/extensions/jev-rerank.ts",
+   ".omp/extensions/jev-classify.ts",
+   ".omp/extensions/jev-review.ts",
+   ".omp/extensions/jev-memory-filter.ts",
+   ".omp/extensions/jev-flag.ts",
+   ".omp/extensions/jev-gate.ts",
+   ".omp/extensions/jev-memory-filter.test.mjs",
+   ".omp/extensions/jev-longres-shadow.ts",
+   ".omp/extensions/kit-guard/kit-guard.test.ts",
+   ".omp/extensions/kit-guard/policy.ts",
+   ".omp/extensions/kit-guard/index.ts"
+  ],
+  "inventory_hint_row": {
+   "expect": "off",
+   "extension": "./work/jev-35sg/jev-skill-hint.ts"
+  },
+  "oracle_query": "[.[] | select(.ts >= $start and .ts < $end)] | length",
+  "oracles": [
+   {
+    "count": 838,
+    "end": "2026-10-05T00:22:08Z",
+    "exit": 0,
+    "label": "hint-positive",
+    "start": "2026-10-04T00:22:08Z",
+    "stderr": ""
+   },
+   {
+    "count": 0,
+    "end": "2026-10-13T14:39:54Z",
+    "exit": 0,
+    "label": "hint-recorded-postrestart",
+    "start": "2026-10-12T14:39:54Z",
+    "stderr": ""
+   },
+   {
+    "count": 191,
+    "end": "2026-10-05T17:00:20Z",
+    "exit": 0,
+    "label": "veto-positive",
+    "start": "2026-10-04T17:00:20Z",
+    "stderr": ""
+   },
+   {
+    "count": 0,
+    "end": "2026-10-13T14:39:54Z",
+    "exit": 0,
+    "label": "veto-recorded-postrestart",
+    "start": "2026-10-12T14:39:54Z",
+    "stderr": ""
+   }
+  ],
+  "scope": "PARTIAL only. Oct12-Oct13 interval is the old documented candidate window after five observed current-pane starts, NOT a proven all-precutover cohort window.",
+  "source_bindings": {
+   "kit/src/skill-hint.ts": {
+    "equals_commit": true,
+    "sha256": "25883eabdd1ba47863cf08f4715a8ed5a0b9705372772ce15bca4cf7cf93c041"
+   },
+   "work/jev-35sg/extensions-inventory.md": {
+    "equals_commit": true,
+    "sha256": "66c5e6097a9ddc7bfc7bdabb1a6f0714fe9980e1f52b1c4707ac9e83a65b78a6"
+   },
+   "work/jev-35sg/jev-skill-hint.test.mjs": {
+    "equals_commit": true,
+    "sha256": "76aa92b6a62c760b6d1a1e37ad33285eda745c176cd4761c0ad9e16275977e3d"
+   },
+   "work/jev-35sg/jev-skill-hint.ts": {
+    "equals_commit": true,
+    "sha256": "f575b5f2dcb73961b096fab2241c10380ed04450b6aad8105454b39500182a64"
+   },
+   "work/jev-inventory/expected.json": {
+    "equals_commit": true,
+    "sha256": "ba7502a8999ade71e7ebde6b9b36e19fc165f629978214e195b60d3e708344be"
+   }
+  },
+  "test": {
+   "command": [
+    "node",
+    "--test",
+    "work/jev-35sg/jev-skill-hint.test.mjs"
+   ],
+   "exit": 0,
+   "model_calls": "injected only; no live model requests",
+   "stderr": "",
+   "stdout": "TAP version 13\n# (node:50696) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/josh/Developer/jev/work/jev-35sg/jev-skill-hint.ts is not specified and it doesn't parse as CommonJS.\n# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.\n# To eliminate this warning, add \"type\": \"module\" to /Users/josh/Developer/package.json.\n# (Use `node --trace-warnings ...` to show where the warning was created)\n# Subtest: shortlist ranks skill names over description noise and caps at twenty\nok 1 - shortlist ranks skill names over description noise and caps at twenty\n  ---\n  duration_ms: 1.580333\n  type: 'test'\n  ...\n# Subtest: vendored roster holds both acceptance skills with usable descriptions\nok 2 - vendored roster holds both acceptance skills with usable descriptions\n  ---\n  duration_ms: 1.092958\n  type: 'test'\n  ...\n# Subtest: confident non-none choice becomes the hint text\nok 3 - confident non-none choice becomes the hint text\n  ---\n  duration_ms: 0.235375\n  type: 'test'\n  ...\n# Subtest: billed usage flows to the hint result for spend accounting\nok 4 - billed usage flows to the hint result for spend accounting\n  ---\n  duration_ms: 0.10125\n  type: 'test'\n  ...\n# Subtest: none, low confidence, refusal, and empty prompt all stay silent\nok 5 - none, low confidence, refusal, and empty prompt all stay silent\n  ---\n  duration_ms: 0.305333\n  type: 'test'\n  ...\n# Subtest: declared OFF policy skips calls; a planted ON policy exercises the handler\nok 6 - declared OFF policy skips calls; a planted ON policy exercises the handler\n  ---\n  duration_ms: 15.096917\n  type: 'test'\n  ...\n# Subtest: slow failures past the deadline log as timeout, fast ones keep their reason\nok 7 - slow failures past the deadline log as timeout, fast ones keep their reason\n  ---\n  duration_ms: 402.946625\n  type: 'test'\n  ...\n# Subtest: warmup probes the transport once without blocking the turn\nok 8 - warmup probes the transport once without blocking the turn\n  ---\n  duration_ms: 0.243833\n  type: 'test'\n  ...\n# Subtest: extension warmup is fire-and-forget and ignores checkpoint failure\nok 9 - extension warmup is fire-and-forget and ignores checkpoint failure\n  ---\n  duration_ms: 0.965417\n  type: 'test'\n  ...\n# Subtest: resolved deadline hits log as timeout, not transport\nok 10 - resolved deadline hits log as timeout, not transport\n  ---\n  duration_ms: 302.252917\n  type: 'test'\n  ...\n# Subtest: noul-rank hints the argmax at or above cut\nok 11 - noul-rank hints the argmax at or above cut\n  ---\n  duration_ms: 0.510334\n  type: 'test'\n  ...\n# Subtest: noul-rank stays silent below cut, on invalid scores, refusal, and empty prompt\nok 12 - noul-rank stays silent below cut, on invalid scores, refusal, and empty prompt\n  ---\n  duration_ms: 0.175792\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 838.246708\n"
+  },
+  "unclassified_files": [],
+  "unmet_original_acceptance": "Every original pre-cutover pane/session must be bound to actual restart/exit and the original resulting24h; existing b35c67/wbel prerequisite remains open. Current35sg already REWORK4240/4241; no duplicate state change or close."
+ }
+}
