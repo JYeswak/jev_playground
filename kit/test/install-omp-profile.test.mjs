@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { lstat, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { cp, lstat, mkdir, readdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -51,8 +51,12 @@ async function makePackageResolution() {
     },
   };
   const packageRoot = join(host, 'node_modules', packageManifest.name);
-  await mkdir(join(host, 'node_modules'), { recursive: true });
-  await symlink(nativePkgDir, packageRoot, 'dir');
+  // Physical recursive copy (symlinks dereferenced): the installed package
+  // must be real files so loader behavior matches production. A symlink
+  // here would let realpath escape node_modules and mask Node's
+  // type-stripping ban, the exact blind spot under test.
+  await cp(nativePkgDir, packageRoot, { recursive: true, dereference: true });
+  assert.equal(await realpath(packageRoot), packageRoot, 'installed package must be physical files, not a symlink escape');
   await writeFile(join(host, 'package.json'), JSON.stringify(rootManifest, null, 2) + '\n');
   const packageLockPath = join(host, 'package-lock.json');
   await writeFile(packageLockPath, JSON.stringify(lock, null, 2) + '\n');
@@ -192,45 +196,39 @@ test('a declared-ON gate family installs its locked package shim on a measured p
   assert.equal(lockedPackage.packages['node_modules/jev-fixture-native'].resolved, PACKAGE_GIT + '#' + PACKAGE_PIN);
   const resolvedImport = consumer.resolve(family.packageSpecifier);
   assert.equal(await readFile(resolvedImport, 'utf8'), await readFile(join(nativePkgDir, 'src', 'gate-hook.ts'), 'utf8'));
-  const probeDir = join(home, 'probe');
-  await mkdir(probeDir, { recursive: true });
-  const probeNonce = 'positive-install-marker';
-  process.env.JEV_HOOK_PROBE_DIR = probeDir;
-  process.env.JEV_HOOK_PROBE_NONCE = probeNonce;
-  let result;
-  try {
-    result = await installProfileTargets({
-      ompHome,
-      profiles: ['default'],
-      families,
-      switchRegistry: await loadJson(surfacesFixture),
-      maxHandlerLatencyMs: 5000,
-    });
-  } finally {
-    delete process.env.JEV_HOOK_PROBE_DIR;
-    delete process.env.JEV_HOOK_PROBE_NONCE;
-  }
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
   assert.equal(result.exit, 0);
   assert.equal(result.families[0].status, 'installed');
-  const loadRows = (await readFile(join(probeDir, 'hook-loads.jsonl'), 'utf8')).trim().split('\n').map((line) => JSON.parse(line));
-  assert.deepEqual(loadRows.map((row) => [row.nonce, row.family]), [[probeNonce, 'gate']]);
   const shim = await readFile(hookShimPath(ompHome, 'default', 'gate', 'pre'), 'utf8');
   assert.ok(shim.includes('classifier-shim-v2 family=gate'));
-  assert.ok(shim.includes('native-pkg/src/gate-hook.ts'));
+  assert.ok(shim.includes('jev-fixture-native/src/gate-hook.ts'));
+  assert.ok(shim.includes('export { default } from'));
   assert.equal(shim.includes('jev-kit/'), false);
   assert.ok(shim.includes('pin=' + PACKAGE_PIN));
   assert.equal(shim.includes('/Users/'), false);
   assert.equal(shim.includes('Developer/jev'), false);
-  const loadedShim = await import(pathToFileURL(hookShimPath(ompHome, 'default', 'gate', 'pre')).href);
-  assert.equal(typeof loadedShim.default, 'function');
-  const registered = {};
-  await loadedShim.default({ on: (event, handler) => { registered[event] = handler; } });
-  assert.equal(typeof registered.tool_call, 'function');
-  assert.deepEqual(await registered.tool_call({ command: 'rm -rf /important' }), { block: true, reason: 'fixture-risk' });
-  assert.deepEqual(await registered.tool_call({ command: 'ls' }), { block: false, reason: 'fixture-allow' });
   const marker = await loadJson(join(ompHome, 'agent', 'jev-shims.json'));
   assert.equal(marker.shims.gate.sha256.length, 64);
   assert.equal(marker.shims.gate.pin, PACKAGE_PIN);
+});
+
+test('the fixture hook entry registers and judges through a stub pi', async () => {
+  // Execution proof for the entry the installer accepts statically: import
+  // from the canonical fixture path (outside node_modules, so Node strips
+  // types) and drive the registered handler.
+  const entry = await import(pathToFileURL(join(nativePkgDir, 'src', 'gate-hook.ts')).href);
+  assert.equal(typeof entry.default, 'function');
+  const registered = {};
+  await entry.default({ on: (event, handler) => { registered[event] = handler; } });
+  assert.equal(typeof registered.tool_call, 'function');
+  assert.deepEqual(await registered.tool_call({ command: 'rm -rf /important' }), { block: true, reason: 'fixture-risk' });
+  assert.deepEqual(await registered.tool_call({ command: 'ls' }), { block: false, reason: 'fixture-allow' });
 });
 
 test('the screen safe-side id executes the pass-on-unreachable contract test', async () => {
@@ -448,6 +446,54 @@ test('a package entry without a native default export is refused before writing'
   assert.equal(result.exit, 4);
   assert.equal(result.families[0].status, 'refused');
   assert.ok((result.families[0].reason ?? '').includes('no default function export'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a default export that is not a function is refused before writing', async () => {
+  const home = await freshHome('installer-profile-null-default');
+  const ompHome = join(home, 'omp-home');
+  const contracts = {
+    gate: await loadJson(join(contractsDir, 'gate.json')),
+    screen: await loadJson(join(contractsDir, 'screen.json')),
+    hint: await loadJson(join(contractsDir, 'hint.json')),
+  };
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies(contracts)).filter((family) => family.id === 'hint')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/null-default.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('no default function export'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a factory that never registers the declared event is refused before writing', async () => {
+  const home = await freshHome('installer-profile-inert');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/inert-hook.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('never handles tool_call'));
   assert.deepEqual(result.writes, []);
   assert.deepEqual(await snapshotTree(ompHome), before);
 });

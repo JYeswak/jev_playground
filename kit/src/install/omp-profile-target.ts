@@ -262,12 +262,107 @@ const NATIVE_SURFACE_MECHANISMS: Record<string, NativeMechanism> = {
   "advisory": { kind: "extension" },
 };
 
-// A package entry is native-compatible when it loads, exposes a default
-// function export, and — for hook mechanisms — registers its declared host
-// event when invoked with a stub pi. Pure library modules without a default
-// export, and factories that never register, are refused before any write.
-// Loading executes the entry's top level: that import is the install-time
-// load check, so entries must stay side-effect free.
+// A package entry is native-compatible for its declared surface under one
+// of two tiers. Tier 1 executes: the entry imports under Node, exposes a
+// default function export, and — for hook mechanisms — registers its
+// declared host event when invoked with a stub pi. Tier 2 is a static
+// fallback for exactly one Node limitation: type stripping is banned for
+// files under node_modules, while the host loader accepts them. Tier 2
+// strips strings/comments and requires a line-anchored `export default
+// function` declaration (async allowed) plus the pi.on("<event>") call
+// literal for hooks; anything else — non-function defaults, re-export
+// forms, missing handlers — fails closed, and tier 2 never executes.
+// The host session start remains the final load authority.
+// No regular expressions anywhere: linear single-pass scan plus prefix and
+// substring checks. Pure library modules without a default export, and
+// factories that never register, are refused before any write in both
+// tiers. Executed or scanned entries must stay side-effect free.
+const MAX_NATIVE_SCAN_BYTES = 262144;
+
+function stripCode(source: string, keepStrings: boolean): string {
+  const parts: string[] = [];
+  let i = 0;
+  const n = source.length;
+  while (i < n) {
+    const ch = source[i];
+    const next = i + 1 < n ? source[i + 1] : "";
+    if (ch === "/" && next === "/") {
+      let j = i;
+      while (j < n && source[j] !== "\n") j++;
+      parts.push(" ".repeat(j - i));
+      i = j;
+    } else if (ch === "/" && next === "*") {
+      const end = source.indexOf("*/", i + 2);
+      const stop = end < 0 ? n : end + 2;
+      for (let k = i; k < stop; k++) parts.push(source[k] === "\n" ? "\n" : " ");
+      i = stop;
+    } else if (!keepStrings && (ch === "'" || ch === '"' || ch === "`")) {
+      let j = i + 1;
+      while (j < n) {
+        if (source[j] === "\\") { j += 2; continue; }
+        if (source[j] === ch) break;
+        if (ch !== "`" && source[j] === "\n") break;
+        j++;
+      }
+      const stop = j < n && source[j] === ch ? j + 1 : j;
+      for (let k = i; k < stop; k++) parts.push(source[k] === "\n" ? "\n" : " ");
+      i = stop;
+    } else {
+      parts.push(ch);
+      i++;
+    }
+  }
+  return parts.join("");
+}
+
+function callsOnEvent(codeWithStrings: string, event: string): boolean {
+  for (const quote of ["\"", "'", "`"]) {
+    const needle = quote + event + quote;
+    let at = codeWithStrings.indexOf(needle);
+    while (at >= 0) {
+      if (codeWithStrings.slice(0, at).trimEnd().endsWith(".on(")) return true;
+      at = codeWithStrings.indexOf(needle, at + 1);
+    }
+  }
+  return false;
+}
+
+function isTypeStrippingRefusal(error: unknown): boolean {
+  return error !== null && typeof error === "object" && "code" in error && error.code === "ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING";
+}
+
+function isTypeScriptPath(path: string): boolean {
+  return path.endsWith(".ts") || path.endsWith(".mts") || path.endsWith(".cts") || path.endsWith(".tsx");
+}
+
+async function scanNativeEntry(importedPath: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
+  let source: string;
+  try {
+    source = await readFile(importedPath, "utf8");
+  } catch (error) {
+    throw new Error("native entry unreadable: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+  }
+  if (Buffer.byteLength(source, "utf8") > MAX_NATIVE_SCAN_BYTES) {
+    throw new Error("native entry too large to verify: " + familyId);
+  }
+  const stripped = stripCode(source, false);
+  let declaresDefaultFunction = false;
+  for (const line of stripped.split("\n")) {
+    const trimmed = line.trimStart();
+    if (trimmed.startsWith("export default function") || trimmed.startsWith("export default async function")) {
+      declaresDefaultFunction = true;
+      break;
+    }
+  }
+  if (!declaresDefaultFunction) {
+    throw new Error("native entry declares no default function export: " + familyId);
+  }
+  if (expectedEvent === undefined) return;
+  if (!callsOnEvent(stripCode(source, true), expectedEvent)) {
+    throw new Error("native entry never handles " + expectedEvent + ": " + familyId);
+  }
+}
+
 async function loadNativeEntry(importedPath: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
   let loaded: unknown;
   try {
@@ -275,6 +370,14 @@ async function loadNativeEntry(importedPath: string, familyId: string, expectedE
     // locked package path, so no static import can name this module.
     loaded = await import(pathToFileURL(importedPath).href);
   } catch (error) {
+    // Exactly one Node limitation falls through: type stripping is banned
+    // for files under node_modules, while the host loader accepts them.
+    // Those entries take the static contract screen below; every other
+    // load failure refuses outright.
+    if (isTypeStrippingRefusal(error) && isTypeScriptPath(importedPath)) {
+      await scanNativeEntry(importedPath, familyId, expectedEvent);
+      return;
+    }
     throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
   if (!isRecord(loaded) || !("default" in loaded) || typeof loaded.default !== "function") {

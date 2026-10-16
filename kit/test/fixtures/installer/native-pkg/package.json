@@ -2,6 +2,7 @@
   "name": "jev-fixture-native",
   "version": "0.0.1-fixture.1",
   "private": true,
+  "type": "module",
   "description": "Fixture native package for installer profile-target tests: real hook/extension entry shapes, never published.",
   "jev": {
     "safe_side_tests": {
