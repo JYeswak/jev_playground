@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_2aa91852e999b9e10085a7492145fcab00396898ebe043c717f499311962558e",
+ "limitations": [
+  "README prose truth verified against cited EVAL sections; full gates selftest ran on ae41ee01 with targeted re-greens on final HEAD."
+ ],
+ "operation": "jev-qx7b-non-author-verify",
+ "parameters": {
+  "candidate": "bfd0d83e"
+ },
+ "producer": "RubyMeadow",
+ "result_ref": {
+  "bytes": 312,
+  "sha256": "593898ec6b5812225467307f27e76f39dfb2d920f7a013cf622ce56c26a9de0a"
+ }
+}
