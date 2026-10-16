@@ -133,6 +133,41 @@ class ReplayNegatives(unittest.TestCase):
         self.assertTrue(any("invalid encoder probability" in m
                             for m in verdict["mismatches"]))
 
+    def test_invalid_trigger_probability_mismatches(self):
+        rows = read_jsonl(self.work, "answers-protectai.jsonl")
+        trigger = next(r for r in rows if r["set"] == "trigger-negative")
+        trigger["p"] = -1.0
+        write_jsonl(self.work, "answers-protectai.jsonl", rows)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("invalid trigger probability" in m
+                            for m in verdict["mismatches"]))
+
+    def test_wrong_call_count_mismatches(self):
+        receipt = read_receipt(self.work)
+        receipt["jev_public_calls"] = 448
+        write_receipt(self.work, receipt)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("jev_public_calls" in m
+                            for m in verdict["mismatches"]))
+
+    def test_tampered_spend_mismatches(self):
+        receipt = read_receipt(self.work)
+        receipt["jev_public_input_tokens"] += 1
+        write_receipt(self.work, receipt)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("jev_public_input_tokens" in m
+                            for m in verdict["mismatches"]))
+
+    def test_missing_dev_row_mismatches(self):
+        rows = read_jsonl(self.work, "answers-protectai.jsonl")
+        write_jsonl(self.work, "answers-protectai.jsonl", rows[1:])
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertEqual(verdict["status"], "MISMATCH")
+
     def test_missing_jev_mate_mismatches(self):
         rows = read_jsonl(self.work, "answers-jev.jsonl")
         write_jsonl(self.work, "answers-jev.jsonl", rows[:-1])

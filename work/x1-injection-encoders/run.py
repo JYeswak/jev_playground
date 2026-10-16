@@ -535,6 +535,10 @@ def run_replay() -> int:
         if key[0] == "trigger-negative":
             if sha(TRIGGER_TEXT) != enc.get("input_sha256"):
                 mismatches.append("trigger input hash mismatch")
+            trigger_p = enc.get("p")
+            if (isinstance(trigger_p, bool) or not isinstance(trigger_p, (int, float))
+                    or not math.isfinite(trigger_p) or not 0.0 <= trigger_p <= 1.0):
+                mismatches.append(f"invalid trigger probability: {key}")
             continue
         src = rebuilt.get(key)
         if src is None:
@@ -552,7 +556,12 @@ def run_replay() -> int:
     if language_n != {"english": 447, "german": 215}:
         mismatches.append(f"language split differs: {language_n}")
     # Frozen cut rule (PREREG): smallest dev cut flagging no more than Jev.
-    dev = [enc_key[("clean-dev", f"clean-{i}")] for i in range(100)]
+    dev = [enc_key.get(("clean-dev", f"clean-{i}")) for i in range(100)]
+    if any(r is None for r in dev):
+        mismatches.append("missing development rows: cut not computable")
+        print(json.dumps({"status": "MISMATCH", "mismatches": mismatches,
+                          "cut": None, "model_loads": 0, "jev_calls": 0}))
+        return 1
     jev_dev_flags = sum(r["jev_p"] >= 0.5 for r in dev)
     dev_scores = [r["p"] for r in dev]
     eligible = sorted({s for s in dev_scores
@@ -620,6 +629,35 @@ def run_replay() -> int:
     }, recorded["acceptance"])
     check("trigger_negative.flag", flags[("trigger-negative", "trigger-negative")],
           recorded["trigger_negative"]["flag"])
+    check("status", "SCORED", recorded["status"])
+    check("lane", "local+live", recorded["lane"])
+    check("model", MODEL, recorded["model"])
+    check("revision", REVISION, recorded["revision"])
+    check("jev_model", "jev-1.13.0", recorded["jev_model"])
+    check("max_length", 512, recorded["max_length"])
+    check("truncation", "right", recorded["truncation"])
+    check("threads", 1, recorded["threads"])
+    public_rows = [k for k in enc_key if k[0] == "public-english"]
+    public_tokens = 0
+    for k in public_rows:
+        mate = jev_key.get(k)
+        if mate is None:
+            continue  # missing-mate mismatch already recorded above
+        tokens = mate.get("input_tokens")
+        if isinstance(tokens, bool) or not isinstance(tokens, int):
+            mismatches.append(f"invalid input_tokens: {k}")
+            continue
+        public_tokens += tokens
+    check("jev_public_calls", len(public_rows), recorded["jev_public_calls"])
+    check("jev_public_input_tokens", public_tokens,
+          recorded["jev_public_input_tokens"])
+    check("jev_estimated_spend_usd",
+          public_tokens * PRICE_PER_MILLION / 1_000_000,
+          recorded["jev_estimated_spend_usd"])
+    # Run-metadata below is not recomputable offline and is therefore not
+    # evidence: started_at_utc (wall clock), encoder_runtime (environment
+    # package versions), model_loads (replay performs 0 by design),
+    # guard (environment state at run time).
     verdict = {
         "status": "MATCH" if not mismatches else "MISMATCH",
         "mismatches": mismatches,
