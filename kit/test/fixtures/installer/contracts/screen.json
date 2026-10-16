@@ -13,6 +13,7 @@
   },
   "surface_type": "result-screen",
   "safe_side": "pass",
+  "safe_side_test_id": "installer.screen.unreachable.passes",
   "budget": {
     "latency_budget_ms": 800,
     "daily_call_cap": 400,

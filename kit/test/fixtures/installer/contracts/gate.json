@@ -13,6 +13,7 @@
   },
   "surface_type": "command-gate",
   "safe_side": "refuse",
+  "safe_side_test_id": "installer.gate.unreachable.refuses",
   "budget": {
     "latency_budget_ms": 1500,
     "daily_call_cap": 400,

@@ -5,19 +5,22 @@
       "id": "gate",
       "surface_type": "command-gate",
       "kind": "gate",
-      "declared": "ON"
+      "declared": "ON",
+      "safe_side_test_id": "installer.gate.unreachable.refuses"
     },
     {
       "id": "screen",
       "surface_type": "result-screen",
       "kind": "screen",
-      "declared": "OFF"
+      "declared": "OFF",
+      "safe_side_test_id": "installer.screen.unreachable.passes"
     },
     {
       "id": "hint",
       "surface_type": "advisory",
       "kind": "extension",
       "declared": "ON",
+      "safe_side_test_id": "installer.screen.unreachable.passes",
       "supported_profiles": ["default"]
     }
   ]
