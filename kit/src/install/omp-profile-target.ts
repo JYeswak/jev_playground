@@ -136,7 +136,7 @@ function packageNameFromSpecifier(specifier: string): string {
   return segments[0];
 }
 
-async function resolveFamilyPackage(family: TargetFamily): Promise<Record<string, unknown>> {
+async function resolveFamilyPackage(family: TargetFamily): Promise<{ safeSideTests: Record<string, unknown>; importedPath: string }> {
   const packageName = packageNameFromSpecifier(family.packageSpecifier);
   const packageRoot = resolve(family.packageRoot);
   const packageLockPath = resolve(family.packageLockPath);
@@ -187,16 +187,16 @@ async function resolveFamilyPackage(family: TargetFamily): Promise<Record<string
   const jevMetadata = packageValue.jev;
   const safeSideTests = isRecord(jevMetadata) ? jevMetadata.safe_side_tests : undefined;
   if (!isRecord(safeSideTests)) throw new Error("package manifest has no safe-side test registry: " + family.id);
-  return safeSideTests;
+  return { safeSideTests, importedPath };
 }
 
 
-function shimSource(family: TargetFamily, profile: string, offSwitch: { path: string; polarity: string }, safeSide: string): string {
+function shimSource(family: TargetFamily, profile: string, offSwitch: { path: string; polarity: string }, safeSide: string, importSpecifier: string): string {
   return (
     `${SHIM_MARKER_PREFIX} family=${family.id} profile=${profile} pin=${family.pin}\n` +
     `// off-switch: ${offSwitch.path} (${offSwitch.polarity})\n` +
     `// safe-side: ${safeSide} (test ${family.manifest.safeSideTestId})\n` +
-    "export * from " + JSON.stringify(family.packageSpecifier) + ";\n"
+    "export * from " + JSON.stringify(importSpecifier) + ";\n"
   );
 }
 
@@ -305,16 +305,20 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
         throw new Error(`packaged import must not be a repo path: ${family.id}`);
       }
       let gate: { offSwitch: { path: string; polarity: string }; safeSide: string };
+      let importedPath: string;
       try {
-        const safeSideTests = await resolveFamilyPackage(family);
-        gate = await checkBlastRadius(family, input.switchRegistry, input.maxHandlerLatencyMs, safeSideTests);
+        const resolved = await resolveFamilyPackage(family);
+        importedPath = resolved.importedPath;
+        gate = await checkBlastRadius(family, input.switchRegistry, input.maxHandlerLatencyMs, resolved.safeSideTests);
       } catch (error) {
         families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
         refused = true;
         continue;
       }
       const dest = join(agentDir, "shims", `jev-${family.id}.ts`);
-      const source = shimSource(family, profile, gate.offSwitch, gate.safeSide);
+      const shimRelative = relative(dirname(dest), importedPath);
+      const importSpecifier = shimRelative.startsWith(".") ? shimRelative : "./" + shimRelative;
+      const source = shimSource(family, profile, gate.offSwitch, gate.safeSide, importSpecifier);
       if (source.includes("/Users/") || source.includes("Developer/jev")) {
         throw new Error(`generated shim leaks a repo path: ${family.id}`);
       }
