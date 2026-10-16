@@ -17,10 +17,12 @@ Rules (acceptance-enforced):
 
 Usage:
   python3 work/gate-family/demand/census.py --days 7 --json
+  python3 work/gate-family/demand/census.py --days 7 --as-of 2026-10-13T16:00:00Z --json
   python3 work/gate-family/demand/census.py --days 7 --json --selftest
 """
 
 import argparse
+import glob
 import hashlib
 import json
 import os
@@ -29,7 +31,8 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__)))))
-SRC_LOG = os.path.expanduser("~/.local/state/jev/gate-observe.jsonl")
+STATE_DIR = os.path.expanduser("~/.local/state/jev")
+SRC_LOG = os.path.join(STATE_DIR, "gate-observe.jsonl")
 UNCD_ITEMS = os.path.join(REPO, "work/jev-uncd/items.jsonl")
 LIM_MANIFEST = os.path.join(REPO, "work/jev-1lim/manifest.jsonl")
 LIM_A = os.path.join(REPO, "work/jev-1lim/labels-A.jsonl")
@@ -40,7 +43,7 @@ OUT_DIR = os.path.join(REPO, "work/gate-family/demand")
 ROWS_OUT = os.path.join(OUT_DIR, "rows-hash-only.jsonl")
 RECEIPT_OUT = os.path.join(OUT_DIR, "receipt.json")
 
-VERSION = "p2-census-v1"
+VERSION = "p2-census-v2"
 
 
 def parse_ts(s):
@@ -51,6 +54,15 @@ def parse_ts(s):
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return dt
+
+
+def discover_sources():
+    archives = sorted(glob.glob(os.path.join(STATE_DIR, "gate-observe.jsonl.*.archive")))
+    paths = archives + [SRC_LOG]
+    missing = [p for p in paths if not os.path.isfile(p)]
+    if missing:
+        raise SystemExit("missing census source files: " + ", ".join(missing))
+    return paths
 
 
 def is_harm(label):
@@ -134,9 +146,19 @@ def try_join(row):
     return False, None
 
 
-def run_census(days, emit=True):
-    with open(SRC_LOG, "rb") as f:
-        raw_lines = f.read().splitlines(keepends=True)
+def _raw_ts(raw):
+    try:
+        return parse_ts(json.loads(raw.decode("utf-8")).get("ts"))
+    except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
+        return None
+
+def run_census(days, emit=True, asof=None):
+    sources = discover_sources()
+    contents = []
+    for path in sources:
+        with open(path, "rb") as f:
+            contents.append(f.read().splitlines(keepends=True))
+    raw_lines = [raw for content in contents for raw in content]
     full_sha = hashlib.sha256(b"".join(raw_lines)).hexdigest()
 
     parsed = []
@@ -150,12 +172,29 @@ def run_census(days, emit=True):
             continue
         parsed.append((ts, raw, r))
     if not parsed:
-        raise SystemExit("no parseable rows with ts in source log")
+        raise SystemExit("no parseable rows with ts in source logs")
     max_ts = max(t for t, _, _ in parsed)
-    cutoff = max_ts - timedelta(days=days)
-    window = [(t, raw, r) for (t, raw, r) in parsed if t >= cutoff]
-    window.sort(key=lambda x: (x[0].isoformat(), str(x[2].get("cmdSha"))))
+    anchor = asof if asof is not None else max_ts
+    cutoff = anchor - timedelta(days=days)
+    window = [(t, raw, r) for (t, raw, r) in parsed if cutoff <= t <= anchor]
     window_sha = hashlib.sha256(b"".join(raw for _, raw, _ in window)).hexdigest()
+    actual_start = min(t for t, _, _ in window).isoformat() if window else None
+    start_gap_s = (min(t for t, _, _ in window) - cutoff).total_seconds() if window else None
+    covers_span = bool(window) and start_gap_s is not None and start_gap_s <= 300
+    span_hours = round((anchor - min(t for t, _, _ in window)).total_seconds() / 3600, 1) if window else 0.0
+    file_records = []
+    for path, content in zip(sources, contents):
+        kept = []
+        for raw in content:
+            ts = _raw_ts(raw)
+            if ts is not None and ts <= anchor:
+                kept.append(raw)
+        file_records.append({
+            "path": os.path.basename(path),
+            "lines": len(content),
+            "kept_lines": len(kept),
+            "kept_sha256": hashlib.sha256(b"".join(kept)).hexdigest(),
+        })
 
     label_sets = load_label_sets()
     status_breakdown = Counter()
@@ -207,15 +246,24 @@ def run_census(days, emit=True):
         "window": {
             "days": days,
             "cutoff": cutoff.isoformat(),
-            "max_ts": max_ts.isoformat(),
+            "anchor": anchor.isoformat(),
+            "file_max_ts": max_ts.isoformat(),
+            "actual_start": actual_start,
+            "actual_span_hours": span_hours,
             "rows": len(window),
+            "covers_requested_span": covers_span,
+            "span_note": "window fully covers the requested span" if covers_span else f"source holds {span_hours}h; a trailing-{days}d window covers the file, not {days} days of demand",
         },
         "source_hashes": {
-            "gate_observe_full_sha256": full_sha,
-            "gate_observe_full_lines": len(raw_lines),
+            "source_files": file_records,
+            "concatenated_sha256": full_sha,
+            "concatenated_lines": len(raw_lines),
             "window_rows_sha256": window_sha,
+            "window_row_order": "file order across epoch-ordered archives plus live log",
             "uncd_items": "work/jev-uncd/items.jsonl",
             "lim_manifest": "work/jev-1lim/manifest.jsonl",
+            "source_note": "scored logs: rotated gate-observe.jsonl archives in epoch order plus the live tail; gate-observe-full.jsonl carries no outcomes and is not a source",
+            "historic_9bae04e5": "reproduced 2026-10-13 from archive 1 (2750 rows, file order): sha256 9bae04e5fc6a2e81d5ee9982f0be0657b88d119cef92d7a00b7d89efc055b12a",
         },
         "status_breakdown": dict(status_breakdown),
         "eligible_denominator": eligible,
@@ -289,12 +337,18 @@ def selftest():
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=7)
+    ap.add_argument("--as-of", default=None,
+                    help="pin window end to this ISO timestamp; default: file max ts")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args(argv)
     if args.selftest and not selftest():
         return 1
-    result = run_census(args.days)
+    asof = parse_ts(args.as_of) if args.as_of else None
+    if args.as_of and asof is None:
+        print("unparseable --as-of timestamp", file=sys.stderr)
+        return 2
+    result = run_census(args.days, asof=asof)
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:

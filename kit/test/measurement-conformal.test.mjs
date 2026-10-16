@@ -96,20 +96,45 @@ function exactCoverageBand(nCalibration, nTest, alpha) {
   return { lowerCount: quantile(0.025), upperCount: quantile(0.975), confidence: 0.95 };
 }
 
-test('D5 frozen Banking77 LAC split meets its exact finite-sample coverage band', () => {
+test('frozen Banking77 split refuses captured probability mass outside the fixed bound', () => {
   const data = fixture();
   assert.equal(data.calibration.length, 200);
   assert.equal(data.test.length, 600);
   assert.equal(new Set(data.calibration.map((item) => item.id)).size, 200);
   assert.equal(new Set(data.test.map((item) => item.id)).size, 600);
   assert.equal(data.calibration.some((item) => data.test.some((held) => held.id === item.id)), false);
-
+  const invalidMass = (rows) => rows.filter((item) => {
+    const total = Object.values(item.probabilities).reduce((sum, value) => sum + value, 0);
+    return Math.abs(total - 1) > 1e-6;
+  }).length;
+  assert.equal(invalidMass(data.calibration), 14);
+  assert.equal(invalidMass(data.test), 36);
   const result = splitConformalLac({ ...data, alpha: ALPHA, probabilityFloor: FLOOR, samplingFrame: FRAME });
-  assert.equal(result.status, 'OK', `status=${result.status} reason=${result.reason}`);
+  assert.equal(result.status, 'REFUSE');
+  assert.equal(result.reason, 'invalid_probability_vector');
+  assert.equal(result.coverage, undefined);
+});
+
+test('D5 synthetic arithmetic-only 200/600 split matches exact finite-sample coverage band', () => {
+  // Synthetic arithmetic-only fixture; not observed-data coverage or a D5 measurement.
+  const labels = ['a', 'b'];
+  const samplingFrame = frameFor('synthetic target population');
+  const makeRow = (id, group, index, goodCount) => {
+    const trueLabel = index % 2 === 0 ? 'a' : 'b';
+    const pTrue = index < goodCount ? 0.8 : 0.7;
+    const probabilities = trueLabel === 'a' ? { a: pTrue, b: 1 - pTrue } : { a: 1 - pTrue, b: pTrue };
+    return row(id, trueLabel, probabilities, group);
+  };
+  const calibration = Array.from({ length: 200 }, (_, i) => makeRow(`cal-${i}`, 'DEV', i, 190));
+  const held = Array.from({ length: 600 }, (_, i) => makeRow(`held-${i}`, 'SAMPLE', i, 540));
+  const result = splitConformalLac({ labels, calibration, test: held, alpha: ALPHA, probabilityFloor: FLOOR, samplingFrame });
+  assert.equal(result.status, 'OK');
   assert.equal(result.nCalibration, 200);
   assert.equal(result.nTest, 600);
   assert.equal(result.calibrationRank, 181);
+  assert.ok(Math.abs(result.threshold - 0.2) <= Number.EPSILON);
   assert.deepEqual(result.coverageBand, exactCoverageBand(200, 600, ALPHA));
+  assert.equal(result.covered, 540);
   assert.ok(result.covered >= result.coverageBand.lowerCount);
   assert.ok(result.covered <= result.coverageBand.upperCount);
   assert.ok(Number.isFinite(result.meanSetSize));
@@ -127,7 +152,7 @@ test('LAC includes every label tied at q-hat', () => {
   const held = [row('t1', 'b', { a: 0.2, b: 0.8 }, 'SAMPLE')];
   const result = splitConformalLac({ labels, calibration, test: held, alpha: 0.4, probabilityFloor: FLOOR, samplingFrame: frameFor() });
   assert.equal(result.status, 'OK');
-  assert.equal(result.threshold, 0.2);
+  assert.ok(Math.abs(result.threshold - 0.2) <= Number.EPSILON);
   assert.deepEqual(result.predictionSets[0].labels, ['b']);
 });
 
