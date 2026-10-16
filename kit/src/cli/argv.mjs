@@ -1,4 +1,4 @@
-const COMMANDS = ['doctor', 'health', 'repair', 'ask', 'rank', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
+const COMMANDS = ['doctor', 'health', 'repair', 'ask', 'rank', 'rerank', 'classify', 'verify', 'score', 'gate', 'canary', 'miner', 'omp', 'install', 'uninstall'];
 const DESTRUCTIVE_OPTIONS = new Set(['--apply', '--force', '--yes', '--delete', '--remove', '--adopt', '--take-over-bin']);
 const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
@@ -10,6 +10,8 @@ const VALUE_OPTIONS = {
   verify: new Set(['--claim', '--evidence', '--backend']),
   score: new Set(['--text', '--levels', '--backend']),
   gate: new Set(['--command', '--backend']),
+  canary: new Set([]),
+  miner: new Set(['--input', '--as-of', '--labels']),
   omp: new Set(['--dir']),
   install: new Set(['--dir']),
   uninstall: new Set(['--dir']),
@@ -26,6 +28,7 @@ const BOOLEAN_OPTIONS = {
   omp: new Set(['--dry-run', '--apply']),
   install: new Set(['--dry-run', '--apply']),
   uninstall: new Set(['--dry-run', '--apply']),
+  miner: new Set(['--rank']),
 };
 
 function oneEditOrSwap(left, right) {

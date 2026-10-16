@@ -104,7 +104,7 @@ test("miner job carries the fixed cap and load deferral", () => {
   const stateDir = tempState();
   const job = buildMinerJob({ stateDir });
   assert.equal(job.label, "classifier-miner-daily");
-  assert.deepEqual(job.command, ["nice", "-n", "10", "classifier", "miner", "--daily", "--json"]);
+  assert.deepEqual(job.command, ["nice", "-n", "10", "classifier", "miner", "--rank", "--json"]);
   assert.equal(job.timeCapSecs, 3000);
   assert.equal(job.deferWhileLoadAbove, 80);
   assert.equal(job.keylessSkip, true);
@@ -114,7 +114,7 @@ test("miner job carries the fixed cap and load deferral", () => {
 });
 
 test("any path token refuses; bare classifier dispatch passes", () => {
-  assert.doesNotThrow(() => assertSafeCommand(["classifier", "miner", "--daily"]));
+  assert.doesNotThrow(() => assertSafeCommand(["classifier", "miner", "--rank", "--json"]));
   assert.throws(() => assertSafeCommand(["work/fleet-schema/miner.py", "--daily"]), /repository path/);
   assert.throws(() => assertSafeCommand(["scripts/jev-latest-canary-run.sh"]), /repository path/);
   assert.throws(() => assertSafeCommand(["/abs/path/x"]), /repository path/);
@@ -149,5 +149,5 @@ test("emitted argv executes from a distinct installed root via PATH double", () 
     });
   }
   const calls = readFileSync(callsFile, "utf8").trim().split("\n");
-  assert.deepEqual(calls, ["miner --daily --json", "canary"]);
+  assert.deepEqual(calls, ["miner --rank --json", "canary"]);
 });

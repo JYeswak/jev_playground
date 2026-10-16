@@ -56,6 +56,12 @@ export function rewriteCliError(input: ErrorInput): CliError {
     return result('NOT_RUN', EXIT_CODES.NOT_RUN, 'NOT_RUN: Jev backend has no key (TYPESAFE_API_KEY unset)',
       ['offline: add --fake', 'diagnose: classifier doctor'], command);
   }
+  if (input.reason === 'uncalibrated') {
+    return result('NOT_RUN', EXIT_CODES.NOT_RUN, 'NOT_RUN: no exact committed Clef calibration exists for this question', [`rerun: ${command} --backend jev`], command);
+  }
+  if (input.reason === 'truncated') {
+    return result('REFUSED', EXIT_CODES.REFUSED, 'REFUSED: Clef input reached the 16384-token boundary; no answer emitted', ['reduce the input below 16384 tokens', `rerun: ${command} --backend jev`], command);
+  }
   if (input.reason === 'invalid-answer' || input.reason === 'no-answers' || message.includes('unoffered label')) {
     const marker = 'unoffered label';
     const remainder = message.includes(marker) ? message.slice(message.indexOf(marker) + marker.length) : '';
@@ -81,17 +87,21 @@ export function rewriteCliError(input: ErrorInput): CliError {
   }
   if (input.reason === 'refused-unsafe') {
     return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
-      message || 'REFUSED_UNSAFE: installer refused to modify files', ['inspect the reported path before retrying'], command);
+      message || 'REFUSED_UNSAFE: direct or non-loopback Clef URL refused', [`rerun: ${command} --backend jev`, 'configure the localbench gateway URL instead of a direct Clef server'], command);
   }
   if (input.reason === 'transport' || input.reason === 'http') {
     return result('RETRYABLE', EXIT_CODES.RETRYABLE,
       message || 'RETRYABLE: transient operation failure', ['retry after the active operation or transient failure clears'], command);
   }
-  if (input.reason === 'clef-unreachable') {
+  if (input.reason === 'backend-hold' || input.reason === 'online-required' || input.reason === 'clef-unreachable') {
     return result('ONLINE_REQUIRED', EXIT_CODES.ONLINE_REQUIRED,
-      `error: clef backend unreachable at ${input.path ?? 'http://127.0.0.1:8010/v1/systemone'}`,
-      ['use hosted: --backend jev', 'diagnose: classifier doctor'], command);
+      message || 'ONLINE_REQUIRED: configured Clef gateway is unavailable', [`rerun: ${command} --backend jev`, 'diagnose: classifier doctor'], command);
   }
+  if (input.reason === 'auth') {
+    return result('AUTH', EXIT_CODES.FINDINGS,
+      message || 'canary AUTH: secret-manager login failed; canary never ran', [`rerun: ${command} --help`, 'diagnose: classifier doctor'], command);
+  }
+
   const status = input.reason === 'usage' ? 'USAGE' : input.reason === 'io' ? 'IO' : 'FINDINGS';
   const exitCode = status === 'USAGE' ? EXIT_CODES.USAGE : status === 'IO' ? EXIT_CODES.IO : EXIT_CODES.FINDINGS;
   return result(status, exitCode, message || `error: ${status.toLowerCase()}`, [`rerun: ${command} --help`], command);

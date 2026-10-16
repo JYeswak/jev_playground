@@ -92,9 +92,9 @@ const MINER_TIME_CAP_SECS = 3000;
 const MINER_DEFER_LOAD_ABOVE = 80;
 // Installed-classifier dispatch only: bare argv against the installed
 // `classifier` on PATH, never a repository checkout path. The miner and
-// canary subcommands are served by the classifier binary itself (CLI
-// dispatch pending); these definitions pin the exact argv it must serve.
-const MINER_COMMAND = ['nice', '-n', '10', 'classifier', 'miner', '--daily', '--json'];
+// canary subcommands are served by the classifier binary itself; these
+// definitions pin the exact argv it must serve.
+const MINER_COMMAND = ['nice', '-n', '10', 'classifier', 'miner', '--rank', '--json'];
 const CANARY_COMMAND = ['classifier', 'canary'];
 
 /**

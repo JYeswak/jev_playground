@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { askJev, askJevChoice, askJevScore } from "../dist/client.js";
+import { fileURLToPath } from "node:url";
+import { askJev, askJevChoice, askJevScore, configuredBackend, previewJevRequest } from "../dist/client.js";
 import { rerankTop1 } from "../dist/rerank.js";
 import { classifyText } from "../dist/classify.js";
 import { verifyClaim } from "../dist/verify.js";
@@ -18,11 +19,12 @@ import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
 import { FAMILIES, FAMILY_REGISTRY } from "../dist/families/registry.js";
-import { buildDailyJobs, defaultSpecForFamilies } from "../dist/install/daily-jobs.js";
+import { listDailyJobs } from "../dist/install/daily-jobs.js";
 import { runDoctor } from "../src/doctor/engine.mjs";
 import { runRepair } from "../dist/doctor/repair.js";
 import { runHealth } from "../src/doctor/readiness.mjs";
 import { formatCliError, rewriteCliError } from "../dist/cli/errors.js";
+import { optionsPreflight } from "../dist/preflight.js";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -132,97 +134,161 @@ async function repair(parsed) {
 async function ask(args) {
   const kind = args[1];
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
   const statePath = option(args, "--state");
   const questionPath = option(args, "--question");
   if (!kind || !statePath || !questionPath || !["choice", "score", "noul"].includes(kind)) {
-    return usageFailure("classifier ask choice|score|noul --state FILE --question FILE [--fake] [--json|--robot]");
+    return usageFailure("classifier ask choice|score|noul --state FILE --question FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
   }
   const state = await readJson(statePath);
   const question = await readJson(questionPath);
+  if (dryRun) {
+    const backend = configuredBackend(fake ? "jev" : option(args, "--backend"));
+    if (!backend) return usageFailure("--backend must be jev, clef, or auto");
+    if (kind === "choice") {
+      const choiceQuestion = { type: "choice", instructions: question.instructions ?? "", criteria: question.criteria };
+      if (Array.isArray(question.criteria)) return usageFailure("ask choice question criteria must be a label map");
+      optionsPreflight(choiceQuestion);
+      return previewJevRequest(state, { choice: choiceQuestion }, undefined, backend, "choice");
+    }
+    if (kind === "score") {
+      if (!Array.isArray(question.criteria) || question.criteria.length < 2) return usageFailure("ask score question criteria must contain at least two levels");
+      return previewJevRequest(state, { score: { type: "score", instructions: question.instructions ?? "", criteria: question.criteria } }, undefined, backend, "score");
+    }
+    const rawQuestion = question.instructions ?? question;
+    const noulQuestion = typeof rawQuestion === "string"
+      ? { type: "noul", instructions: rawQuestion }
+      : { type: "noul", instructions: rawQuestion.instructions, ...(rawQuestion.criteria ? { criteria: rawQuestion.criteria } : {}) };
+    return previewJevRequest(state, { value: noulQuestion }, undefined, backend, "noul");
+  }
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/recorded-answer-rows.json", ROOT), "utf8")))
     : undefined;
+  const backend = fake ? "jev" : option(args, "--backend");
   if (kind === "choice") {
-    return askJevChoice({ state, instructions: question.instructions ?? "", classes: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+    return askJevChoice({ state, instructions: question.instructions ?? "", classes: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl, backend });
   }
   if (kind === "score") {
-    return askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+    return askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl, backend });
   }
-  return askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+  return askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl, backend });
 }
 
 async function gate(args) {
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
+  const backend = fake ? "jev" : option(args, "--backend");
   const command = option(args, "--command");
-  if (!command) return usageFailure("classifier gate --command C [--fake] [--json|--robot]");
+  if (!command) return usageFailure("classifier gate --command C [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
+  if (dryRun) return gateCommand({ command, backend, dryRun: true });
   if (fake) {
     const fixture = await readJson(new URL("../examples/gate-public.json", import.meta.url).pathname);
     if (command !== fixture.command) return usageFailure("--fake only supports the captured public example command");
     const answers = Object.fromEntries(Object.entries(fixture.scores).map(([key, noul]) => [key, { noul }]));
-    return gateCommand({ command, model: fixture.model, ask: async () => ({ ok: true, answers, latencyMs: 0, resolvedModel: fixture.model, usage: undefined }) });
+    return gateCommand({ command, model: fixture.model, backend: "jev", ask: async () => ({ ok: true, answers, latencyMs: 0, resolvedModel: fixture.model, usage: undefined }) });
   }
-  return gateCommand({ command });
+  return gateCommand({ command, backend });
 }
 
 async function rerank(args) {
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
   const query = option(args, "--query");
   const candidatesPath = option(args, "--candidates");
-  if (!query || !candidatesPath) return usageFailure("classifier rerank --query Q --candidates FILE [--fake] [--json|--robot]");
+  if (!query || !candidatesPath) return usageFailure("classifier rerank --query Q --candidates FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
   const candidates = await readJson(candidatesPath);
-  const fetchImpl = fake
+  const fetchImpl = fake && !dryRun
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/rerank-fiqa-answer.json", ROOT), "utf8")))
     : undefined;
-  return rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
+  return rerankTop1({ query, candidates, backend: fake ? "jev" : option(args, "--backend"), dryRun, apiKey: fake && !dryRun ? "fixture-key" : undefined, fetchImpl, model: fake && !dryRun ? "fake" : undefined });
 }
 
 async function classify(args) {
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
   const text = option(args, "--text");
   const labelsPath = option(args, "--labels");
-  if (!text || !labelsPath) return usageFailure("classifier classify --text T --labels FILE [--fake] [--json|--robot]");
+  if (!text || !labelsPath) return usageFailure("classifier classify --text T --labels FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
   const labels = await readJson(labelsPath);
-  const fetchImpl = fake
+  const fetchImpl = fake && !dryRun
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/banking77-answer.json", ROOT), "utf8")))
     : undefined;
-  return classifyText({
-    text,
-    labels,
-    apiKey: fake ? "fixture-key" : undefined,
-    fetchImpl,
-    model: fake ? "fake" : undefined,
-  });
+  return classifyText({ text, labels, backend: fake ? "jev" : option(args, "--backend"), dryRun, apiKey: fake && !dryRun ? "fixture-key" : undefined, fetchImpl, model: fake && !dryRun ? "fake" : undefined });
 }
+
 
 async function verify(args) {
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
   const claim = option(args, "--claim");
   const evidencePath = option(args, "--evidence");
-  if (!claim || !evidencePath) return usageFailure("classifier verify --claim C --evidence FILE [--fake] [--json|--robot]");
+  if (!claim || !evidencePath) return usageFailure("classifier verify --claim C --evidence FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
   const evidence = await readFile(resolve(evidencePath), "utf8");
-  const fetchImpl = fake
+  const fetchImpl = fake && !dryRun
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/scifact-answer.json", ROOT), "utf8")))
     : undefined;
-  return verifyClaim({
-    claim,
-    evidence,
-    apiKey: fake ? "fixture-key" : undefined,
-    fetchImpl,
-    model: fake ? "fake" : undefined,
-  });
+  return verifyClaim({ claim, evidence, backend: fake ? "jev" : option(args, "--backend"), dryRun, apiKey: fake && !dryRun ? "fixture-key" : undefined, fetchImpl, model: fake && !dryRun ? "fake" : undefined });
 }
+
 
 async function score(args) {
   const fake = hasFlag(args, "--fake");
+  const dryRun = hasFlag(args, "--dry-run");
   const text = option(args, "--text");
   const levelsPath = option(args, "--levels");
-  if (!text || !levelsPath) return usageFailure("classifier score --text T --levels FILE [--fake] [--json|--robot]");
+  if (!text || !levelsPath) return usageFailure("classifier score --text T --levels FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]");
   const levels = await readJson(levelsPath);
-  const fetchImpl = fake
+  const fetchImpl = fake && !dryRun
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/sst5-answer.json", ROOT), "utf8")))
     : undefined;
-  return scoreText({ text, levels, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
+  return scoreText({ text, levels, backend: fake ? "jev" : option(args, "--backend"), dryRun, apiKey: fake && !dryRun ? "fixture-key" : undefined, fetchImpl, model: fake && !dryRun ? "fake" : undefined });
 }
+const CANARY_RUNNER = new URL("../scripts/jev-latest-canary-run.sh", ROOT);
+const MINER_RUNNER = new URL("../work/fleet-schema/miner.py", ROOT);
+
+function allOptions(args, name) {
+  const values = [];
+  for (let i = 0; i < args.length; i += 1) {
+    if (args[i] === name && i + 1 < args.length) values.push(args[i + 1]);
+  }
+  return values;
+}
+
+function todayUtc() {
+  return new Date().toISOString().slice(0, 19) + "Z";
+}
+
+async function canary() {
+  const probe = await execProbe("bash", [fileURLToPath(CANARY_RUNNER)], { timeout: 120000 });
+  const outcome = probe.code === 0 ? "OK" : probe.code === 1 ? "MOVED" : probe.code === 2 ? "NOT_RUN" : probe.code === 4 ? "AUTH" : "ERROR";
+  if (probe.code === 0) return { ok: true, outcome, detail: probe.stdout.trim().split("\n").slice(-3) };
+  const reason = probe.code === 2 ? "NOT_RUN" : probe.code === 4 ? "auth" : outcome;
+  return { ok: false, reason, outcome, runnerExit: probe.code, message: `canary ${outcome} (runner exit ${probe.code})`, detail: probe.stdout.trim().split("\n").slice(-3) };
+}
+
+async function miner(args) {
+  const inputs = allOptions(args, "--input");
+  const asOf = option(args, "--as-of") ?? todayUtc();
+  const labels = option(args, "--labels");
+  const rank = hasFlag(args, "--rank");
+  if (!labels && !rank) return usageFailure("classifier miner --labels FAMILY|--rank [--input FILE] [--as-of YYYY-MM-DD] [--json|--robot]");
+  const minerArgs = [
+    ...(labels ? ["--labels", labels] : []),
+    ...(rank ? ["--rank"] : []),
+    ...inputs.flatMap((input) => ["--input", input]),
+    "--as-of", asOf, "--json",
+  ];
+  const probe = await execProbe("python3", [fileURLToPath(MINER_RUNNER), ...minerArgs], { timeout: 120000 });
+  if (probe.code !== 0) return { ok: false, reason: "ERROR", runnerExit: probe.code, message: `miner failed (runner exit ${probe.code})`, detail: probe.stderr.trim().split("\n").slice(-3) };
+  let detail = null;
+  try {
+    detail = JSON.parse(probe.stdout);
+  } catch {
+    detail = probe.stdout.trim().split("\n").slice(-3);
+  }
+  return { ok: true, detail };
+}
+
 async function runInstaller(command, args, parsed) {
   if (hasFlag(args, "--dry-run") && hasFlag(args, "--apply")) {
     return usageFailure("--dry-run and --apply cannot be used together");
@@ -231,7 +297,7 @@ async function runInstaller(command, args, parsed) {
   const target = parsed.positionals[0] ?? "all";
   const plan = await createInstallPlan({ target, dir: option(args, "--dir") });
   const dailyJobs = command === "install" && target === "daily"
-    ? buildDailyJobs(defaultSpecForFamilies(FAMILIES), {
+    ? listDailyJobs(FAMILIES, {
       stateDir: join(process.env.HOME ?? homedir(), ".local/state/classifier"),
     })
     : undefined;
@@ -339,6 +405,8 @@ async function main() {
     else if (parsed.command === "health") result = await health(parsed);
     else if (parsed.command === "ask") result = await ask(args);
     else if (parsed.command === "install" || parsed.command === "uninstall") result = await runInstaller(parsed.command, args, parsed);
+    else if (parsed.command === "canary") result = await canary();
+    else if (parsed.command === "miner") result = await miner(args);
     else if (parsed.command === "omp" && parsed.subcommand === "install") {
       result = { ok: true, ...await installOmp(option(args, "--dir") ?? process.cwd(), hasFlag(args, "--dry-run")) };
     } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
@@ -346,18 +414,19 @@ async function main() {
     } else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") {
       result = await FAMILY_RUNNERS[family.runner](args);
     } else {
-      result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|install|uninstall|omp ...");
+      result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|canary|miner|install|uninstall|omp ...");
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const code = error && typeof error === "object" ? error.code : undefined;
-    const knownReasons = ["unconfigured", "sdk-missing", "billing-hold", "transport", "http", "non-json", "no-answers", "invalid-answer"];
-    const reason = knownReasons.find((candidate) => message.includes(`(${candidate})`))
-      ?? (code === "USAGE" ? "usage"
-        : code === "REFUSED" ? "refused-unsafe"
-          : code === "RETRYABLE" ? "transport"
-            : code === "ENOENT" || code === "ENOTDIR" ? "no-input"
-              : ["EACCES", "EIO", "EISDIR", "IO"].includes(code) ? "io" : "exception");
+    const knownReasons = ["unconfigured", "uncalibrated", "truncated", "sdk-missing", "billing-hold", "backend-hold", "online-required", "refused-unsafe", "transport", "http", "non-json", "no-answers", "invalid-answer"];
+    const reason = knownReasons.find((candidate) => message.includes("(" + candidate + ")"))
+      ?? (message.startsWith("uncalibrated:") ? "uncalibrated"
+        : code === "USAGE" ? "usage"
+          : code === "REFUSED" ? "refused-unsafe"
+            : code === "RETRYABLE" ? "transport"
+              : code === "ENOENT" || code === "ENOTDIR" ? "no-input"
+                : ["EACCES", "EIO", "EISDIR", "IO"].includes(code) ? "io" : "exception");
     cliError = rewriteCliError({
       reason,
       message,
@@ -367,7 +436,8 @@ async function main() {
       path: parsed.command === "classify" ? option(args, "--labels") : undefined,
       cwd: process.cwd(),
     });
-    result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}) };
+    const backendRequested = configuredBackend(hasFlag(args, "--fake") ? "jev" : option(args, "--backend"));
+    result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}), ...(backendRequested ? { backend: backendRequested === "clef" ? "clef" : "jev", backendRequested } : {}) };
   }
   if (!cliError && result?.ok === false && parsed.command !== "doctor" && parsed.command !== "health") {
     cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: `classifier ${parsed.command}` });

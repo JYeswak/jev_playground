@@ -14,6 +14,8 @@ Commands:
   verify                 Check evidence for a claim
   score                  Rate text on a rubric
   gate                   Judge command risk
+  canary                 Run the jev-latest canary under its secret manager
+  miner                  Run the fleet-decision miner over decision logs
   omp install|uninstall  Manage project-scoped omp files
   install                Install project-scoped omp files
   uninstall              Uninstall project-scoped omp files
@@ -25,11 +27,15 @@ Global options:
   -h, --help             Show help and exit
   --version              Print version and exit
 
+Backend options (ask, rerank, classify, verify, score, gate):
+  --backend jev|clef|auto Select the decision backend (default: jev)
+  --dry-run              Build a keyless Jev request preview; do not call a backend
+
 Fixture option:
   --fake                 Use captured data; available on ask, rerank, classify, verify, score, and gate
 
 Exit codes:
-  0 success; 1 findings/NOT_RUN; 3 refused; 4 refused_unsafe
+  0 success; 1 findings; 2 not_run; 3 refused; 4 refused_unsafe
   5 retryable; 6 online_required; 64 usage; 66 no_input
   73 cannot_create; 74 I/O
 
@@ -51,13 +57,13 @@ const HEALTH_HELP = `classifier health [--json|--robot]
 
 Run quick offline readiness checks without changing files.`;
 
-const ASK_HELP = `classifier ask choice|score|noul --state FILE --question FILE [--fake] [--json|--robot]
+const ASK_HELP = `classifier ask choice|score|noul --state FILE --question FILE [--backend jev|clef|auto] [--dry-run|--fake] [--json|--robot]
 
 Examples:
-  classifier ask choice --state kit/examples/state.json --question kit/examples/question.json --fake --robot
+  classifier ask choice --state kit/examples/state.json --question kit/examples/question.json --backend auto --dry-run --robot
 
 Exit codes:
-  0 success; 1 findings/NOT_RUN; 3 refused; 64 usage; 66 no_input`;
+  0 success; 1 findings; 2 not_run; 3 refused; 64 usage; 66 no_input`; 
 
 export function helpFor(topic = '') {
   if (!topic) return OVERVIEW_HELP;
