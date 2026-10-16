@@ -1,0 +1,38 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_d9c171bbd51b1e73a3e1539f3b8543ec71b008a0d644630a510bcfed6eeca066",
+ "limitations": [
+  "13/13 and10 actual file/API cases; source-independent cutoff/adoption guard only, not approval of global zero-LIVE stage exit"
+ ],
+ "operation": "stage-exit.original-api-cutoff-review",
+ "parameters": {
+  "subject_sha256": "fc9404d1e1a37ad9fc382f8bfce93a60b5e4cedad04601ccd53abaaafb39e6ca"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "bead": "jev-uzq1.2",
+  "build_source": "effa1fbedd6864f997c57b59c1c03c1e109c79dc",
+  "build_source_module_identical": true,
+  "candidate": "7b2cb91ec805930f30510a73eb3730c332fff05e",
+  "compiled_artifact_sha256": "9bde39147d09389bee9b09fb30232d39a0c69c791b4c465a6c5920727da8c867",
+  "external_file_api": {
+   "entry": "checkStageEligibility default filesystem reader from built kit/dist/ship/stage-exit.js",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "{\"scope\":\"cutoff/adoption-source-check-only\",\"rows\":[{\"label\":\"29\",\"accepted\":true,\"expected\":true,\"reason\":null},{\"label\":\"30\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: outcome positives 30 reach the 30 cutoff\"},{\"label\":\"31\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: outcome positives 31 reach the 30 cutoff\"},{\"label\":\"7d\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: window must be 14d, got 7d\"},{\"label\":\"missing-window\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: window must be 14d, got undefined\"},{\"label\":\"missing-adoption\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: elapsed minutes must be a finite number\"},{\"label\":\"60min\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: elapsed 60 minutes reaches the 60-minute bound\"},{\"label\":\"negative-elapsed\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: elapsed minutes -1 is negative\"},{\"label\":\"tampered\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: stage receipt bytes disagree with declared source hash\"},{\"label\":\"missing-file\",\"accepted\":false,\"expected\":false,\"reason\":\"stage-exit refused: stage receipt artifact missing or unreadable: file:///Users/josh/Developer/jev/var/agent-tmp/stage-api-review.59421/missing-file.json\"}]}\n"
+  },
+  "limits": "Only DROPPED count/window and adoption guard: no fullparent stage exit, zeroLIVE approval, family shipping, NI, model/service action, or missing original16family verdict proof. No SUT/source edits by reviewer.",
+  "named_suite": {
+   "command": "node --test kit/test/stage-exit.test.mjs",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "TAP version 13\n# Subtest: 29 positives with receipt provenance passes eligibility only\nok 1 - 29 positives with receipt provenance passes eligibility only\n  ---\n  duration_ms: 1.366708\n  type: 'test'\n  ...\n# Subtest: exactly 30 and 31 positives fail the strict cutoff\nok 2 - exactly 30 and 31 positives fail the strict cutoff\n  ---\n  duration_ms: 0.222375\n  type: 'test'\n  ...\n# Subtest: bare numbers without receipt source are refused\nok 3 - bare numbers without receipt source are refused\n  ---\n  duration_ms: 0.089625\n  type: 'test'\n  ...\n# Subtest: unstated or different window fails\nok 4 - unstated or different window fails\n  ---\n  duration_ms: 0.070459\n  type: 'test'\n  ...\n# Subtest: stranger-adopts receipt under 60 minutes passes\nok 5 - stranger-adopts receipt under 60 minutes passes\n  ---\n  duration_ms: 0.113292\n  type: 'test'\n  ...\n# Subtest: negative elapsed minutes fail\nok 6 - negative elapsed minutes fail\n  ---\n  duration_ms: 0.103917\n  type: 'test'\n  ...\n# Subtest: missing receipt or 60+ minutes fail\nok 7 - missing receipt or 60+ minutes fail\n  ---\n  duration_ms: 0.063958\n  type: 'test'\n  ...\n# Subtest: absent canonical stage receipt refuses eligibility\nok 8 - absent canonical stage receipt refuses eligibility\n  ---\n  duration_ms: 3.766333\n  type: 'test'\n  ...\n# Subtest: valid receipt artifact loads for checks\nok 9 - valid receipt artifact loads for checks\n  ---\n  duration_ms: 1.615166\n  type: 'test'\n  ...\n# Subtest: malformed receipt artifact fails\nok 10 - malformed receipt artifact fails\n  ---\n  duration_ms: 0.954542\n  type: 'test'\n  ...\n# Subtest: eligibility through loader passes on a hash-bound artifact\nok 11 - eligibility through loader passes on a hash-bound artifact\n  ---\n  duration_ms: 1.057708\n  type: 'test'\n  ...\n# Subtest: tampered artifact bytes refuse through the same entry\nok 12 - tampered artifact bytes refuse through the same entry\n  ---\n  duration_ms: 0.600417\n  type: 'test'\n  ...\n# Subtest: unrelated real file refuses through the same entry\nok 13 - unrelated real file refuses through the same entry\n  ---\n  duration_ms: 0.497875\n  type: 'test'\n  ...\n1..13\n# tests 13\n# suites 0\n# pass 13\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 128.721583\n"
+  },
+  "source_scope": "Parent original WHAT/AC specifies stage-exit record work/stage1-exit/verdict.md, not public ship CLI; director3727 explicitly allows original API boundary alternative; prior CLI-only limitation superseded by this source interpretation and actual built API proof",
+  "source_sha256": {
+   "kit/src/ship/stage-exit.ts": "6325836d80db6da36c02c2a8d07d2287ad0c76672a0e489dec6dd9e1a8b7cbdf",
+   "kit/test/stage-exit.test.mjs": "c64dde697747668d83e752271254a3d8507a532ba36bf382f78a9aeba4f27ae5"
+  }
+ }
+}
