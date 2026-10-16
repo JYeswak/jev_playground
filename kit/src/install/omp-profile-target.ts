@@ -331,22 +331,34 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   } catch (error) {
     throw new Error("native entry factory throws: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
+  // Every recorded registration call must be well-formed, whatever the
+  // mechanism: a single malformed registration (null tool, null handler)
+  // fails the host at load, so mixed valid+invalid registrations refuse.
+  for (const call of calls) {
+    if (call.method === "registerTool") {
+      const tool = call.args.length >= 1 ? call.args[0] : undefined;
+      if (!(typeof tool === "object" && tool !== null && "name" in tool && typeof tool.name === "string" && tool.name !== "")) {
+        throw new Error("native entry registers a malformed tool: " + familyId);
+      }
+    } else if (call.method === "on") {
+      if (!(call.args.length >= 2 && typeof call.args[0] === "string" && typeof call.args[1] === "function")) {
+        throw new Error("native entry registers a malformed handler: " + familyId);
+      }
+    }
+  }
   if (expectedEvent === undefined) {
-    // Advisory contract, derived from the in-repo extension exemplar: the
-    // entry must register at least one well-formed tool (object with a
-    // non-empty name). Clean completion alone is not registration, and a
-    // null or nameless registration does not satisfy it either.
-    const toolsRegistered = calls.some((call) => call.method === "registerTool" && call.args.length >= 1 &&
-      typeof call.args[0] === "object" && call.args[0] !== null &&
-      "name" in call.args[0] && typeof call.args[0].name === "string" && call.args[0].name !== "");
+    // Advisory contract, derived from the in-repo extension exemplar: at
+    // least one tool must be registered; clean completion alone is not
+    // registration.
+    const toolsRegistered = calls.some((call) => call.method === "registerTool");
     if (!toolsRegistered) {
       throw new Error("native entry registers no tool: " + familyId);
     }
     return;
   }
   // Hook contract: the declared event must be registered with a callable
-  // handler. pi.on(name, null) does not count.
-  const registered = calls.some((call) => call.method === "on" && call.args.length >= 2 && call.args[0] === expectedEvent && typeof call.args[1] === "function");
+  // handler (already proven well-formed above).
+  const registered = calls.some((call) => call.method === "on" && call.args[0] === expectedEvent);
   if (!registered) {
     throw new Error("native entry does not register " + expectedEvent + ": " + familyId);
   }

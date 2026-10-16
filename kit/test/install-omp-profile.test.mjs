@@ -559,7 +559,7 @@ test('an entry with an unresolvable import is refused before writing', async () 
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
-test('a null handler registration does not satisfy the event proof', async () => {
+test('a null handler registration is malformed and refused before writing', async () => {
   const home = await freshHome('installer-profile-bad-handler');
   const ompHome = join(home, 'omp-home');
   const gate = await loadJson(join(contractsDir, 'gate.json'));
@@ -576,7 +576,7 @@ test('a null handler registration does not satisfy the event proof', async () =>
   });
   assert.equal(result.exit, 4);
   assert.equal(result.families[0].status, 'refused');
-  assert.ok((result.families[0].reason ?? '').includes('does not register tool_call'));
+  assert.ok((result.families[0].reason ?? '').includes('malformed handler'));
   assert.deepEqual(result.writes, []);
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
@@ -607,7 +607,7 @@ test('a factory that throws when invoked is refused before writing', async () =>
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
-test('a null tool registration does not satisfy the advisory proof', async () => {
+test('a null tool registration is malformed and refused before writing', async () => {
   const home = await freshHome('installer-profile-null-tool');
   const ompHome = join(home, 'omp-home');
   const contracts = {
@@ -628,7 +628,33 @@ test('a null tool registration does not satisfy the advisory proof', async () =>
   });
   assert.equal(result.exit, 4);
   assert.equal(result.families[0].status, 'refused');
-  assert.ok((result.families[0].reason ?? '').includes('registers no tool'));
+  assert.ok((result.families[0].reason ?? '').includes('malformed tool'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
+test('a null registration before a valid one still refuses the whole entry', async () => {
+  const home = await freshHome('installer-profile-mixed-bad-tool');
+  const ompHome = join(home, 'omp-home');
+  const contracts = {
+    gate: await loadJson(join(contractsDir, 'gate.json')),
+    screen: await loadJson(join(contractsDir, 'screen.json')),
+    hint: await loadJson(join(contractsDir, 'hint.json')),
+  };
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies(contracts)).filter((family) => family.id === 'hint')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/mixed-bad-tool.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('malformed tool'));
   assert.deepEqual(result.writes, []);
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
