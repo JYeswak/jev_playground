@@ -1,0 +1,50 @@
+{
+  "schema": "jev.x2-validator-evidence.v1",
+  "bead": "jev-b35c.31",
+  "ruling": "RedMaple A+(i): strict historical 396/hash join; synthetic production validator seam; historical pack local-only",
+  "sources": {
+    "work/x2-clef-suites/run.py": {
+      "git_blob": "51adf106003bcf7dae964cd48021c7c204573af8",
+      "sha256": "b62719d0512f69b1f653806e53c70a0f1c2a40fb388b18b11ffaa9c623c4e5ed"
+    },
+    "work/x2-clef-suites/test_run.py": {
+      "git_blob": "829ab89493223351e81e71dae361b5f51c8f693e",
+      "sha256": "bd67d72e898d4d2745c043be67dcce1279387facd27828d5d7b77e91cd055a01"
+    },
+    "TESTS.md": {
+      "git_blob": "9395678eee30682d5dea56995f83fe781b8582e1",
+      "sha256": "c7bf513eb5fe656ef4ac842cf6d730aafd8b53d1991cd5d41c9bfc101c32a4b1"
+    }
+  },
+  "commands": [
+    {
+      "command": "env -u X2_COMMANDS_PATH TMPDIR=$PWD/var/agent-tmp/x2-save-cobalt uv run --no-project python3 -m unittest work/x2-clef-suites/test_run.py",
+      "exit": 0,
+      "stdout": "Ran 20 tests in 1.237s\nOK",
+      "data": "public fixture only; no private command pack available to CI"
+    },
+    {
+      "command": "env X2_COMMANDS_PATH=/Users/josh/.local/state/jev/x3-pack-canonical.jsonl TMPDIR=$PWD/var/agent-tmp/x2-save-cobalt uv run --no-project python3 -m unittest work.x2-clef-suites.test_run.X2HistoricalPrivateTests -v",
+      "exit": 0,
+      "stdout": "Ran 3 tests in 0.014s\nOK",
+      "input": {
+        "pack_mode": "0600",
+        "pack_sha256": "35540a609c994bc52081631fb9ca7d7336bdab7b64bb4f33d65e44b90721ff99"
+      },
+      "scope": "local-only; never CI"
+    }
+  ],
+  "scanner": {
+    "name": "ubs",
+    "version": "5.4.17",
+    "critical": 0,
+    "warnings": 0,
+    "informational": 119,
+    "output": "no critical or warning findings"
+  },
+  "limitations": [
+    "No X7 replay result or main-CI green claim.",
+    "The 396-row historical private join is local-only.",
+    "Independent non-author grade required before bead closure."
+  ]
+}

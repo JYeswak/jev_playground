@@ -1,0 +1,23 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c3cb7b5ee2f76e05828e2542ad16f126184a0bec75b317b787d2a7aea49cb3cd",
+ "limitations": [
+  "historical-private-join-is-local-only",
+  "no-whole-main-green-claim"
+ ],
+ "operation": "x2-validator-seam-verification",
+ "parameters": {
+  "historical_pack_sha256": "35540a609c994bc52081631fb9ca7d7336bdab7b64bb4f33d65e44b90721ff99",
+  "keyless_tests": "20",
+  "local_historical_tests": "3",
+  "registry_blob": "9395678eee30682d5dea56995f83fe781b8582e1",
+  "run_blob": "51adf106003bcf7dae964cd48021c7c204573af8",
+  "tests_blob": "829ab89493223351e81e71dae361b5f51c8f693e"
+ },
+ "producer": "jev-b35c.31",
+ "result_ref": {
+  "bytes": 1964,
+  "sha256": "bf3967085a0d24ff24278373fb5ba82a3d261ff63315927a8741bcd60e0f3e36"
+ }
+}
