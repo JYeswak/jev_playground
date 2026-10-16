@@ -90,3 +90,34 @@ test('an unoffered recorded answer is REFUSED with exit 3, not NOT_RUN', async (
   assert.equal(body.status, 'REFUSED');
   assert.equal(body.errors[0].code, 'REFUSED');
 });
+
+test('backend-failure reruns carry the verb required args, bare without them', () => {
+  const args = "--command 'npm publish --access public'";
+  const withArgs = rewriteCliError({ reason: 'backend-hold', command: 'classifier gate', rerunArgs: args });
+  assert.equal(withArgs.code, 'ONLINE_REQUIRED');
+  assert.equal(withArgs.exit_code, EXIT_CODES.ONLINE_REQUIRED);
+  assert.equal(withArgs.remediation[0], `rerun: classifier gate ${args} --backend jev`);
+  const bare = rewriteCliError({ reason: 'backend-hold', command: 'classifier gate' });
+  assert.equal(bare.remediation[0], 'rerun: classifier gate --backend jev');
+});
+
+test('ownership refusals ignore rerun args (complete guidance already)', () => {
+  const owned = rewriteCliError({
+    reason: 'refused-unsafe',
+    message: 'CLI target ownership or payload conflicts with the requested operation',
+    command: 'classifier install',
+    rerunArgs: "--command 'x'",
+  });
+  assert.equal(owned.remediation[0], 'back up, then remove the conflicting file, and rerun: classifier install cli --apply');
+});
+
+test('live gate backend failure rerun names its required --command', async () => {
+  const home = await freshHome('classifier-gate-rerun');
+  const result = runCli([
+    'gate', '--command', 'npm publish --access public', '--backend', 'clef', '--robot',
+  ], { home });
+  const body = JSON.parse(result.stdout);
+  assert.equal(body.ok, false);
+  const rerun = body.errors[0].remediation.find((line) => line.startsWith('rerun:'));
+  assert.ok(rerun.includes("--command 'npm publish --access public'"), rerun);
+});

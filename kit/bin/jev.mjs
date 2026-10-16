@@ -17,7 +17,7 @@ import { installCli, uninstallCli } from "../dist/install/cli-target.js";
 import { acquireInstallLock } from "../dist/install/manifest.js";
 import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
-import { parseArgv } from "../src/cli/argv.mjs";
+import { parseArgv, shellQuote } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
 import { FAMILIES, FAMILY_REGISTRY } from "../dist/families/registry.js";
 import { listDailyJobs } from "../dist/install/daily-jobs.js";
@@ -36,6 +36,30 @@ function hasFlag(args, flag) {
 function option(args, name) {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] : undefined;
+}
+
+// Required-argument fragment for error rerun: lines. An emitted rerun:
+// command carrying these args is directly runnable instead of failing USAGE.
+// Only flags the invocation actually carried are included (backend failures
+// happen after input validation, so required args are present); values pass through shellQuote.
+function rerunArgsFor(command, subcommand, args) {
+  const present = (flag) => {
+    const value = option(args, flag);
+    return value === undefined ? undefined : `${flag} ${shellQuote(value)}`;
+  };
+  const parts = [];
+  if (command === 'ask' && subcommand) parts.push(subcommand);
+  for (const flag of command === 'ask' ? ['--state', '--question']
+    : command === 'gate' ? ['--command']
+    : command === 'rerank' ? ['--query', '--candidates']
+    : command === 'classify' ? ['--text', '--labels']
+    : command === 'verify' ? ['--claim', '--evidence']
+    : command === 'score' ? ['--text', '--levels']
+    : []) {
+    const piece = present(flag);
+    if (piece !== undefined) parts.push(piece);
+  }
+  return parts.length > 0 ? parts.join(' ') : undefined;
 }
 
 
@@ -458,12 +482,13 @@ async function main() {
       option: parsed.command === "classify" ? "--labels" : undefined,
       path: parsed.command === "classify" ? option(args, "--labels") : undefined,
       cwd: process.cwd(),
+      rerunArgs: rerunArgsFor(parsed.command, parsed.subcommand, args),
     });
     const backendRequested = configuredBackend(hasFlag(args, "--fake") ? "jev" : option(args, "--backend"));
     result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}), ...(backendRequested ? { backend: backendRequested === "clef" ? "clef" : "jev", backendRequested } : {}) };
   }
   if (!cliError && result?.ok === false && parsed.command !== "doctor" && parsed.command !== "health") {
-    cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: `classifier ${parsed.command}` });
+    cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: `classifier ${parsed.command}`, rerunArgs: rerunArgsFor(parsed.command, parsed.subcommand, args) });
   }
   if (cliError) {
     const reasonByCode = {

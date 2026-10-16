@@ -72,7 +72,7 @@ function suggestionFor(value, candidates) {
   return matches.length === 1 ? matches[0] : undefined;
 }
 
-function shellQuote(value) {
+export function shellQuote(value) {
   if (value.length > 0 && value.length <= 256) {
     let safe = true;
     for (let i = 0; i < value.length; i += 1) {

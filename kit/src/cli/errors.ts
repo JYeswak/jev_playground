@@ -11,6 +11,7 @@ type ErrorInput = {
   path?: string;
   count?: number;
   files?: string[];
+  rerunArgs?: string;
 };
 
 export type CliError = {
@@ -28,6 +29,11 @@ function result(code: string, exitCode: number, message: string, remediation: st
 export function rewriteCliError(input: ErrorInput): CliError {
   const command = input.command ?? 'classifier';
   const message = input.message ?? '';
+  // rerunArgs carries the verb's required arguments (built by the caller with
+  // shell quoting) so an emitted rerun: line is directly runnable; without it
+  // the bare subcommand would fail USAGE on missing required flags.
+  const withArgs = (tail: string): string =>
+    `rerun: ${command}${input.rerunArgs ? ` ${input.rerunArgs}` : ''} ${tail}`;
   if (input.reason === 'unknown-command') {
     const suggestion = input.correctedCommand ? `\ndid you mean: ${input.correctedCommand}` : '';
     return result('USAGE', EXIT_CODES.USAGE, `error: unknown command '${input.option ?? message}'${suggestion}`, [], command);
@@ -57,10 +63,10 @@ export function rewriteCliError(input: ErrorInput): CliError {
       ['offline: add --fake', 'diagnose: classifier doctor'], command);
   }
   if (input.reason === 'uncalibrated') {
-    return result('NOT_RUN', EXIT_CODES.NOT_RUN, 'NOT_RUN: no exact committed Clef calibration exists for this question', [`rerun: ${command} --backend jev`], command);
+    return result('NOT_RUN', EXIT_CODES.NOT_RUN, 'NOT_RUN: no exact committed Clef calibration exists for this question', [withArgs('--backend jev')], command);
   }
   if (input.reason === 'truncated') {
-    return result('REFUSED', EXIT_CODES.REFUSED, 'REFUSED: Clef input reached the 16384-token boundary; no answer emitted', ['reduce the input below 16384 tokens', `rerun: ${command} --backend jev`], command);
+    return result('REFUSED', EXIT_CODES.REFUSED, 'REFUSED: Clef input reached the 16384-token boundary; no answer emitted', ['reduce the input below 16384 tokens', withArgs('--backend jev')], command);
   }
   if (input.reason === 'invalid-answer' || input.reason === 'no-answers' || message.includes('unoffered label')) {
     const marker = 'unoffered label';
@@ -91,7 +97,7 @@ export function rewriteCliError(input: ErrorInput): CliError {
         message, [`back up, then remove the conflicting file, and rerun: ${command} cli --apply`], command);
     }
     return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
-      message || 'REFUSED_UNSAFE: direct or non-loopback Clef URL refused', [`rerun: ${command} --backend jev`, 'configure the localbench gateway URL instead of a direct Clef server'], command);
+      message || 'REFUSED_UNSAFE: direct or non-loopback Clef URL refused', [withArgs('--backend jev'), 'configure the localbench gateway URL instead of a direct Clef server'], command);
   }
   if (input.reason === 'transport' || input.reason === 'http') {
     return result('RETRYABLE', EXIT_CODES.RETRYABLE,
@@ -99,7 +105,7 @@ export function rewriteCliError(input: ErrorInput): CliError {
   }
   if (input.reason === 'backend-hold' || input.reason === 'online-required' || input.reason === 'clef-unreachable') {
     return result('ONLINE_REQUIRED', EXIT_CODES.ONLINE_REQUIRED,
-      message || 'ONLINE_REQUIRED: configured Clef gateway is unavailable', [`rerun: ${command} --backend jev`, 'diagnose: classifier doctor'], command);
+      message || 'ONLINE_REQUIRED: configured Clef gateway is unavailable', [withArgs('--backend jev'), 'diagnose: classifier doctor'], command);
   }
   if (input.reason === 'auth') {
     return result('AUTH', EXIT_CODES.FINDINGS,
