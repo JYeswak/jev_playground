@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -274,6 +274,9 @@ async function miner(args) {
   if (!labels && !rank) return usageFailure("classifier miner --labels FAMILY|--rank [--input FILE] [--as-of YYYY-MM-DD] [--json|--robot]");
   const rankOutput = option(args, "--rank-output")
     ?? (rank ? join(process.env.HOME ?? homedir(), ".local/state/jev/miner-RANK.md") : undefined);
+  if (rankOutput && !option(args, "--rank-output")) {
+    await mkdir(dirname(rankOutput), { recursive: true });
+  }
   const minerArgs = [
     ...(labels ? ["--labels", labels] : []),
     ...(rank ? ["--rank"] : []),
@@ -282,14 +285,18 @@ async function miner(args) {
     ...(rankOutput ? ["--rank-output", rankOutput] : []),
   ];
   const probe = await execProbe("python3", [fileURLToPath(MINER_RUNNER), ...minerArgs], { timeout: 120000 });
-  if (probe.code !== 0) return { ok: false, reason: "ERROR", runnerExit: probe.code, message: `miner failed (runner exit ${probe.code})`, detail: probe.stderr.trim().split("\n").slice(-3) };
-  let detail = null;
+  let payload = null;
   try {
-    detail = JSON.parse(probe.stdout);
+    payload = JSON.parse(probe.stdout);
   } catch {
-    detail = probe.stdout.trim().split("\n").slice(-3);
+    payload = null;
   }
-  return { ok: true, detail };
+  const verdict = payload && typeof payload.verdict === "string" ? payload.verdict : null;
+  if (probe.code === 0 && (verdict === "COMPLETE" || (labels && verdict === null))) return { ok: true, verdict: verdict ?? "COMPLETE", detail: payload };
+  if (verdict === "PARTIAL" || verdict === "DEFERRED") {
+    return { ok: false, reason: verdict, verdict, runnerExit: probe.code, message: `miner ${verdict} (runner exit ${probe.code})`, detail: payload };
+  }
+  return { ok: false, reason: "ERROR", verdict, runnerExit: probe.code, message: `miner failed (runner exit ${probe.code})`, detail: payload ?? probe.stderr.trim().split("\n").slice(-3) };
 }
 
 async function runInstaller(command, args, parsed) {

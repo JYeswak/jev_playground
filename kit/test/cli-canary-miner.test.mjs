@@ -45,3 +45,15 @@ test("miner runs keyless over fixture input", async () => {
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.ok, true);
 });
+
+
+test("miner rank mode preserves PARTIAL verdict on empty corpus", async () => {
+  const home = await freshHome("cli-miner-rank");
+  const tmp = mkdtempSync(join(tmpdir(), "cli-miner-rank-tmp-"));
+  const result = runCli(["miner", "--rank", "--json"], { home, env: { TMPDIR: tmp } });
+  assert.equal(result.status, 1, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.ok, false);
+  assert.equal(envelope.errors[0].code, "FINDINGS");
+  assert.match(envelope.errors[0].message, /miner PARTIAL/);
+});
