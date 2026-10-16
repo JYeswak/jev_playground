@@ -1,0 +1,66 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_c6a1ad272bd9f5d8fc22421188d5430db0ed3c4398c5adc9001b16976ad5b0f3",
+ "limitations": [
+  "Counterexample only; no full installer acceptance, profile startup, parent close or model-quality claim."
+ ],
+ "operation": "jev-b35c.74.native-package-review",
+ "parameters": {
+  "subject_sha256": "9e4304de82888d452747b34fbf4ffc99118c11ba438cf040217dcb2d4d5333f7"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "RubyMeadow",
+  "bead": "jev-b35c.74",
+  "candidate": "6bb53fc004ee14f96a4a7d904a14164f21905244",
+  "cause": {
+   "installer": "kit/src/install/omp-profile-target.ts:271-296,382-390",
+   "test_mask": "kit/test/install-omp-profile.test.mjs:33-59 symlinks nativePkgDir; Node resolves real path outside node_modules"
+  },
+  "limits": {
+   "full_installer_suite": "NOT_RUN; actual sbh admission exit1/free_pct13.376785702556827",
+   "native_profile_startup": "NOT_RUN by reviewer; direct real native hook loader exercised in owned process",
+   "parent_close": false,
+   "source_edits": false,
+   "tooling_find": {
+    "actual_billing": "UNKNOWN",
+    "all_failed": true,
+    "requests": 27,
+    "successful_model_output_used": false,
+    "tool_reported_cost_usd": 0,
+    "tool_reported_tokens": 0
+   }
+  },
+  "observations": {
+   "actual_native_hook_loader": {
+    "exit": 0,
+    "network_denied": true,
+    "source": "/Users/josh/.local/opt/omp-kit/omp-src/18.11.0/node_modules/@oh-my-pi/pi-coding-agent/src/extensibility/hooks/loader.ts:146-182",
+    "stderr": "",
+    "stdout": "{\"nativeLoader\":true,\"loaded\":1,\"errors\":[],\"events\":[[\"tool_call\"]]}\n"
+   },
+   "canonical_fixture_import": {
+    "events": [
+     "tool_call"
+    ],
+    "exit": 0,
+    "loaded": true,
+    "stderr": "MODULE_TYPELESS_PACKAGE_JSON warning"
+   },
+   "node": "v22.23.3",
+   "physical_package_import": {
+    "code": "ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING",
+    "exit": 4,
+    "message": "Stripping types is currently unsupported for files under node_modules"
+   }
+  },
+  "reviewer": "DarkBear",
+  "source": {
+   "exact_git_archive": true,
+   "path": "kit/test/fixtures/installer/native-pkg/src/gate-hook.ts",
+   "sha256": "9e4304de82888d452747b34fbf4ffc99118c11ba438cf040217dcb2d4d5333f7"
+  },
+  "verdict": "REWORK"
+ }
+}
