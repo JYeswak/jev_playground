@@ -1,0 +1,122 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_5438fa035ad2ebe926459cfa9433253a36af000922955dd05e5904a185220a79",
+ "limitations": [
+  "Current runtime counterexample and candidate source inspection, not exact-candidate replay or full acceptance."
+ ],
+ "operation": "jev-b35c.20.daily-cli-review",
+ "parameters": {
+  "subject_sha256": "4b3005581d299c170eeb2c449bca48f34a42ae4d9f9ba115af2bf86ad61f3e49"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "WildDog",
+  "bead": "jev-b35c.20",
+  "candidate": "1f55410143c531f6d4f1d7c7f5310280587335f2",
+  "candidate_cli_sha256": "fae7d9eb02a064546a95b90d298714b4f771df1a12cd89033756fb421ad0e8b2",
+  "cli_matches_candidate": false,
+  "command": "node kit/bin/jev.mjs install daily --dry-run --robot",
+  "complete_stdout": {
+   "commands": [],
+   "data": {
+    "jobs": [
+     {
+      "command": [
+       "classifier",
+       "classify",
+       "eval"
+      ],
+      "keylessSkip": true,
+      "label": "classifier-classify-eval-daily",
+      "offSwitch": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/.local/state/classifier/classify.off",
+      "schedule": "daily",
+      "timeCapSecs": 600
+     },
+     {
+      "command": [
+       "classifier",
+       "gate",
+       "eval"
+      ],
+      "keylessSkip": true,
+      "label": "classifier-gate-eval-daily",
+      "offSwitch": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/.local/state/classifier/gate.off",
+      "schedule": "daily",
+      "timeCapSecs": 600
+     },
+     {
+      "command": [
+       "classifier",
+       "rank",
+       "eval"
+      ],
+      "keylessSkip": true,
+      "label": "classifier-rank-eval-daily",
+      "offSwitch": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/.local/state/classifier/rank.off",
+      "schedule": "daily",
+      "timeCapSecs": 600
+     },
+     {
+      "command": [
+       "classifier",
+       "score",
+       "eval"
+      ],
+      "keylessSkip": true,
+      "label": "classifier-score-eval-daily",
+      "offSwitch": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/.local/state/classifier/score.off",
+      "schedule": "daily",
+      "timeCapSecs": 600
+     },
+     {
+      "command": [
+       "classifier",
+       "verify",
+       "eval"
+      ],
+      "keylessSkip": true,
+      "label": "classifier-verify-eval-daily",
+      "offSwitch": "/Users/josh/Developer/jev/var/agent-tmp/native74-review.25572/.local/state/classifier/verify.off",
+      "schedule": "daily",
+      "timeCapSecs": 600
+     }
+    ],
+    "mode": "dry-run",
+    "status": "PLANNED",
+    "steps": [
+     "daily"
+    ],
+    "target": "daily"
+   },
+   "errors": [],
+   "meta": {
+    "backend": "jev",
+    "backend_requested": "jev",
+    "fallback_reason": null,
+    "latency_ms": 0,
+    "model": null,
+    "usage": null,
+    "version": "0.0.0"
+   },
+   "ok": true,
+   "schema": "classifier.install.v1",
+   "status": "OK",
+   "warnings": []
+  },
+  "current_cli_sha256": "4b3005581d299c170eeb2c449bca48f34a42ae4d9f9ba115af2bf86ad61f3e49",
+  "exit": 0,
+  "failure": "Required canary runner and N0b miner absent from current public dry-run job set; candidate CLI also retains old builder; author4061 explicitly leaves CLI integration incomplete",
+  "limits": [
+   "Current CLI has peer differences from candidate; not an exact-candidate runtime replay or full source-equivalence claim.",
+   "No product edits, full suite, service activation or provider calls; network denied and writes constrained to owned scratch.",
+   "Existing unratified CLI custody requires owner ruling; no peer-file edit."
+  ],
+  "reviewer": "DarkBear",
+  "source": {
+   "candidate": "kit/bin/jev.mjs:21,234; both call buildDailyJobs/defaultSpecForFamilies, not new listDailyJobs",
+   "current": "kit/bin/jev.mjs:21,252-255"
+  },
+  "verdict": "REWORK"
+ }
+}
