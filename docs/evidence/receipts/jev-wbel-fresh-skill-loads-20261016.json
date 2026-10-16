@@ -1,0 +1,406 @@
+{
+ "authority": "live",
+ "confidence": "observed",
+ "evidence_id": "ev_255ea0cb473c1b6fbb4fdade8f1fb97a958f4a3dfa01dcd11f91f2e27c9894bf",
+ "limitations": [
+  "20 real skill reads and unchanged canonical veto log; all historical pane coverage and physical D9 provider attribution remain unverified."
+ ],
+ "operation": "jev-wbel-bounded-native-fresh-session",
+ "parameters": {
+  "subject_sha256": "dc2343fddad29140df6f29c9b9d7e3a2557346f9573246fec1a986d115be612f"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "authority": "AM57965",
+  "billing_not_queried": true,
+  "capture_sha256": "dc2343fddad29140df6f29c9b9d7e3a2557346f9573246fec1a986d115be612f",
+  "cwd": "/Users/josh/Developer/jev",
+  "historical_all_pane_roster": "UNVERIFIED",
+  "max_seconds": 300,
+  "native_usage_purposes": [
+   {
+    "model": "clef-flash",
+    "provider": "clef",
+    "purpose": "unexpected-stop"
+   },
+   {
+    "model": "@cf/cloudflare/clef-flash",
+    "provider": "cloudflare-workers-ai",
+    "purpose": "unexpected-stop"
+   }
+  ],
+  "observed_end": "2026-10-16T06:53:34.872531+00:00",
+  "observed_native_omp_processes": [
+   {
+    "pid": 4086,
+    "started": "2026-10-16T04:41:52+00:00"
+   },
+   {
+    "pid": 5778,
+    "started": "2026-10-16T06:35:57+00:00"
+   },
+   {
+    "pid": 5780,
+    "started": "2026-10-16T06:35:57+00:00"
+   },
+   {
+    "pid": 12859,
+    "started": "2026-10-15T01:47:25+00:00"
+   },
+   {
+    "pid": 12863,
+    "started": "2026-10-15T01:47:25+00:00"
+   },
+   {
+    "pid": 16404,
+    "started": "2026-10-16T01:05:15+00:00"
+   },
+   {
+    "pid": 21677,
+    "started": "2026-10-15T01:00:15+00:00"
+   },
+   {
+    "pid": 22563,
+    "started": "2026-10-15T09:19:01+00:00"
+   },
+   {
+    "pid": 25572,
+    "started": "2026-10-16T02:46:08+00:00"
+   },
+   {
+    "pid": 27213,
+    "started": "2026-10-15T01:02:43+00:00"
+   },
+   {
+    "pid": 30862,
+    "started": "2026-10-14T22:46:00+00:00"
+   },
+   {
+    "pid": 32149,
+    "started": "2026-10-15T22:02:57+00:00"
+   },
+   {
+    "pid": 35635,
+    "started": "2026-10-15T23:42:59+00:00"
+   },
+   {
+    "pid": 41127,
+    "started": "2026-10-15T07:25:15+00:00"
+   },
+   {
+    "pid": 42215,
+    "started": "2026-10-16T06:49:57+00:00"
+   },
+   {
+    "pid": 42271,
+    "started": "2026-10-16T06:49:57+00:00"
+   },
+   {
+    "pid": 42948,
+    "started": "2026-10-15T07:26:02+00:00"
+   },
+   {
+    "pid": 48044,
+    "started": "2026-10-15T02:09:01+00:00"
+   },
+   {
+    "pid": 48455,
+    "started": "2026-10-15T02:09:08+00:00"
+   },
+   {
+    "pid": 52527,
+    "started": "2026-10-13T23:41:43+00:00"
+   },
+   {
+    "pid": 54905,
+    "started": "2026-10-14T03:26:15+00:00"
+   },
+   {
+    "pid": 58630,
+    "started": "2026-10-15T04:22:39+00:00"
+   },
+   {
+    "pid": 58632,
+    "started": "2026-10-15T04:22:39+00:00"
+   },
+   {
+    "pid": 58809,
+    "started": "2026-10-15T01:10:16+00:00"
+   },
+   {
+    "pid": 60638,
+    "started": "2026-10-15T04:56:16+00:00"
+   },
+   {
+    "pid": 61971,
+    "started": "2026-10-16T06:05:05+00:00"
+   },
+   {
+    "pid": 64788,
+    "started": "2026-10-15T02:19:46+00:00"
+   },
+   {
+    "pid": 64789,
+    "started": "2026-10-15T02:19:46+00:00"
+   },
+   {
+    "pid": 66023,
+    "started": "2026-10-13T04:13:41+00:00"
+   },
+   {
+    "pid": 69265,
+    "started": "2026-10-16T06:25:54+00:00"
+   },
+   {
+    "pid": 69373,
+    "started": "2026-10-15T03:30:18+00:00"
+   },
+   {
+    "pid": 72587,
+    "started": "2026-10-15T20:38:02+00:00"
+   },
+   {
+    "pid": 72770,
+    "started": "2026-10-15T05:34:04+00:00"
+   },
+   {
+    "pid": 74165,
+    "started": "2026-10-15T00:16:35+00:00"
+   },
+   {
+    "pid": 78792,
+    "started": "2026-10-14T19:35:43+00:00"
+   },
+   {
+    "pid": 79556,
+    "started": "2026-10-16T06:11:36+00:00"
+   },
+   {
+    "pid": 82333,
+    "started": "2026-10-15T04:04:20+00:00"
+   },
+   {
+    "pid": 85387,
+    "started": "2026-10-15T04:05:29+00:00"
+   },
+   {
+    "pid": 92031,
+    "started": "2026-10-15T01:19:47+00:00"
+   },
+   {
+    "pid": 96309,
+    "started": "2026-10-15T22:25:48+00:00"
+   },
+   {
+    "pid": 96706,
+    "started": "2026-10-16T04:38:46+00:00"
+   },
+   {
+    "pid": 96977,
+    "started": "2026-10-16T04:39:05+00:00"
+   },
+   {
+    "pid": 32957,
+    "started": "2026-10-16T00:32:12+00:00"
+   },
+   {
+    "pid": 92901,
+    "started": "2026-10-15T01:38:10+00:00"
+   },
+   {
+    "pid": 22137,
+    "started": "2026-10-16T00:28:38+00:00"
+   },
+   {
+    "pid": 11942,
+    "started": "2026-10-16T05:47:38+00:00"
+   },
+   {
+    "pid": 38466,
+    "started": "2026-10-15T02:03:50+00:00"
+   },
+   {
+    "pid": 85082,
+    "started": "2026-10-15T15:09:53+00:00"
+   },
+   {
+    "pid": 81174,
+    "started": "2026-10-15T22:23:39+00:00"
+   },
+   {
+    "pid": 83372,
+    "started": "2026-10-15T18:10:14+00:00"
+   },
+   {
+    "pid": 15643,
+    "started": "2026-10-15T07:16:05+00:00"
+   },
+   {
+    "pid": 66129,
+    "started": "2026-10-14T19:24:13+00:00"
+   },
+   {
+    "pid": 58919,
+    "started": "2026-10-15T03:16:41+00:00"
+   },
+   {
+    "pid": 19487,
+    "started": "2026-10-16T05:49:51+00:00"
+   },
+   {
+    "pid": 85084,
+    "started": "2026-10-15T15:09:53+00:00"
+   },
+   {
+    "pid": 39886,
+    "started": "2026-10-15T02:04:23+00:00"
+   },
+   {
+    "pid": 38961,
+    "started": "2026-10-15T02:04:01+00:00"
+   },
+   {
+    "pid": 21018,
+    "started": "2026-10-15T00:35:33+00:00"
+   },
+   {
+    "pid": 21140,
+    "started": "2026-10-15T00:35:34+00:00"
+   },
+   {
+    "pid": 94161,
+    "started": "2026-10-15T01:38:45+00:00"
+   },
+   {
+    "pid": 94424,
+    "started": "2026-10-15T01:38:55+00:00"
+   },
+   {
+    "pid": 21243,
+    "started": "2026-10-15T00:35:35+00:00"
+   },
+   {
+    "pid": 21349,
+    "started": "2026-10-15T00:35:37+00:00"
+   },
+   {
+    "pid": 95499,
+    "started": "2026-10-15T01:39:32+00:00"
+   },
+   {
+    "pid": 26300,
+    "started": "2026-10-15T07:21:19+00:00"
+   },
+   {
+    "pid": 59216,
+    "started": "2026-10-14T15:54:41+00:00"
+   },
+   {
+    "pid": 66131,
+    "started": "2026-10-14T19:24:13+00:00"
+   },
+   {
+    "pid": 59700,
+    "started": "2026-10-14T15:54:53+00:00"
+   },
+   {
+    "pid": 81186,
+    "started": "2026-10-15T22:23:39+00:00"
+   },
+   {
+    "pid": 81180,
+    "started": "2026-10-15T22:23:39+00:00"
+   },
+   {
+    "pid": 81190,
+    "started": "2026-10-15T22:23:39+00:00"
+   },
+   {
+    "pid": 85905,
+    "started": "2026-10-16T06:31:21+00:00"
+   },
+   {
+    "pid": 75731,
+    "started": "2026-10-16T00:51:42+00:00"
+   },
+   {
+    "pid": 75256,
+    "started": "2026-10-16T00:51:32+00:00"
+   },
+   {
+    "pid": 76062,
+    "started": "2026-10-16T00:51:48+00:00"
+   },
+   {
+    "pid": 27434,
+    "started": "2026-10-15T00:38:34+00:00"
+   },
+   {
+    "pid": 87447,
+    "started": "2026-10-14T22:22:55+00:00"
+   },
+   {
+    "pid": 80037,
+    "started": "2026-10-16T00:54:07+00:00"
+   },
+   {
+    "pid": 61960,
+    "started": "2026-10-15T00:10:52+00:00"
+   },
+   {
+    "pid": 65398,
+    "started": "2026-10-15T00:11:57+00:00"
+   },
+   {
+    "pid": 63775,
+    "started": "2026-10-15T00:11:18+00:00"
+   },
+   {
+    "pid": 66326,
+    "started": "2026-10-15T00:12:10+00:00"
+   }
+  ],
+  "physical_D9_network_attribution": "not instrumented; no D9 log or native model_usage purpose observed",
+  "pid": 42174,
+  "primary_catalog_cost": 0.2662004,
+  "primary_messages": 21,
+  "primary_model": "gpt-6.1-sol",
+  "primary_tokens": {
+   "cacheRead": 1220864,
+   "cacheWrite": 0,
+   "input": 68742,
+   "output": 663,
+   "totalTokens": 1290269
+  },
+  "process_exit": 0,
+  "profile": "codex",
+  "read_events": 20,
+  "read_paths": [
+   "skill://verification-before-completion:1-30",
+   "skill://surgical-patch:1-30",
+   "skill://typescript-best-practices:1-30",
+   "skill://testing-anti-patterns:1-30",
+   "skill://request-validation:1-30",
+   "skill://error-handling-patterns:1-30",
+   "skill://config-file-management:1-30",
+   "skill://authentication-authorization:1-30",
+   "skill://api-design-patterns:1-30",
+   "skill://pagination-filtering:1-30",
+   "skill://retry-backoff-patterns:1-30",
+   "skill://caching-strategy:1-30",
+   "skill://concurrency-patterns:1-30",
+   "skill://integration-testing:1-30",
+   "skill://test-driven-development:1-30",
+   "skill://safe-refactor:1-30",
+   "skill://backward-compatibility:1-30",
+   "skill://log-aggregation:1-30",
+   "skill://state-management:1-30",
+   "skill://dependency-management:1-30"
+  ],
+  "session_id": "01a14379-76a4-7488-9bff-0bf7b38bd255",
+  "start": "2026-10-16T06:49:55.999603+00:00",
+  "successful_read_ends": 20,
+  "veto_log_sha_after": "107331ecbd10b2d36015a2f502d82d8604773cff2de2c65ca2de0a9b64ecff04",
+  "veto_log_sha_before": "107331ecbd10b2d36015a2f502d82d8604773cff2de2c65ca2de0a9b64ecff04"
+ }
+}
