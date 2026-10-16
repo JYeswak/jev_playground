@@ -1,0 +1,180 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6aeeb69db957a8dd034921577dc0bc3ceeeaff85ecf8a84584e6f23672507164",
+ "limitations": [
+  "Two real original-scope negative failures; focused16 pass and normal installed controls are partial, not full acceptance or parent completion."
+ ],
+ "operation": "jev-b35c.75.real-artifact-review",
+ "parameters": {},
+ "producer": "DarkBear",
+ "result_ref": {
+  "author": "JadeSpire",
+  "bead": "jev-b35c.75",
+  "build_and_existing_tests": {
+   "fail": 0,
+   "focused_install_cli_tests": 16,
+   "full_kit": "NOT_RUN by reviewer after decisive new consumer failures; author373 remains author evidence only",
+   "npm_ci_exit": 0,
+   "output_artifact": "artifact://1509",
+   "pass": 16,
+   "prepare_exit": 0
+  },
+  "candidate": "fef7a71953f9f8c869a058a1b4d7231c431aaeb8",
+  "complete_owned_captures": {
+   "bytes": 611266,
+   "path": "/Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/captures.json",
+   "sha256": "6e0b5cf07534c44f7f5333b9052e8b91e56d3ef5327ffae9105486cc41ce1c18"
+  },
+  "failures": [
+   {
+    "actual_dependency_import": {
+     "exit": 1,
+     "stderr": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/sdk-omission/consumer/.local/share/classifier/versions/0.0.0/node_modules/@typesafe-ai/sdk/dist/index.mjs' imported from /Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/sdk-omission/consumer/.local/share/classifier/versions/0.0.0/[eval1]\nDid you mean to import \"@typesafe-ai/sdk/dist/index.cjs\"?\n    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n    at defaultResolve (node:internal/modules/esm/resolve:989:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)\n    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)\n    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)\n    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/sdk-omission/consumer/.local/share/classifier/versions/0.0.0/node_modules/@typesafe-ai/sdk/dist/index.mjs'\n}\n\nNode.js v22.23.3\n",
+     "stdout": ""
+    },
+    "actual_sdk_differences": [
+     {
+      "path": "dist/index.mjs",
+      "variant": "absent"
+     }
+    ],
+    "consumer_after_entries": 248,
+    "consumer_before_entries": 2,
+    "consumer_unchanged": false,
+    "expected": "Refuse incomplete declared production runtime before installed/current publication; no provider inference was invoked to demonstrate the missing module.",
+    "id": "SDK_ESM_ENTRY_OMISSION",
+    "input": "physical complete prepared artifact copied with ONLY SDK dist/index.mjs omitted, package metadata/export unchanged",
+    "install": {
+     "exit": 0,
+     "signal": null,
+     "status": "installed",
+     "stderr": "",
+     "stdout_bytes": 30091,
+     "stdout_sha256": "9279b401e45af3d8d906206070180cc7de69d73081a0519e8a3787737f33246a",
+     "writes": 201
+    },
+    "installed_version": {
+     "exit": 0,
+     "stdout": "classifier 0.0.0\n"
+    },
+    "reported_installed": "installed",
+    "source_boundary": "cli-target.ts255-292 dependency walk accepts metadata/directory; --version gate does not import lazy SDK; client.ts9-13 loads ESM index"
+   },
+   {
+    "actual_installed_sha256": "8f0252569286949f3fbfc7ffa042e73ee2470d9f729954a9982c3477154af6ff",
+    "declared_asset_preserved": false,
+    "declared_source_sha256": "a7c2132f13604b3167d5d6ff427f2aaa57e4806c6bf76c30ffdcbadda3af4382",
+    "expected": "Refuse reserved namespace collision before consumer writes; do not publish an artifact whose declared asset was clobbered and whose identical repeat conflicts.",
+    "first": {
+     "exit": 0,
+     "signal": null,
+     "status": "installed",
+     "stderr": "",
+     "stdout_bytes": 31623,
+     "stdout_sha256": "900868e34bb1ad2dffa10d47b8514562517e3ba0e8b71e958e9e172cae40b65e",
+     "writes": 203
+    },
+    "id": "RESERVED_MANIFEST_ASSET_COLLISION",
+    "identical_payload_repeat": {
+     "exit": 4,
+     "signal": null,
+     "status": "REFUSED_UNSAFE",
+     "stderr": "CLI target ownership or payload conflicts with the requested operation\nrerun: classifier install --backend jev\nconfigure the localbench gateway URL instead of a direct Clef server\nsee: classifier install --help\n",
+     "stdout_bytes": 569,
+     "stdout_sha256": "1ecc51e7472e6cf6475acb05cf5a6841e00af6e5c500f6e231057e9fdad9bacc"
+    },
+    "input": "same real prepared artifact; package.files adds .classifier-install.json with valid source bytes {version:2,entries:[]}",
+    "installed_bytes": 45551,
+    "repeat_filesystem_unchanged": true,
+    "source_boundary": "cli-target.ts246-250 accepts reserved asset;387-399 copies it then overwrites same path with installer metadata",
+    "source_bytes": 27
+   }
+  ],
+  "independent_readonly_slices": [
+   "ArtifactSafetyReview: reserved manifest path finding reproduced; exact-mode concern not promoted beyond original repeat contract.",
+   "ArtifactContractReview: dependency entry omission reproduced; public takeover-flag suggestion not promoted without original public-flag scope."
+  ],
+  "limits": [
+   "No reviewer production/test/gate source edits; negative artifact copies omit/create data without deleting canonical or copied files.",
+   "All child network denied, writes confined to owned root; launchctl execution denied; no classifier inference/model/provider prompt or real user HOME/service effects.",
+   "Doctor schema FINDINGS exercised; ancestor repository discovery remained visible even under GIT ceiling, so no standalone/no-repo health claim.",
+   "Real-payload takeover/rollback remainder and full-kit aggregate not rerun after decisive failures; no full acceptance/close/.19/.20/whole-main claim."
+  ],
+  "positive_control": {
+   "actual_sdk_import": {
+    "exit": 0,
+    "stdout": "{\"resolved\":\"file:///Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/installed-control/.local/share/classifier/versions/0.0.0/node_modules/@typesafe-ai/sdk/dist/index.mjs\",\"imported\":true}\n"
+   },
+   "doctor": {
+    "exit": 1,
+    "not_health_pass": true,
+    "schema": "classifier.doctor.v1",
+    "status": "FINDINGS"
+   },
+   "install": {
+    "exit": 0,
+    "signal": null,
+    "status": "installed",
+    "stderr": "",
+    "stdout_bytes": 29450,
+    "stdout_sha256": "a3f6979736da95609d584c96c0047351812948b118c16ae955584d69b8204159",
+    "writes": 202
+   },
+   "installed_version": {
+    "exit": 0,
+    "stdout": "classifier 0.0.0\n"
+   },
+   "package_version": "0.0.0",
+   "runner_help": {
+    "exit": 0,
+    "stdout": "Usage: jev-latest-canary-run.sh [--secret-manager CMD] [--notify-bin CMD] [--canary PATH] [--project-id ID] [--log-file PATH] [--help]\nRun the jev-latest canary once under its secret manager, classify the\noutcome, notify (via the notifier command) unless OK, print a NOTIFY record,\nand append a log line. Keyless offline operation is the caller's choice of\ndoubles: pass stubs via --secret-manager / --notify-bin / --canary for\nhermetic runs.\nOutcomes: OK(0) MOVED(1) NOT_RUN(2) ERROR(3) AUTH(4).\n"
+   },
+   "self_repeat": {
+    "exit": 0,
+    "signal": null,
+    "status": "already",
+    "stderr": "",
+    "stdout_bytes": 299,
+    "stdout_sha256": "16618a24bbe63ba1eb377c925734a835816b3009a003ecc48c131f5d587e2b5b",
+    "writes": 0
+   },
+   "whole_filesystem_identity_and_bytes_stable": true
+  },
+  "preflight": "/Users/josh/Developer/jev/var/agent-tmp/cli75-review.25572/preflight.json",
+  "reviewer": "DarkBear",
+  "source": [
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/cli-target.ts",
+    "sha256": "527c600789e4d969c477912de273d4c2f67057d8f1692a1cf2a6e7ac11a44e2f"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/install/manifest.ts",
+    "sha256": "7f192f0da454bb43a3b83f53f515cd27e8758932d34b32783fd908f06d1b5e8b"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/bin/jev.mjs",
+    "sha256": "92fb4faa8fe81148b89eca3abddacc028952370abc2b0efa70ecf7df9e847c02"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/src/client.ts",
+    "sha256": "dd51edec903f254847bacfba1ff98103c9ee347e1b92e60f42eda39eaeef533c"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/test/install-cli.test.mjs",
+    "sha256": "62f499ffa9518df00f48036d13ca7c089e70d1df0ab73935877138d47d77ac71"
+   },
+   {
+    "currentMatchesExercised": true,
+    "path": "kit/package.json",
+    "sha256": "49bf5f6c7e45922b326357182c5b0a6606cfb9326b37e403660cfcced0d3048f"
+   }
+  ],
+  "verdict": "REWORK"
+ }
+}
