@@ -1,0 +1,155 @@
+{
+ "authority": "pending",
+ "confidence": "observed",
+ "evidence_id": "ev_3ec0aaca081d5d72bdc539e0fb2c82f84b980be5d006669e62dff4f2bb83c0b6",
+ "limitations": [
+  "Original executor and actual path variation recovered; literal planned staging/promotion remains unverified, no full parent completion or new inference."
+ ],
+ "operation": "jev-x1.original-method-trace",
+ "parameters": {
+  "subject_sha256": "cba7a4c099f02e577a5b0b56a9441479d727ac1e1f549d4010a4516b9fb97ba8"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "details": {
+   "actual_canonical_artifact_writes": [
+    {
+     "argument_sha256": "a66ef085063e94a271b0723cc772354341d0eab1733d1f03c30432499605abde",
+     "path": "work/x1-injection-encoders/PREREG.md",
+     "record": 440,
+     "timestamp": "2026-10-05T15:22:42.658Z"
+    },
+    {
+     "argument_sha256": "c6dc09e40704f9968afa9a4fc978978d3c4287f9e095e33190af00edc4d13f39",
+     "path": "work/x1-injection-encoders/PREREG.md",
+     "record": 563,
+     "timestamp": "2026-10-05T15:26:47.096Z"
+    },
+    {
+     "argument_sha256": "183fc22ddc0194150e98fdcc481ff0a7b9c0d3075922ca558cf91595d0973383",
+     "path": "work/x1-injection-encoders/run.py",
+     "record": 624,
+     "timestamp": "2026-10-05T15:30:03.186Z"
+    },
+    {
+     "argument_sha256": "928a6a3ba85169ce6690dfbdbfc21d263a440d2417b32aec97d45782f663dee4",
+     "path": "work/x1-injection-encoders/run.py",
+     "record": 715,
+     "timestamp": "2026-10-05T15:35:43.195Z"
+    }
+   ],
+   "actual_owned_scratch_setup": {
+    "argument_sha256": "c7adb6e5e534e249706fda667ad2d93ce6a3d4e6908559b50d910e18801a20ca",
+    "record": 245,
+    "result_error": false,
+    "retained_output_path": "/Users/josh/.omp/agent/sessions/-Developer-jev/2026-10-05T14-31-25-023Z_01a10c7a-025f-72c0-9d4d-d27227a0ea62/69.shake.log:1204-1214",
+    "setup": "mkdir -p var/agent-tmp/x1.p2; write pane=2 label=x1 repo=jev bead=jev-x1-injection-encoders-e2gp to .owner; export TMPDIR=$PWD/var/agent-tmp/x1.p2",
+    "source_output": "Model-config metadata HTTP200; uptime/32cores; no reported mkdir/write error. Not a modern filesystem-identity proof.",
+    "timestamp": "2026-10-05T15:17:22.449Z"
+   },
+   "bead": "jev-x1-injection-encoders-e2gp",
+   "classification": "ORIGINAL_EXECUTOR_RECOVERED_ACTUAL_METHOD_VARIATION_REQUIRES_SOURCE_INTERPRETATION",
+   "coverage_limits": [
+    "Index maintenance finished; exact read-only lexical queries then succeeded. Broad glob over .omp timed out and was NOT absence proof. The actual pre-scoring parent was found through known peer-session parent filename, not the adjacent li3w worker.",
+    "Actual session records now identify pre-run planned-path absence, a different owned temporary directory, canonical scientific-file writes and original scheduled scored command. Do not call planned stage/copy never executed: dynamically constructed paths, other sessions or operator actions are not excluded.",
+    "The original scored invocation record1568 schedules background jobbg_5; this receipt does not newly certify its completed exit from that scheduling message. Existing unchanged scientific receipt/data and independent replay retain their separate authority.",
+    "A later backup/copy/hold command1737 returned error; no successful staged promotion is inferred from it.",
+    "No new ProtectAI/Jev scoring, data/bar/PREREG change, source edits, CASS refresh/repair/kill, or source-folder reconstruction occurred. Parent whole-method PASS/close not claimed."
+   ],
+   "existing_scientific_acceptance": {
+    "canonical_receipt": "ev_80f03306ca0267aff464725c7eee9fd0984b448a5e7a9b8b3bc6acc9e1de45b5",
+    "status": "VERIFIED recorded-runtime/science scope remains unchanged; original data/receipt677->47d byte-identical, no new experiment or second study win."
+   },
+   "original_named_command_invocations": [
+    {
+     "argument_sha256": "1bde74aba3a1acac79936d738044fa4b273d97c49988f5d49ead9273e2a82190",
+     "call_id": "call_KM86TE3qvghd2RhX6hSBfpA3|fc_021920c622919ef4016ac3c8e367f087d0b802828e130d3b29",
+     "cwd": null,
+     "future_hold_control": true,
+     "has_nice10": true,
+     "local_model_dependencies": false,
+     "owned_TMPDIR": true,
+     "record": 1014,
+     "result_error": false,
+     "result_exit_code": null,
+     "retained_result_pointer": "[shaken ~27 tokens — recover: artifact://83 (region 6)]",
+     "timestamp": "2026-10-05T15:57:26.316Z",
+     "uses_infisical": false
+    },
+    {
+     "argument_sha256": "294549051d116f56ea60e3e9b93c9d489891e79a14d22f1a36b8992fac9cced0",
+     "call_id": "call_YdLEaDFY34Sg8UYCP1SGbOQJ|fc_01ab7e845ed4e0f5016ac3cfc3627c87d0b48516a563f3c4c2",
+     "cwd": null,
+     "future_hold_control": false,
+     "has_nice10": true,
+     "local_model_dependencies": true,
+     "owned_TMPDIR": true,
+     "record": 1561,
+     "result_error": true,
+     "result_exit_code": null,
+     "retained_result_pointer": "[shaken ~20 tokens — recover: artifact://104 (region 49)]",
+     "timestamp": "2026-10-05T16:26:46.114Z",
+     "uses_infisical": true
+    },
+    {
+     "argument_sha256": "e8995d591d2ecb5ecb699a5293162e61db9e3dbf0715f8ea4d8d5acc22731234",
+     "call_id": "call_XUrmKpksEveBtGfZVglpJ8ld|fc_01ab7e845ed4e0f5016ac3cfcc54e487d0ad6c95f8fd8b4980",
+     "cwd": null,
+     "future_hold_control": false,
+     "has_nice10": true,
+     "local_model_dependencies": true,
+     "owned_TMPDIR": true,
+     "record": 1568,
+     "result_error": false,
+     "result_exit_code": null,
+     "retained_result_pointer": "[shaken ~87 tokens — recover: artifact://104 (region 50)]",
+     "timestamp": "2026-10-05T16:26:56.292Z",
+     "uses_infisical": true
+    },
+    {
+     "argument_sha256": "a5312ed4918e98e35238f97117d42209041c22304ececca5a054b3464d34f5bc",
+     "call_id": "call_oZhrItEBnvHcaIUIOd2mHcQR|fc_026aa8d368bbbea9016ac3d621b6e087d0a0e7aa7b427e813e",
+     "cwd": null,
+     "future_hold_control": true,
+     "has_nice10": false,
+     "local_model_dependencies": false,
+     "owned_TMPDIR": false,
+     "record": 1737,
+     "result_error": true,
+     "result_exit_code": null,
+     "retained_result_pointer": "[shaken ~39 tokens — recover: artifact://142 (region 27)]",
+     "timestamp": "2026-10-05T16:53:57.397Z",
+     "uses_infisical": false
+    }
+   ],
+   "original_planned_path_check": {
+    "argument_sha256": "3e55b2f644e6826226a2793ed754dddbbc643bb6ac248ee9b98203c4ab3af63e",
+    "call_id": "toolu_012CoiqXnYcUguD4mnfCmQow",
+    "exit": 2,
+    "observed_errors": [
+     "ls: cannot access 'work/x1-injection-encoders': No such file or directory",
+     "ls: cannot access 'work/plan-20261004/experiments/x1-injection-encoders': No such file or directory"
+    ],
+    "record": 195,
+    "retained_output_path": "/Users/josh/.omp/agent/sessions/-Developer-jev/2026-10-05T14-31-25-023Z_01a10c7a-025f-72c0-9d4d-d27227a0ea62/69.shake.log:694-713",
+    "timestamp": "2026-10-05T15:16:13.708Z"
+   },
+   "original_prereg": {
+    "before_first_scored_invocation": true,
+    "boundary": "Actual prereg content does not supply an explicit staged-path/copy ruling; earlier failed read of an invalid expanded SHA was not evidence, resolved from observed short7d44b778 before using content.",
+    "commit": "7d44b7783c4989604b732e5b7ba7d29001fc114c",
+    "sha256": "dfebc6fa10b1aa5c8c81c490e9b07f18f78f5114a3056748c996ab65f99b4912"
+   },
+   "remaining_exact_input": "Interpret original method against actual ownedTMPDIR x1.p2 plus direct canonical PREREG/runner writes and scored run. Literal planned experiments-path execution and planned staged-to-work promotion/copy are NOT established by these selected records; source-family text instead names var/agent-tmp/dogfood/<x>. Need original method authority/ruling or additional actual copy trace, not generic model permission.",
+   "retained_output_integrity": "Historical result pointers were resolved in their ORIGINAL session directory, not current artifact://69 scope. No raw session, credentials, private tool-result texts or new model outputs copied into this receipt.",
+   "reviewer": "DarkBear",
+   "source_snapshot": {
+    "initial_cwd": "/Users/josh/Developer/jev",
+    "path": "/Users/josh/.omp/agent/sessions/-Developer-jev/2026-10-05T14-31-25-023Z_01a10c7a-025f-72c0-9d4d-d27227a0ea62.jsonl",
+    "records": 33570,
+    "sha256": "cba7a4c099f02e577a5b0b56a9441479d727ac1e1f549d4010a4516b9fb97ba8"
+   },
+   "whole_parent_method_pass": false
+  }
+ }
+}
