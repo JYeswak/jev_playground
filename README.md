@@ -187,7 +187,7 @@ Only recorded cap 3 is identifiable: another `--memory-cap` returns `NOT_IDENTIF
 
 The per-turn cap3 source reference is hash-pinned in `work/jev-jzgm/cap3-reference.json`; to replay its exact window use `--from 2026-10-01T19:45:00Z --to 2026-10-02T19:45:00Z`. The former aggregate-only reference remains separately reported and its historical +183-token difference is not treated as a pass.
 
-Skill veto enforcement is REFUTED (jev-wbel: 0.990 demo precision falls to 0.335 on real loads at a 79% veto rate); the shadow never blocked, and it is removed from `.omp/config.yml` (KIT_GATE_EDIT, `2030f719`), so no shadow loads or logs occur. Vendor-paste post-commit shadow logs would-flag hunks on every commit (jev-30hi: 0.842 precision, 0.640 recall); enforcement waits on a blind 0.90/0.10 bar.
+Skill veto enforcement is REFUTED (jev-wbel: 0.990 demo precision falls to 0.335 on real loads at a 79% veto rate); removed from project registration and auto-discovery in `1b8ea68b`; full historical-cohort zero-row retirement remains pending jev-wbel/.67. Vendor-paste post-commit shadow logs would-flag hunks on every commit (jev-30hi: 0.842 precision, 0.640 recall); enforcement waits on a blind 0.90/0.10 bar.
 
 Per-prompt skill hints PARKED (R133 VEIN-EXHAUSTED): every recall gain came with misroutes; silence was strictly safer. Extension stays OFF. The semantic retry is refuted too (jev-zbb1, R135: best recall 4/20 below the 8/20 gate). Web-search rerank stays OFF (jev-ib1h: 0 opens in 15 answered).
 
