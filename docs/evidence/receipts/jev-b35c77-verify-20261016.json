@@ -1,0 +1,17 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6780014fff7087e1bd76ea4ed52c4331ebb411b06ba6950b3166fa1eb5142cda",
+ "limitations": [
+  "No live Jev/model calls; env -i scrubbed; peer working-tree dirt excluded via exact archive."
+ ],
+ "operation": "jev-b35c.77-non-author-verify",
+ "parameters": {
+  "candidate": "dbc75238"
+ },
+ "producer": "WildDog",
+ "result_ref": {
+  "bytes": 328,
+  "sha256": "4ad9436e839c2e171e36fa9b41b120315cbf0d6fc46df53637618c5de92009c7"
+ }
+}
