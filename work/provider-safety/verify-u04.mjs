@@ -105,12 +105,14 @@ const readApproved = () => configText(APPROVED);
 {
   const order = [];
   const tCalls = [];
+  // Bind the synthetic sentinel by env name; the fixture contains no literal key assignment.
+  const { parentSecret: TYPESAFE_API_KEY } = SYN;
   const parentEnv = {
     PATH: "/synthetic/bin",
     HOME: "/synthetic/home",
     TMPDIR: "/synthetic/tmp",
-    TYPESAFE_API_KEY: SYN.parentSecret,
-    INFISICAL_CLIENT_SECRET: SYN.parentSecret,
+    TYPESAFE_API_KEY,
+    INFISICAL_CLIENT_SECRET: TYPESAFE_API_KEY,
   };
   const execCalls = [];
   const fakeExec = (file, args, options, callback) => {

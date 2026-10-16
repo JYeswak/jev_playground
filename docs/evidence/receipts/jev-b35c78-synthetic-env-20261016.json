@@ -1,0 +1,172 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_397d6bf1dc743016a2e664ecb589f232acb5bfcbbd4f6e2cd7637b811d2465b7",
+ "limitations": [],
+ "operation": "preserve_synthetic_provider_env_reference",
+ "parameters": {
+  "bead": "jev-b35c.78"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "details": {
+   "actual_u04": {
+    "checks": 19,
+    "exit": 0,
+    "global_fetch_calls": 0,
+    "network_calls": 0,
+    "stderr": "",
+    "stdout": "{\n  \"tool\": \"verify-u04.mjs\",\n  \"bead\": \"jev-u04-key-provider-check-p147\",\n  \"run_at\": \"2026-10-16T20:17:51.432Z\",\n  \"network_calls\": 0,\n  \"global_fetch_calls\": 0,\n  \"source_hashes\": {\n    \"work/jev-client/src/infisical-key.ts\": \"98900c1a7d937c3425bb5c8312840dc95ee428386ef5f09c4da910467b1f6428\"\n  },\n  \"injected_paths\": [\n    \"user-session-runner\",\n    \"machine-fallback-runner\",\n    \"approved-transport\",\n    \"synthetic-config-reader\"\n  ],\n  \"credential_acquisition_order\": [\n    \"user-session\",\n    \"machine-fallback\"\n  ],\n  \"checks\": [\n    {\n      \"name\": \"user-success returns key\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"user-success order is user-session only\",\n      \"pass\": true,\n      \"detail\": \"user-session\"\n    },\n    {\n      \"name\": \"user-success makes no transport call\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"fallback returns key via machine route\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"fallback order user-then-machine\",\n      \"pass\": true,\n      \"detail\": \"user-session-failed,machine-fallback\"\n    },\n    {\n      \"name\": \"fallback attempted machine route after expired session\",\n      \"pass\": true,\n      \"detail\": \"runner=2 transport=1\"\n    },\n    {\n      \"name\": \"fallback transport hit approved login path\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"child env scrubs parent secrets\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"machine child receives approved URL and synthetic token\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"both-fail resolves undefined (no throw)\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"both-fail output is secret-free\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"denied route resolves undefined\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"denied route makes zero transport calls\",\n      \"pass\": true,\n      \"detail\": \"transport=0\"\n    },\n    {\n      \"name\": \"denied route never reaches machine child\",\n      \"pass\": true,\n      \"detail\": \"runner calls=1 (user-session attempt only)\"\n    },\n    {\n      \"name\": \"denied approval with working user session still returns user key\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"denied approval makes zero transport calls on user leg\",\n      \"pass\": true,\n      \"detail\": \"transport=0\"\n    },\n    {\n      \"name\": \"denied approval never reaches machine child on user leg\",\n      \"pass\": true,\n      \"detail\": \"runner calls=1\"\n    },\n    {\n      \"name\": \"source hash recorded (64 hex)\",\n      \"pass\": true,\n      \"detail\": \"\"\n    },\n    {\n      \"name\": \"no global fetch calls\",\n      \"pass\": true,\n      \"detail\": \"globalFetchCalls=0\"\n    }\n  ],\n  \"pass\": true\n}\n"
+   },
+   "bead": "jev-b35c.78",
+   "before": {
+    "ast_metadata": {
+     "assignments": [
+      {
+       "initializerKind": "PropertyAccessExpression",
+       "line": 112,
+       "literal": false
+      }
+     ],
+     "parseErrors": 0,
+     "path": "work/provider-safety/verify-u04.mjs"
+    },
+    "boundary": "Reported field was an AST PropertyAccessExpression, not a literal value. No possible secret value was printed, hashed or authenticated; no redundant failing-run confirmation.",
+    "diagnostic": "work/provider-safety/verify-u04.mjs:112 TYPESAFE_API_KEY value (value withheld)",
+    "source": "actual remote CI38957755761 at01368d69fa0c301fde0cc21254f0ddcd224edb5b",
+    "status": "RED30"
+   },
+   "change": "Destructure the same synthetic parent sentinel using the environment variable name and use object shorthand; both environment keys and reference values remain identical. Gate and exemptions unchanged.",
+   "limits": [
+    "Author targeted source/gate proof only; no independent close or whole-CI-green claim.",
+    "No real credential lookup/rotation, key exposure, API/model/network call, global config, provider implementation or detector/exemption change.",
+    "Existing user-success/expired-session/both-fail/denied-route and child-env isolation checks remain the consumer contract; no new wiring test.",
+    "Operator docs/TESTS intentionally unchanged because invocation and semantics remain identical; inline fixture-binding comment documents the source-only change."
+   ],
+   "role": "implementer evidence only",
+   "scanner": {
+    "exit": 1,
+    "raw_report_json_text": "{\"project\":\"/Users/josh/Developer/jev\",\"timestamp\":\"2026-10-16 14:21:40\",\"status\":\"ok\",\"failed_modules\":[],\"git\":{\"repository\":\"https://github.com/JYeswak/jev_playground\",\"commit\":\"339cce0efb56c04c179efb94359f42a4b2dab9d7\",\"blob_base\":\"https://github.com/JYeswak/jev_playground/blob/339cce0efb56c04c179efb94359f42a4b2dab9d7\"},\"scanners\":[{\"language\":\"js\",\"project\":\"/Users/josh/Developer/jev/work/provider-safety/verify-u04.mjs\",\"timestamp\":\"2026-10-16T20:21:40Z\",\"files\":1,\"critical\":7,\"warning\":0,\"info\":8,\"version\":\"4.7\",\"status\":\"ok\",\"findings\":[{\"rule\":\"js.typescript.explicit-any\",\"category_id\":\"js.typescript\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":41,\"col\":1,\"severity\":\"info\",\"message\":\"Explicit any types present — // Global fetch tripwire: any non-injected network attempt fails the run.\",\"suppressed\":false},{\"rule\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":100,\"col\":1,\"severity\":\"info\",\"message\":\"Type comparisons - verify both sides match — check(\\\"user-success order is user-session only\\\", JSON.stringify(order) === '[\\\"user-session\\\"]', order.join(\\\",\\\"));\",\"suppressed\":false},{\"rule\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":145,\"col\":1,\"severity\":\"info\",\"message\":\"Type comparisons - verify both sides match — JSON.stringify(order) === '[\\\"user-session-failed\\\",\\\"machine-fallback\\\"]',\",\"suppressed\":false},{\"rule\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":186,\"col\":1,\"severity\":\"info\",\"message\":\"Type comparisons - verify both sides match — check(\\\"both-fail resolves undefined (no throw)\\\", value === undefined && threw === null);\",\"suppressed\":false},{\"rule\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":99,\"col\":1,\"severity\":\"critical\",\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"suppressed\":false},{\"rule\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":142,\"col\":1,\"severity\":\"critical\",\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"suppressed\":false},{\"rule\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":162,\"col\":1,\"severity\":\"critical\",\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"suppressed\":false},{\"rule\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":232,\"col\":1,\"severity\":\"critical\",\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"suppressed\":false},{\"rule\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":12,\"col\":1,\"severity\":\"critical\",\"message\":\"Possible hardcoded secrets: clientSecret: \\\"u04-synthetic-client-secret\\\",\",\"suppressed\":false},{\"rule\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":13,\"col\":1,\"severity\":\"critical\",\"message\":\"Possible hardcoded secrets: accessToken: \\\"u04-synthetic-access-token\\\",\",\"suppressed\":false},{\"rule\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":15,\"col\":1,\"severity\":\"critical\",\"message\":\"Possible hardcoded secrets: parentSecret: \\\"u04-parent-env-sentinel\\\",\",\"suppressed\":false},{\"rule\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":98,\"col\":15,\"severity\":\"info\",\"message\":\"await without try/catch; wrap to handle rejections\",\"suppressed\":false},{\"rule\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":141,\"col\":15,\"severity\":\"info\",\"message\":\"await without try/catch; wrap to handle rejections\",\"suppressed\":false},{\"rule\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":205,\"col\":17,\"severity\":\"info\",\"message\":\"await without try/catch; wrap to handle rejections\",\"suppressed\":false},{\"rule\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"path\":\"work/provider-safety/verify-u04.mjs\",\"line\":231,\"col\":17,\"severity\":\"info\",\"message\":\"await without try/catch; wrap to handle rejections\",\"suppressed\":false}],\"extras\":{\"profile\":{\"files_considered\":1,\"files_after_prefilter\":1,\"prefilter_ms\":79,\"cache_hits\":0,\"cache_misses\":1,\"cache_hit_rate\":0.0}},\"findings_sink\":true}],\"totals\":{\"critical\":7,\"warning\":0,\"info\":8,\"files\":1},\"findings\":[{\"lang\":\"js\",\"rule_id\":\"js.typescript.explicit-any\",\"category_id\":\"js.typescript\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":41,\"col\":1,\"message\":\"Explicit any types present — // Global fetch tripwire: any non-injected network attempt fails the run.\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"455fbbfe39100dee\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":100,\"col\":1,\"message\":\"Type comparisons - verify both sides match — check(\\\"user-success order is user-session only\\\", JSON.stringify(order) === '[\\\"user-session\\\"]', order.join(\\\",\\\"));\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"d3db07a4db82811c\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":145,\"col\":1,\"message\":\"Type comparisons - verify both sides match — JSON.stringify(order) === '[\\\"user-session-failed\\\",\\\"machine-fallback\\\"]',\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"0783ca0c173f4e38\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.type-coercion.different-types\",\"category_id\":\"js.type-coercion\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":186,\"col\":1,\"message\":\"Type comparisons - verify both sides match — check(\\\"both-fail resolves undefined (no throw)\\\", value === undefined && threw === null);\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"1177bce2cd4ac1fd\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":99,\"col\":1,\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"f73e60dfec2c7d2d\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":142,\"col\":1,\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"94116c3d5d77369c\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":162,\"col\":1,\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"ebdb6441fbbeab7f\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"javascript.ctcompare.unsafe_secret_compare\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":232,\"col\":1,\"message\":\"Secret, signature, or token compared with ==/!= without timing-safe equality\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"66a91e819ed17b67\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":12,\"col\":1,\"message\":\"Possible hardcoded secrets: clientSecret: \\\"u04-synthetic-client-secret\\\",\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"39bc85cbb77678b0\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":13,\"col\":1,\"message\":\"Possible hardcoded secrets: accessToken: \\\"u04-synthetic-access-token\\\",\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"b6e427429f1a18f5\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.security.hardcoded-secrets\",\"category_id\":\"js.security\",\"severity\":\"critical\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":15,\"col\":1,\"message\":\"Possible hardcoded secrets: parentSecret: \\\"u04-parent-env-sentinel\\\",\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"2d40259aa0bd1b0e\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":98,\"col\":15,\"message\":\"await without try/catch; wrap to handle rejections\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"1b9449d550275e88\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":141,\"col\":15,\"message\":\"await without try/catch; wrap to handle rejections\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"d13516f1b410c8e6\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":205,\"col\":17,\"message\":\"await without try/catch; wrap to handle rejections\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"ad4fe6460c64804d\",\"suppressed\":false},{\"lang\":\"js\",\"rule_id\":\"js.async.await-no-try\",\"category_id\":\"js.async\",\"severity\":\"info\",\"confidence\":\"\",\"file\":\"work/provider-safety/verify-u04.mjs\",\"line\":231,\"col\":17,\"message\":\"await without try/catch; wrap to handle rejections\",\"remediation\":\"\",\"fix\":\"\",\"fingerprint\":\"85d1f1260b61089b\",\"suppressed\":false}]}\n",
+    "stderr": "ℹ Scanning one file directly (no workspace): /Users/josh/Developer/jev/work/provider-safety/verify-u04.mjs\nUBS Meta-Runner v5.5.0  2026-10-16 14:21:39\nProject: /Users/josh/Developer/jev\nFormat:  json\nDetected: js\nℹ ast-grep (path): /opt/homebrew/bin/ast-grep\nScanning js...\nFinished js (1s)\n",
+    "triage": [
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 99,
+       "message": "Secret, signature, or token compared with ==/!= without timing-safe equality",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "javascript.ctcompare.unsafe_secret_compare",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 142,
+       "message": "Secret, signature, or token compared with ==/!= without timing-safe equality",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "javascript.ctcompare.unsafe_secret_compare",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 162,
+       "message": "Secret, signature, or token compared with ==/!= without timing-safe equality",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "javascript.ctcompare.unsafe_secret_compare",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 232,
+       "message": "Secret, signature, or token compared with ==/!= without timing-safe equality",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "javascript.ctcompare.unsafe_secret_compare",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 12,
+       "message": "Possible hardcoded secrets: clientSecret: \"u04-synthetic-client-secret\",",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "js.security.hardcoded-secrets",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 13,
+       "message": "Possible hardcoded secrets: accessToken: \"u04-synthetic-access-token\",",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "js.security.hardcoded-secrets",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     },
+     {
+      "finding": {
+       "category_id": "js.security",
+       "col": 1,
+       "line": 15,
+       "message": "Possible hardcoded secrets: parentSecret: \"u04-parent-env-sentinel\",",
+       "path": "work/provider-safety/verify-u04.mjs",
+       "rule": "js.security.hardcoded-secrets",
+       "severity": "critical",
+       "suppressed": false
+      },
+      "human_severity": "none",
+      "reason": "Synthetic verifier-only sentinel declarations and exact expected-value comparisons, not credential storage/authentication or production timing-sensitive decisions. Existing fake provider/runner isolation proof reports zero network/global fetch calls.",
+      "tool_severity": "critical"
+     }
+    ]
+   },
+   "source_sha256": "d9eba138184b8a4c5fa3414a3903b74874aa3f97dfba6c8bc932e44bc00d57f8",
+   "unchanged_gate": {
+    "exit": 0,
+    "stderr": "",
+    "stdout": "PASS: no secret values in 6812 committable files (14 allowlisted hit(s), listed in foundation/gates.d/30-no-secrets.exemptions)\n"
+   },
+   "unchanged_gate_selftest": {
+    "exit": 0,
+    "stderr": "",
+    "stdout": "SELFTEST_PASS: planted tree exits 1\nSELFTEST_PASS: key under work/ is named\nSELFTEST_PASS: key under docs/ is named\nSELFTEST_PASS: key under foundation/ is named\nSELFTEST_PASS: $NAME and ${NAME} references are quiet\nSELFTEST_PASS: a literal in the recorded-command shape is named\nSELFTEST_PASS: a $'...' literal is named\nSELFTEST_PASS: allowlisted token is quiet at its listed path\nSELFTEST_PASS: an unlisted key in an allowlisted file is named\nSELFTEST_PASS: the allowlisted token at an unlisted path is named\nSELFTEST_PASS: RED output withholds every planted value\nSELFTEST_PASS: outside a git work tree it exits 3 without a verdict\n"
+   }
+  }
+ }
+}
