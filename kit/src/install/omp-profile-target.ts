@@ -11,15 +11,17 @@
 // nothing reads process.env.
 
 import { mkdir, readdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { createRequire, stripTypeScriptTypes } from "node:module";
+import { createRequire, registerHooks, stripTypeScriptTypes } from "node:module";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { EXIT_CODES } from "../families/registry.js";
 import { validateContract, type DecisionContract } from "../contracts.js";
 import { isSafeProfileName, profileAgentDir } from "./omp-paths.js";
 import { decide } from "../conformance.js";
 import { mergeExtensions } from "./omp-config-merge.js";
-import { pathToFileURL } from "node:url";
+
 
 export const SHIM_MARKER_PREFIX = "// classifier-shim-v2";
 export type TargetFamily = {
@@ -267,48 +269,33 @@ const NATIVE_SURFACE_MECHANISMS: Record<string, NativeMechanism> = {
 // registers its declared host event when invoked with a stub pi. The check
 // runs by execution in both cases: directly, or — for exactly one Node
 // limitation (type stripping is banned for files under node_modules, while
-// the host loader accepts them there) — against a physical bounded copy
-// staged outside node_modules, stripped with Node's own builtin. Copying
-// preserves relative structure so sibling imports resolve as installed;
-// unresolvable ones fail closed at import. Pure library modules without a
-// default export, and factories that never register, are refused before
-// any write. The host session start remains the final load authority.
-let stageSequence = 0;
-const MAX_STAGE_FILES = 1024;
-const MAX_STAGE_BYTES = 8 * 1024 * 1024;
-
-async function stagePackageCopy(packageDir: string, stagingRoot: string, familyId: string): Promise<string> {
-  // readFile follows symlinks, so the staged tree is always physical files;
-  // a link escape just costs budget, never fidelity. Left in place under
-  // the caller-owned staging root; test scratch and OS tmp reap it.
-  const dest = join(stagingRoot, `stage-${familyId}-${process.pid}-${stageSequence++}`);
-  let files = 0;
-  let bytes = 0;
-  const walk = async (src: string, dst: string): Promise<void> => {
-    await mkdir(dst, { recursive: true });
-    const entries = await readdir(src, { withFileTypes: true });
-    for (const entry of entries) {
-      const from = join(src, entry.name);
-      const to = join(dst, entry.name);
-      if (entry.isDirectory()) {
-        await walk(from, to);
-      } else {
-        const content = await readFile(from);
-        files += 1;
-        bytes += content.length;
-        if (files > MAX_STAGE_FILES || bytes > MAX_STAGE_BYTES) {
-          throw new Error("package too large to verify: " + familyId);
-        }
-        await writeFile(to, content);
-      }
-    }
-  };
-  try {
-    await walk(packageDir, dest);
-  } catch (error) {
-    throw new Error("cannot stage package for verification: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
+// the host loader accepts them there) — through a scoped builtin-TS load
+// hook covering only the locked package root, deregistered in finally.
+// The hook uses Node's own stripping engine, so entries load exactly as
+// Node would load them outside node_modules; relative structure, bare
+// dependencies and import.meta resolve in place, and unresolvable ones
+// fail closed at import. Pure library modules without a default export,
+// and factories that never register, are refused before any write. The
+// host session start remains the final load authority.
+function registerPackageTsHook(packageDir: string, familyId: string): () => void {
+  if (typeof registerHooks !== "function") {
+    throw new Error("native TypeScript verification needs a Node load-hook runtime: " + familyId);
   }
-  return dest;
+  const rootUrl = pathToFileURL(packageDir).href;
+  const prefix = rootUrl.endsWith("/") ? rootUrl : rootUrl + "/";
+  const handle = registerHooks({
+    load(url, context, next) {
+      if (url.startsWith(prefix) && (url.endsWith(".ts") || url.endsWith(".mts") || url.endsWith(".cts") || url.endsWith(".tsx"))) {
+        return {
+          format: "module",
+          source: stripTypeScriptTypes(readFileSync(fileURLToPath(url), "utf8")),
+          shortCircuit: true,
+        };
+      }
+      return next(url, context);
+    },
+  });
+  return () => handle.deregister();
 }
 
 
@@ -321,7 +308,11 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   // for the invocation below.
   const factory: (pi: unknown) => unknown = loaded.default as (pi: unknown) => unknown;
   const seen: string[] = [];
-  const stubPi = { on: (event: string, _handler: (event: unknown) => Promise<unknown>) => { seen.push(event); } };
+  const stubPi = { on: (event: string, handler: unknown) => {
+    // Registration counts only for callable handlers: pi.on(name, null)
+    // must not satisfy the event proof.
+    if (typeof handler === "function") seen.push(event);
+  } };
   try {
     await factory(stubPi);
   } catch (error) {
@@ -332,7 +323,7 @@ async function checkLoadedModule(loaded: unknown, familyId: string, expectedEven
   }
 }
 
-async function loadNativeEntry(importedPath: string, packageDir: string, stagingRoot: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
+async function loadNativeEntry(importedPath: string, packageDir: string, familyId: string, expectedEvent: string | undefined): Promise<void> {
   try {
     // Dynamic import: the specifier is computed at runtime from the validated
     // locked package path, so no static import can name this module.
@@ -346,28 +337,22 @@ async function loadNativeEntry(importedPath: string, packageDir: string, staging
       throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
     }
   }
-  const stagedDir = await stagePackageCopy(packageDir, stagingRoot, familyId);
-  const entryRel = relative(packageDir, importedPath);
-  if (entryRel === ".." || entryRel.startsWith(".." + sep) || isAbsolute(entryRel)) {
-    throw new Error("native entry escapes staged package: " + familyId);
-  }
-  const stagedEntry = join(stagedDir, entryRel);
-  let stripped: string;
-  try {
-    // Node builtin: the same stripping engine Node itself uses, so the
-    // staged entry loads exactly as Node would load it outside node_modules.
-    stripped = stripTypeScriptTypes(await readFile(stagedEntry, "utf8"), { mode: "transform" });
-  } catch (error) {
-    throw new Error("native entry does not transpile: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
-  }
-  await writeFile(stagedEntry, stripped);
+  // Scoped builtin-TS hook on the original physical path: no copy, no
+  // relocation, no parse. Adversarial entries (dead registration, missing
+  // imports, non-function defaults) fail by execution right here.
+  const deregister = registerPackageTsHook(packageDir, familyId);
   let loaded: unknown;
   try {
-    loaded = await import(pathToFileURL(stagedEntry).href);
+    loaded = await import(pathToFileURL(importedPath).href);
   } catch (error) {
+    deregister();
     throw new Error("native entry does not load: " + familyId + ": " + (error instanceof Error ? error.message : String(error)));
   }
-  await checkLoadedModule(loaded, familyId, expectedEvent);
+  try {
+    await checkLoadedModule(loaded, familyId, expectedEvent);
+  } finally {
+    deregister();
+  }
 }
 
 async function checkBlastRadius(
@@ -461,8 +446,7 @@ export async function installProfileTargets(input: ProfileInstallInput): Promise
           throw new Error("unsupported native surface: " + family.id);
         }
         mechanism = found;
-        const stagingRoot = join(dirname(resolve(family.packageLockPath)), ".jev-native-stage");
-        await loadNativeEntry(importedPath, resolved.packageDir, stagingRoot, family.id, mechanism.kind === "hook" ? mechanism.event : undefined);
+        await loadNativeEntry(importedPath, resolved.packageDir, family.id, mechanism.kind === "hook" ? mechanism.event : undefined);
       } catch (error) {
         families.push({ family: family.id, profile, status: "refused", reason: error instanceof Error ? error.message : String(error) });
         refused = true;

@@ -559,6 +559,28 @@ test('an entry with an unresolvable import is refused before writing', async () 
   assert.deepEqual(await snapshotTree(ompHome), before);
 });
 
+test('a null handler registration does not satisfy the event proof', async () => {
+  const home = await freshHome('installer-profile-bad-handler');
+  const ompHome = join(home, 'omp-home');
+  const gate = await loadJson(join(contractsDir, 'gate.json'));
+  const packageManifest = await loadJson(join(nativePkgDir, 'package.json'));
+  const families = (await loadFamilies({ gate })).filter((family) => family.id === 'gate')
+    .map((family) => ({ ...family, packageSpecifier: packageManifest.name + '/src/bad-handler.ts' }));
+  const before = await snapshotTree(ompHome);
+  const result = await installProfileTargets({
+    ompHome,
+    profiles: ['default'],
+    families,
+    switchRegistry: await loadJson(surfacesFixture),
+    maxHandlerLatencyMs: 5000,
+  });
+  assert.equal(result.exit, 4);
+  assert.equal(result.families[0].status, 'refused');
+  assert.ok((result.families[0].reason ?? '').includes('does not register tool_call'));
+  assert.deepEqual(result.writes, []);
+  assert.deepEqual(await snapshotTree(ompHome), before);
+});
+
 test('a surface absent from the switch registry is refused with exit 4', async () => {
   const home = await freshHome('installer-profile-ghost');
   const ompHome = join(home, 'omp-home');
