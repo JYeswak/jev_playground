@@ -2,8 +2,8 @@
 # install-jev-compact.sh — install the jev-compact pre-compaction hook + skill into any repo.
 #
 # Usage: install-jev-compact.sh [--check] [target-dir]
-#   target-dir defaults to the current directory. --check verifies an existing
-#   install without writing anything.
+# target-dir defaults to the current directory. --check is read-only: it verifies an
+# installed target, or validates this source repo without copying files.
 #
 # What lands in the target (all project-scoped, all reviewable):
 #   .omp/hooks/pre/jev-compact.ts          entry (template: compaction/deploy/hook-entry.ts)
@@ -67,9 +67,36 @@ verify() {
   fi
 }
 
+verify_source_repo() {
+  source_ok=1
+  for f in "$repo/.omp/hooks/pre/jev-compact.ts" "$entry_src" \
+           "$repo/compaction/src/omp-binding.ts" "$repo/compaction/src/omp-hook.ts" \
+           "$repo/compaction/src/omp-adapter.ts" "$skill_src/SKILL.md"; do
+    if [ -f "$f" ]; then
+      echo "ok: $f"
+    else
+      echo "RED: missing source-repo file $f"
+      source_ok=0
+    fi
+  done
+  if (cd "$repo/compaction" && node --input-type=module -e "await import('fast-jev-compaction')" >/dev/null 2>&1); then
+    echo "ok: fast-jev-compaction resolves from $repo/compaction"
+  else
+    echo "RED: fast-jev-compaction does not resolve from $repo/compaction" >&2
+    source_ok=0
+  fi
+  [ "$source_ok" = "1" ] || fail "source-repo check failed for $repo"
+  echo "PASS: jev-compact source-repo check at $repo (read-only; no source copies)"
+}
+
 if [ "$mode" = "check" ]; then
   [ -d "$target" ] || fail "target is not a directory: $target"
   need node
+  target_abs=$(CDPATH='' cd -- "$target" && pwd -P) || fail "cannot resolve target: $target"
+  if [ "$target_abs" = "$repo" ]; then
+    verify_source_repo
+    exit 0
+  fi
   if [ ! -d "$dep_src" ]; then
     echo "RED: pinned fast-jev-compaction clone is missing: $dep_src" >&2
     echo "FIX: from the repository root run ./scripts/bootstrap-compaction.sh, then rerun $0 --check $target" >&2

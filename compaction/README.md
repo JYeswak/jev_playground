@@ -91,6 +91,10 @@ It copies the hook, vendors the compactor and its dependency under
 2026-09-19 against a scratch target: `PASS: jev-compact installed (placement + dependency; firing
 proven only by /compact + log)`.
 
+### Checking from the source repository
+
+From this repository root, `./compaction/install-jev-compact.sh --check` runs a read-only source-repo check. It verifies the tracked hook, template, source modules and skill, then resolves `fast-jev-compaction` from `compaction/`; it does not create `.omp/lib` or copy `compaction/src`. Bootstrap the pinned dependency first with `./scripts/bootstrap-compaction.sh`. For another repository, keep using `--check /path/to/target` after installation.
+
 Then, in the target:
 
 ```bash
