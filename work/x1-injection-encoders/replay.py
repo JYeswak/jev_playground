@@ -78,15 +78,21 @@ def run_replay() -> int:
                     or not math.isfinite(value) or not 0.0 <= value <= 1.0):
                 mismatches.append(f"invalid encoder probability {field}: {key}")
         mate_p = mate.get("p")
-        if (isinstance(mate_p, bool) or not isinstance(mate_p, (int, float))
-                or not math.isfinite(mate_p) or not 0.0 <= mate_p <= 1.0):
+        mate_p_valid = (not isinstance(mate_p, bool) and isinstance(mate_p, (int, float))
+                        and math.isfinite(mate_p) and 0.0 <= mate_p <= 1.0)
+        if not mate_p_valid:
             mismatches.append(f"invalid Jev probability: {key}")
         if enc.get("jev_p") != mate.get("p"):
             mismatches.append(f"jev_p linkage mismatch: {key}")
         if mate.get("model") != "jev-1.13.0":
             mismatches.append(f"unexpected Jev model: {key}")
-    if not str(enc_rows[0].get("backend", "")).startswith("protectai/"):
-        mismatches.append("unexpected encoder backend")
+        if mate.get("status") != "answered":
+            mismatches.append(f"unexpected Jev status: {key}")
+        if mate_p_valid and mate.get("flag") != (mate_p >= 0.5):
+            mismatches.append(f"Jev flag inconsistent with p: {key}")
+    for key, enc in enc_key.items():
+        if enc.get("backend") != MODEL:
+            mismatches.append(f"unexpected encoder backend: {key}")
     # Provenance: rebuild source texts offline and re-verify recorded hashes.
     dev_src, scored_src, language_n = construct()
     rebuilt = {(r["set"], r["id"]): r for r in dev_src + scored_src}

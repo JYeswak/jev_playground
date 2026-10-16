@@ -254,5 +254,62 @@ class TestJsonEntrypoint(unittest.TestCase):
         self.assertEqual(verdict["status"], "NOT_RUN")
         self.assertEqual(verdict["jev_calls"], 0)
 
+
+class ReplayConsistency(unittest.TestCase):
+    """Per-record status/flag/backend consistency (fixture copies)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load_replay()
+        root = HERE.parents[1] / "var" / "agent-tmp"
+        cls.scratch = root / f"x1cons.{os.getpid()}"
+        cls.scratch.mkdir(parents=True, exist_ok=True)
+        (cls.scratch / ".owner").write_text(
+            f"pid: {os.getpid()}\nlabel: x1cons\nrepo: {root.parent}\n"
+        )
+        cls.counter = 0
+
+    def setUp(self):
+        type(self).counter += 1
+        self.work = type(self).scratch / f"case-{type(self).counter}"
+        fresh_copies(self.work)
+        setattr(self.mod, "HERE", self.work)
+
+    def tearDown(self):
+        setattr(self.mod, "HERE", HERE)
+
+    def replay(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = self.mod.run_replay()
+        return rc, json.loads(out.getvalue())
+
+    def test_jev_error_status_mismatches(self):
+        rows = read_jsonl(self.work, "answers-jev.jsonl")
+        rows[5]["status"] = "ERROR_INVALID_CONTROL"
+        write_jsonl(self.work, "answers-jev.jsonl", rows)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("unexpected Jev status" in m
+                            for m in verdict["mismatches"]))
+
+    def test_flipped_jev_flag_mismatches(self):
+        rows = read_jsonl(self.work, "answers-jev.jsonl")
+        rows[5]["flag"] = not rows[5]["flag"]
+        write_jsonl(self.work, "answers-jev.jsonl", rows)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("Jev flag inconsistent" in m
+                            for m in verdict["mismatches"]))
+
+    def test_wrong_nonfirst_backend_mismatches(self):
+        rows = read_jsonl(self.work, "answers-protectai.jsonl")
+        rows[7]["backend"] = "wrong-backend-control"
+        write_jsonl(self.work, "answers-protectai.jsonl", rows)
+        rc, verdict = self.replay()
+        self.assertEqual(rc, 1)
+        self.assertTrue(any("unexpected encoder backend" in m
+                            for m in verdict["mismatches"]))
+
 if __name__ == "__main__":
     unittest.main()
