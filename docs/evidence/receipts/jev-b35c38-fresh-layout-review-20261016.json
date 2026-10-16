@@ -1,0 +1,88 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_8bf1884b129e9ff0dc233018d593fd6e23280c60845ca5b3b2191e0f787f888f",
+ "limitations": [
+  "Fresh layout uses policy-permitted exact git archive, not git clone; declared public dependency fetched and built by unchanged committed bootstrap. No live compaction or model-quality claim."
+ ],
+ "operation": "jev-b35c.38.fresh-layout-review",
+ "parameters": {
+  "subject_sha256": "fb0b98cd6ebcdb2190e582afba3225da3810799ac2cd3acaa526f9dfecb90b86"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "added_tests": false,
+  "bootstrap": "sh scripts/bootstrap-compaction.sh",
+  "bootstrap_external_pin": "6e1da50",
+  "bootstrap_observed_exit": 0,
+  "borrowed_dependencies": false,
+  "candidate": "c48d5f3a0f546645edf29ea5a27fed0eaa6c16bd",
+  "changed_tracked_files": [],
+  "fresh_check": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "ok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/hooks/pre/jev-compact.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/deploy/hook-entry.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-binding.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-hook.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-adapter.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/skills/jev-compact/SKILL.md\nok: fast-jev-compaction resolves from /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction\nPASS: jev-compact source-repo check at /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap (read-only; no source copies)\n"
+  },
+  "layout_method": "Exact-commit git archive under permitted read-only grading exception, not git clone; 41 tracked files unchanged after committed bootstrap.",
+  "model_calls": 0,
+  "negative": {
+   "exit": 1,
+   "stderr": "RED: fast-jev-compaction does not resolve from /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction\nRED: source-repo check failed for /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap\n",
+   "stdout": "ok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/hooks/pre/jev-compact.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/deploy/hook-entry.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-binding.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-hook.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-adapter.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/skills/jev-compact/SKILL.md\n"
+  },
+  "restored": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "ok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/hooks/pre/jev-compact.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/deploy/hook-entry.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-binding.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-hook.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction/src/omp-adapter.ts\nok: /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/.omp/skills/jev-compact/SKILL.md\nok: fast-jev-compaction resolves from /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap/compaction\nPASS: jev-compact source-repo check at /Users/josh/Developer/jev/var/agent-tmp/b38-review.59421/fresh-bootstrap (read-only; no source copies)\n"
+  },
+  "suite": {
+   "command": "npm test --prefix compaction",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "\n> omp-compact-replay@0.1.0 test\n> node --import tsx --test test/*.test.ts\n\nTAP version 13\n# Subtest: single stochastic observations carry spread and no established determinism\nok 1 - single stochastic observations carry spread and no established determinism\n  ---\n  duration_ms: 0.621083\n  type: 'test'\n  ...\n# Subtest: a differing stochastic sample set refuses a verdict\nok 2 - a differing stochastic sample set refuses a verdict\n  ---\n  duration_ms: 0.07625\n  type: 'test'\n  ...\n# Subtest: zero-spread samples permit a requested verdict\nok 3 - zero-spread samples permit a requested verdict\n  ---\n  duration_ms: 0.557583\n  type: 'test'\n  ...\n# Subtest: adaptOmpTranscript\n    # Subtest: maps user text, assistant text+calls, thinking dropped and counted\n    ok 1 - maps user text, assistant text+calls, thinking dropped and counted\n      ---\n      duration_ms: 1.170334\n      type: 'test'\n      ...\n    # Subtest: attaches each result to the message following its call (real stream order)\n    ok 2 - attaches each result to the message following its call (real stream order)\n      ---\n      duration_ms: 0.23275\n      type: 'test'\n      ...\n    # Subtest: ignores streaming updates and non-message events\n    ok 3 - ignores streaming updates and non-message events\n      ---\n      duration_ms: 0.056708\n      type: 'test'\n      ...\n    # Subtest: parks trailing results on an empty user message instead of dropping\n    ok 4 - parks trailing results on an empty user message instead of dropping\n      ---\n      duration_ms: 0.069583\n      type: 'test'\n      ...\n    # Subtest: KNOWN-BAD: dropping the trailer loses evidence (asserts current behavior is keep)\n    ok 5 - KNOWN-BAD: dropping the trailer loses evidence (asserts current behavior is keep)\n      ---\n      duration_ms: 0.129375\n      type: 'test'\n      ...\n    1..5\nok 4 - adaptOmpTranscript\n  ---\n  duration_ms: 2.093916\n  type: 'suite'\n  ...\n# Subtest: on-disk SessionEntry envelope\n    # Subtest: adapts `type: \"message\"` identically to `type: \"message_end\"`\n    ok 1 - adapts `type: \"message\"` identically to `type: \"message_end\"`\n      ---\n      duration_ms: 0.093667\n      type: 'test'\n      ...\n    # Subtest: PLANTED NEGATIVE: an unknown envelope type still yields nothing\n    ok 2 - PLANTED NEGATIVE: an unknown envelope type still yields nothing\n      ---\n      duration_ms: 0.077791\n      type: 'test'\n      ...\n    1..2\nok 5 - on-disk SessionEntry envelope\n  ---\n  duration_ms: 0.403417\n  type: 'suite'\n  ...\n# Subtest: hindsight oracle\n    # Subtest: counts a drop as a mistake only when the result is LATER reused\n    ok 1 - counts a drop as a mistake only when the result is LATER reused\n      ---\n      duration_ms: 0.654959\n      type: 'test'\n      ...\n    # Subtest: PLANTED NEGATIVE: keeping everything scores zero mistakes but is not free\n    ok 2 - PLANTED NEGATIVE: keeping everything scores zero mistakes but is not free\n      ---\n      duration_ms: 0.071333\n      type: 'test'\n      ...\n    # Subtest: a token already present earlier is NOT a fingerprint\n    ok 3 - a token already present earlier is NOT a fingerprint\n      ---\n      duration_ms: 0.181208\n      type: 'test'\n      ...\n    # Subtest: the random baseline drops the SAME COUNT, preserving alignment\n    ok 4 - the random baseline drops the SAME COUNT, preserving alignment\n      ---\n      duration_ms: 0.103125\n      type: 'test'\n      ...\n    1..4\nok 6 - hindsight oracle\n  ---\n  duration_ms: 1.464583\n  type: 'suite'\n  ...\n# Subtest: compactOmpTranscript\n    # Subtest: prunes a low-value result, keeps the rest byte-identical\n    ok 1 - prunes a low-value result, keeps the rest byte-identical\n      ---\n      duration_ms: 1.698083\n      type: 'test'\n      ...\n    # Subtest: throws on Jev failure — the caller owns the fallback, not the core\n    ok 2 - throws on Jev failure — the caller owns the fallback, not the core\n      ---\n      duration_ms: 0.485583\n      type: 'test'\n      ...\n    1..2\nok 7 - compactOmpTranscript\n  ---\n  duration_ms: 2.607458\n  type: 'suite'\n  ...\n# Subtest: compactOmpTranscriptSafe (never destroy context on error)\n    # Subtest: passthrough on transport failure returns the input unchanged\n    ok 1 - passthrough on transport failure returns the input unchanged\n      ---\n      duration_ms: 0.757708\n      type: 'test'\n      ...\n    # Subtest: passthrough on malformed Jev answers (missing keys are refused, not coerced)\n    ok 2 - passthrough on malformed Jev answers (missing keys are refused, not coerced)\n      ---\n      duration_ms: 0.182875\n      type: 'test'\n      ...\n    # Subtest: passthrough below the minimum reduction (yields to the built-in summarizer)\n    ok 3 - passthrough below the minimum reduction (yields to the built-in summarizer)\n      ---\n      duration_ms: 0.35225\n      type: 'test'\n      ...\n    # Subtest: KNOWN-BAD guard: passthrough output keeps every evidence byte\n    ok 4 - KNOWN-BAD guard: passthrough output keeps every evidence byte\n      ---\n      duration_ms: 0.181916\n      type: 'test'\n      ...\n    1..4\nok 8 - compactOmpTranscriptSafe (never destroy context on error)\n  ---\n  duration_ms: 1.574792\n  type: 'suite'\n  ...\n# Subtest: resolveOmpHookConfig\n    # Subtest: defaults the reduction floor and accepts numeric overrides\n    ok 1 - defaults the reduction floor and accepts numeric overrides\n      ---\n      duration_ms: 0.120834\n      type: 'test'\n      ...\n    # Subtest: ignores non-numeric values instead of coercing them\n    ok 2 - ignores non-numeric values instead of coercing them\n      ---\n      duration_ms: 0.052375\n      type: 'test'\n      ...\n    1..2\nok 9 - resolveOmpHookConfig\n  ---\n  duration_ms: 0.321208\n  type: 'suite'\n  ...\n# Subtest: registerOmpHook\n    # Subtest: registers on omp's pre-compact point\n    ok 1 - registers on omp's pre-compact point\n      ---\n      duration_ms: 0.179709\n      type: 'test'\n      ...\n    # Subtest: returns undefined (omp default) when Jev fails\n    ok 2 - returns undefined (omp default) when Jev fails\n      ---\n      duration_ms: 0.314208\n      type: 'test'\n      ...\n    # Subtest: yields to the built-in summarizer on success (verdict logged, nothing returned)\n    ok 3 - yields to the built-in summarizer on success (verdict logged, nothing returned)\n      ---\n      duration_ms: 0.279334\n      type: 'test'\n      ...\n    1..3\nok 10 - registerOmpHook\n  ---\n  duration_ms: 0.824458\n  type: 'suite'\n  ...\n# Subtest: summarize\n    # Subtest: names the reduction and the fail-safe direction\n    ok 1 - names the reduction and the fail-safe direction\n      ---\n      duration_ms: 0.25475\n      type: 'test'\n      ...\n    1..1\nok 11 - summarize\n  ---\n  duration_ms: 0.3265\n  type: 'suite'\n  ...\n# Subtest: project entry .omp/hooks/pre/jev-compact.ts: missing package declines without throwing, registers nothing, names the installer\nok 12 - project entry .omp/hooks/pre/jev-compact.ts: missing package declines without throwing, registers nothing, names the installer\n  ---\n  duration_ms: 1.376375\n  type: 'test'\n  ...\n# Subtest: project entry .omp/hooks/pre/jev-compact.ts: any other load failure also declines and keeps the real message\nok 13 - project entry .omp/hooks/pre/jev-compact.ts: any other load failure also declines and keeps the real message\n  ---\n  duration_ms: 0.113875\n  type: 'test'\n  ...\n# Subtest: project entry .omp/hooks/pre/jev-compact.ts: positive control, a loadable binding is registered and nothing is warned\nok 14 - project entry .omp/hooks/pre/jev-compact.ts: positive control, a loadable binding is registered and nothing is warned\n  ---\n  duration_ms: 0.111958\n  type: 'test'\n  ...\n# Subtest: deployed template compaction/deploy/hook-entry.ts: missing package declines without throwing, registers nothing, names the installer\nok 15 - deployed template compaction/deploy/hook-entry.ts: missing package declines without throwing, registers nothing, names the installer\n  ---\n  duration_ms: 0.0745\n  type: 'test'\n  ...\n# Subtest: deployed template compaction/deploy/hook-entry.ts: any other load failure also declines and keeps the real message\nok 16 - deployed template compaction/deploy/hook-entry.ts: any other load failure also declines and keeps the real message\n  ---\n  duration_ms: 0.10875\n  type: 'test'\n  ...\n# Subtest: deployed template compaction/deploy/hook-entry.ts: positive control, a loadable binding is registered and nothing is warned\nok 17 - deployed template compaction/deploy/hook-entry.ts: positive control, a loadable binding is registered and nothing is warned\n  ---\n  duration_ms: 0.041959\n  type: 'test'\n  ...\n# Subtest: registers a handler for session_before_compact\nok 18 - registers a handler for session_before_compact\n  ---\n  duration_ms: 0.609625\n  type: 'test'\n  ...\n# Subtest: KNOWN-BAD: a malformed envelope makes the seam refuse, not guess\nok 19 - KNOWN-BAD: a malformed envelope makes the seam refuse, not guess\n  ---\n  duration_ms: 0.185583\n  type: 'test'\n  ...\n# Subtest: a declined compaction passes through rather than destroying context\nok 20 - a declined compaction passes through rather than destroying context\n  ---\n  duration_ms: 0.53725\n  type: 'test'\n  ...\n# Subtest: a compaction that does not shrink is refused\nok 21 - a compaction that does not shrink is refused\n  ---\n  duration_ms: 0.093667\n  type: 'test'\n  ...\n# Subtest: the default export refuses to be installed without a configured asker\nok 22 - the default export refuses to be installed without a configured asker\n  ---\n  duration_ms: 0.145791\n  type: 'test'\n  ...\n# Subtest: REAL TRANSCRIPT: a Jev outage passes through with its reason, context intact\nok 23 - REAL TRANSCRIPT: a Jev outage passes through with its reason, context intact\n  ---\n  duration_ms: 1.6635\n  type: 'test'\n  ...\n# Subtest: every decision is appended to decisionLogPath, and a bad path cannot break compaction\nok 24 - every decision is appended to decisionLogPath, and a bad path cannot break compaction\n  ---\n  duration_ms: 1.788833\n  type: 'test'\n  ...\n# Subtest: PRODUCTION SHAPE: the transcript is read from preparation.messagesToSummarize\nok 25 - PRODUCTION SHAPE: the transcript is read from preparation.messagesToSummarize\n  ---\n  duration_ms: 0.15925\n  type: 'test'\n  ...\n# Subtest: PRODUCTION SHAPE: a custom role with string content is normalized, not dropped\nok 26 - PRODUCTION SHAPE: a custom role with string content is normalized, not dropped\n  ---\n  duration_ms: 0.902\n  type: 'test'\n  ...\n# Subtest: REAL TRANSCRIPT: a Jev verdict is measured and yielded, never returned as messages\nok 27 - REAL TRANSCRIPT: a Jev verdict is measured and yielded, never returned as messages\n  ---\n  duration_ms: 1.776708\n  type: 'test'\n  ...\n# Subtest: fromEnv registers nothing without a key and never throws\nok 28 - fromEnv registers nothing without a key and never throws\n  ---\n  duration_ms: 0.092542\n  type: 'test'\n  ...\n# Subtest: fromEnv refuses a keyed session without recipient and transcript approval\nok 29 - fromEnv refuses a keyed session without recipient and transcript approval\n  ---\n  duration_ms: 0.046125\n  type: 'test'\n  ...\n# Subtest: fromEnv registers synthetic-approved handler without a network call\nok 30 - fromEnv registers synthetic-approved handler without a network call\n  ---\n  duration_ms: 0.070333\n  type: 'test'\n  ...\n1..30\n# tests 45\n# suites 8\n# pass 45\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 174.024125\n"
+  },
+  "tracked_paths": [
+   ".omp/hooks/pre/jev-compact.ts",
+   ".omp/skills/jev-compact/SKILL.md",
+   "compaction/README.md",
+   "compaction/ab/run-ab.ts",
+   "compaction/ab/verdict.ts",
+   "compaction/deploy/hook-entry.ts",
+   "compaction/fixtures/omp-session-20260917.jsonl",
+   "compaction/fixtures/omp-session-big-20260917.jsonl",
+   "compaction/fixtures/seed-svc/saa",
+   "compaction/fixtures/seed-svc/sab",
+   "compaction/fixtures/seed-svc/sac",
+   "compaction/fixtures/seed-svc/sad",
+   "compaction/fixtures/seed-svc/sae",
+   "compaction/fixtures/seed-svc/saf",
+   "compaction/fixtures/seed-svc/sag",
+   "compaction/fixtures/seed-svc/sah",
+   "compaction/hindsight.ts",
+   "compaction/install-jev-compact.sh",
+   "compaction/live-probe.mjs",
+   "compaction/package-lock.json",
+   "compaction/package.json",
+   "compaction/runs/ab-20260917.json",
+   "compaction/runs/ab-rerun-20260918.json",
+   "compaction/runs/ab-sample3-20260918.json",
+   "compaction/runs/ab-verdict-migration-20260918.json",
+   "compaction/runs/hook-recon-20260917.md",
+   "compaction/runs/replay-20260917.json",
+   "compaction/runs/replay-big-20260917.json",
+   "compaction/runs/rerun-20260920.json",
+   "compaction/src/omp-adapter.ts",
+   "compaction/src/omp-binding.ts",
+   "compaction/src/omp-hook.ts",
+   "compaction/src/replay.ts",
+   "compaction/test/ab-verdict.test.ts",
+   "compaction/test/adapter.test.ts",
+   "compaction/test/hindsight.test.ts",
+   "compaction/test/hook-compact.test.ts",
+   "compaction/test/hook-entry.test.ts",
+   "compaction/test/omp-binding.test.ts",
+   "compaction/tsconfig.json",
+   "scripts/bootstrap-compaction.sh"
+  ]
+ }
+}
