@@ -309,15 +309,20 @@ test('a missing real SDK runtime entry refuses before installation despite a wor
 });
 
 test('a declared asset cannot occupy the installer manifest namespace', async () => {
-  const home = await freshHome('installer-cli-reserved-manifest');
-  const packageDir = await artifact('5.0.0');
-  const pkg = JSON.parse(await readFile(join(packageDir, 'package.json'), 'utf8'));
-  await writeFile(join(packageDir, '.classifier-install.json'), JSON.stringify({ version: 2, entries: [] }));
-  await writeFile(join(packageDir, 'package.json'), JSON.stringify({
-    ...pkg, files: [...pkg.files, '.classifier-install.json'],
-  }));
-  const before = await snapshotTree(home);
-  await assert.rejects(installCli({ home, version: '5.0.0', packageDir }),
-    (error) => error.code === 'USAGE');
-  assert.deepEqual(await snapshotTree(home), before);
+  for (const [version, path] of [
+    ['5.0.0', '.classifier-install.json'],
+    ['6.0.0', '.CLASSIFIER-INSTALL.JSON'],
+  ]) {
+    const home = await freshHome('installer-cli-reserved-manifest');
+    const packageDir = await artifact(version);
+    const pkg = JSON.parse(await readFile(join(packageDir, 'package.json'), 'utf8'));
+    await writeFile(join(packageDir, path), JSON.stringify({ version: 2, entries: [] }));
+    await writeFile(join(packageDir, 'package.json'), JSON.stringify({
+      ...pkg, files: [...pkg.files, path],
+    }));
+    const before = await snapshotTree(home);
+    await assert.rejects(installCli({ home, version, packageDir }),
+      (error) => error.code === 'USAGE');
+    assert.deepEqual(await snapshotTree(home), before);
+  }
 });

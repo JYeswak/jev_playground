@@ -219,9 +219,12 @@ async function preparePayload(input: CliInstallInput): Promise<CliPayload> {
   const entry = packagePath(pkg.bin.classifier);
   const alias = `bin/${input.binName ?? "classifier"}`;
   const files = new Map<string, PayloadFile>();
+  const reservedManifestPath = CLI_PAYLOAD_MANIFEST.toUpperCase();
   const collect = async (path: string): Promise<void> => {
     const rel = packagePath(relative(root, path).split(sep).join("/"));
-    if (rel === CLI_PAYLOAD_MANIFEST || rel.startsWith(CLI_PAYLOAD_MANIFEST + "/")) {
+    // Reserve a portable namespace without rewriting the declared asset path.
+    const comparedPath = rel.normalize("NFKC").toUpperCase();
+    if (comparedPath === reservedManifestPath || comparedPath.startsWith(reservedManifestPath + "/")) {
       throw targetError(`prepared package asset uses the reserved installer manifest path: ${rel}`, "USAGE");
     }
     if (files.has(rel)) return;
