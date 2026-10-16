@@ -37,23 +37,15 @@ function fail(message: string): never {
 }
 
 /**
- * Command tokens must not escape to a checkout or a service manager.
- * Refused: absolute paths, `..` traversal, `/Users/` and `Developer/jev`
- * checkout markers, and launchctl/systemctl. Plain relative script paths
- * (e.g. the miner/canary runners named by jev-b35c.20 AC3/AC4) are allowed:
- * they resolve against the service runner's working directory, never a
- * pinned checkout.
+ * Command tokens must be bare argv words dispatching through the installed
+ * `classifier` on PATH: no path separators at all (absolute, relative, or
+ * traversal), no checkout markers, no service-manager calls. No job command
+ * ever names a file, so no token can escape to a repository checkout.
  */
 export function assertSafeCommand(command: string[]): void {
   for (const token of command) {
-    if (
-      token.startsWith('/') ||
-      token.split('/').includes('..') ||
-      token.includes('/Users/') ||
-      token.includes('Developer/jev')
-    ) {
-      fail(`repository path in command token: ${token}`);
-    }
+    if (token.includes('/')) fail(`repository path in command token: ${token}`);
+    if (token.includes('/Users/') || token.includes('Developer/jev')) fail(`repository path in command token: ${token}`);
     if (token === 'launchctl' || token === 'systemctl') fail(`service-manager call in command: ${token}`);
   }
 }
@@ -98,12 +90,17 @@ export function buildDailyJobs(
 
 const MINER_TIME_CAP_SECS = 3000;
 const MINER_DEFER_LOAD_ABOVE = 80;
-const MINER_COMMAND = ['nice', '-n', '10', 'python3', 'work/fleet-schema/miner.py', '--daily', '--json'];
-const CANARY_COMMAND = ['scripts/jev-latest-canary-run.sh'];
+// Installed-classifier dispatch only: bare argv against the installed
+// `classifier` on PATH, never a repository checkout path. The miner and
+// canary subcommands are served by the classifier binary itself (CLI
+// dispatch pending); these definitions pin the exact argv it must serve.
+const MINER_COMMAND = ['nice', '-n', '10', 'classifier', 'miner', '--daily', '--json'];
+const CANARY_COMMAND = ['classifier', 'canary'];
 
 /**
- * Canary job (jev-b35c.20 AC3): wraps the fixed jev-jh6f canary runner
- * (scripts/jev-latest-canary-run.sh, e17bb591), not an inline shell string.
+ * Canary job (jev-b35c.20 AC3): dispatches the installed `classifier canary`
+ * subcommand, which wraps the fixed jev-jh6f canary runner (e17bb591) —
+ * never an inline shell string and never a checkout script path.
  */
 export function buildCanaryJob(options: DailyJobsOptions): DailyJob {
   if (!options.stateDir || typeof options.stateDir !== 'string') fail('stateDir is required');

@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import {
   assertSafeCommand,
@@ -86,15 +87,16 @@ test("duplicate family labels are refused", () => {
   );
 });
 
-test("canary job wraps the fixed runner, not an inline shell string", () => {
+test("canary job dispatches installed classifier, not an inline shell string", () => {
   const stateDir = tempState();
   const job = buildCanaryJob({ stateDir });
   assert.equal(job.label, "classifier-canary-daily");
-  assert.deepEqual(job.command, ["scripts/jev-latest-canary-run.sh"]);
+  assert.deepEqual(job.command, ["classifier", "canary"]);
   assert.equal(job.keylessSkip, true);
   assert.equal(job.offSwitch, `${stateDir}/canary.off`);
   for (const token of job.command) {
     assert.ok(!token.includes("zsh"), "no inline shell wrapper");
+    assert.ok(!token.includes("/"), "no checkout path");
   }
 });
 
@@ -102,7 +104,7 @@ test("miner job carries the fixed cap and load deferral", () => {
   const stateDir = tempState();
   const job = buildMinerJob({ stateDir });
   assert.equal(job.label, "classifier-miner-daily");
-  assert.deepEqual(job.command, ["nice", "-n", "10", "python3", "work/fleet-schema/miner.py", "--daily", "--json"]);
+  assert.deepEqual(job.command, ["nice", "-n", "10", "classifier", "miner", "--daily", "--json"]);
   assert.equal(job.timeCapSecs, 3000);
   assert.equal(job.deferWhileLoadAbove, 80);
   assert.equal(job.keylessSkip, true);
@@ -111,9 +113,10 @@ test("miner job carries the fixed cap and load deferral", () => {
   assert.throws(() => validateMinerJob({ ...job, deferWhileLoadAbove: undefined }), /without the load-80 deferral/);
 });
 
-test("plain relative runner paths pass; absolute and traversal paths refuse", () => {
-  assert.doesNotThrow(() => assertSafeCommand(["work/fleet-schema/miner.py", "--daily"]));
-  assert.doesNotThrow(() => assertSafeCommand(["scripts/jev-latest-canary-run.sh"]));
+test("any path token refuses; bare classifier dispatch passes", () => {
+  assert.doesNotThrow(() => assertSafeCommand(["classifier", "miner", "--daily"]));
+  assert.throws(() => assertSafeCommand(["work/fleet-schema/miner.py", "--daily"]), /repository path/);
+  assert.throws(() => assertSafeCommand(["scripts/jev-latest-canary-run.sh"]), /repository path/);
   assert.throws(() => assertSafeCommand(["/abs/path/x"]), /repository path/);
   assert.throws(() => assertSafeCommand(["a/../../evil"]), /repository path/);
   assert.throws(() => assertSafeCommand(["systemctl", "start", "x"]), /service-manager/);
@@ -129,4 +132,22 @@ test("dry-run listing composes evals, canary and miner without writing", () => {
     jobs.map((job) => job.label),
     ["classifier-canary-daily", "classifier-classify-eval-daily", "classifier-gate-eval-daily", "classifier-miner-daily"],
   );
+});
+
+test("emitted argv executes from a distinct installed root via PATH double", () => {
+  const stateDir = tempState();
+  const binDir = mkdtempSync(join(tmpdir(), "install-service-bin-"));
+  const callsFile = join(stateDir, "calls.log");
+  writeFileSync(binDir + "/classifier", `#!/bin/sh\necho "$@" >> ${JSON.stringify(callsFile)}\n`, { mode: 0o755 });
+  const jobs = listDailyJobs([{ name: "gate" }], { stateDir });
+  const miner = jobs.find((job) => job.label === "classifier-miner-daily");
+  const canary = jobs.find((job) => job.label === "classifier-canary-daily");
+  for (const job of [miner, canary]) {
+    execFileSync(job.command[0], job.command.slice(1), {
+      env: { ...process.env, PATH: `${binDir}:/usr/bin:/bin` },
+      stdio: "ignore",
+    });
+  }
+  const calls = readFileSync(callsFile, "utf8").trim().split("\n");
+  assert.deepEqual(calls, ["miner --daily --json", "canary"]);
 });
