@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /** Mission Protocol adapter. Runs existing acceptance; never promotes fixture evidence to live. */
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -108,6 +109,8 @@ function scanJson(roots: string[]): string[] {
   for (const root of roots) walk(root);
   return out;
 }
+export type ClefCalibration = { path: string; doc: unknown; preregResolves: boolean; resultResolves: boolean; preregCt: number; resultCt: number };
+
 
 // Local-first pillar judge (jev-b35c.44). A family routes to Clef only where a
 // committed receipt shows it non-inferior to Jev under the same calibration;
@@ -120,10 +123,10 @@ export function localFirstReport(suiteExit: number | null, suitePasses: number, 
   if (suiteExit !== 0) return fail('backend route acceptance failed; default-Jev unproven');
   if (!Number.isSafeInteger(suitePasses) || suitePasses < 1) return unknown('backend route acceptance ran no passing tests');
   const envRoutesClef = envBackend !== undefined && envBackend !== 'jev';
-  const verified = calibrations.filter((cal) => niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves) === null);
+  const verified = calibrations.filter((cal) => niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves, cal.preregCt, cal.resultCt) === null);
   if (envRoutesClef && verified.length === 0) return fail('JEV_BACKEND routes to Clef without a committed non-inferiority receipt');
   for (const cal of calibrations) {
-    const reason = niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves);
+    const reason = niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves, cal.preregCt, cal.resultCt);
     if (reason !== null) return fail(`family routes to Clef without a committed non-inferiority receipt: ${cal.path} (${reason})`);
   }
   return calibrations.length === 0 && !envRoutesClef
@@ -131,7 +134,7 @@ export function localFirstReport(suiteExit: number | null, suitePasses: number, 
     : pass();
 }
 
-function niReceiptReason(doc: unknown, preregResolves: boolean, resultResolves: boolean): string | null {
+function niReceiptReason(doc: unknown, preregResolves: boolean, resultResolves: boolean, preregCt: number, resultCt: number): string | null {
   if (!isObject(doc)) return 'calibration is not an object';
   const receipt = doc['receipt'];
   if (!isObject(receipt)) return 'missing NI receipt block';
@@ -141,12 +144,29 @@ function niReceiptReason(doc: unknown, preregResolves: boolean, resultResolves: 
   }
   if (!preregResolves) return 'prereg_commit not in history';
   if (!resultResolves) return 'result_commit not in history';
+  if (preregCt >= 0 && resultCt >= 0 && preregCt > resultCt) return 'preregistration not before results';
   if (typeof receipt['margin'] !== 'number' || !(receipt['margin'] as number >= 0)) return 'receipt margin not stated';
   if (!Number.isSafeInteger(receipt['n']) || (receipt['n'] as number) < 1) return 'receipt sample size not stated';
   if (typeof receipt['question_key'] === 'string' && receipt['question_key'] !== (doc as Record<string, unknown>)['question_key']) return 'receipt question_key differs';
   const modelId = isObject((doc as Record<string, unknown>)['model']) ? ((doc as Record<string, unknown>)['model'] as Record<string, unknown>)['id'] : undefined;
   if (typeof receipt['model_id'] === 'string' && receipt['model_id'] !== modelId) return 'receipt model_id differs';
+  // The receipt binds the evaluated bytes: payload is the artifact minus its
+  // receipt block in canonical (sorted-key) JSON, mirroring the stage-exit
+  // payload/source split. A changed calibration with an unchanged receipt
+  // refuses instead of passing on stale provenance.
+  const { receipt: _detached, ...payload } = doc as Record<string, unknown>;
+  const actual = createHash('sha256').update(canonicalJson(payload), 'utf8').digest('hex');
+  if (typeof receipt['calibration_sha256'] !== 'string' || receipt['calibration_sha256'] !== actual) return 'receipt not bound to calibration bytes';
   return null;
+}
+
+// Deterministic canonical JSON: sorted object keys, compact separators.
+export function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (isObject(value)) {
+    return `{${Object.keys(value).sort().map((k) => `${JSON.stringify(k)}:${canonicalJson(value[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
 }
 
 type Child = { argv: string[]; exit: number | null; signal: string | null; stdout: string; stderr: string; error: string | null };
@@ -206,7 +226,13 @@ export function check(pillar: Pillar): { result: Verdict; children: Child[] } {
       const resultRef = typeof receipt['result_commit'] === 'string' ? receipt['result_commit'] as string : '';
       const preregResolves = /^[0-9a-f]{40}$/.test(prereg) && record(run(['git', 'cat-file', '-e', `${prereg}^{commit}`])).exit === 0;
       const resultResolves = /^[0-9a-f]{40}$/.test(resultRef) && record(run(['git', 'cat-file', '-e', `${resultRef}^{commit}`])).exit === 0;
-      calibrations.push({ path: rel, doc, preregResolves, resultResolves });
+      const stamp = (sha: string, ok: boolean): number => {
+        if (!ok) return -1;
+        const out = record(run(['git', 'show', '-s', '--format=%ct', `${sha}^{commit}`]));
+        const n = Number((out.stdout ?? '').trim());
+        return Number.isSafeInteger(n) && n > 0 ? n : -1;
+      };
+      calibrations.push({ path: rel, doc, preregResolves, resultResolves, preregCt: stamp(prereg, preregResolves), resultCt: stamp(resultRef, resultResolves) });
     }
     result = localFirstReport(suite.exit, tapPasses, calibrations, process.env.JEV_BACKEND);
   } else {

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
-import { doctorReport, localFirstReport, measuredReport, parseTapPasses, scheduledRuns } from './mission-check';
+import { createHash } from 'node:crypto';
+import { doctorReport, canonicalJson, localFirstReport, measuredReport, parseTapPasses, scheduledRuns } from './mission-check';
 
 // These controls exercise checker behavior only. They are not live pillar evidence.
 const now = Date.parse('2026-10-15T02:00:00Z');
@@ -68,15 +69,18 @@ describe('doctor execution is not proof by itself', () => {
 });
 
 describe('local-first pillar binding', () => {
+  const goodPayload = {
+    schema: 'jev.clef-calibration.v1', question_key: 'intent',
+    model: { id: 'clef-flash' },
+  };
   const goodReceipt = {
     verdict: 'PASS', prereg_commit: 'a'.repeat(40), result_commit: 'b'.repeat(40),
     margin: 0.02, n: 600, question_key: 'intent', model_id: 'clef-flash',
+    calibration_sha256: '',
   };
-  const goodDoc = {
-    schema: 'jev.clef-calibration.v1', question_key: 'intent',
-    model: { id: 'clef-flash' }, receipt: goodReceipt,
-  };
-  const goodCal = { path: 'work/x/cal.json', doc: goodDoc, preregResolves: true, resultResolves: true };
+  goodReceipt.calibration_sha256 = createHash('sha256').update(canonicalJson(goodPayload), 'utf8').digest('hex');
+  const goodDoc = { ...goodPayload, receipt: goodReceipt };
+  const goodCal = { path: 'work/x/cal.json', doc: goodDoc, preregResolves: true, resultResolves: true, preregCt: 100, resultCt: 200 };
 
   test('passes with green suite and no Clef-routed families, stated explicitly', () => {
     const v = localFirstReport(0, 9, []);
@@ -127,6 +131,18 @@ describe('local-first pillar binding', () => {
   test('env unset or jev keeps prior behavior', () => {
     expect(localFirstReport(0, 9, [], undefined).verdict).toBe('PASS');
     expect(localFirstReport(0, 9, [], 'jev').verdict).toBe('PASS');
+  });
+  test('changed calibration with unchanged receipt refuses (stale provenance)', () => {
+    const tampered = { ...goodPayload, threshold: 0.9, receipt: goodReceipt };
+    const v = localFirstReport(0, 9, [{ path: 'p', doc: tampered, preregResolves: true, resultResolves: true, preregCt: 100, resultCt: 200 }]);
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('bound to calibration bytes');
+  });
+
+  test('inverted prereg/result chronology refuses', () => {
+    const v = localFirstReport(0, 9, [{ ...goodCal, preregCt: 300, resultCt: 200 }]);
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('not before results');
   });
 
   test('TAP parsing requires a real pass count', () => {
