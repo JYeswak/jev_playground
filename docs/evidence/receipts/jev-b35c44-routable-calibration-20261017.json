@@ -1,0 +1,36 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_34def01c32373d36c170f1ab63d273ab8dccfd2e1aaf7cfa8626ac2122306cb3",
+ "limitations": [
+  "Actual loader/consumer control uses injected recorded transport, not live model evaluation; confirms existing NI guard REWORK"
+ ],
+ "operation": "mission-local-first.routable-calibration-counterexamples",
+ "parameters": {
+  "subject_sha256": "f164f272cc1d43985e3d4fe840fba74b204769cb749ceab9678cdbc6527fcd89"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "bead": "jev-b35c.44",
+  "execution": {
+   "command": "bun --eval <one-run caller importing loadCalibrations, askClef and actual check> -- <real head parent>",
+   "exit": 0,
+   "scope": "actual default loader+consumer with injected recorded transport, then full production check/node9 subprocess; NO real network/model request",
+   "stderr": "",
+   "stdout": "{\"rows\":[{\"kind\":\"positive\",\"loaded\":1,\"consumerOk\":true,\"injectedTransportCalls\":1,\"guard\":{\"verdict\":\"PASS\",\"reason\":\"required acceptance evidence passed\"},\"children\":[{\"argv\":[\"node\",\"--test\",\"kit/test/backend.test.mjs\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"6fa6b3b0db593f94ca152169fc0be109a044c966^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"6fa6b3b0db593f94ca152169fc0be109a044c966^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0}]},{\"kind\":\"same-commit\",\"loaded\":1,\"consumerOk\":true,\"injectedTransportCalls\":1,\"guard\":{\"verdict\":\"PASS\",\"reason\":\"required acceptance evidence passed\"},\"children\":[{\"argv\":[\"node\",\"--test\",\"kit/test/backend.test.mjs\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0}]},{\"kind\":\"nonfinite-json-margin\",\"loaded\":1,\"consumerOk\":true,\"injectedTransportCalls\":1,\"guard\":{\"verdict\":\"PASS\",\"reason\":\"required acceptance evidence passed\"},\"children\":[{\"argv\":[\"node\",\"--test\",\"kit/test/backend.test.mjs\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"6fa6b3b0db593f94ca152169fc0be109a044c966^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"cat-file\",\"-e\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"6fa6b3b0db593f94ca152169fc0be109a044c966^{commit}\"],\"exit\":0},{\"argv\":[\"git\",\"show\",\"-s\",\"--format=%ct\",\"53e5cb7f9f3187c68afad5e1ebe96908560e4a3d^{commit}\"],\"exit\":0}]}],\"scope\":\"existing runtime-approved B77 fixture format, actual loader and askClef injected recorded transport; no real model/network/config change\"}\n"
+  },
+  "limitations": "No production source/realcalibration/config/HOME/pin/test modifications, no valid NI or modelquality claim; no new permanent conformance code",
+  "prior_evidence_id": "ev_075b14fa2a127a383bca389f85c155339a72a81c3615d22bcde08ba00dad32a1",
+  "published_commit": "53e5cb7f9f3187c68afad5e1ebe96908560e4a3d",
+  "setup_correction": "Initial throwaway Bun argv indexing included evaluation sentinel; failedpositivecontrol was probe error, not product failure; changed only probe slice(-2), reran same saved production code and all3 runtime-valid rows load1/consumerOk/calls1/guardPASS. Earlier4case evidence unchanged.",
+  "source_fixture": "loader-approved Banking77 schema/map/fit from kit/test/calibration.test.mjs39-57 and recorded response fixture; no real experiment or model weight claim",
+  "source_sha256": {
+   "kit/src/calibration.ts": "2aa8a52d67ab26e93dba86035aa5f2cd2ccc2756d6ac2311fefff31a5c29a6ed",
+   "kit/src/clef.ts": "b29bd7ae6feae02ad8b18128b697d2b685b9c36a5c5a20bee6868b2ae37ea6b9",
+   "kit/test/calibration.test.mjs": "172ef59e64293a655b8b168336327617307a95bec7df0ed3a68e33e8f46c2c55",
+   "kit/test/fixtures/banking77-answer.json": "1f920170e4ac05eb17bcee239133601780013fa4d9305f47d84e65f0ecd66354",
+   "scripts/mission-check.ts": "940cc781b4cd67866bd129baac26e108752f282f9bedd0e193c997c784ad8f84"
+  },
+  "verdict": "Existing REWORK strengthened: both mutants load and route through real consumer, not just malformed/unroutable schema fixture"
+ }
+}
