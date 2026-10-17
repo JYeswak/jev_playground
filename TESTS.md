@@ -686,9 +686,11 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 | kit/test/fixtures/miniwob-drag-items-grid-one-option.json | covered by node --test kit/test/preflight.test.mjs | Captured MiniWoB seed 100 row and one-option observation provenance | registry-only; source fixture |
 | kit/test/fixtures/fits-state.json | covered by node --test kit/test/preflight.test.mjs | Committed `work/pokeagent-emerald/segment2-request-states.jsonl:1` FITS row; no scratch path | registry-only; source fixture |
 | kit/test/fixtures/recorded-answer-rows.json | covered by node --test kit/test/fake.test.mjs | Captured Choice answer rows from `work/osw-bestofn/live_rows_r3.jsonl` | registry-only; source fixture |
-| kit/test/cli.test.mjs | node --test kit/test/cli.test.mjs | doctor --robot NOT_RUN/no-key exit 2, fake offline ask, invalid robot usage; doctor-always-READY plant fails | 3/3 keyless; mutation RED |
-| kit/test/package.test.mjs | node --test kit/test/package.test.mjs | npm pack → temp install → compiled doctor --robot NOT_RUN/no-key exit 2; package-name plant fails | 1/1 keyless; mutation RED |
+| kit/test/cli.test.mjs | node --test kit/test/cli.test.mjs | doctor --robot keyless FINDINGS exit 1, fake offline ask, invalid robot usage; doctor-always-READY plant fails | 3/3 keyless; mutation RED |
+| kit/test/package.test.mjs | node --test kit/test/package.test.mjs | npm pack → temp install → compiled doctor --robot keyless FINDINGS exit 1 with Jev backend NOT_RUN; package-name plant fails | 1/1 keyless; mutation RED |
 | kit/test/install.test.mjs | node --test kit/test/install.test.mjs | fresh temp git repo receives 4 tools, observe hook, portable support files, extensions, and refuses a user-modified overwrite | 1/1 keyless; RPC L2 manual proof |
+| kit/test/combine-cascade.test.mjs | node --test kit/test/combine-cascade.test.mjs | D8 stacking/cascade replay from committed paired rows, input hash/join tamper refusal | keyless recorded-data checks; EXPLORED, not routing or quality qualification |
+| scripts/mission-check.test.ts | bun test scripts/mission-check.test.ts | local-first backend/NI evidence and scheduled-run, doctor and ledger policy controls | fixture check logic only; not live pillar health |
 ## Newly registered tests — jev-1fv3
 
 - `.omp/hooks/post/jev-find-rank.test.mjs` — keyless forward find-rank shadow hook: hash-only rows, rank assertions, cap, and real-log protection. Run: `node --experimental-strip-types --test .omp/hooks/post/jev-find-rank.test.mjs` (4 tests).

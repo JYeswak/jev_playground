@@ -1,0 +1,52 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_6ace6fea02a88e5bab0cf69c739f4ffa5319a88be0672360b219d03ebc09955b",
+ "limitations": [
+  "Doc/registry acceptance only; neither CLI/package suite rerun nor live/model/backend/pillar health claimed; no test source modified. Existing suite descriptions are not new green execution claims."
+ ],
+ "operation": "jev-7faq.registry-contract-correction",
+ "parameters": {
+  "subject_sha256": "534837c342f0b64419b89fbb484cc0c981d189ac105a57a6797455b380a13415"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "details": {
+   "acceptance": {
+    "command": "bash foundation/gates.d/70-tests-registry-sync.sh",
+    "final_exit": 0,
+    "final_output": "70-tests-registry-sync: 273 tracked test file(s), all enumerated",
+    "initial_exit": 1,
+    "initial_output": "DRIFT tracked but not named in TESTS.md: kit/test/combine-cascade.test.mjs\nDRIFT tracked but not named in TESTS.md: scripts/mission-check.test.ts\n70-tests-registry-sync: 2 unnamed, 0 stale"
+   },
+   "assertions": {
+    "cli": [
+     "kit/test/cli.test.mjs:28 assert.equal(result.code, 1);",
+     "kit/test/cli.test.mjs:31 assert.equal(body.status, 'FINDINGS');",
+     "kit/test/cli.test.mjs:33 assert.equal(body.errors[0].exit_code, 1);"
+    ],
+    "package": [
+     "kit/test/package.test.mjs:53 assert.equal(doctor.code, 1, doctor.stderr);",
+     "kit/test/package.test.mjs:56 assert.equal(body.status, 'FINDINGS');",
+     "kit/test/package.test.mjs:58 assert.equal(body.data.backends.jev.status, 'NOT_RUN');"
+    ]
+   },
+   "author": "DarkBear",
+   "bead": "jev-7faq",
+   "boundary": "Doc/registry acceptance only; neither CLI/package suite rerun nor live/model/backend/pillar health claimed; no test source modified. Existing suite descriptions are not new green execution claims.",
+   "changed": "TESTS.md only: correct two keyless doctor rows to FINDINGS exit1; package row preserves backendNOT_RUN; register two existing unnamed suites to satisfy original mandatory70 gate.",
+   "testsUnchanged": [
+    {
+     "path": "kit/test/cli.test.mjs",
+     "sha256": "b1900beb6d6506c1011e7abff24f66c5fc4e87139cd8e286cccc58f9b3e6dcbc",
+     "unchanged": true
+    },
+    {
+     "path": "kit/test/package.test.mjs",
+     "sha256": "28f61aa4a068484824f1ff5a936f60b7295c18ae82d9041dc9abc6c0446ced60",
+     "unchanged": true
+    }
+   ]
+  }
+ }
+}
