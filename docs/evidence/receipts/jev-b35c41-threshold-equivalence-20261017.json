@@ -1,0 +1,151 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_4d32eaf84501f1c0f88f76232143cbe9dd0429393450bde9d99cc608b3ff9716",
+ "limitations": [
+  "Only fixedcohort route/outcome equivalence at two existingcuts; no historicalgrid reconstruction, generalization, newrouting or duplicatebackendclose. My compiledCLI/fullkit runNOT_RUN."
+ ],
+ "operation": "jev-b35c41.fixed-threshold-equivalence",
+ "parameters": {
+  "subject_sha256": "a059154fa3c4c377dca5dde023391922c4d408e78ee3eea8628e39765d0bc815"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "details": {
+   "actual_named_source_contract": {
+    "complete_stderr": "",
+    "complete_stdout": "TAP version 13\n# Subtest: default Jev keeps the exact System One request bytes and makes no Clef request\nok 1 - default Jev keeps the exact System One request bytes and makes no Clef request\n  ---\n  duration_ms: 27.388666\n  type: 'test'\n  ...\n# Subtest: auto rejects the public Banking77 calibration as a family receipt\nok 2 - auto rejects the public Banking77 calibration as a family receipt\n  ---\n  duration_ms: 0.879292\n  type: 'test'\n  ...\n# Subtest: the auto route gate requires every family, receipt, question, fingerprint, and hold condition\nok 3 - the auto route gate requires every family, receipt, question, fingerprint, and hold condition\n  ---\n  duration_ms: 0.120334\n  type: 'test'\n  ...\n# Subtest: auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\nok 4 - auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\n  ---\n  duration_ms: 0.6965\n  type: 'test'\n  ...\n# Subtest: two consecutive Clef transport failures start a 60-second hold\nok 5 - two consecutive Clef transport failures start a 60-second hold\n  ---\n  duration_ms: 0.16275\n  type: 'test'\n  ...\n# Subtest: bundles and score never route to Clef\nok 6 - bundles and score never route to Clef\n  ---\n  duration_ms: 0.862208\n  type: 'test'\n  ...\n# Subtest: CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\nok 7 - CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\n  ---\n  duration_ms: 0.343125\n  type: 'test'\n  ...\n# Subtest: dry-run previews the canonical Jev request without calling the asker\nok 8 - dry-run previews the canonical Jev request without calling the asker\n  ---\n  duration_ms: 0.269333\n  type: 'test'\n  ...\n# Subtest: rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\nok 9 - rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\n  ---\n  duration_ms: 0.607375\n  type: 'test'\n  ...\n# Subtest: questionSha matches canonical question plus sorted state keys\nok 10 - questionSha matches canonical question plus sorted state keys\n  ---\n  duration_ms: 1.226459\n  type: 'test'\n  ...\n# Subtest: fingerprintWeights hashes model file bytes, not file names\nok 11 - fingerprintWeights hashes model file bytes, not file names\n  ---\n  duration_ms: 5.241417\n  type: 'test'\n  ...\n# Subtest: loadCalibrations accepts a structurally valid unit fixture and refuses missing commits or non-finite maps\nok 12 - loadCalibrations accepts a structurally valid unit fixture and refuses missing commits or non-finite maps\n  ---\n  duration_ms: 5.710709\n  type: 'test'\n  ...\n# Subtest: Platt mapping matches the vendored local-shadow implementation at the frozen probe values\nok 13 - Platt mapping matches the vendored local-shadow implementation at the frozen probe values\n  ---\n  duration_ms: 0.2275\n  type: 'test'\n  ...\n# Subtest: Clef uses the receipt question key, sends no Authorization header, and returns calibrated choice\nok 14 - Clef uses the receipt question key, sends no Authorization header, and returns calibrated choice\n  ---\n  duration_ms: 23.110292\n  type: 'test'\n  ...\n# Subtest: Clef refuses a question-hash mismatch without returning raw probabilities\nok 15 - Clef refuses a question-hash mismatch without returning raw probabilities\n  ---\n  duration_ms: 0.172084\n  type: 'test'\n  ...\n# Subtest: Clef refuses absent calibration and >=16384 post-truncation input tokens\nok 16 - Clef refuses absent calibration and >=16384 post-truncation input tokens\n  ---\n  duration_ms: 0.326042\n  type: 'test'\n  ...\n# Subtest: Clef HTTP 500 is a typed failure and never returns raw scores\nok 17 - Clef HTTP 500 is a typed failure and never returns raw scores\n  ---\n  duration_ms: 0.25525\n  type: 'test'\n  ...\n# Subtest: Clef requires an explicit safe gateway URL and refuses the direct server\nok 18 - Clef requires an explicit safe gateway URL and refuses the direct server\n  ---\n  duration_ms: 0.250792\n  type: 'test'\n  ...\n# Subtest: Clef serializes concurrent requests in one process\nok 19 - Clef serializes concurrent requests in one process\n  ---\n  duration_ms: 0.650708\n  type: 'test'\n  ...\n# Subtest: T8 cascade reproduces the published Banking77 outcome as EXPLORED\nok 20 - T8 cascade reproduces the published Banking77 outcome as EXPLORED\n  ---\n  duration_ms: 132.6255\n  type: 'test'\n  ...\n# Subtest: T9 stacking reproduces the published vendor outcome as EXPLORED\nok 21 - T9 stacking reproduces the published vendor outcome as EXPLORED\n  ---\n  duration_ms: 121.62375\n  type: 'test'\n  ...\n# Subtest: a dropped paired row refuses instead of silently narrowing the denominator\nok 22 - a dropped paired row refuses instead of silently narrowing the denominator\n  ---\n  duration_ms: 75.154167\n  type: 'test'\n  ...\n# Subtest: a flipped label moves the pinned numbers (sensitivity, not self-consistency)\nok 23 - a flipped label moves the pinned numbers (sensitivity, not self-consistency)\n  ---\n  duration_ms: 62.465042\n  type: 'test'\n  ...\n# Subtest: math controls: known normal tail and DeLong degenerate cases\nok 24 - math controls: known normal tail and DeLong degenerate cases\n  ---\n  duration_ms: 0.208083\n  type: 'test'\n  ...\n1..24\n# tests 24\n# suites 0\n# pass 24\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 483.22075\n",
+    "exit": 0,
+    "locked_dependency_proof": [
+     {
+      "file": "package.json",
+      "matches": true,
+      "sha256": "49bf5f6c7e45922b326357182c5b0a6606cfb9326b37e403660cfcced0d3048f"
+     },
+     {
+      "file": "package-lock.json",
+      "matches": true,
+      "sha256": "0edbf383200676e3db6b14d246aa9bc79716811d754d92e40a5075383f0e297d"
+     }
+    ],
+    "tests": 24
+   },
+   "actual_vendor_contract": {
+    "corrected_fixture_scope": {
+     "complete_stderr": "",
+     "complete_stdout": "TAP version 13\n# Subtest: addedBlocks splits per file, skips vendored/dep/non-source paths, needs 3 added lines\nok 1 - addedBlocks splits per file, skips vendored/dep/non-source paths, needs 3 added lines\n  ---\n  duration_ms: 2.993958\n  type: 'test'\n  ...\n# Subtest: .gitignore and .txt are skipped without a call; pasted MIT .js is scored\nok 2 - .gitignore and .txt are skipped without a call; pasted MIT .js is scored\n  ---\n  duration_ms: 1.682083\n  type: 'test'\n  ...\n# Subtest: planted MIT block is flagged, own code is not; rows carry commit/file/hash\nok 3 - planted MIT block is flagged, own code is not; rows carry commit/file/hash\n  ---\n  duration_ms: 0.281167\n  type: 'test'\n  ...\n# Subtest: refused asker and cap both log fail-open rows and never throw\nok 4 - refused asker and cap both log fail-open rows and never throw\n  ---\n  duration_ms: 0.19\n  type: 'test'\n  ...\n# Subtest: cut 0.35 is the frozen 30hi operating point\nok 5 - cut 0.35 is the frozen 30hi operating point\n  ---\n  duration_ms: 0.047417\n  type: 'test'\n  ...\n# Subtest: jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands\nok 6 - jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands\n  ---\n  duration_ms: 0.758375\n  type: 'test'\n  ...\n# Subtest: local leg is disabled before fetch or guard when its opt-in URL is unset\nok 7 - local leg is disabled before fetch or guard when its opt-in URL is unset\n  ---\n  duration_ms: 0.060667\n  type: 'test'\n  ...\n# Subtest: local guard timeout bounds the post-commit runner under two seconds\nok 8 - local guard timeout bounds the post-commit runner under two seconds\n  ---\n  duration_ms: 758.252833\n  type: 'test'\n  ...\n# Subtest: slow local endpoint shares one two-second deadline across commit hunks\nok 9 - slow local endpoint shares one two-second deadline across commit hunks\n  ---\n  duration_ms: 2007.571833\n  type: 'test'\n  ...\n# Subtest: main shares its local deadline across hunks through the production askLocal adapter\nok 10 - main shares its local deadline across hunks through the production askLocal adapter\n  ---\n  duration_ms: 2005.396792\n  type: 'test'\n  ...\n# Subtest: local endpoint has no baked-in loopback default\nok 11 - local endpoint has no baked-in loopback default\n  ---\n  duration_ms: 0.896209\n  type: 'test'\n  ...\n1..11\n# tests 11\n# suites 0\n# pass 11\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 4913.162666\n",
+     "exit": 0,
+     "port": 63481,
+     "scope": "Unchanged test source, controlled in-process HTTP fixture restricted to this owned loopback port, external and production endpoints denied.",
+     "tests": 11
+    },
+    "initial": {
+     "complete_stderr": "",
+     "complete_stdout": "TAP version 13\n# Subtest: addedBlocks splits per file, skips vendored/dep/non-source paths, needs 3 added lines\nok 1 - addedBlocks splits per file, skips vendored/dep/non-source paths, needs 3 added lines\n  ---\n  duration_ms: 1.756417\n  type: 'test'\n  ...\n# Subtest: .gitignore and .txt are skipped without a call; pasted MIT .js is scored\nok 2 - .gitignore and .txt are skipped without a call; pasted MIT .js is scored\n  ---\n  duration_ms: 1.485625\n  type: 'test'\n  ...\n# Subtest: planted MIT block is flagged, own code is not; rows carry commit/file/hash\nok 3 - planted MIT block is flagged, own code is not; rows carry commit/file/hash\n  ---\n  duration_ms: 0.263916\n  type: 'test'\n  ...\n# Subtest: refused asker and cap both log fail-open rows and never throw\nok 4 - refused asker and cap both log fail-open rows and never throw\n  ---\n  duration_ms: 0.1745\n  type: 'test'\n  ...\n# Subtest: cut 0.35 is the frozen 30hi operating point\nok 5 - cut 0.35 is the frozen 30hi operating point\n  ---\n  duration_ms: 0.045\n  type: 'test'\n  ...\n# Subtest: jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands\nok 6 - jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands\n  ---\n  duration_ms: 0.700959\n  type: 'test'\n  ...\n# Subtest: local leg is disabled before fetch or guard when its opt-in URL is unset\nok 7 - local leg is disabled before fetch or guard when its opt-in URL is unset\n  ---\n  duration_ms: 0.060958\n  type: 'test'\n  ...\n# Subtest: local guard timeout bounds the post-commit runner under two seconds\nok 8 - local guard timeout bounds the post-commit runner under two seconds\n  ---\n  duration_ms: 757.528167\n  type: 'test'\n  ...\n# Subtest: slow local endpoint shares one two-second deadline across commit hunks\nnot ok 9 - slow local endpoint shares one two-second deadline across commit hunks\n  ---\n  duration_ms: 4.619083\n  type: 'test'\n  location: '/Users/josh/Developer/jev/var/agent-tmp/backend41-review.25572/source/work/vendor-paste/vendor-shadow.test.mjs:199:1'\n  failureType: 'testCodeFailure'\n  error: 'listen EPERM: operation not permitted 127.0.0.1'\n  code: 'EPERM'\n  stack: |-\n    Server.setupListenHandle [as _listen2] (node:net:1919:21)\n    listenInCluster (node:net:1998:12)\n    node:net:2207:7\n    process.processTicksAndRejections (node:internal/process/task_queues:89:21)\n  ...\n# Subtest: main shares its local deadline across hunks through the production askLocal adapter\nnot ok 10 - main shares its local deadline across hunks through the production askLocal adapter\n  ---\n  duration_ms: 3.377875\n  type: 'test'\n  location: '/Users/josh/Developer/jev/var/agent-tmp/backend41-review.25572/source/work/vendor-paste/vendor-shadow.test.mjs:248:1'\n  failureType: 'testCodeFailure'\n  error: 'listen EPERM: operation not permitted 127.0.0.1'\n  code: 'EPERM'\n  stack: |-\n    Server.setupListenHandle [as _listen2] (node:net:1919:21)\n    listenInCluster (node:net:1998:12)\n    node:net:2207:7\n    process.processTicksAndRejections (node:internal/process/task_queues:89:21)\n  ...\n# Subtest: local endpoint has no baked-in loopback default\nok 11 - local endpoint has no baked-in loopback default\n  ---\n  duration_ms: 0.754541\n  type: 'test'\n  ...\n1..11\n# tests 11\n# suites 0\n# pass 9\n# fail 2\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 918.641208\n",
+     "exit": 1,
+     "reason": "Reviewer deny-all-network sandbox refused existing injected fixture server listen EPERM; not an application failure."
+    }
+   },
+   "already_completed_independent_original_acceptance": {
+    "boundary": "This completed before the later critical admission observation and superseded my request for an exact existing compiled artifact; do not relabel her CLI8/actualremedy as my execution.",
+    "by": "LavenderDune",
+    "canonical_verify_exit": 0,
+    "gate": 232,
+    "path": "docs/evidence/receipts/jev-b35c41-fixed-review-20261016.json",
+    "publication": "06cc05e2",
+    "receipt": "ev_bd16388c57f2d79423564f2bab033eecca5362cb95510d9f68897ae4474f8829"
+   },
+   "bead": "jev-b35c.4.1",
+   "candidate": "3b6b2280121a90c4de884f44e3bdbf90c47ccb38",
+   "input_bindings": [
+    {
+     "path": "work/choice-banking77/rows-full-jev.jsonl",
+     "role": "jevFull",
+     "sha256": "791dc645bfb1a0c99a30dd36e38eff5af9dcfb47d63bb46edfb39b2b418683e3"
+    },
+    {
+     "path": "work/local-decision-arms/rows-clefflash.jsonl",
+     "role": "clefHeld",
+     "sha256": "850fc6f6d6017121e9eb5bc26eb7a92529821c73ca3796c25631b47c4456becb"
+    },
+    {
+     "path": "work/local-decision-arms/rows-clefflash-dev.jsonl",
+     "role": "clefDev",
+     "sha256": "6eed954a8c51fda2303f595c439eec46af2b75bbe72a32b2f8ba9dd8d7681099"
+    },
+    {
+     "path": "work/vendor-paste/vendor-rows.jsonl",
+     "role": "vendorJev",
+     "sha256": "00c3346b5ebc4364fba29675c1d77a2409a4b7ed9c82207c5091c42434c2cb38"
+    },
+    {
+     "path": "work/vendor-paste/sample.json",
+     "role": "vendorSample",
+     "sha256": "2a167ed69ebfa5aa41399b278c14c1dae5a40ec630f4de97cfbb7faaa39644ab"
+    },
+    {
+     "path": "work/local-decision-arms/vendor-rows-clefflash.jsonl",
+     "role": "vendorClef",
+     "sha256": "6dab05529656568df232de6fe42f9a808c28cbff221f6f158f189d885c12c11a"
+    },
+    {
+     "path": "work/local-decision-arms/vendor-rows-clefflash-dev.jsonl",
+     "role": "vendorClefDev",
+     "sha256": "d7cd03394145a288ec9c808867a8613e2591520c7bd080f9ccf65d145a54c0ab"
+    }
+   ],
+   "interpretation": "Both already-fixed cuts produce identical routes for every original DEV200 and HELD600 row, hence identical held565/600,253/600deferred,12/0discordant,p0.00048828125. This resolves observed outcome/routing-vector discrepancy on the locked cohort, NOT the unknown historical published-grid/rounding choice, universal threshold equivalence or new routing qualification.",
+   "method_and_result": {
+    "boundary": "Only the two already-fixed source/reference cuts compared; DEV-only fit, no HELD parameter selection, data/reference rewrite or routing/quality authorization. Pure throwaway analysis reuses exact source helpers, not a new permanent test or production CLI proof.",
+    "comparisons": [
+     {
+      "accuracy": "0.9416666666666667",
+      "cascade_only": 0,
+      "clef_only": 12,
+      "correct": 565,
+      "deferred": 253,
+      "deferred_fraction": "0.4216666666666667",
+      "held": 600,
+      "paired_p": "0.00048828125",
+      "tau": "0.75"
+     },
+     {
+      "accuracy": "0.9416666666666667",
+      "cascade_only": 0,
+      "clef_only": 12,
+      "correct": 565,
+      "deferred": 253,
+      "deferred_fraction": "0.4216666666666667",
+      "held": 600,
+      "paired_p": "0.00048828125",
+      "tau": "0.7733273722407844"
+     }
+    ],
+    "derived_dev_tau": "0.7733273722407844",
+    "dev_route_differences": 0,
+    "fixed_published_tau": ".75",
+    "held_route_differences": 0
+   },
+   "no_claim": [
+    "No new backend/combination/cascade routing, calibration map, schema/row/reference/bar change, held-fit/cut selection, new data or model/provider inference. Existing combine/cascadeNOT_RUN and EXPLORED/latency-trade accuracyLOSS remain.",
+    "No new product implementation, source/test edit, parent/fullmission/quality/value/L3 or whole-mainCI claim. Alreadyclosed unit is not closed/counteddelivered again.",
+    "No raw paired source rows/private prompts/keys persisted. All results derive from source-hash-pinned committed observations and two preset source/referencecuts; no golden regenerated to pass."
+   ],
+   "reviewer": "DarkBear",
+   "runtime_limit": {
+    "actual_admission_exit": 1,
+    "actual_admission_json": "{\"command\":\"check\",\"container_available_bytes\":134420971520,\"container_id\":\"/dev/disk3\",\"container_total_bytes\":994662584320,\"exit_code\":1,\"free_bytes\":134420971520,\"free_excludes_purgeable\":true,\"free_pct\":13.51422820552728,\"mount_point\":\"/System/Volumes/Data\",\"path\":\"/Users/josh/Developer/jev/var/agent-tmp/backend41-review.25572/source\",\"platform\":{\"darwin\":{\"apfs\":{\"container_available_bytes\":134420971520,\"container_id\":\"/dev/disk3\",\"container_total_bytes\":994662584320,\"estimated_reclaimable_by_snapshot_thinning\":{\"bytes\":14476905856,\"method\":\"foundation\"},\"free_excludes_purgeable\":true,\"is_primary\":true,\"shared_volumes\":[\"BuildCast\",\"BuildFH\",\"BuildShared\",\"Macintosh HD\",\"Preboot\",\"Recovery\",\"Update\",\"VM\"],\"volume_available_bytes\":144880406528,\"volume_role\":\"Data\",\"volume_total_bytes\":994662584320}}},\"schema_version\":2,\"status\":\"critical\",\"threshold_pct\":14.0,\"total_bytes\":994662584320,\"unprotected\":null,\"volume_available_bytes\":144880406528,\"volume_role\":\"Data\",\"volume_total_bytes\":994662584320}\n",
+    "compiled_cli_run_by_this_review": false,
+    "compiler_prepare_run": false,
+    "full_kit_run_by_this_review": false,
+    "scope": "Native source-test convention only; identical preexisting locked deps symlinked read-only. No compiler, emit/transpile loader workaround or critical-floor waiver."
+   },
+   "scope": "SUPPLEMENTARY_FIXED_COHORT_THRESHOLD_EQUIVALENCE_NOT_A_SECOND_UNIT_CLOSE",
+   "source": {
+    "helpers_used": "Exact source function declarations/constants selected structurally by TypeScript AST and executed only as a one-run math analysis; no source file edited or copied into a new permanent test.",
+    "path": "kit/test/combine-cascade.test.mjs",
+    "sha256": "9ff9fc1d6a6b13aca561a4a67c5077a260d3c02acb16f3b02de8ece84ea59598"
+   }
+  }
+ }
+}
