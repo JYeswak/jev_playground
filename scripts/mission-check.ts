@@ -116,14 +116,17 @@ function scanJson(roots: string[]): string[] {
 // have run green with at least one passing test (parsed TAP, not just exit),
 // AND every discovered Clef calibration to carry a verified receipt stating
 // an explicit margin over a positive sample (or none to exist, stated).
-export function localFirstReport(suiteExit: number | null, suitePasses: number, calibrations: ClefCalibration[]): Verdict {
+export function localFirstReport(suiteExit: number | null, suitePasses: number, calibrations: ClefCalibration[], envBackend?: string): Verdict {
   if (suiteExit !== 0) return fail('backend route acceptance failed; default-Jev unproven');
   if (!Number.isSafeInteger(suitePasses) || suitePasses < 1) return unknown('backend route acceptance ran no passing tests');
+  const envRoutesClef = envBackend !== undefined && envBackend !== 'jev';
+  const verified = calibrations.filter((cal) => niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves) === null);
+  if (envRoutesClef && verified.length === 0) return fail('JEV_BACKEND routes to Clef without a committed non-inferiority receipt');
   for (const cal of calibrations) {
     const reason = niReceiptReason(cal.doc, cal.preregResolves, cal.resultResolves);
     if (reason !== null) return fail(`family routes to Clef without a committed non-inferiority receipt: ${cal.path} (${reason})`);
   }
-  return calibrations.length === 0
+  return calibrations.length === 0 && !envRoutesClef
     ? { verdict: 'PASS', reason: 'backend route acceptance passed; scan found no Clef-routed families' }
     : pass();
 }
@@ -205,7 +208,7 @@ export function check(pillar: Pillar): { result: Verdict; children: Child[] } {
       const resultResolves = /^[0-9a-f]{40}$/.test(resultRef) && record(run(['git', 'cat-file', '-e', `${resultRef}^{commit}`])).exit === 0;
       calibrations.push({ path: rel, doc, preregResolves, resultResolves });
     }
-    result = localFirstReport(suite.exit, tapPasses, calibrations);
+    result = localFirstReport(suite.exit, tapPasses, calibrations, process.env.JEV_BACKEND);
   } else {
     const child = record(run(['gh', 'run', 'list', '--repo', 'JYeswak/jev_playground', '--branch', 'main', '--workflow', 'stranger-run.yml', '--event', 'schedule', '--limit', '7', '--json', 'databaseId,event,status,conclusion,createdAt,headSha,url']));
     result = scheduledRuns(report(child));

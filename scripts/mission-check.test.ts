@@ -110,6 +110,24 @@ describe('local-first pillar binding', () => {
   test('verified receipt passes', () => {
     expect(localFirstReport(0, 9, [goodCal]).verdict).toBe('PASS');
   });
+  test('env-routed Clef without a receipt fails even with green suite', () => {
+    const v = localFirstReport(0, 9, [], 'clef');
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('JEV_BACKEND');
+  });
+
+  test('env-routed auto without a receipt fails', () => {
+    expect(localFirstReport(0, 9, [], 'auto').verdict).toBe('FAIL');
+  });
+
+  test('env-routed Clef with a verified receipt passes', () => {
+    expect(localFirstReport(0, 9, [goodCal], 'clef').verdict).toBe('PASS');
+  });
+
+  test('env unset or jev keeps prior behavior', () => {
+    expect(localFirstReport(0, 9, [], undefined).verdict).toBe('PASS');
+    expect(localFirstReport(0, 9, [], 'jev').verdict).toBe('PASS');
+  });
 
   test('TAP parsing requires a real pass count', () => {
     expect(parseTapPasses('TAP version 13\n# pass 9\n# fail 0\n')).toBe(9);
