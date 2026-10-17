@@ -1,0 +1,79 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_58d7a046812f7528cfd114a0c3520717aa7044b6a44a7dd8bf743526bfc8056a",
+ "limitations": [
+  "Only local-first registration and invariant execution qualified; five other pillars remain unregistered; no model value or global mission pass."
+ ],
+ "operation": "connect-approved-local-first-check",
+ "parameters": {
+  "bead": "jev-b35c.44",
+  "subject_sha256": "b672869cc6c8124df2daabb823f89829161d7c84643c5cfd22917dd8708a3829"
+ },
+ "producer": "JadeSpire",
+ "result_ref": {
+  "actual_local_first_row": {
+   "check": "omp-kit heavy -- bun scripts/mission-check.ts --pillar local-first",
+   "clause": "Clef serves a family only where a committed receipt shows it non-inferior to Jev within a preregistered margin under the same calibration; otherwise Jev. Clef runs through localbench's gateway (localbench kit-jtq2, tracked by a jev bead); if that gateway is not delivered, Clef stays out of stage 1 and every family keeps Jev or its rule incumbent. Stage 1 measures Clef-Flash on the gate and screen family suites only (X2); other families keep Jev or their rule/encoder winner, and full Clef (51 GB) is DROPPED from stage 1 (jev-52s0 records the decision and its provenance).",
+   "command_sha256": "afc03a358b3151071ffcb40daf12caa270b4360c281fbb6d1c372dd489768e03",
+   "id": "local-first",
+   "path": "scripts/mission-check.ts",
+   "sha256": "940cc781b4cd67866bd129baac26e108752f282f9bedd0e193c997c784ad8f84",
+   "status": "REGISTERED"
+  },
+  "approval": "QuietBadger AM60300",
+  "authority_boundary": "integration author evidence, not non-author closure or global mission/model quality",
+  "bead": "jev-b35c.44",
+  "changed_field": "pillar[local-first].check_sha256",
+  "commands": {
+   "mission_sync": {
+    "command": [
+     "/opt/homebrew/bin/python3",
+     "scripts/mission-sync.py",
+     "--check"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "stdout": ".omp/mission.toml matches ROADMAP.md (6 pillars).\n"
+   },
+   "native_registration": {
+    "command": [
+     "omp-kit",
+     "mission",
+     "validate",
+     "--project",
+     "/Users/josh/Developer/jev",
+     "--json"
+    ],
+    "exit": 1,
+    "stderr": "",
+    "stdout": "{\"ok\":false,\"tool_version\":\"0.2.38\",\"data\":{\"errors\":[\"MISSION_CHECK_UNREGISTERED:live:CHECK_SHA256_MISMATCH\",\"MISSION_CHECK_UNREGISTERED:measured:CHECK_SHA256_MISMATCH\",\"MISSION_CHECK_UNREGISTERED:honest:CHECK_SHA256_MISMATCH\",\"MISSION_CHECK_UNREGISTERED:portable:CHECK_SHA256_MISMATCH\",\"MISSION_CHECK_UNREGISTERED:current:CHECK_SHA256_MISMATCH\"],\"identity\":\"Typed classifiers that earn their place in our tools: each one proven live, measured, and delivered through one model-neutral CLI (`classifier`) that makes the next one cheap.\",\"mission_file\":\".omp/mission.toml\",\"no_claim\":\"A registered check is integrity-pinned; its measurement quality is not established.\",\"overall\":\"UNREGISTERED\",\"pillars\":[{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar live\",\"clause\":\"Every claimed surface is ON in a real omp session: it fires on a positive and stays silent on a planted negative in a fresh omp --mode=rpc session.\",\"command_sha256\":\"7f872d29d460de1a6c996caba53020d42a43a7c778d9fa383dbc83e2b9a990cd\",\"id\":\"live\",\"path\":\"scripts/mission-check.ts\",\"reason\":\"CHECK_SHA256_MISMATCH\",\"sha256\":\"77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28\",\"status\":\"UNREGISTERED\"},{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar measured\",\"clause\":\"Every live surface has a value-minus-cost receipt from our own session logs (tokens saved, harms caught, turns rescued, minus Jev/Clef spend and latency). A negative result turns the surface off.\",\"command_sha256\":\"4c7af87181c1642dcf6328f8bc494ec2a738d95a594cbc738741e263ebcdc03e\",\"id\":\"measured\",\"path\":\"scripts/mission-check.ts\",\"reason\":\"CHECK_SHA256_MISMATCH\",\"sha256\":\"77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28\",\"status\":\"UNREGISTERED\"},{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar honest\",\"clause\":\"Every quality claim has its bar committed before the first live call, an incumbent on the same rows, N, date, model id and spend.\",\"command_sha256\":\"3e08ff757672cdad47fa2da348a375381f6133ecc335adedf5827060254eb3ea\",\"id\":\"honest\",\"path\":\"scripts/mission-check.ts\",\"reason\":\"CHECK_SHA256_MISMATCH\",\"sha256\":\"77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28\",\"status\":\"UNREGISTERED\"},{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar local-first\",\"clause\":\"Clef serves a family only where a committed receipt shows it non-inferior to Jev within a preregistered margin under the same calibration; otherwise Jev. Clef runs through localbench's gateway (localbench kit-jtq2, tracked by a jev bead); if that gateway is not delivered, Clef stays out of stage 1 and every family keeps Jev or its rule incumbent. Stage 1 measures Clef-Flash on the gate and screen family suites only (X2); other families keep Jev or their rule/encoder winner, and full Clef (51 GB) is DROPPED from stage 1 (jev-52s0 records the decision and its provenance).\",\"command_sha256\":\"afc03a358b3151071ffcb40daf12caa270b4360c281fbb6d1c372dd489768e03\",\"id\":\"local-first\",\"path\":\"scripts/mission-check.ts\",\"sha256\":\"940cc781b4cd67866bd129baac26e108752f282f9bedd0e193c997c784ad8f84\",\"status\":\"REGISTERED\"},{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar portable\",\"clause\":\"A stranger runs the README from a fresh clone, and classifier ready plus one family run in a project we did not write.\",\"command_sha256\":\"9cfaa4060211b40504f1318c03d7d24c4590a6d395b072f651223cbafacd38b9\",\"id\":\"portable\",\"path\":\"scripts/mission-check.ts\",\"reason\":\"CHECK_SHA256_MISMATCH\",\"sha256\":\"77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28\",\"status\":\"UNREGISTERED\"},{\"check\":\"omp-kit heavy -- bun scripts/mission-check.ts --pillar current\",\"clause\":\"What is declared ON is what is running: no switch, hook or log that says one thing while the machine does another.\",\"command_sha256\":\"12887091596f5b8c1d2edb285619c6479cbf4bd731813a9342de75ff0143a2d5\",\"id\":\"current\",\"path\":\"scripts/mission-check.ts\",\"reason\":\"CHECK_SHA256_MISMATCH\",\"sha256\":\"77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28\",\"status\":\"UNREGISTERED\"}],\"stage\":\"1: families proven or refuted, CLI built\"},\"meta\":{\"schema_version\":\"1\",\"verification\":\"PERFORMED\"},\"warnings\":[],\"commands\":[],\"errors\":[]}\n"
+   },
+   "real_local_first": {
+    "command": [
+     "omp-kit",
+     "heavy",
+     "--",
+     "bun",
+     "scripts/mission-check.ts",
+     "--pillar",
+     "local-first"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "stdout": "{\"schema\":\"jev.mission-check.v1\",\"pillar\":\"local-first\",\"claim_class\":\"invariant\",\"evidence_tier\":\"live\",\"verdict\":\"PASS\",\"reason\":\"backend route acceptance passed; scan found no Clef-routed families\",\"children\":[{\"argv\":[\"node\",\"--test\",\"kit/test/backend.test.mjs\"],\"exit\":0,\"signal\":null,\"stdout\":\"TAP version 13\\n# Subtest: default Jev keeps the exact System One request bytes and makes no Clef request\\nok 1 - default Jev keeps the exact System One request bytes and makes no Clef request\\n  ---\\n  duration_ms: 24.785541\\n  type: 'test'\\n  ...\\n# Subtest: auto rejects the public Banking77 calibration as a family receipt\\nok 2 - auto rejects the public Banking77 calibration as a family receipt\\n  ---\\n  duration_ms: 0.782417\\n  type: 'test'\\n  ...\\n# Subtest: the auto route gate requires every family, receipt, question, fingerprint, and hold condition\\nok 3 - the auto route gate requires every family, receipt, question, fingerprint, and hold condition\\n  ---\\n  duration_ms: 0.11675\\n  type: 'test'\\n  ...\\n# Subtest: auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\\nok 4 - auto makes at most one Clef attempt and one Jev fallback; explicit Clef never falls back\\n  ---\\n  duration_ms: 0.653208\\n  type: 'test'\\n  ...\\n# Subtest: two consecutive Clef transport failures start a 60-second hold\\nok 5 - two consecutive Clef transport failures start a 60-second hold\\n  ---\\n  duration_ms: 0.163583\\n  type: 'test'\\n  ...\\n# Subtest: bundles and score never route to Clef\\nok 6 - bundles and score never route to Clef\\n  ---\\n  duration_ms: 1.061208\\n  type: 'test'\\n  ...\\n# Subtest: CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\\nok 7 - CLI accepts backend and dry-run flags and reports class-correct refusal envelopes\\n  ---\\n  duration_ms: 0.27575\\n  type: 'test'\\n  ...\\n# Subtest: dry-run previews the canonical Jev request without calling the asker\\nok 8 - dry-run previews the canonical Jev request without calling the asker\\n  ---\\n  duration_ms: 0.231209\\n  type: 'test'\\n  ...\\n# Subtest: rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\\nok 9 - rerank, score, verify, and gate dry-runs preserve their canonical question shapes without calling askers\\n  ---\\n  duration_ms: 0.534459\\n  type: 'test'\\n  ...\\n1..9\\n# tests 9\\n# suites 0\\n# pass 9\\n# fail 0\\n# cancelled 0\\n# skipped 0\\n# todo 0\\n# duration_ms 151.65375\\n\",\"stderr\":\"\",\"error\":null}]}\n"
+   }
+  },
+  "mission_sha256": "b672869cc6c8124df2daabb823f89829161d7c84643c5cfd22917dd8708a3829",
+  "other_bytes_unchanged": true,
+  "other_five_registration_errors": [
+   "MISSION_CHECK_UNREGISTERED:live:CHECK_SHA256_MISMATCH",
+   "MISSION_CHECK_UNREGISTERED:measured:CHECK_SHA256_MISMATCH",
+   "MISSION_CHECK_UNREGISTERED:honest:CHECK_SHA256_MISMATCH",
+   "MISSION_CHECK_UNREGISTERED:portable:CHECK_SHA256_MISMATCH",
+   "MISSION_CHECK_UNREGISTERED:current:CHECK_SHA256_MISMATCH"
+  ],
+  "source_commit": "b99f0df6f6df22946e20e163a7cbe6fb1ccc0fb1",
+  "source_sha256": "940cc781b4cd67866bd129baac26e108752f282f9bedd0e193c997c784ad8f84"
+ }
+}

@@ -5,8 +5,14 @@
 # The pillar rows must equal ROADMAP.md's pillar table: `python3 scripts/mission-sync.py --check` (converge r4).
 
 name = "jev"
-identity = "Typed classifiers that earn their place in our tools: each one proven live, measured, and delivered through one model-neutral CLI that makes the next one cheap."
+identity = "Typed classifiers that earn their place in our tools: each one proven live, measured, and delivered through one model-neutral CLI (`classifier`) that makes the next one cheap."
 stage = "1: families proven or refuted, CLI built"
+stage_exit_bead = "jev-uzq1"
+pillar_ids = ["live", "measured", "honest", "local-first", "portable", "current"]
+negative_evidence = "NEGATIVE_EVIDENCE.md"
+discrepancies = "kit/conformance/DISCREPANCIES.md"
+run_ledger = "EVAL.md"
+approval_source = "Jev pane-1 Mission C selection, 2026-10-04; work/plan-20261004/MISSION-AUDIT.md"
 approved_by = "Joshua"
 approved_at = "2026-10-04"
 approval_quote = "yes i like c"
@@ -22,8 +28,13 @@ not_in_mission = ["benchmark tourism", "certificates, ledgers or dashboards with
 
 [[pillar]]
 id = "live"
+claim_class = "live-witness"
+evidence_tier = "live"
 clause = "Every claimed surface is ON in a real omp session: it fires on a positive and stays silent on a planted negative in a fresh omp --mode=rpc session."
-check = "classifier doctor --json"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar live"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28"
+check_command_sha256 = "7f872d29d460de1a6c996caba53020d42a43a7c778d9fa383dbc83e2b9a990cd"
 check_fails_when = "any claimed-ON surface lacks a fresh both-ways L3 receipt in work/l3-receipts/receipts.jsonl (jev-grzn)"
 status = "partial"
 interim_check = "python3 work/omp-jev-review/surface-census.py --scoreboard --days 7"
@@ -31,50 +42,80 @@ beads = ["jev-grzn", "jev-b35c.3", "jev-b35c.30", "jev-c710"]
 
 [[pillar]]
 id = "measured"
+claim_class = "live-witness"
+evidence_tier = "live"
 clause = "Every live surface has a value-minus-cost receipt from our own session logs (tokens saved, harms caught, turns rescued, minus Jev/Clef spend and latency). A negative result turns the surface off."
-check = "python3 work/jev-mvvh/ledger.py --gate --days 7"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar measured"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28"
+check_command_sha256 = "4c7af87181c1642dcf6328f8bc494ec2a738d95a594cbc738741e263ebcdc03e"
 check_fails_when = "any surface UNMEASURED or any KILL verdict still ON"
 status = "missing"
 beads = ["jev-mvvh", "jev-n1-result-family-bakeoff-fcqw", "jev-n2-reread-dedup-rule-i817", "jev-c3vl", "jev-n3-route-locate-bakeoff-4xnz", "jev-n4-recover-error-rule-1grh", "jev-n6-outcome-logging-vfnv", "jev-n7-pin-compaction-files-k0gu", "jev-n8-delegate-outcome-label-umcw", "jev-n9-nudge-actionability-4471", "jev-x4-vendored-probe-closeout-82p7", "jev-x8-memory-relevant-drop-enn9", "jev-sxi2", "jev-ayly", "jev-dq7p", "jev-sm2f", "jev-7o58", "jev-2af1", "jev-np5k", "jev-jm1n", "jev-pn19", "jev-x3su"]
 
 [[pillar]]
 id = "honest"
+claim_class = "invariant"
+evidence_tier = "live"
 clause = "Every quality claim has its bar committed before the first live call, an incumbent on the same rows, N, date, model id and spend."
-check = "python3 scripts/bar_chronology.py --since 2026-09-24 --json --strict && python3 scripts/bead-lint.py --all-open"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar honest"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28"
+check_command_sha256 = "3e08ff757672cdad47fa2da348a375381f6133ecc335adedf5827060254eb3ea"
 check_fails_when = "any result row FAILs bar chronology or lacks incumbent, row-set hash, N, date, model id or spend; bead-lint is the plan-quality lint"
 status = "partial"
 beads = ["jev-6gun", "jev-oh7c", "jev-convergence-gate-g57u", "jev-n0-fleet-decision-miner-sclo", "jev-conformance-harness-acs2", "jev-metamorphic-label-pending-uvi5", "jev-n5-land-failure-classes-uphill-az20", "jev-n10-review-rules-incumbent-xqx8", "jev-x7-gate-rules-closeout-9td0", "jev-pifg", "jev-8i8i"]
 
 [[pillar]]
 id = "local-first"
+claim_class = "invariant"
+evidence_tier = "live"
+qualification_claim_class = "statistical"
 clause = "Clef serves a family only where a committed receipt shows it non-inferior to Jev within a preregistered margin under the same calibration; otherwise Jev. Clef runs through localbench's gateway (localbench kit-jtq2, tracked by a jev bead); if that gateway is not delivered, Clef stays out of stage 1 and every family keeps Jev or its rule incumbent. Stage 1 measures Clef-Flash on the gate and screen family suites only (X2); other families keep Jev or their rule/encoder winner, and full Clef (51 GB) is DROPPED from stage 1 (jev-52s0 records the decision and its provenance)."
-check = "classifier backend audit --json"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar local-first"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "940cc781b4cd67866bd129baac26e108752f282f9bedd0e193c997c784ad8f84"
+check_command_sha256 = "afc03a358b3151071ffcb40daf12caa270b4360c281fbb6d1c372dd489768e03"
 check_fails_when = "any family routes to Clef without a committed non-inferiority receipt"
 status = "missing"
 beads = ["jev-b35c.4", "jev-x1-injection-encoders-e2gp", "jev-x2-clef-four-suites-3rbd", "jev-x3-factcheck-encoders-s28q", "jev-x6-intent-encoder-0u9a", "jev-c3vl", "jev-oy76", "jev-52s0", "jev-k3yw", "jev-d7tn"]
 
 [[pillar]]
 id = "portable"
+claim_class = "live-witness"
+evidence_tier = "live"
+stranger_lane_evidence_tier = "fixture"
 clause = "A stranger runs the README from a fresh clone, and classifier ready plus one family run in a project we did not write."
-check = "gh run list --workflow stranger-run.yml --event schedule --limit 7 --json conclusion --jq 'all(.[]; .conclusion == \"success\")' | grep -qx true && classifier ready"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar portable"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28"
+check_command_sha256 = "9cfaa4060211b40504f1318c03d7d24c4590a6d395b072f651223cbafacd38b9"
 check_fails_when = "any of the last 7 scheduled stranger-runs failed (manual reruns do not count) or classifier ready fails on the jev-r1vp project; the lane is keyless and uses --fake"
 status = "partial"
 beads = ["jev-r1vp", "jev-b35c.7", "jev-i15c"]
 
 [[pillar]]
 id = "current"
+claim_class = "invariant"
+evidence_tier = "live"
 clause = "What is declared ON is what is running: no switch, hook or log that says one thing while the machine does another."
-check = "classifier doctor --json"
+check = "omp-kit heavy -- bun scripts/mission-check.ts --pillar current"
+check_path = "scripts/mission-check.ts"
+check_sha256 = "77aeb59cb7399eb9f63f25f0b8543778cbbee66dc792a9908cfb19cc688e6f28"
+check_command_sha256 = "12887091596f5b8c1d2edb285619c6479cbf4bd731813a9342de75ff0143a2d5"
 check_fails_when = "the drift section reports any declared-vs-running mismatch"
 status = "missing"
 beads = ["jev-b35c.3", "jev-35sg"]
 
 [cadence]
-daily = ["stranger-run.yml (Actions, 03:17 UTC; recent scheduled runs use the keyless --fake lane)", "jev-latest canary (launchd, 09:07)", "pillar checks (omp-kit MP5, not running)", "fleet watcher (stopped)"]
-weekly = ["value ledger --gate (launchd work/jev-mvvh/ai.jev.value-ledger.plist)", "omp-kit doctor --scope mission (MP2, not running)"]
+daily = "Run all six exact pillar check commands in this record; scheduled README producer: gh run list --repo JYeswak/jev_playground --workflow stranger-run.yml --event schedule --limit 7 --json databaseId,event,status,conclusion,createdAt,headSha,url. MP5 scheduling is not activated by this record; the Jev watcher remains stopped."
+weekly = "python3 work/jev-mvvh/ledger.py --gate --days 7 --json; omp-kit doctor --scope mission --project /Users/josh/Developer/jev --json (MP2 delivery remains a prerequisite, not a recorded pass)."
 exit = "every pillar check green on 7 consecutive daily rows"
 
 [blast_radius]
+binaries = ["classifier", "clf", "jev-skill-gap"]
+paths = ["kit/src/**", "kit/bin/**", ".omp/hooks/**", ".omp/tools/**", ".omp/extensions/**", "work/jev-client/src/**", "~/.omp/agent/hooks/**", "~/.omp/profiles/*/agent/hooks/**", "~/.omp/jev-pinned/**"]
+sessions = ["All OMP sessions loading machine-wide Jev installs; inventoried profiles: default, claude, codex, muse, grok"]
 installs_outside_repo = [".omp/extensions/jev-memory-filter.ts (every repo's session via global install)", "~/.omp hooks installed by kit", "~/.omp/agent/hooks/post + 4 profiles: jev-injection-global.ts, jev-webscreen-global.ts (hardlinks into work/jev-j0er until jev-49oe)", "guard-rule.ts pre hooks", "pinned copies under ~/.omp/jev-pinned/<sha>/ once jev-49oe lands"]
 rule = "latency budget under omp handler limits, never holds the host turn, takes the contract's declared safe side when down/slow (screen passes, command gate may refuse); at its daily cap a command gate passes with a log unless a committed bar shows normal session volume never reaches the cap, host pane 1 off switch"
 shared_binaries = ["br 0.7.4", "ntm 1.36.1", "dcg 0.15.2", "cass 0.10.0", "bv 0.25.2", "ubs 5.4.17"]
