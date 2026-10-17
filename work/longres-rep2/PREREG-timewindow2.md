@@ -55,3 +55,14 @@ spend cap at $0.042/M input tokens, no retry storm, stop immediately on 401/402/
 receipt. Score, commit rows, scorer, corpus hashes and result after horizon;
 never inspect interim model results or extend the window post hoc. Any extension
 requires a new prereg before looking at outcomes.
+
+## Amendment A (frozen before any collection run): reference cutoff and label evidence
+
+Labels depend on file bytes after each event, and session files keep growing.
+Reference cutoff is exactly 2026-10-17T03:00:00Z: label determination for a
+row considers only the at most 399 following lines in the same source file
+whose entry timestamp parses and is <= the cutoff; lines without a parseable
+timestamp are excluded from label evidence. Each corpus row retains those
+evidence bytes (`ref_evidence`) alongside the full result text, so every
+label recomputes exactly from committed bytes. No collection, call, or
+outcome has been observed at this amendment.
