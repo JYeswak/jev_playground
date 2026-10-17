@@ -147,6 +147,19 @@ describe('local-first pillar binding', () => {
     expect(v.verdict).toBe('FAIL');
     expect(v.reason).toContain('not before results');
   });
+  test('identical prereg/result commits refuse (no precedence proof)', () => {
+    const same = { ...goodDoc, receipt: { ...goodReceipt, prereg_commit: 'c'.repeat(40), result_commit: 'c'.repeat(40) } };
+    const v = localFirstReport(0, 9, [{ path: 'p', doc: same, preregResolves: true, resultResolves: true, preregCt: 100, resultCt: 100 }]);
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('identical to results');
+  });
+
+  test('vacuous overflow margin refuses', () => {
+    const wide = { ...goodDoc, receipt: { ...goodReceipt, margin: 1e309 } };
+    const v = localFirstReport(0, 9, [{ path: 'p', doc: wide, preregResolves: true, resultResolves: true, preregCt: 100, resultCt: 200 }]);
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('vacuous');
+  });
 
   test('TAP parsing requires a real pass count', () => {
     expect(parseTapPasses('TAP version 13\n# pass 9\n# fail 0\n')).toBe(9);

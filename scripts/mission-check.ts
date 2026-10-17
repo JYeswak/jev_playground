@@ -141,8 +141,12 @@ function niReceiptReason(doc: unknown, preregResolves: boolean, resultResolves: 
   }
   if (!preregResolves) return 'prereg_commit not in history';
   if (!resultResolves) return 'result_commit not in history';
+  if (receipt['prereg_commit'] === receipt['result_commit']) return 'preregistration identical to results';
   if (preregCt >= 0 && resultCt >= 0 && preregCt > resultCt) return 'preregistration not before results';
+  // NI margins in this codebase compare rates on [0,1] (X2 PREREG: 5pp
+  // paired accuracy margin); a margin above 1, however finite, is vacuous.
   if (typeof receipt['margin'] !== 'number' || !(receipt['margin'] as number >= 0)) return 'receipt margin not stated';
+  if ((receipt['margin'] as number) > 1) return 'receipt margin vacuous';
   if (!Number.isSafeInteger(receipt['n']) || (receipt['n'] as number) < 1) return 'receipt sample size not stated';
   if (typeof receipt['question_key'] === 'string' && receipt['question_key'] !== (doc as Record<string, unknown>)['question_key']) return 'receipt question_key differs';
   const modelId = isObject((doc as Record<string, unknown>)['model']) ? ((doc as Record<string, unknown>)['model'] as Record<string, unknown>)['id'] : undefined;
