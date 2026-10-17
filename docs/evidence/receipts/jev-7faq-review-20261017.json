@@ -1,0 +1,42 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_61972a026222eb924b9afea9649cacff0f34165bf350478aa5a2f388f7f31249",
+ "limitations": [
+  "Document-only acceptance and registry gate, not fresh CLI/package suites or live/model/pillar proof"
+ ],
+ "operation": "registry.no-key-doctor-exit-review",
+ "parameters": {
+  "subject_sha256": "eb6aa403c8d6ce299abb16090121f4e550f19b50892ea7503a07af575d9543d9"
+ },
+ "producer": "LavenderDune",
+ "result_ref": {
+  "assertions": {
+   "kit/test/cli.test.mjs:28": "assert.equal(result.code, 1);",
+   "kit/test/package.test.mjs:53": "assert.equal(doctor.code, 1, doctor.stderr);"
+  },
+  "bead": "jev-7faq",
+  "candidate": "00f113074845599d2f83f72495137bfdd1fa2b1f",
+  "candidate_changed_paths": [
+   "TESTS.md",
+   "docs/evidence/receipts/jev-7faq-registry-20261017.json"
+  ],
+  "fresh_gate": {
+   "command": "bash foundation/gates.d/70-tests-registry-sync.sh",
+   "complete_stdout": "70-tests-registry-sync: 273 tracked test file(s), all enumerated\n",
+   "exit": 0
+  },
+  "rows": {
+   "689": "| kit/test/cli.test.mjs | node --test kit/test/cli.test.mjs | doctor --robot keyless FINDINGS exit 1, fake offline ask, invalid robot usage; doctor-always-READY plant fails | 3/3 keyless; mutation RED |",
+   "690": "| kit/test/package.test.mjs | node --test kit/test/package.test.mjs | npm pack → temp install → compiled doctor --robot keyless FINDINGS exit 1 with Jev backend NOT_RUN; package-name plant fails | 1/1 keyless; mutation RED |"
+  },
+  "scope": "Doc-only registry parity; doctor FINDINGS/1 distinguished from backend NOT_RUN. No testfile edits, no fresh CLI/package execution or live/model/pillar health claim.",
+  "source_sha256": {
+   "TESTS.md": "534837c342f0b64419b89fbb484cc0c981d189ac105a57a6797455b380a13415",
+   "foundation/gates.d/70-tests-registry-sync.sh": "d0de3815e489d8a3d8e872d480ab5fdfac2eb8adfaafe7f051efb6b3211d9345",
+   "kit/test/cli.test.mjs": "b1900beb6d6506c1011e7abff24f66c5fc4e87139cd8e286cccc58f9b3e6dcbc",
+   "kit/test/package.test.mjs": "28f61aa4a068484824f1ff5a936f60b7295c18ae82d9041dc9abc6c0446ced60"
+  },
+  "test_files_byte_identical_to_parent": true
+ }
+}
