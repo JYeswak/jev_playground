@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { createHash } from 'node:crypto';
-import { doctorReport, canonicalJson, localFirstReport, measuredReport, parseTapPasses, scheduledRuns } from './mission-check';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { doctorReport, canonicalJson, localFirstReport, measuredReport, parseTapPasses, scheduledRuns, scanCalibrationDir } from './mission-check';
 
 // These controls exercise checker behavior only. They are not live pillar evidence.
 const now = Date.parse('2026-10-15T02:00:00Z');
@@ -149,5 +152,42 @@ describe('local-first pillar binding', () => {
     expect(parseTapPasses('TAP version 13\n# pass 9\n# fail 0\n')).toBe(9);
     expect(parseTapPasses('no tap here')).toBe(0);
     expect(parseTapPasses('')).toBe(0);
+  });
+});
+
+describe('calibration discovery follows the consumer path', () => {
+  const root = join('var', 'agent-tmp', `mission-scan.${process.pid}`);
+  function fixtureDir(files: Record<string, string>): string {
+    const dir = join(root, `case-${Object.keys(files).length}-${Date.now() % 100000}`);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, '.owner'), `pid: ${process.pid}\nlabel: mission-scan\n`);
+    for (const [name, content] of Object.entries(files)) writeFileSync(join(dir, name), content);
+    return dir;
+  }
+
+  test('finds top-level json, skips non-json and unparseable files', () => {
+    const dir = fixtureDir({
+      'a.json': '{"schema":"jev.clef-calibration.v1"}',
+      'b.txt': 'not json scanned',
+      'c.json': '{broken',
+    });
+    const found = scanCalibrationDir(dir);
+    expect(found.map((f) => f.path)).toEqual(['a.json']);
+    expect((found[0].doc as Record<string, unknown>)['schema']).toBe('jev.clef-calibration.v1');
+  });
+
+  test('missing directory reads as empty, not fatal', () => {
+    expect(scanCalibrationDir(join(root, 'no-such-dir'))).toEqual([]);
+  });
+
+  test('planted invalid calibration in the consumer path refuses end to end', () => {
+    const dir = fixtureDir({
+      'bad.json': JSON.stringify({ schema: 'jev.clef-calibration.v1', question_key: 'q' }),
+    });
+    const found = scanCalibrationDir(dir);
+    expect(found.length).toBe(1);
+    const v = localFirstReport(0, 9, found.map((f) => ({ path: f.path, doc: f.doc, preregResolves: false, resultResolves: false, preregCt: -1, resultCt: -1 })));
+    expect(v.verdict).toBe('FAIL');
+    expect(v.reason).toContain('bad.json');
   });
 });

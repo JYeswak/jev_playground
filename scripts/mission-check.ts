@@ -87,26 +87,23 @@ export function parseTapPasses(stdout: string): number {
   return 0;
 }
 
-// Read-only JSON inventory for calibration discovery. Walks only the given
-// roots, skipping dependency/build/fixture/scratch trees; unparseable files
-// are skipped by callers, never fatal.
-const SKIP_DIRS: Record<string, true> = { node_modules: true, dist: true, fixtures: true, 'agent-tmp': true, '.git': true };
-
-function scanJson(roots: string[]): string[] {
-  const out: string[] = [];
-  const walk = (dir: string) => {
-    let entries: { name: string; isDirectory(): boolean }[] = [];
+// Read-only calibration discovery through the actual consumer path: the
+// runtime loader (kit calibration/clef) reads top-level *.json only, so the
+// check reads exactly that directory. A calibration anywhere else never
+// routes and is out of scope; unparseable files are skipped like the loader
+// skips them (they cannot route either).
+export function scanCalibrationDir(dirAbs: string): { path: string; doc: unknown }[] {
+  const out: { path: string; doc: unknown }[] = [];
+  let names: string[] = [];
+  try {
+    names = readdirSync(dirAbs).sort();
+  } catch { return out; }
+  for (const name of names) {
+    if (!name.endsWith('.json')) continue;
     try {
-      entries = readdirSync(resolve(ROOT, dir), { withFileTypes: true }) as unknown as typeof entries;
-    } catch { return; }
-    for (const entry of entries) {
-      if (SKIP_DIRS[entry.name]) continue;
-      const rel = dir === '.' ? entry.name : `${dir}/${entry.name}`;
-      if (entry.isDirectory()) walk(rel);
-      else if (rel.endsWith('.json')) out.push(rel);
-    }
-  };
-  for (const root of roots) walk(root);
+      out.push({ path: name, doc: JSON.parse(readFileSync(resolve(dirAbs, name), 'utf8')) });
+    } catch { continue; }
+  }
   return out;
 }
 export type ClefCalibration = { path: string; doc: unknown; preregResolves: boolean; resultResolves: boolean; preregCt: number; resultCt: number };
@@ -215,12 +212,10 @@ export function check(pillar: Pillar): { result: Verdict; children: Child[] } {
     const suite = record(run(['node', '--test', 'kit/test/backend.test.mjs']));
     const tapPasses = parseTapPasses(suite.stdout);
     const calibrations: ClefCalibration[] = [];
-    for (const rel of scanJson(['work', 'docs'])) {
-      let doc: unknown = null;
-      try {
-        doc = JSON.parse(readFileSync(resolve(ROOT, rel), 'utf8'));
-      } catch { continue; }
+    const calDir = resolve(ROOT, 'kit/calibration/clef');
+    for (const { path: name, doc } of scanCalibrationDir(calDir)) {
       if (!isObject(doc) || doc['schema'] !== 'jev.clef-calibration.v1') continue;
+      const rel = `kit/calibration/clef/${name}`;
       const receipt = isObject(doc['receipt']) ? (doc['receipt'] as Record<string, unknown>) : {};
       const prereg = typeof receipt['prereg_commit'] === 'string' ? receipt['prereg_commit'] as string : '';
       const resultRef = typeof receipt['result_commit'] === 'string' ? receipt['result_commit'] as string : '';
