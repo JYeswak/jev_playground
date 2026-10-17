@@ -9,17 +9,17 @@
 {"type":"message","id":"m07","parentId":"s1","timestamp":"2026-10-04T00:41:01Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c04","name":"read","arguments":{"path":"artifact://17002"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m08","parentId":"m07","timestamp":"2026-10-04T00:41:02Z","message":{"role":"toolResult","toolCallId":"c04","toolName":"read","isError":false,"content":[]}}
 {"type":"session","id":"synthetic-session-c","timestamp":"2026-10-04T00:42:00Z","cwd":"/fixture","version":"observed-shape"}
-{"type":"message","id":"m09","parentId":"s2","timestamp":"2026-10-04T00:42:01Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c05","name":"read","arguments":{"path":"/fixture/src/a.ts","range":"1-10"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"m09","parentId":"s2","timestamp":"2026-10-04T00:42:01Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c05","name":"read","arguments":{"path":"/fixture/src/a.ts:1-10"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m10","parentId":"m09","timestamp":"2026-10-04T00:42:02Z","message":{"role":"toolResult","toolCallId":"c05","toolName":"read","isError":false,"content":[]}}
 {"type":"message","id":"m11","parentId":"m10","timestamp":"2026-10-04T00:42:03Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c06","name":"bash","arguments":{"command":"sed -i '' -e s/x/y/ /fixture/src/a.ts"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m12","parentId":"m11","timestamp":"2026-10-04T00:42:04Z","message":{"role":"toolResult","toolCallId":"c06","toolName":"bash","isError":false,"content":[]}}
-{"type":"message","id":"m13","parentId":"m12","timestamp":"2026-10-04T00:42:05Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c07","name":"read","arguments":{"path":"/fixture/src/a.ts","range":"1-10"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"m13","parentId":"m12","timestamp":"2026-10-04T00:42:05Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c07","name":"read","arguments":{"path":"/fixture/src/a.ts:1-10"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m14","parentId":"m13","timestamp":"2026-10-04T00:42:06Z","message":{"role":"toolResult","toolCallId":"c07","toolName":"read","isError":false,"content":[]}}
-{"type":"message","id":"m15","parentId":"m14","timestamp":"2026-10-04T00:42:07Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c08","name":"read","arguments":{"path":"/fixture/src/a.ts","range":"1-10"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"m15","parentId":"m14","timestamp":"2026-10-04T00:42:07Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c08","name":"read","arguments":{"path":"/fixture/src/a.ts:11-20:raw"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m16","parentId":"m15","timestamp":"2026-10-04T00:42:08Z","message":{"role":"toolResult","toolCallId":"c08","toolName":"read","isError":false,"content":[]}}
 {"type":"message","id":"m17","parentId":"m16","timestamp":"2026-10-04T00:42:09Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c09","name":"find","arguments":{"query":"a.ts"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m18","parentId":"m17","timestamp":"2026-10-04T00:42:10Z","message":{"role":"toolResult","toolCallId":"c09","toolName":"find","isError":false,"content":[{"type":"text","text":"/fixture/src/a.ts"}]}}
-{"type":"message","id":"m19","parentId":"m18","timestamp":"2026-10-04T00:42:11Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c10","name":"read","arguments":{"path":"/fixture/src/a.ts","range":"1-10"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"m19","parentId":"m18","timestamp":"2026-10-04T00:42:11Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c10","name":"read","arguments":{"path":"/fixture/src/a.ts:11-20:raw"}}],"stopReason":"toolUse"}}
 {"type":"message","id":"m20","parentId":"m19","timestamp":"2026-10-04T00:42:12Z","message":{"role":"toolResult","toolCallId":"c10","toolName":"read","isError":false,"content":[]}}
 {"type":"custom_message","customType":"mid-run-todo-nudge","id":"n01","parentId":"m20","timestamp":"2026-10-04T00:43:00Z","details":{}}
 {"type":"message","id":"m21","parentId":"n01","timestamp":"2026-10-04T00:43:01Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c11","name":"todo","arguments":{"op":"view"}}],"stopReason":"toolUse"}}
@@ -36,3 +36,23 @@
 {"type":"message","id":"m31","parentId":"m30","timestamp":"2026-10-04T00:47:00Z","message":{"role":"assistant","content":[],"stopReason":"stop"}}
 {"type":"message","id":"m32","parentId":"m31","timestamp":"2026-10-04T00:47:01Z","message":{"role":"user","content":[{"type":"text","text":"wrong"}]}}
 {"type":"message","id":"m33","parentId":"m32","timestamp":"2026-10-04T00:48:28Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"c16","name":"read","arguments":{"path":"/fixture/after-cutoff.py"}}],"stopReason":"toolUse"}}
+{"type":"session","id":"synthetic-session-proxies","timestamp":"2026-10-04T00:20:00Z","cwd":"/fixture","version":"observed-shape"}
+{"type":"message","id":"proxy01","timestamp":"2026-10-04T00:20:01Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"repeat01","name":"bash","arguments":{"command":"printf repeated"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy02","timestamp":"2026-10-04T00:20:02Z","message":{"role":"toolResult","toolCallId":"repeat01","toolName":"bash","isError":false,"content":[{"type":"text","text":"[shaken synthetic fixture output]"}]}}
+{"type":"message","id":"proxy03","timestamp":"2026-10-04T00:20:03Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"repeat02","name":"bash","arguments":{"command":"printf repeated"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy04","timestamp":"2026-10-04T00:20:04Z","message":{"role":"toolResult","toolCallId":"repeat02","toolName":"bash","isError":false,"content":[]}}
+{"type":"message","id":"proxy05","timestamp":"2026-10-04T00:20:05Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"route01","name":"ask","arguments":{"question":"Synthetic fixture question"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy06","timestamp":"2026-10-04T00:20:06Z","message":{"role":"toolResult","toolCallId":"route01","toolName":"ask","isError":true,"content":[]}}
+{"type":"message","id":"proxy07","timestamp":"2026-10-04T00:20:07Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"land01","name":"bash","arguments":{"command":"git commit -m fixture"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy08","timestamp":"2026-10-04T00:20:08Z","message":{"role":"toolResult","toolCallId":"land01","toolName":"bash","isError":true,"content":[{"type":"text","text":"hook failed"}]}}
+{"type":"message","id":"proxy09","timestamp":"2026-10-04T00:20:09Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"land02","name":"bash","arguments":{"command":"br close synthetic-bead"}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy10","timestamp":"2026-10-04T00:20:10Z","message":{"role":"toolResult","toolCallId":"land02","toolName":"bash","isError":true,"content":[{"type":"text","text":"cannot close: blocked"}]}}
+{"type":"message","id":"proxy11","timestamp":"2026-10-04T00:20:11Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"delegate-ok","name":"task","arguments":{"tasks":[{"agent":"task"}]}}],"stopReason":"toolUse"}}
+{"type":"message","id":"proxy12","timestamp":"2026-10-04T00:20:12Z","message":{"role":"toolResult","toolCallId":"delegate-ok","toolName":"task","isError":false,"content":[]}}
+{"type":"message","id":"proxy13","timestamp":"2026-10-04T00:20:13Z","message":{"role":"assistant","content":[],"stopReason":"stop"}}
+{"type":"message","id":"proxy14","timestamp":"2026-10-04T00:20:14Z","message":{"role":"user","content":[{"type":"text","text":"Please continue."}]}}
+{"type":"custom_message","customType":"mid-run-todo-nudge","id":"nudge-unjoined","timestamp":"2026-10-04T00:20:15Z","details":{}}
+{"type":"message","id":"proxy15","timestamp":"2026-10-04T00:20:16Z","positives":1,"message":{"role":"assistant","content":[{"type":"toolCall","id":"delegate-unjoined","name":"task","arguments":{"tasks":[{"agent":"task"}]}}],"stopReason":"toolUse"}}
+{"type":"session","id":"synthetic-session-kit-guard","timestamp":"2026-10-04T00:21:00Z","cwd":"/fixture","version":"observed-shape"}
+{"type":"custom_message","customType":"kit-guard","id":"kit01","timestamp":"2026-10-04T00:21:01Z","content":"kit-guard: context was just compacted. Re-read AGENTS.md, GATES.md, and your bead before your next action.","display":true}
+{"type":"message","id":"kit02","timestamp":"2026-10-04T00:21:02Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"kit-read","name":"read","arguments":{"path":"/fixture/AGENTS.md"}}],"stopReason":"toolUse"}}

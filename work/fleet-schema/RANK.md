@@ -6,6 +6,15 @@ command: nice -n 10 python3 work/fleet-schema/miner.py --rank --as-of 2026-10-04
 Current counts are recomputed from the streamed miner output; plan counts are from the committed decision-point registry.
 A partial or deferred scan is not a ranking and MUST NOT be treated as complete.
 
+## Emitted evidence
+
+`--labels FAMILY --json` emits hash-only source-defined proxies; missing outcomes are `NOT_COUNTED`, not negative labels.
+`reread` emits raw re-fetch metadata, including recorded path selectors, without harm or label fields.
+Rank outcomes refer only to shown hits; an unavailable transcript call index stays null.
+`result` also reports shaken-command repeat distances. K remains unknown unless `--rerun-window-calls` is supplied; no default scientific threshold is invented.
+For pin, delegate and outcome, the 30-positive cut uses observed re-fetch/error/correction proxies separately from total label counts.
+JSON rank output includes baseline counts and explicit `reopen` reasons. These proxies do not establish classifier quality.
+
 | Family | Current occurrences | Plan occurrences | Δ occurrences | Current labels | Plan labels | Δ labels | Re-rank |
 |---|---:|---:|---:|---:|---:|---:|---|
 | result | 90517 | 99680 | -9163 | 3611 | 4329 | -718 | — |

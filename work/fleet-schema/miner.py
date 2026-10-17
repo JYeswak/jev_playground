@@ -40,6 +40,10 @@ DEFAULT_BUDGET_SECONDS = 3000.0
 WINDOW_DAYS = 14
 MAX_LOAD_AVERAGE = 80.0
 RANK_REPORT = ROOT / "work" / "fleet-schema" / "RANK.md"
+EMITTED_FAMILIES = frozenset({
+    "result", "reread", "rank", "route", "nudge", "recover",
+    "land", "outcome", "pin", "delegate",
+})
 
 # DP line numbers from FAMILY-REBUILD.md section 1. DP-48 is an outcome
 # source for `outcome`, not an additional occurrence-bearing decision.
@@ -170,6 +174,22 @@ def _read_path(call: ToolCall) -> Optional[str]:
     return path.split(":", 1)[0]
 
 
+def _read_selector(call: ToolCall) -> str:
+    path = call.path or ""
+    suffix = path.partition(":")[2] if "://" not in path else ""
+    selector = suffix or str(call.arguments.get("range") or call.arguments.get("line_range") or "")
+    parts = selector.split(":")
+    if all(
+        part in {"raw", "img", "conflicts"} or (
+            any(char in "0123456789" for char in part)
+            and all(char in "0123456789-+," for char in part)
+        )
+        for part in parts
+    ):
+        return selector
+    return ""
+
+
 def _write_paths(call: ToolCall) -> Set[str]:
     args = call.arguments
     found: Set[str] = set()
@@ -252,11 +272,15 @@ def extract_result_labels(rows: Sequence[Mapping[str, object]], as_of: str) -> L
         raise ValueError(f"invalid --as-of timestamp: {as_of}")
     start = cutoff - timedelta(days=WINDOW_DAYS)
     calls = tool_calls(rows, as_of)
-    by_call = {call.tool_call_id: call for call in calls if call.tool_call_id}
+    by_call = {(call.session_id, call.tool_call_id): call for call in calls if call.tool_call_id}
     spills: List[Tuple[str, int, str, str]] = []
     seen: Set[Tuple[str, str]] = set()
     readbacks: Set[Tuple[str, str]] = set()
+    session_id = "unknown-session"
     for row in rows:
+        if row.get("type") == "session":
+            session_id = str(row.get("id") or "unknown-session")
+            continue
         stamp = _event_time(row)
         if row.get("type") != "message" or stamp is None or not start <= stamp <= cutoff:
             continue
@@ -264,7 +288,7 @@ def extract_result_labels(rows: Sequence[Mapping[str, object]], as_of: str) -> L
         if not isinstance(message, dict):
             continue
         if message.get("role") == "toolResult":
-            call = by_call.get(str(message.get("toolCallId") or ""))
+            call = by_call.get((session_id, str(message.get("toolCallId") or "")))
             if call is None:
                 continue
             for artifact_id in _artifact_ids(_text(message.get("content"))):
@@ -277,7 +301,7 @@ def extract_result_labels(rows: Sequence[Mapping[str, object]], as_of: str) -> L
             for block in message.get("content") or []:
                 if not isinstance(block, dict) or block.get("type") != "toolCall" or block.get("name") != "read":
                     continue
-                call = by_call.get(str(block.get("id") or ""))
+                call = by_call.get((session_id, str(block.get("id") or "")))
                 args = block.get("arguments")
                 path = args.get("path") if isinstance(args, dict) else None
                 if call is not None and isinstance(path, str):
@@ -315,7 +339,7 @@ def extract_reread_events(rows: Sequence[Mapping[str, object]], as_of: str) -> L
                 "session_id_sha256": _sha(call.session_id),
                 "call_index": call.call_index,
                 "path_sha256": _sha(path),
-                "line_range": str(call.arguments.get("range") or call.arguments.get("line_range") or ""),
+                "line_range": _read_selector(call),
                 "fetch_tool": call.name,
                 "calls_since_prior_read": call.call_index - previous.call_index - 1,
             })
@@ -375,7 +399,12 @@ def ca37_candidate_counts(path: Path) -> Dict[str, Tuple[int, int]]:
     return counts
 
 
-def validate_golden_provenance(directory: Path) -> None:
+def validate_golden_provenance(
+    directory: Path,
+    *,
+    expected_miner_source_sha256: Optional[str] = None,
+    expected_command: Optional[str] = None,
+) -> None:
     labels = directory / "labels.jsonl"
     if not labels.is_file():
         raise ValueError("labels.jsonl is missing")
@@ -392,6 +421,11 @@ def validate_golden_provenance(directory: Path) -> None:
     )
     if expected != _sha(labels.read_bytes()):
         raise ValueError("labels.jsonl does not match PROVENANCE.md sha256")
+    fields = dict(line.split(": ", 1) for line in text.splitlines() if ": " in line)
+    if expected_miner_source_sha256 is not None and fields.get("miner source sha256") != expected_miner_source_sha256:
+        raise ValueError("golden miner source identity does not match")
+    if expected_command is not None and fields.get("command") != expected_command:
+        raise ValueError("golden command/input identity does not match")
 
 
 def _tokens(command: str) -> List[str]:
@@ -499,6 +533,8 @@ class _Pending:
     remaining: int
     payload: object
     counted: bool
+    origin: Optional[ToolCall] = None
+    event_hash: str = ""
 
 
 @dataclass
@@ -516,6 +552,16 @@ class Metrics:
     find_rank_touched: int = 0
     result_labels: List[dict] = field(default_factory=list)
     reread_events: List[dict] = field(default_factory=list)
+    organic_rows: Dict[str, List[dict]] = field(default_factory=dict)
+    result_reruns: List[dict] = field(default_factory=list)
+    rerun_window_calls: Optional[int] = None
+    shaken_wait: Dict[str, List[Tuple[ToolCall, int, str]]] = field(default_factory=dict)
+    call_rows: Dict[str, List[dict]] = field(default_factory=dict)
+    hint_rows: Dict[str, dict] = field(default_factory=dict)
+    rule_rows: Dict[str, dict] = field(default_factory=dict)
+    final_row: Optional[dict] = None
+    _last_find_call: Optional[ToolCall] = None
+    _last_find_hash: str = ""
     session_id: str = "unknown-session"
     call_index: int = 0
     epoch: int = 0
@@ -529,12 +575,81 @@ class Metrics:
     artifact_reads: Set[str] = field(default_factory=set)
     repeat_seen: Set[str] = field(default_factory=set)
     pending: List[_Pending] = field(default_factory=list)
-    outcome_wait: Dict[str, str] = field(default_factory=dict)
+    outcome_wait: Dict[str, Tuple[str, _Pending, ToolCall]] = field(default_factory=dict)
     ttsr_rules: Counter = field(default_factory=Counter)
 
     def _in_window(self, row: Mapping[str, object]) -> bool:
         stamp = _event_time(row)
         return stamp is not None and self.start <= stamp <= self.cutoff
+
+
+    def label_rows(self, family: str) -> List[dict]:
+        if family == "result":
+            return self.result_labels + self.result_reruns
+        if family == "reread":
+            return self.reread_events
+        if family not in EMITTED_FAMILIES:
+            raise ValueError("no organic emitter for " + family)
+        return self.organic_rows.get(family, [])
+
+    def _emit(
+        self, family: str, source_kind: str, event_hash: str,
+        origin: Optional[ToolCall] = None, label: Optional[str] = None,
+        **metadata: object,
+    ) -> dict:
+        emitted = {
+            "schema_version": 1, "family": family,
+            "session_id_sha256": _sha(origin.session_id if origin else self.session_id),
+            "call_index": origin.call_index if origin else None,
+            "event_sha256": event_hash, "label": label,
+            "status": "COUNTED" if label is not None else "NOT_COUNTED",
+            "source_kind": source_kind,
+        }
+        emitted.update(metadata)
+        self.organic_rows.setdefault(family, []).append(emitted)
+        return emitted
+
+    @staticmethod
+    def _set_label(emitted: dict, label: Optional[str]) -> None:
+        emitted["label"] = label
+        emitted["status"] = "COUNTED" if label is not None else "NOT_COUNTED"
+
+    def _expect_result(self, family: str, source_kind: str, call: ToolCall, event_hash: str, **metadata: object) -> None:
+        emitted = self._emit(family, source_kind, event_hash, call, **metadata)
+        if call.tool_call_id:
+            self.call_rows.setdefault(call.tool_call_id, []).append(emitted)
+
+    def _pending_row(self, pending: _Pending, label: Optional[str], call: Optional[ToolCall] = None) -> None:
+        family = "recover" if pending.kind in {"bash_error", "edit_error"} else "pin" if pending.kind == "compaction" else "nudge"
+        if family == "recover" and label is not None and not label.endswith((":ok", ":err")):
+            label = None
+        self._emit(family, pending.kind, pending.event_hash, pending.origin or call, label)
+
+    def _rerun_row(self, call: ToolCall, observed_index: int, event_hash: str, repeat: Optional[ToolCall]) -> None:
+        distance = repeat.call_index - call.call_index if repeat else None
+        result_distance = repeat.call_index - observed_index if repeat else None
+        label = None
+        if self.rerun_window_calls is not None:
+            if result_distance is not None and result_distance <= self.rerun_window_calls:
+                label = "same_command_rerun"
+            elif self.call_index - observed_index >= self.rerun_window_calls:
+                label = "no_rerun_within_window"
+        emitted = self._emit(
+            "result", "shaken_same_command", event_hash, call, label,
+            command_sha256=_sha(str(call.arguments.get("command") or "")),
+            calls_until_repeat=distance, calls_since_result=result_distance,
+            rerun_window_calls=self.rerun_window_calls,
+        )
+        self.result_reruns.append(emitted)
+
+    def _record_rule(self, rule: str, event_hash: str) -> None:
+        emitted = self.rule_rows.get(rule)
+        if emitted is None:
+            self.rule_rows[rule] = self._emit("nudge", "ttsr_session_rule", event_hash, rule_sha256=_sha(rule))
+        else:
+            self._set_label(emitted, "refired")
+        if rule in {"kit-close-needs-evidence", "claim-without-evidence", "kit-close-reason-no-evidence", "kit-unverified-done"}:
+            self._emit("land", "close_evidence_rule", event_hash, rule_sha256=_sha(rule))
 
     def _flush_session(self) -> None:
         for _rule, count in self.ttsr_rules.items():
@@ -549,6 +664,17 @@ class Metrics:
                 "event_sha256": event_hash,
                 "label": "read_back" if artifact_id in self.artifact_reads else "not_read_back",
             })
+        if self._last_find_call is not None and self._in_window({"timestamp": self._last_find_call.timestamp}):
+            self._emit("route", "find_next_call", self._last_find_hash, self._last_find_call)
+        for pending in self.pending:
+            if pending.counted:
+                self._pending_row(pending, None)
+        for _follow, pending, call in self.outcome_wait.values():
+            if pending.counted:
+                self._pending_row(pending, None, call)
+        for waiting in self.shaken_wait.values():
+            for call, observed_index, event_hash in waiting:
+                self._rerun_row(call, observed_index, event_hash, None)
         self.last_assistant_final = False
         self.ttsr_rules.clear()
         self.spills.clear()
@@ -561,6 +687,12 @@ class Metrics:
         self.pending.clear()
         self.outcome_wait.clear()
         self.calls.clear()
+        self.call_rows.clear()
+        self.hint_rows.clear()
+        self.rule_rows.clear()
+        self.final_row = None
+        self._last_find_call = None
+        self.shaken_wait.clear()
         self._last_find = False
 
     def finish(self) -> None:
@@ -580,12 +712,42 @@ class Metrics:
         arguments = args if isinstance(args, dict) else {}
         name = str(block.get("name") or "?")
         call_id = str(block.get("id") or "")
-        call = ToolCall(self.session_id, str(row.get("timestamp") or ""), self.call_index, name, arguments, self.epoch, call_id)
+        call = ToolCall(self.session_id, _event_time(row).isoformat(), self.call_index, name, arguments, self.epoch, call_id)
         if call_id:
             self.calls[call_id] = call
+        event_hash = _sha(json.dumps(row, sort_keys=True, separators=(",", ":")))
+        if self._last_find_call is not None:
+            if self._in_window({"timestamp": self._last_find_call.timestamp}):
+                next_kind = name if name in {"read", "edit", "find", "grep"} else "other"
+                self._emit("route", "find_next_call", self._last_find_hash, self._last_find_call, "next_" + next_kind)
+            self._last_find_call = None
+        if name == "find":
+            self._last_find_call = call
+            self._last_find_hash = event_hash
+        path = call.path or ""
+        if counted:
+            if name in {"find", "grep", "glob"}:
+                self._emit("route", "locate_" + name, event_hash, call)
+            if name == "todo" and arguments.get("op") == "init":
+                self._emit("route", "todo_init", event_hash, call)
+            if name == "web_search" or (name == "read" and path.startswith(("http://", "https://"))):
+                self._emit("route", "web_search" if name == "web_search" else "web_read", event_hash, call)
+            if name == "ask":
+                self._expect_result("route", "ask_result", call, event_hash)
+            if name == "read" and path.startswith("skill://"):
+                self._emit("nudge", "skill_read", event_hash, call, skill_sha256=_sha(path[8:].split("/", 1)[0]))
+            if name == "task":
+                self._emit("delegate", "task_spawn", event_hash, call)
+                self._expect_result("delegate", "task_result", call, event_hash)
+                tasks = arguments.get("tasks")
+                for task in tasks if isinstance(tasks, list) else []:
+                    if isinstance(task, dict):
+                        self._expect_result("delegate", "task_agent", call, event_hash, agent_sha256=_sha(str(task.get("agent") or "task")))
+                        self._emit("delegate", "task_model", event_hash, call, model_sha256=_sha(str(task.get("model") or "")))
+            if name == "yield":
+                self._emit("delegate", "yield_error", event_hash, call, "error" if arguments.get("error") else None)
         if counted:
             self.c["tool:" + name] += 1
-        path = call.path or ""
         if name == "read":
             kind = _path_class(path)
             if counted:
@@ -603,7 +765,7 @@ class Metrics:
                             "session_id_sha256": _sha(self.session_id),
                             "call_index": call.call_index,
                             "path_sha256": _sha(file_path),
-                            "line_range": str(arguments.get("range") or arguments.get("line_range") or ""),
+                            "line_range": _read_selector(call),
                             "fetch_tool": "read",
                             "calls_since_prior_read": call.call_index - prior_index - 1,
                         })
@@ -621,6 +783,10 @@ class Metrics:
                 if self.hinted.get(skill) and counted:
                     self.c["skill_hint_followed"] += 1
                     self.hinted[skill] = False
+                    hinted_row = self.hint_rows.pop(skill, None)
+                    if hinted_row is not None:
+                        hinted_row["call_index"] = call.call_index
+                        self._set_label(hinted_row, "followed")
             if counted and path.startswith("memory://"):
                 self.c["read:memory"] += 1
             if counted and path.startswith("http://"):
@@ -670,6 +836,15 @@ class Metrics:
                     self.c["bash:" + family] += 1
                 if not families:
                     self.c["bash:other"] += 1
+            for origin, observed_index, shaken_hash in self.shaken_wait.pop(command, []):
+                self._rerun_row(origin, observed_index, shaken_hash, call)
+            if counted:
+                for family in ("git_commit", "br_close"):
+                    if family in families:
+                        self._expect_result("land", family + "_result", call, event_hash)
+                        self._expect_result("land", family + ("_hook_reject" if family == "git_commit" else "_refused"), call, event_hash)
+                if "git_revert" in families:
+                    self._emit("land", "git_revert", event_hash, call, "revert_observed")
         edit_targets = _edit_targets(arguments.get("input")) if name == "edit" else set()
         still: List[_Pending] = []
         for pending in self.pending:
@@ -694,17 +869,24 @@ class Metrics:
                 if pending.counted:
                     self.p4["follow:" + pending.kind + ":" + hit] += 1
                 if pending.kind in ("bash_error", "edit_error") and hit in ("identical_retry", "changed_command", "edit_again_no_read"):
-                    self.outcome_wait[call_id] = "outcome:" + pending.kind + ":" + hit
+                    if call_id:
+                        self.outcome_wait[call_id] = ("outcome:" + pending.kind + ":" + hit, pending, call)
+                    elif pending.counted:
+                        self._pending_row(pending, None, call)
+                elif pending.counted:
+                    self._pending_row(pending, hit, call)
                 continue
             pending.remaining -= 1
             if pending.remaining <= 0:
                 if pending.counted:
                     self.p4["follow:" + pending.kind + ":none_within_window"] += 1
+                    self._pending_row(pending, "none_within_window", call)
             else:
                 still.append(pending)
         self.pending = still
         self._last_find = name == "find"
     def process(self, row: Mapping[str, object], source_path: str) -> None:
+        event_hash = _sha(json.dumps(row, sort_keys=True, separators=(",", ":")))
         kind = row.get("type")
         stamp = _event_time(row)
         if stamp is None or stamp > self.cutoff:
@@ -722,14 +904,41 @@ class Metrics:
                 for field_name, value in row.items():
                     if isinstance(value, (str, bool, int)) and not (isinstance(value, int) and not isinstance(value, bool) and abs(value) > 100):
                         self.dl_values[filename + ":" + field_name + "=" + str(value)[:40]] += 1
+                rank_label = None
                 if filename == "find-rank.jsonl":
                     self.find_rank_rows += 1
+                    hits = row.get("hits")
+                    shown = {hit for hit in hits if isinstance(hit, str)} if isinstance(hits, list) else set()
                     next_calls = row.get("nextToolCalls")
-                    if isinstance(next_calls, list) and any(
-                        isinstance(item, dict) and isinstance(item.get("touched"), list) and item["touched"]
+                    touched = isinstance(next_calls, list) and any(
+                        isinstance(item, dict) and isinstance(item.get("touched"), list)
+                        and any(isinstance(hit, str) and hit in shown for hit in item["touched"])
                         for item in next_calls
-                    ):
+                    )
+                    if touched:
                         self.find_rank_touched += 1
+                        rank_label = "touched_shown_hit"
+                    elif shown and row.get("complete") is True:
+                        rank_label = "no_shown_hit_touched"
+                log_families = {
+                    "find-rank.jsonl": ("rank", "find_rank"),
+                    "websearch-rerank.jsonl": ("rank", "web_rerank"),
+                    "skill-hint-calls.jsonl": ("nudge", "skill_hint_log"),
+                    "skill-veto-shadow.jsonl": ("nudge", "skill_veto"),
+                }
+                if filename in log_families:
+                    family, source_kind = log_families[filename]
+                    # A recorded rank outcome does not invent a transcript origin.
+                    emitted = self._emit(family, source_kind, event_hash, label=rank_label)
+                    source_session = row.get("session") or row.get("sessionId") or row.get("session_id")
+                    source_session_hash = row.get("sessionHash")
+                    if (
+                        isinstance(source_session_hash, str) and len(source_session_hash) == 64
+                        and all(char in "0123456789abcdef" for char in source_session_hash)
+                    ):
+                        emitted["session_id_sha256"] = source_session_hash
+                    else:
+                        emitted["session_id_sha256"] = _sha(source_session if isinstance(source_session, str) else "unknown-session")
             return
         if counted:
             self.c["rowtype:" + str(kind)] += 1
@@ -739,7 +948,7 @@ class Metrics:
                 read_files = details.get("readFiles") if isinstance(details, dict) else None
                 if isinstance(read_files, list) and read_files:
                     self.p4["compaction_with_readFiles"] += 1
-                    self.pending.append(_Pending("compaction", 30, {_basename(f) for f in read_files if isinstance(f, str)}, counted))
+                    self.pending.append(_Pending("compaction", 30, {_basename(f) for f in read_files if isinstance(f, str)}, counted, event_hash=event_hash))
             self.epoch += 1
             self.last_read.clear()
             self.last_write.clear()
@@ -750,6 +959,7 @@ class Metrics:
                 for rule in rules:
                     self.ttsr_rules[str(rule)] += 1
                     self.c["ttsr_rule:" + str(rule)] += 1
+                    self._record_rule(str(rule), event_hash)
             return
         if kind in ("custom", "custom_message"):
             custom_type, data = _row_kind(row)
@@ -765,30 +975,39 @@ class Metrics:
                     self.hinted[skill] = True
                     if counted:
                         self.c["skill_hint_emitted"] += 1
+                        previous = self.hint_rows.get(skill)
+                        if previous is not None:
+                            self._set_label(previous, None)
+                        self.hint_rows[skill] = self._emit("nudge", "skill_hint", event_hash, skill_sha256=_sha(skill))
             if kind == "custom_message" and custom_type == "ttsr-injection" and isinstance(details, dict):
                 rules = details.get("rules")
                 if isinstance(rules, list) and counted:
                     for rule in rules:
                         self.ttsr_rules[str(rule)] += 1
                         self.c["ttsr_rule:" + str(rule)] += 1
+                        self._record_rule(str(rule), event_hash)
             if isinstance(data, dict) and "kind" in data and counted:
                 self.c["kind:" + str(custom_type) + ":" + str(data.get("kind"))] += 1
             if kind == "custom_message" and counted:
                 if custom_type == "mid-run-todo-nudge":
                     self.p4["trig:todo_nudge"] += 1
-                    self.pending.append(_Pending("todo_nudge", 3, None, True))
+                    self.pending.append(_Pending("todo_nudge", 3, None, True, event_hash=event_hash))
                 elif custom_type == "lsp-late-diagnostic":
                     files = set()
                     if isinstance(details, dict) and isinstance(details.get("files"), list):
                         files = {_basename(item.get("path", "")) for item in details["files"] if isinstance(item, dict) and isinstance(item.get("path"), str)}
                     self.p4["trig:lsp_late"] += 1
-                    self.pending.append(_Pending("lsp_late", 3, files, True))
+                    self.pending.append(_Pending("lsp_late", 3, files, True, event_hash=event_hash))
                 elif custom_type == "kit-guard":
                     self.p4["trig:kit_guard"] += 1
-                    self.pending.append(_Pending("kit_guard", 5, None, True))
+                    self.pending.append(_Pending("kit_guard", 5, None, True, event_hash=event_hash))
+                elif custom_type == "interrupted-thinking":
+                    self._emit("outcome", "interrupted_thinking", event_hash)
             return
         if kind == "model_usage" and counted:
             self.c["model_usage:" + str(row.get("purpose")) + ":" + str(row.get("role"))] += 1
+            if row.get("purpose") == "find":
+                self._emit("rank", "find_model_usage", event_hash)
             return
         if kind == "thinking_level_change" and counted:
             self.c["thinking_level:" + str(row.get("thinkingLevel")) + ":" + str(row.get("configured"))] += 1
@@ -815,10 +1034,16 @@ class Metrics:
             self._last_find = bool(blocks and blocks[-1].get("name") == "find")
             if counted:
                 self.c["stop:" + str(message.get("stopReason"))] += 1
+                if message.get("stopReason") == "aborted":
+                    self._emit("outcome", "assistant_aborted", event_hash)
             for block in blocks:
                 has_tool = True
                 self._call(block, row, counted)
             self.last_assistant_final = not has_tool and message.get("stopReason") == "stop"
+            if self.last_assistant_final and counted:
+                self.final_row = self._emit("outcome", "correction_after_final", event_hash)
+            elif has_tool:
+                self.final_row = None
             return
         if role == "toolResult":
             name = str(message.get("toolName") or "?")
@@ -826,6 +1051,31 @@ class Metrics:
             error = bool(message.get("isError"))
             call_id = str(message.get("toolCallId") or "")
             call = self.calls.get(call_id)
+            observed_error = message.get("isError")
+            if counted and text.startswith("[shaken"):
+                command = call.arguments.get("command") if call is not None and call.name == "bash" else None
+                if isinstance(command, str) and call is not None:
+                    self.shaken_wait.setdefault(command, []).append((call, self.call_index, event_hash))
+                else:
+                    emitted = self._emit(
+                        "result", "shaken_same_command", event_hash, call,
+                        command_sha256=None, calls_until_repeat=None,
+                        calls_since_result=None, rerun_window_calls=self.rerun_window_calls,
+                    )
+                    self.result_reruns.append(emitted)
+            if counted and isinstance(observed_error, bool):
+                for emitted in self.call_rows.pop(call_id, []):
+                    source_kind = emitted["source_kind"]
+                    lower = text[:2000].lower()
+                    if source_kind in {"ask_result", "task_agent", "task_result"}:
+                        proxy = "error" if observed_error else "ok"
+                    elif source_kind.endswith("_result"):
+                        proxy = "error" if observed_error else "ok"
+                    elif source_kind == "git_commit_hook_reject":
+                        proxy = "hook_reject" if "hook" in lower and ("fail" in lower or "reject" in lower) else "no_hook_reject_observed"
+                    else:
+                        proxy = "refused_or_error" if any(word in lower for word in ("refus", "cannot close", "blocked", "error")) else "no_refusal_observed"
+                    self._set_label(emitted, proxy)
             if counted:
                 if text.startswith("[shaken"):
                     self.c["result_shaken"] += 1
@@ -846,9 +1096,9 @@ class Metrics:
                     self.c["git_push_rejected"] += 1
                 if call is not None and "test_run" in _bash_families(str(call.arguments.get("command") or "")) and (error or " failed" in lower or " failures" in lower):
                     self.c["test_run_failed"] += 1
-                if name == "task":
+                if name == "task" and isinstance(observed_error, bool):
                     self.p2["task_result:" + ("error" if error else "ok")] += 1
-                if name == "ask":
+                if name == "ask" and isinstance(observed_error, bool):
                     self.p2["ask_result:" + ("error" if error else "ok")] += 1
             if counted:
                 for artifact_id in _artifact_ids(text[:600]):
@@ -857,25 +1107,35 @@ class Metrics:
                         if call is not None:
                             self.spills.append((call.call_index, artifact_id, _sha(json.dumps(row, sort_keys=True, separators=(",", ":")))))
             follow = self.outcome_wait.pop(call_id, None)
-            if counted and follow:
-                self.p4[follow + (":err" if error else ":ok")] += 1
+            if follow:
+                follow_key, pending, follow_call = follow
+                if counted and isinstance(observed_error, bool):
+                    self.p4[follow_key + (":err" if error else ":ok")] += 1
+                    self._pending_row(pending, follow_key.removeprefix("outcome:").split(":", 1)[1] + (":err" if error else ":ok"), follow_call)
+                elif pending.counted:
+                    self._pending_row(pending, None, follow_call)
             if call is not None and name == "read":
                 for artifact_id in _artifact_ids(call.path or ""):
                     self.artifact_reads.add(artifact_id)
             if error and name in ("bash", "edit") and call is not None and counted:
                 if name == "bash":
                     self.p4["trig:bash_error"] += 1
-                    self.pending.append(_Pending("bash_error", 1, call.arguments.get("command"), True))
+                    self.pending.append(_Pending("bash_error", 1, call.arguments.get("command"), True, call, event_hash))
                 else:
                     targets = _edit_targets(call.arguments.get("input"))
                     self.p4["trig:edit_error"] += 1
-                    self.pending.append(_Pending("edit_error", 2, targets, True))
+                    self.pending.append(_Pending("edit_error", 2, targets, True, call, event_hash))
             return
         if role == "user":
             text = _text(message.get("content"))
             user_type = _user_class(text)
             if counted:
                 self.c["user:" + user_type] += 1
+                if user_type in {"human_or_other", "conductor_dispatch"}:
+                    self._emit("route", "prompt_" + user_type, event_hash)
+                if user_type == "human_or_other" and self.last_assistant_final and self.final_row is not None:
+                    self._set_label(self.final_row, "correction" if _correction(text) else "no_correction_observed")
+                # A neutral next turn is only a negative regex proxy, never acceptance.
                 if user_type == "human_or_other":
                     if self.last_assistant_final:
                         self.c["user_after_final_answer"] += 1
@@ -884,6 +1144,7 @@ class Metrics:
                     if _correction(text):
                         self.c["user_correction_any"] += 1
             self.last_assistant_final = False
+            self.final_row = None
 
 
 def _source_count(spec: str, metrics: Metrics) -> int:
@@ -924,22 +1185,56 @@ def _family_metrics(metrics: Metrics, point_rows: Sequence[Mapping[str, object]]
         label_count = sum(_source_count(str(spec), metrics) for spec in label_specs)
         point_counts[index] = (occurrence_count, label_count)
     family_counts: Dict[str, Dict[str, int]] = {}
+    positives = {
+        "pin": metrics.p4["follow:compaction:reread_prior_file"],
+        "delegate": metrics.p2["task_result:error"] + metrics.p2["yield:error:None"],
+        "outcome": metrics.c["user_correction_after_final"],
+    }
     for family, points in FAMILY_POINTS.items():
         family_counts[family] = {
             "occurrences": sum(point_counts.get(point, (0, 0))[0] for point in points),
             "labels": sum(point_counts.get(point, (0, 0))[1] for point in points),
         }
+        if family in positives:
+            family_counts[family]["positives"] = int(positives[family])
     return family_counts
 
 
 def _baseline_metrics(point_rows: Sequence[Mapping[str, object]]) -> Dict[str, Dict[str, int]]:
     result: Dict[str, Dict[str, int]] = {}
+    positive_points = {"pin": (41,), "delegate": (43, 45), "outcome": (5,)}
     for family, points in FAMILY_POINTS.items():
         result[family] = {
             "occurrences": sum(int(point_rows[point - 1].get("occurrences_14d", 0)) for point in points if point <= len(point_rows)),
             "labels": sum(int(point_rows[point - 1].get("label_count", 0)) for point in points if point <= len(point_rows)),
         }
+        if family in positive_points:
+            result[family]["positives"] = sum(
+                int(point_rows[point - 1].get("label_count", 0))
+                for point in positive_points[family] if point <= len(point_rows)
+            )
     return result
+
+
+def rank_reopen_reasons(
+    current: Mapping[str, Mapping[str, int]],
+    baseline: Mapping[str, Mapping[str, int]],
+) -> Dict[str, List[str]]:
+    reasons: Dict[str, List[str]] = {}
+    for family in FAMILY_POINTS:
+        now, old = current.get(family, {}), baseline.get(family, {})
+        changed: List[str] = []
+        if (now.get("labels", 0) > 0) != (old.get("labels", 0) > 0):
+            changed.append("label_availability")
+        if family in {"pin", "delegate", "outcome"} and (now or old):
+            positive, prior_positive = now.get("positives"), old.get("positives")
+            if positive is None or prior_positive is None:
+                changed.append("positive_count_unknown")
+            elif (positive >= 30) != (prior_positive >= 30):
+                changed.append("positive_threshold")
+        if changed:
+            reasons[family] = changed
+    return reasons
 
 
 def rank_report(current: Mapping[str, Mapping[str, int]], baseline: Mapping[str, Mapping[str, int]], as_of: str) -> str:
@@ -950,9 +1245,17 @@ def rank_report(current: Mapping[str, Mapping[str, int]], baseline: Mapping[str,
         f"command: nice -n 10 python3 work/fleet-schema/miner.py --rank --as-of {as_of} --json",
         "Current counts are recomputed from the streamed miner output; plan counts are from the committed decision-point registry.",
         "A partial or deferred scan is not a ranking and MUST NOT be treated as complete.", "",
+        "## Emitted evidence", "",
+        "`--labels FAMILY --json` emits hash-only source-defined proxies; missing outcomes are `NOT_COUNTED`, not negative labels.",
+        "`reread` emits raw re-fetch metadata, including recorded path selectors, without harm or label fields.",
+        "Rank outcomes refer only to shown hits; an unavailable transcript call index stays null.",
+        "`result` also reports shaken-command repeat distances. K remains unknown unless `--rerun-window-calls` is supplied; no default scientific threshold is invented.",
+        "For pin, delegate and outcome, the 30-positive cut uses observed re-fetch/error/correction proxies separately from total label counts.",
+        "JSON rank output includes baseline counts and explicit `reopen` reasons. These proxies do not establish classifier quality.", "",
         "| Family | Current occurrences | Plan occurrences | Δ occurrences | Current labels | Plan labels | Δ labels | Re-rank |",
         "|---|---:|---:|---:|---:|---:|---:|---|",
     ]
+    reopen = rank_reopen_reasons(current, baseline)
     for family in FAMILY_POINTS:
         now = current.get(family, {})
         old = baseline.get(family, {})
@@ -960,9 +1263,7 @@ def rank_report(current: Mapping[str, Mapping[str, int]], baseline: Mapping[str,
         old_occurrences = int(old.get("occurrences", 0))
         labels = int(now.get("labels", 0))
         old_labels = int(old.get("labels", 0))
-        crosses_availability = (labels > 0) != (old_labels > 0)
-        crosses_thirty = family in {"pin", "delegate", "outcome"} and (labels >= 30) != (old_labels >= 30)
-        status = "REOPEN" if crosses_availability or crosses_thirty else "—"
+        status = "REOPEN" if family in reopen else "—"
         lines.append(f"| {family} | {occurrences} | {old_occurrences} | {occurrences - old_occurrences:+d} | {labels} | {old_labels} | {labels - old_labels:+d} | {status} |")
     lines.extend([
         "", "The `outcome` occurrence count excludes DP-48 aborts; DP-48 is a label source, not a separate decision.",
@@ -1096,6 +1397,12 @@ def _miner_commit() -> str:
     ).stdout.strip()
     if not commit:
         raise ValueError("miner source must be committed on origin/main before writing goldens")
+    committed = subprocess.run(
+        ["git", "show", f"{commit}:{source_path}"], cwd=ROOT,
+        capture_output=True, check=True, timeout=5,
+    ).stdout
+    if committed != Path(__file__).read_bytes():
+        raise ValueError("running miner source differs from recorded origin/main commit")
     return commit
 
 
@@ -1104,24 +1411,30 @@ def _write_labels(
     family: str,
     as_of: str,
     target: Optional[Path] = None,
+    *,
+    command: Optional[str] = None,
 ) -> None:
     if os.environ.get("UPDATE_GOLDENS") != "1":
         return
-    destination = target or ROOT / "kit" / "fixtures" / family
-    destination.mkdir(parents=True, exist_ok=True)
-    encoded = "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in rows)
-    (destination / "labels.jsonl").write_text(encoded, encoding="utf-8")
+    if family not in EMITTED_FAMILIES:
+        raise ValueError("no organic emitter for " + family)
     commit = _miner_commit()
+    source_sha256 = _sha(Path(__file__).read_bytes())
+    encoded = "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in rows)
     cutoff = _timestamp(as_of)
     if cutoff is None:
         raise ValueError(f"invalid --as-of timestamp: {as_of}")
     provenance = (
         f"# {family} label fixture provenance\n\n"
         f"miner commit: {commit}\n"
+        f"miner source sha256: {source_sha256}\n"
         f"log window: {(cutoff - timedelta(days=WINDOW_DAYS)).isoformat()}..{as_of}\n"
-        f"command: UPDATE_GOLDENS=1 python3 work/fleet-schema/miner.py --labels {family} --as-of {as_of} --json\n"
+        f"command: {command if command is not None else 'UNSPECIFIED (direct API invocation)'}\n"
         f"sha256: {_sha(encoded)}\n"
     )
+    destination = target or ROOT / "kit" / "fixtures" / family
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "labels.jsonl").write_text(encoded, encoding="utf-8")
     (destination / "PROVENANCE.md").write_text(provenance, encoding="utf-8")
 
 
@@ -1134,11 +1447,14 @@ def _main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--input", action="append", type=Path, help="explicit JSONL inputs for bounded reproduction")
     parser.add_argument("--budget-seconds", type=_parse_budget_seconds, default=DEFAULT_BUDGET_SECONDS)
     parser.add_argument("--rank-output", type=Path, default=RANK_REPORT, help="report path for --rank")
+    parser.add_argument("--rerun-window-calls", type=int, help="explicit shaken-result rerun window K; unknown when omitted")
     args = parser.parse_args(argv)
     if not args.labels and not args.rank:
         parser.error("choose --labels FAMILY or --rank")
-    if args.labels not in (None, "result", "reread"):
-        parser.error("only the result and reread label emitters are implemented in N0a")
+    if args.labels is not None and args.labels not in EMITTED_FAMILIES:
+        parser.error("no organic emitter for " + args.labels)
+    if args.rerun_window_calls is not None and args.rerun_window_calls < 1:
+        parser.error("--rerun-window-calls must be positive")
     try:
         _ensure_nice()
     except (OSError, RuntimeError) as error:
@@ -1148,7 +1464,7 @@ def _main(argv: Optional[Sequence[str]] = None) -> int:
     if cutoff is None:
         parser.error("--as-of must be an RFC3339 timestamp")
     paths = args.input or _default_paths(Path.home(), cutoff)
-    metrics = Metrics(cutoff - timedelta(days=WINDOW_DAYS), cutoff)
+    metrics = Metrics(cutoff - timedelta(days=WINDOW_DAYS), cutoff, rerun_window_calls=args.rerun_window_calls)
 
     def observe(row: Mapping[str, object], path: str) -> None:
         metrics.process(row, path)
@@ -1175,16 +1491,22 @@ def _main(argv: Optional[Sequence[str]] = None) -> int:
     current = _family_metrics(metrics, point_rows)
     baseline = _baseline_metrics(point_rows)
     if args.labels:
-        label_rows = metrics.result_labels if args.labels == "result" else metrics.reread_events
+        label_rows = metrics.label_rows(args.labels)
         payload = {"family": args.labels, "as_of": args.as_of, "count": len(label_rows), "labels": label_rows,
                    "family_counts": current, "plan_counts": baseline}
+        if args.labels == "result":
+            payload["rerun_window_calls"] = metrics.rerun_window_calls
         print(json.dumps(payload, sort_keys=True) if args.json else f"{args.labels}: {len(label_rows)} label rows")
         if os.environ.get("UPDATE_GOLDENS") == "1":
-            _write_labels(metrics.result_labels, "result", args.as_of)
-            _write_labels(metrics.reread_events, "reread", args.as_of)
+            invocation = list(argv) if argv is not None else sys.argv[1:]
+            command = "UPDATE_GOLDENS=1 " + shlex.join([sys.executable, str(Path(__file__)), *invocation])
+            _write_labels(label_rows, args.labels, args.as_of, command=command)
     else:
         report = rank_report(current, baseline, args.as_of)
-        payload = {"verdict": "COMPLETE", "as_of": args.as_of, "families": current}
+        payload = {
+            "verdict": "COMPLETE", "as_of": args.as_of, "families": current,
+            "plan_counts": baseline, "reopen": rank_reopen_reasons(current, baseline),
+        }
         write_rank_report(report, args.rank_output)
         print(json.dumps(payload, sort_keys=True) if args.json else report)
     return 0

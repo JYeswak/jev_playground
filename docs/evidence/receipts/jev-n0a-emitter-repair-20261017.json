@@ -1,0 +1,572 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_330f51fa5a8e8dd6b0afd1cda5133ee14184642c8f4e859b9485e914e4ef0e86",
+ "limitations": [
+  "Scoped final source unit/public CLI/recorded rank smoke only; original full organic golden acceptance and independent closure still required. Source must publish before provenance generator permits banks."
+ ],
+ "operation": "jev-n0a.emitter-repair",
+ "parameters": {
+  "subject_sha256": "6c981403b247490501b9091cd6ea0f48d9648d29621a1596efe0d2bf7d9ec44a"
+ },
+ "producer": "DarkBear",
+ "result_ref": {
+  "details": {
+   "author": "DarkBear",
+   "bead": "jev-n0-fleet-decision-miner-sclo",
+   "credit": "Product miner implementation maintenance only; no classifier quality, new experiment, parent completion, model-serving or whole-mainCI credit.",
+   "mandatory_ubs": {
+    "command": "installed UBS5.4.17 --only=python --format=json with --module-dir actual installed modules, native executable fallback and owned RUFF_CACHE_DIR, network/shared writes denied",
+    "coverage_boundary": "Earlier invocations failed module lookup/uv network resolution or Ruff cache write. Those are NOT passes. Final statusok, failed_modules[], all selected native analyzers retained; no --no-uv/category skip or installed tool patch.",
+    "exit": 0,
+    "raw_report": {
+     "failed_modules": [],
+     "git": {
+      "blob_base": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d",
+      "commit": "53e5cb7f9f3187c68afad5e1ebe96908560e4a3d",
+      "repository": "https://github.com/JYeswak/jev_playground"
+     },
+     "project": "/Users/josh/Developer/jev",
+     "scanners": [
+      {
+       "critical": 0,
+       "extras": {
+        "profile": {
+         "cache_hit_rate": 0,
+         "cache_hits": 0,
+         "cache_misses": 2,
+         "files_after_prefilter": 2,
+         "files_considered": 2,
+         "prefilter_ms": 232
+        }
+       },
+       "files": 2,
+       "findings": [
+        {
+         "count": 3,
+         "description": "",
+         "rule": "py.code-quality.tech-debt",
+         "rule_id": "py.code-quality.tech-debt",
+         "samples": [
+          {
+           "code": "later_todo = copy.deepcopy(next(row for row in rows if row.get(\"id\") == \"m21\"))",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 232,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L232"
+          },
+          {
+           "code": "later_todo[\"timestamp\"] = origin[\"timestamp\"]",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 233,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L233"
+          },
+          {
+           "code": "origin, later_session, later_todo,",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 236,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L236"
+          }
+         ],
+         "severity": "info",
+         "title": "Technical debt markers — later_todo = copy.deepcopy(next(row for row in rows if row.get(\"id\") == \"m21\"))"
+        },
+        {
+         "count": 3,
+         "description": "",
+         "rule": "py.collections.index-arithmetic-info",
+         "rule_id": "py.collections.index-arithmetic-info",
+         "samples": [
+          {
+           "code": "\"occurrences\": sum(int(point_rows[point - 1].get(\"occurrences_14d\", 0)) for point in points if point <= len(point_rows)),",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 1208,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L1208"
+          },
+          {
+           "code": "\"labels\": sum(int(point_rows[point - 1].get(\"label_count\", 0)) for point in points if point <= len(point_rows)),",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 1209,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L1209"
+          },
+          {
+           "code": "int(point_rows[point - 1].get(\"label_count\", 0))",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 1213,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L1213"
+          }
+         ],
+         "severity": "info",
+         "title": "Index arithmetic present - review — \"occurrences\": sum(int(point_rows[point - 1].get(\"occurrences_14d\", 0)) for point in points if point <= len(point_rows)),"
+        },
+        {
+         "count": 48,
+         "description": "",
+         "rule": "py.control-flow.unreachable-code",
+         "rule_id": "py.control-flow.unreachable-code",
+         "samples": [
+          {
+           "code": "return None",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 95,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L95"
+          },
+          {
+           "code": "return None",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 99,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L99"
+          },
+          {
+           "code": "return content",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 121,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L121"
+          }
+         ],
+         "severity": "info",
+         "title": "Possible unreachable code after return — return None"
+        },
+        {
+         "count": 45,
+         "description": "",
+         "rule": "py.functions.nested-defs",
+         "rule_id": "py.functions.nested-defs",
+         "samples": [
+          {
+           "code": "def path(self) -> Optional[str]:",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 71,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L71"
+          },
+          {
+           "code": "def complete_counts(self) -> Mapping[str, int]:",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 84,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L84"
+          },
+          {
+           "code": "def _in_window(self, row: Mapping[str, object]) -> bool:",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 581,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L581"
+          }
+         ],
+         "severity": "info",
+         "title": "Nested functions - verify closures and lifetimes — def path(self) -> Optional[str]:"
+        },
+        {
+         "count": 1,
+         "description": "",
+         "rule": "py.io.open-no-encoding",
+         "rule_id": "py.io.open-no-encoding",
+         "samples": [
+          {
+           "code": "with open(path, \"rb\") as stream:",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 1306,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L1306"
+          }
+         ],
+         "severity": "info",
+         "title": "open() missing encoding — with open(path, \"rb\") as stream:"
+        },
+        {
+         "count": 3,
+         "description": "",
+         "rule": "py.parsing.json-loads-no-try",
+         "rule_id": "py.parsing.json-loads-no-try",
+         "samples": [
+          {
+           "code": "saved = json.loads((target / \"labels.jsonl\").read_text(encoding=\"utf-8\"))",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 342,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L342"
+          },
+          {
+           "code": "json.loads(line) for line in miner.PLAN_POINTS.read_text(encoding=\"utf-8\").splitlines()",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 519,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L519"
+          },
+          {
+           "code": "payload = json.loads(output.getvalue())",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+           "line": 548,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/test_miner.py#L548"
+          }
+         ],
+         "severity": "warning",
+         "title": "json.loads without error handling — saved = json.loads((target / \"labels.jsonl\").read_text(encoding=\"utf-8\"))"
+        },
+        {
+         "count": 22,
+         "description": "",
+         "rule": "py.parsing.string-concat-plus",
+         "rule_id": "py.parsing.string-concat-plus",
+         "samples": [
+          {
+           "code": "parsed = datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 97,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L97"
+          },
+          {
+           "code": "raise ValueError(\"candidate \" + name + \" is not counted\")",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 395,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L395"
+          },
+          {
+           "code": "raise ValueError(\"candidate \" + name + \" lacks a label source\")",
+           "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+           "line": 397,
+           "permalink": "https://github.com/JYeswak/jev_playground/blob/53e5cb7f9f3187c68afad5e1ebe96908560e4a3d/work/fleet-schema/miner.py#L397"
+          }
+         ],
+         "severity": "info",
+         "title": "String concatenation with + — parsed = datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))"
+        }
+       ],
+       "info": 122,
+       "language": "python",
+       "project": "/Users/josh/Developer/jev",
+       "report": {
+        "findings": [
+         {
+          "count": 3,
+          "description": "",
+          "rule": "py.code-quality.tech-debt",
+          "rule_id": "py.code-quality.tech-debt",
+          "samples": [
+           {
+            "code": "later_todo = copy.deepcopy(next(row for row in rows if row.get(\"id\") == \"m21\"))",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 232
+           },
+           {
+            "code": "later_todo[\"timestamp\"] = origin[\"timestamp\"]",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 233
+           },
+           {
+            "code": "origin, later_session, later_todo,",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 236
+           }
+          ],
+          "severity": "info",
+          "title": "Technical debt markers — later_todo = copy.deepcopy(next(row for row in rows if row.get(\"id\") == \"m21\"))"
+         },
+         {
+          "count": 3,
+          "description": "",
+          "rule": "py.collections.index-arithmetic-info",
+          "rule_id": "py.collections.index-arithmetic-info",
+          "samples": [
+           {
+            "code": "\"occurrences\": sum(int(point_rows[point - 1].get(\"occurrences_14d\", 0)) for point in points if point <= len(point_rows)),",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 1208
+           },
+           {
+            "code": "\"labels\": sum(int(point_rows[point - 1].get(\"label_count\", 0)) for point in points if point <= len(point_rows)),",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 1209
+           },
+           {
+            "code": "int(point_rows[point - 1].get(\"label_count\", 0))",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 1213
+           }
+          ],
+          "severity": "info",
+          "title": "Index arithmetic present - review — \"occurrences\": sum(int(point_rows[point - 1].get(\"occurrences_14d\", 0)) for point in points if point <= len(point_rows)),"
+         },
+         {
+          "count": 48,
+          "description": "",
+          "rule": "py.control-flow.unreachable-code",
+          "rule_id": "py.control-flow.unreachable-code",
+          "samples": [
+           {
+            "code": "return None",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 95
+           },
+           {
+            "code": "return None",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 99
+           },
+           {
+            "code": "return content",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 121
+           }
+          ],
+          "severity": "info",
+          "title": "Possible unreachable code after return — return None"
+         },
+         {
+          "count": 45,
+          "description": "",
+          "rule": "py.functions.nested-defs",
+          "rule_id": "py.functions.nested-defs",
+          "samples": [
+           {
+            "code": "def path(self) -> Optional[str]:",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 71
+           },
+           {
+            "code": "def complete_counts(self) -> Mapping[str, int]:",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 84
+           },
+           {
+            "code": "def _in_window(self, row: Mapping[str, object]) -> bool:",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 581
+           }
+          ],
+          "severity": "info",
+          "title": "Nested functions - verify closures and lifetimes — def path(self) -> Optional[str]:"
+         },
+         {
+          "count": 1,
+          "description": "",
+          "rule": "py.io.open-no-encoding",
+          "rule_id": "py.io.open-no-encoding",
+          "samples": [
+           {
+            "code": "with open(path, \"rb\") as stream:",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 1306
+           }
+          ],
+          "severity": "info",
+          "title": "open() missing encoding — with open(path, \"rb\") as stream:"
+         },
+         {
+          "count": 3,
+          "description": "",
+          "rule": "py.parsing.json-loads-no-try",
+          "rule_id": "py.parsing.json-loads-no-try",
+          "samples": [
+           {
+            "code": "saved = json.loads((target / \"labels.jsonl\").read_text(encoding=\"utf-8\"))",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 342
+           },
+           {
+            "code": "json.loads(line) for line in miner.PLAN_POINTS.read_text(encoding=\"utf-8\").splitlines()",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 519
+           },
+           {
+            "code": "payload = json.loads(output.getvalue())",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/test_miner.py",
+            "line": 548
+           }
+          ],
+          "severity": "warning",
+          "title": "json.loads without error handling — saved = json.loads((target / \"labels.jsonl\").read_text(encoding=\"utf-8\"))"
+         },
+         {
+          "count": 22,
+          "description": "",
+          "rule": "py.parsing.string-concat-plus",
+          "rule_id": "py.parsing.string-concat-plus",
+          "samples": [
+           {
+            "code": "parsed = datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 97
+           },
+           {
+            "code": "raise ValueError(\"candidate \" + name + \" is not counted\")",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 395
+           },
+           {
+            "code": "raise ValueError(\"candidate \" + name + \" lacks a label source\")",
+            "file": "/Users/josh/Developer/jev/work/fleet-schema/miner.py",
+            "line": 397
+           }
+          ],
+          "severity": "info",
+          "title": "String concatenation with + — parsed = datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))"
+         }
+        ],
+        "version": "unknown"
+       },
+       "status": "ok",
+       "timestamp": "2026-10-17T03:35:29Z",
+       "version": "unknown",
+       "warning": 3
+      }
+     ],
+     "status": "ok",
+     "timestamp": "2026-10-16 21:35:31",
+     "totals": {
+      "critical": 0,
+      "files": 2,
+      "info": 122,
+      "warning": 3
+     }
+    },
+    "stderr": "ℹ Preparing shadow workspace for 2 file(s) and 0 directory target(s)\nℹ Scanning shadow workspace at /Users/josh/Developer/jev/var/agent-tmp/backend41-review.25572/tmp.WjwqkimyZf/files_scan\nUBS Meta-Runner v5.4.17  2026-10-16 21:35:17\nProject: /Users/josh/Developer/jev\nFormat:  json\nDetected: python\nScanning python...\nFinished python (9s)\n",
+    "triage": [
+     {
+      "count": 3,
+      "human_severity": "none",
+      "reason": "Unit tests deliberately let invalid fixture/emitted JSON fail the test; catching or swallowing decode errors would weaken the required corruption guard.",
+      "rule": "py.parsing.json-loads-no-try",
+      "tool_severity": "warning",
+      "triage_verdict": "false-positive"
+     }
+    ]
+   },
+   "original_corpus_runs_before_final_source": {
+    "rank": {
+     "boundary": "Executed before final result-bank concatenation; ranking dependency unchanged, but not represented as whole final-source execution.",
+     "command": "nice -n 10 python3 work/fleet-schema/miner.py --rank --as-of 2026-10-04T00:48:27Z --json",
+     "exit": 0,
+     "output_artifact": "2161",
+     "seconds": "255.42"
+    },
+    "result": {
+     "artifact_rows": 1318,
+     "boundary": "Pre-repair implementation, not final-source or complete N0a acceptance.",
+     "command": "nice -n 10 python3 work/fleet-schema/miner.py --labels result --as-of 2026-10-04T00:48:27Z --json",
+     "exit": 0,
+     "output_artifact": "2142",
+     "seconds": "130.48"
+    }
+   },
+   "ownership_disclosure": "Parent exact reservation list initially omitted the existing sessions fixture before delegated edits. Corrected with grant144743/conflicts[] before saving; no claim of prior fixture custody or historical absence of conflicts. Source/test/task/RANK were reserved. No global/config/private-log writes.",
+   "public_fixture_smokes": [
+    {
+     "count": 3,
+     "exit": 0,
+     "family": "result",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 3, \"family\": \"result\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"artifact_sha256\": \"3ff89028d473468d35253fe88467dae1a638b3f512357fc37fde396b2f17eace\", \"call_index\": 1, \"event_sha256\": \"713f5683c4334ed0ba941e76f58d5cc0d7fcbbaf90303e7f05b251c802377e08\", \"label\": \"read_back\", \"session_id_sha256\": \"ad5bb005d46a75c2b9a8f44fb7325dc1576fd47697a0221dfd215cdb60006bba\"}, {\"artifact_sha256\": \"87c79adac2b7eb02f8fbc468c84898b09763e3a2e8b7bd549933af5fda09a232\", \"call_index\": 3, \"event_sha256\": \"da53804ff2b79df358e6f4d23307d3ad5d3cc984c3271d865846639c676d5e46\", \"label\": \"not_read_back\", \"session_id_sha256\": \"ad5bb005d46a75c2b9a8f44fb7325dc1576fd47697a0221dfd215cdb60006bba\"}, {\"call_index\": 1, \"calls_since_result\": 1, \"calls_until_repeat\": 1, \"command_sha256\": \"9225463b7f5aa57ba44a7384962ce353c54bfed0ee66a7b1bebfcad2114b95f7\", \"event_sha256\": \"058d7eac3e6d0dc1dd77b6c2b87bcc00ba9a6c11743789e3e77d81634fd33f5f\", \"family\": \"result\", \"label\": null, \"rerun_window_calls\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"shaken_same_command\", \"status\": \"NOT_COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}, \"rerun_window_calls\": null}\n"
+    },
+    {
+     "count": 0,
+     "exit": 0,
+     "family": "rank",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 0, \"family\": \"rank\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 3,
+     "exit": 0,
+     "family": "reread",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 3, \"family\": \"reread\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 3, \"calls_since_prior_read\": 1, \"fetch_tool\": \"read\", \"line_range\": \"1-10\", \"path_sha256\": \"dcb0b2230166b27e60ba1393d4021e6f67ff45b87fc8c3f72e71eeb3769b0531\", \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\"}, {\"call_index\": 4, \"calls_since_prior_read\": 0, \"fetch_tool\": \"read\", \"line_range\": \"11-20:raw\", \"path_sha256\": \"dcb0b2230166b27e60ba1393d4021e6f67ff45b87fc8c3f72e71eeb3769b0531\", \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\"}, {\"call_index\": 6, \"calls_since_prior_read\": 1, \"fetch_tool\": \"read\", \"line_range\": \"11-20:raw\", \"path_sha256\": \"dcb0b2230166b27e60ba1393d4021e6f67ff45b87fc8c3f72e71eeb3769b0531\", \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 5,
+     "exit": 0,
+     "family": "route",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 5, \"family\": \"route\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 5, \"event_sha256\": \"1d3cffe0adf9c911dce2bf7bd5d4fc1f4cd08e2ac9659cf78db4cf39964377d8\", \"family\": \"route\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"locate_find\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 5, \"event_sha256\": \"1d3cffe0adf9c911dce2bf7bd5d4fc1f4cd08e2ac9659cf78db4cf39964377d8\", \"family\": \"route\", \"label\": \"next_read\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"find_next_call\", \"status\": \"COUNTED\"}, {\"call_index\": null, \"event_sha256\": \"beef22e40f49fd9d6b6094effeeaaad94477e396cd56cb5979dbabc7296f4b14\", \"family\": \"route\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"prompt_human_or_other\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 3, \"event_sha256\": \"9c5ae5167b3abe0aee8d711920c4c33beb57aef2bb201e81a62572251d01522a\", \"family\": \"route\", \"label\": \"error\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"ask_result\", \"status\": \"COUNTED\"}, {\"call_index\": null, \"event_sha256\": \"1fd41f7c38e5781649ecfc73ce409c751f55e87606551d1d676d4ecea14d4ee1\", \"family\": \"route\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"prompt_human_or_other\", \"status\": \"NOT_COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 3,
+     "exit": 0,
+     "family": "nudge",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 3, \"family\": \"nudge\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 7, \"event_sha256\": \"2053723914de7256b59b5ae8e1708b4710d6a73947320f61490e3449b88b80ae\", \"family\": \"nudge\", \"label\": \"followed\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"todo_nudge\", \"status\": \"COUNTED\"}, {\"call_index\": null, \"event_sha256\": \"b2cdedd8c1cab5c7a02c25de9bd345ca6644c715d5d932a49ff6c1392ced0bc2\", \"family\": \"nudge\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"todo_nudge\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 1, \"event_sha256\": \"8824910e70bd39707023387f006a5e24f22885294dafe17547f2a39455cbb33c\", \"family\": \"nudge\", \"label\": \"reread_agents\", \"schema_version\": 1, \"session_id_sha256\": \"4250cfb0289ab35ab92da8edb41f04e19a6f5c63001b8a11676cc0cc7461dd74\", \"source_kind\": \"kit_guard\", \"status\": \"COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 3,
+     "exit": 0,
+     "family": "recover",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 3, \"family\": \"recover\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 8, \"event_sha256\": \"500f830b07cca88fd674dba29f5b576b0bad9a367fa62df406c1d0d9c9691105\", \"family\": \"recover\", \"label\": \"changed_command:ok\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"bash_error\", \"status\": \"COUNTED\"}, {\"call_index\": 4, \"event_sha256\": \"a05de17c0bbfc49d38af781e419d3584062877c17b63bb4f03ad603da5f8a992\", \"family\": \"recover\", \"label\": \"changed_command:err\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"bash_error\", \"status\": \"COUNTED\"}, {\"call_index\": 5, \"event_sha256\": \"f72058c3f920012ba0b599469717c70a69030284f8a5beea2efdb0cca5b2a3ce\", \"family\": \"recover\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"bash_error\", \"status\": \"NOT_COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 4,
+     "exit": 0,
+     "family": "land",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 4, \"family\": \"land\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 4, \"event_sha256\": \"de6cb5cb590d6652467f7a65ca3c5e52d97f0058477d6f386b71bfe70a7d8c16\", \"family\": \"land\", \"label\": \"error\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"git_commit_result\", \"status\": \"COUNTED\"}, {\"call_index\": 4, \"event_sha256\": \"de6cb5cb590d6652467f7a65ca3c5e52d97f0058477d6f386b71bfe70a7d8c16\", \"family\": \"land\", \"label\": \"hook_reject\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"git_commit_hook_reject\", \"status\": \"COUNTED\"}, {\"call_index\": 5, \"event_sha256\": \"d2c63828fac1910dcfa09f90421c592408f49c73b4189309ed626c308e6eac17\", \"family\": \"land\", \"label\": \"error\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"br_close_result\", \"status\": \"COUNTED\"}, {\"call_index\": 5, \"event_sha256\": \"d2c63828fac1910dcfa09f90421c592408f49c73b4189309ed626c308e6eac17\", \"family\": \"land\", \"label\": \"refused_or_error\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"br_close_refused\", \"status\": \"COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 2,
+     "exit": 0,
+     "family": "outcome",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 2, \"family\": \"outcome\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": null, \"event_sha256\": \"b1d893aadd7e2f59c2e962155cae36ddcac9daa5efd2e693d8ba2af509ab4001\", \"family\": \"outcome\", \"label\": \"correction\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"correction_after_final\", \"status\": \"COUNTED\"}, {\"call_index\": null, \"event_sha256\": \"5f832cd153bb9af559c5bbaf08af47ca05ed1b264bb5a444abc4e8b0aeeb6f12\", \"family\": \"outcome\", \"label\": \"no_correction_observed\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"correction_after_final\", \"status\": \"COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 1,
+     "exit": 0,
+     "family": "pin",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 1, \"family\": \"pin\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 10, \"event_sha256\": \"896e77cc8a53827121cacb566c527c04267033f52218e17e1b84b6ced5055c50\", \"family\": \"pin\", \"label\": \"reread_prior_file\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"compaction\", \"status\": \"COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    },
+    {
+     "count": 12,
+     "exit": 0,
+     "family": "delegate",
+     "stderr": "",
+     "stdout": "{\"as_of\": \"2026-10-04T00:48:27Z\", \"count\": 12, \"family\": \"delegate\", \"family_counts\": {\"delegate\": {\"labels\": 1, \"occurrences\": 9, \"positives\": 1}, \"effort\": {\"labels\": 0, \"occurrences\": 0}, \"gate\": {\"labels\": 0, \"occurrences\": 0}, \"land\": {\"labels\": 5, \"occurrences\": 2}, \"memory\": {\"labels\": 0, \"occurrences\": 0}, \"nudge\": {\"labels\": 1, \"occurrences\": 2}, \"outcome\": {\"labels\": 1, \"occurrences\": 2, \"positives\": 1}, \"pin\": {\"labels\": 1, \"occurrences\": 1, \"positives\": 1}, \"rank\": {\"labels\": 0, \"occurrences\": 0}, \"recover\": {\"labels\": 2, \"occurrences\": 3}, \"reread\": {\"labels\": 2, \"occurrences\": 4}, \"result\": {\"labels\": 2, \"occurrences\": 3}, \"review\": {\"labels\": 0, \"occurrences\": 0}, \"route\": {\"labels\": 2, \"occurrences\": 4}, \"screen\": {\"labels\": 0, \"occurrences\": 0}, \"watch\": {\"labels\": 0, \"occurrences\": 0}}, \"labels\": [{\"call_index\": 11, \"event_sha256\": \"5070f088d2078cc900d00eeb4faedf83c7a5731e1fe80c00424ef1d76de035d1\", \"family\": \"delegate\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"task_spawn\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 11, \"event_sha256\": \"5070f088d2078cc900d00eeb4faedf83c7a5731e1fe80c00424ef1d76de035d1\", \"family\": \"delegate\", \"label\": \"error\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"task_result\", \"status\": \"COUNTED\"}, {\"agent_sha256\": \"0ebb429fa86d481c2630fac53db1c91cffed5d4d41d1021c179444eb67e7ee0b\", \"call_index\": 11, \"event_sha256\": \"5070f088d2078cc900d00eeb4faedf83c7a5731e1fe80c00424ef1d76de035d1\", \"family\": \"delegate\", \"label\": \"error\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"task_agent\", \"status\": \"COUNTED\"}, {\"call_index\": 11, \"event_sha256\": \"5070f088d2078cc900d00eeb4faedf83c7a5731e1fe80c00424ef1d76de035d1\", \"family\": \"delegate\", \"label\": null, \"model_sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\", \"schema_version\": 1, \"session_id_sha256\": \"a631514fc4b2ec8cab4925aa400706934eaeaad11e94cc672dbce2d102c988b9\", \"source_kind\": \"task_model\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 6, \"event_sha256\": \"32e638e4ec20ffaa1404e3c28895d21e374b130dbece6c306e03f28b70e6a456\", \"family\": \"delegate\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_spawn\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 6, \"event_sha256\": \"32e638e4ec20ffaa1404e3c28895d21e374b130dbece6c306e03f28b70e6a456\", \"family\": \"delegate\", \"label\": \"ok\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_result\", \"status\": \"COUNTED\"}, {\"agent_sha256\": \"0ebb429fa86d481c2630fac53db1c91cffed5d4d41d1021c179444eb67e7ee0b\", \"call_index\": 6, \"event_sha256\": \"32e638e4ec20ffaa1404e3c28895d21e374b130dbece6c306e03f28b70e6a456\", \"family\": \"delegate\", \"label\": \"ok\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_agent\", \"status\": \"COUNTED\"}, {\"call_index\": 6, \"event_sha256\": \"32e638e4ec20ffaa1404e3c28895d21e374b130dbece6c306e03f28b70e6a456\", \"family\": \"delegate\", \"label\": null, \"model_sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_model\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 7, \"event_sha256\": \"23506ec05e98d9c66eec080a155ea42862bd884f95eb15d316c465e280e80d5e\", \"family\": \"delegate\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_spawn\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 7, \"event_sha256\": \"23506ec05e98d9c66eec080a155ea42862bd884f95eb15d316c465e280e80d5e\", \"family\": \"delegate\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_result\", \"status\": \"NOT_COUNTED\"}, {\"agent_sha256\": \"0ebb429fa86d481c2630fac53db1c91cffed5d4d41d1021c179444eb67e7ee0b\", \"call_index\": 7, \"event_sha256\": \"23506ec05e98d9c66eec080a155ea42862bd884f95eb15d316c465e280e80d5e\", \"family\": \"delegate\", \"label\": null, \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_agent\", \"status\": \"NOT_COUNTED\"}, {\"call_index\": 7, \"event_sha256\": \"23506ec05e98d9c66eec080a155ea42862bd884f95eb15d316c465e280e80d5e\", \"family\": \"delegate\", \"label\": null, \"model_sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\", \"schema_version\": 1, \"session_id_sha256\": \"706a30e737a0616483b07c1fa7f7e96575a85181ea02e2ade5181fa8b729d5d2\", \"source_kind\": \"task_model\", \"status\": \"NOT_COUNTED\"}], \"plan_counts\": {\"delegate\": {\"labels\": 39, \"occurrences\": 4362, \"positives\": 39}, \"effort\": {\"labels\": 0, \"occurrences\": 10756}, \"gate\": {\"labels\": 0, \"occurrences\": 74351}, \"land\": {\"labels\": 652, \"occurrences\": 6466}, \"memory\": {\"labels\": 0, \"occurrences\": 41025}, \"nudge\": {\"labels\": 1533, \"occurrences\": 22479}, \"outcome\": {\"labels\": 31, \"occurrences\": 7536, \"positives\": 31}, \"pin\": {\"labels\": 1385, \"occurrences\": 1577, \"positives\": 1385}, \"rank\": {\"labels\": 421, \"occurrences\": 41059}, \"recover\": {\"labels\": 6644, \"occurrences\": 11970}, \"reread\": {\"labels\": 20388, \"occurrences\": 36827}, \"result\": {\"labels\": 4329, \"occurrences\": 99680}, \"review\": {\"labels\": 0, \"occurrences\": 220}, \"route\": {\"labels\": 1292, \"occurrences\": 44086}, \"screen\": {\"labels\": 0, \"occurrences\": 19835}, \"watch\": {\"labels\": 0, \"occurrences\": 16124}}}\n"
+    }
+   ],
+   "recorded_rank_log": {
+    "boundary": "Observed shown-hit outcome proxy, not a fabricated transcript index or model quality label.",
+    "counted": 525,
+    "exit": 0,
+    "no_shown_hit_touched": 184,
+    "not_counted": 109,
+    "rows": 634,
+    "stdout_sha256": "27a71642b1b723e8c481bc930bc25a58507cf5e5fb85a8dd9d000ddea85646b8",
+    "touched_shown_hit": 341,
+    "unknown_origin_call_indices": 634
+   },
+   "red_evidence": [
+    "Pre-repair positive threshold test errors: missing rank_reopen_reasons.",
+    "Integrated source initially counted an unshown touched hash and discarded a recorded rank-positive outcome; new actual consumer regressions both failed before repair.",
+    "Shaken rerun existed internally but was absent from labels/golden bank boundary; regression failed before concatenation fix."
+   ],
+   "source": [
+    {
+     "path": "work/fleet-schema/miner.py",
+     "sha256": "a9772ada91e972660fbc003cbc7038862df913cda6555bdebb115203775c8673"
+    },
+    {
+     "path": "work/fleet-schema/test_miner.py",
+     "sha256": "8f377eb5d0c4ffc30cef0d1de43adfcaa032147d34f65053e34435b044540db4"
+    },
+    {
+     "path": "work/fleet-schema/fixtures/sessions.jsonl",
+     "sha256": "93404f91c97b3b0445d1a5e06505a3c1092a8700ec060fb0967fd51a9f89c137"
+    },
+    {
+     "path": "work/fleet-schema/task.json",
+     "sha256": "d2a454d0c0e343aa58838295e14c03a495bed6e0bcdfa909f0fe72cf046f7877"
+    },
+    {
+     "path": "work/fleet-schema/RANK.md",
+     "sha256": "be5532e63ca459221c014388b49d46573b13f919857d218fa8bf979179beb13e"
+    }
+   ],
+   "status": "IMPLEMENTATION_SAVED_FOR_ORGANIC_GOLDEN_ACCEPTANCE_NOT_DONE",
+   "unit": {
+    "command": "nice -n 10 uv run --no-project --no-config python3 -m unittest discover -s work/fleet-schema -p test_miner.py -v",
+    "exit": 0,
+    "stderr": "test_as_of_drops_every_later_tool_call (test_miner.MinerLabelsTest.test_as_of_drops_every_later_tool_call) ... ok\ntest_ca37_rows_reproduce_observed_label_counts (test_miner.MinerLabelsTest.test_ca37_rows_reproduce_observed_label_counts) ... ok\ntest_decision_log_scalar_counts_accumulate_as_integer_values (test_miner.MinerLabelsTest.test_decision_log_scalar_counts_accumulate_as_integer_values) ... ok\ntest_family_outcomes_remain_source_defined_proxies (test_miner.MinerLabelsTest.test_family_outcomes_remain_source_defined_proxies) ... ok\ntest_golden_writer_records_and_checks_hash_only_rows (test_miner.MinerLabelsTest.test_golden_writer_records_and_checks_hash_only_rows) ... ok\ntest_golden_writer_refuses_uncommitted_running_source_before_writing (test_miner.MinerLabelsTest.test_golden_writer_refuses_uncommitted_running_source_before_writing) ... ok\ntest_label_emitters_exclude_events_before_the_fourteen_day_window (test_miner.MinerLabelsTest.test_label_emitters_exclude_events_before_the_fourteen_day_window) ... ok\ntest_missing_golden_provenance_fails_closed (test_miner.MinerLabelsTest.test_missing_golden_provenance_fails_closed) ... ok\ntest_missing_joined_outcome_is_emitted_not_counted_despite_positive_hint (test_miner.MinerLabelsTest.test_missing_joined_outcome_is_emitted_not_counted_despite_positive_hint) ... ok\ntest_nudge_followup_in_another_session_does_not_label_origin (test_miner.MinerLabelsTest.test_nudge_followup_in_another_session_does_not_label_origin) ... ok\ntest_organic_family_rows_use_closed_private_proxy_envelope (test_miner.MinerLabelsTest.test_organic_family_rows_use_closed_private_proxy_envelope) ... ok\ntest_provenance_refuses_running_source_and_input_invocation_mismatch (test_miner.MinerLabelsTest.test_provenance_refuses_running_source_and_input_invocation_mismatch) ... ok\ntest_rank_ignores_unshown_hits_and_requires_complete_negative_window (test_miner.MinerLabelsTest.test_rank_ignores_unshown_hits_and_requires_complete_negative_window) ... ok\ntest_rank_labels_count_touched_hit_rows_not_hit_entries (test_miner.MinerLabelsTest.test_rank_labels_count_touched_hit_rows_not_hit_entries) ... ok\ntest_reread_emits_raw_refetch_metadata_without_harm_or_label (test_miner.MinerLabelsTest.test_reread_emits_raw_refetch_metadata_without_harm_or_label) ... ok\ntest_result_readback_join_is_scoped_to_session_and_hash_only (test_miner.MinerLabelsTest.test_result_readback_join_is_scoped_to_session_and_hash_only) ... ok\ntest_reused_tool_call_ids_never_join_across_sessions (test_miner.MinerLabelsTest.test_reused_tool_call_ids_never_join_across_sessions) ... ok\ntest_same_command_rerun_exposes_distance_without_inventing_k (test_miner.MinerLabelsTest.test_same_command_rerun_exposes_distance_without_inventing_k) ... ok\ntest_sed_in_place_write_invalidates_repeat_read_candidate (test_miner.MinerLabelsTest.test_sed_in_place_write_invalidates_repeat_read_candidate) ... ok\ntest_budget_above_cap_is_rejected_by_scanner_and_cli (test_miner.MinerSafetyTest.test_budget_above_cap_is_rejected_by_scanner_and_cli) ... usage: python3 -m unittest [-h]\n                           [--labels {result,rank,reread,route,nudge,recover,land,outcome,pin,delegate,review,memory,gate,screen,watch,effort}]\n                           [--rank] --as-of AS_OF [--json] [--input INPUT]\n                           [--budget-seconds BUDGET_SECONDS]\n                           [--rank-output RANK_OUTPUT]\n                           [--rerun-window-calls RERUN_WINDOW_CALLS]\npython3 -m unittest: error: argument --budget-seconds: budget must be a number in (0, 3000]\nok\ntest_budget_overrun_is_partial_and_names_unread_files (test_miner.MinerSafetyTest.test_budget_overrun_is_partial_and_names_unread_files) ... ok\ntest_empty_scan_set_fails_closed (test_miner.MinerSafetyTest.test_empty_scan_set_fails_closed) ... ok\ntest_invalid_json_never_yields_complete_counts (test_miner.MinerSafetyTest.test_invalid_json_never_yields_complete_counts) ... ok\ntest_load_above_80_defers_without_reading (test_miner.MinerSafetyTest.test_load_above_80_defers_without_reading) ... ok\ntest_load_crossing_limit_mid_file_stops_with_partial_verdict (test_miner.MinerSafetyTest.test_load_crossing_limit_mid_file_stops_with_partial_verdict) ... ok\ntest_rank_does_not_substitute_total_labels_for_positives (test_miner.MinerSafetyTest.test_rank_does_not_substitute_total_labels_for_positives) ... ok\ntest_rank_json_reopens_at_positive_thirty_with_constant_total_labels (test_miner.MinerSafetyTest.test_rank_json_reopens_at_positive_thirty_with_constant_total_labels) ... ok\ntest_rank_reopens_at_thirty_positive_labels (test_miner.MinerSafetyTest.test_rank_reopens_at_thirty_positive_labels) ... ok\ntest_unreadable_file_makes_scan_partial (test_miner.MinerSafetyTest.test_unreadable_file_makes_scan_partial) ... ok\n\n----------------------------------------------------------------------\nRan 29 tests in 0.102s\n\nOK\n",
+    "stdout": ""
+   },
+   "unknowns": [
+    "Original numeric K not supplied in original task/plan; default staysnull/NOT_COUNTED; explicit --rerun-window-calls supported, not an invented scientific cut.",
+    "Organic result/reread/other family golden banks plus non-author generation review remain required by originalAC6; full original N0a NOT_DONE and not in_review yet.",
+    "Final-source full default-corpus result and rank acceptance remain to run after saved source identity is published."
+   ]
+  }
+ }
+}
